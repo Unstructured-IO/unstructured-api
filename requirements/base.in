@@ -1,0 +1,4 @@
+unstructured>=0.2.4
+unstructured-api-tools>=0.4.4
+
+ratelimit
