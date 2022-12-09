@@ -62,7 +62,7 @@ ipykernel==6.15.3
     #   jupyter-console
     #   notebook
     #   qtconsole
-ipython==8.6.0
+ipython==8.7.0
     # via
     #   -r dev.in
     #   execnb
@@ -166,7 +166,7 @@ pexpect==4.8.0
     # via ipython
 pickleshare==0.7.5
     # via ipython
-pip-tools==6.10.0
+pip-tools==6.11.0
     # via -r dev.in
 platformdirs==2.5.2
     # via black
