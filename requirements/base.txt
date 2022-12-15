@@ -8,12 +8,18 @@ anyio==3.6.1
     # via
     #   starlette
     #   watchfiles
+argilla==1.1.1
+    # via unstructured
 attrs==22.1.0
     # via jsonschema
+backoff==2.2.1
+    # via argilla
 beautifulsoup4==4.11.1
     # via nbconvert
 bleach==5.0.1
     # via nbconvert
+certifi==2022.12.7
+    # via httpx
 click==8.1.3
     # via
     #   nltk
@@ -21,22 +27,28 @@ click==8.1.3
     #   uvicorn
 defusedxml==0.7.1
     # via nbconvert
+deprecated==1.2.13
+    # via argilla
 entrypoints==0.4
     # via jupyter-client
 fastapi==0.85.0
     # via unstructured-api-tools
 fastjsonschema==2.16.2
     # via nbformat
-h11==0.13.0
-    # via uvicorn
+h11==0.9.0
+    # via
+    #   httpcore
+    #   uvicorn
+httpcore==0.11.1
+    # via httpx
 httptools==0.5.0
     # via uvicorn
+httpx==0.15.5
+    # via argilla
 idna==3.4
-    # via anyio
-importlib-metadata==5.0.0
-    # via nbconvert
-importlib-resources==5.10.0
-    # via jsonschema
+    # via
+    #   anyio
+    #   rfc3986
 jinja2==3.1.2
     # via
     #   nbconvert
@@ -66,6 +78,8 @@ markupsafe==2.1.1
     #   nbconvert
 mistune==2.0.4
     # via nbconvert
+monotonic==1.6
+    # via argilla
 mypy==0.991
     # via unstructured-api-tools
 mypy-extensions==0.4.3
@@ -84,14 +98,22 @@ nest-asyncio==1.5.5
     #   nbclient
 nltk==3.7
     # via unstructured
+numpy==1.23.5
+    # via
+    #   argilla
+    #   pandas
 packaging==21.3
-    # via nbconvert
+    # via
+    #   argilla
+    #   nbconvert
+pandas==1.5.2
+    # via argilla
 pandocfilters==1.5.0
     # via nbconvert
-pkgutil-resolve-name==1.3.10
-    # via jsonschema
 pydantic==1.10.2
-    # via fastapi
+    # via
+    #   argilla
+    #   fastapi
 pygments==2.13.0
     # via nbconvert
 pyparsing==3.0.9
@@ -99,19 +121,25 @@ pyparsing==3.0.9
 pyrsistent==0.18.1
     # via jsonschema
 python-dateutil==2.8.2
-    # via jupyter-client
+    # via
+    #   jupyter-client
+    #   pandas
 python-dotenv==0.21.0
     # via uvicorn
 python-multipart==0.0.5
     # via unstructured-api-tools
+pytz==2022.6
+    # via pandas
 pyyaml==6.0
     # via uvicorn
 pyzmq==24.0.1
     # via jupyter-client
 ratelimit==2.2.1
-    # via -r requirements/base.in
+    # via -r base.in
 regex==2022.10.31
     # via nltk
+rfc3986[idna2008]==1.5.0
+    # via httpx
 six==1.16.0
     # via
     #   bleach
@@ -121,19 +149,22 @@ six==1.16.0
 slowapi==0.1.6
     # via unstructured-api-tools
 sniffio==1.3.0
-    # via anyio
+    # via
+    #   anyio
+    #   httpcore
+    #   httpx
 soupsieve==2.3.2.post1
     # via beautifulsoup4
 starlette==0.20.4
     # via fastapi
 tinycss2==1.1.1
     # via nbconvert
-tomli==2.0.1
-    # via mypy
 tornado==6.2
     # via jupyter-client
 tqdm==4.64.1
-    # via nltk
+    # via
+    #   argilla
+    #   nltk
 traitlets==5.4.0
     # via
     #   jupyter-client
@@ -151,11 +182,10 @@ typing-extensions==4.3.0
     # via
     #   mypy
     #   pydantic
-    #   starlette
-unstructured==0.2.5
-    # via -r requirements/base.in
+unstructured==0.3.1
+    # via -r base.in
 unstructured-api-tools==0.4.6
-    # via -r requirements/base.in
+    # via -r base.in
 uvicorn[standard]==0.18.3
     # via unstructured-api-tools
 uvloop==0.17.0
@@ -168,7 +198,7 @@ webencodings==0.5.1
     #   tinycss2
 websockets==10.3
     # via uvicorn
-zipp==3.10.0
+wrapt==1.13.3
     # via
-    #   importlib-metadata
-    #   importlib-resources
+    #   argilla
+    #   deprecated
