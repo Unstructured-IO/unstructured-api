@@ -90,19 +90,18 @@ jobs:
     - if: steps.changes.outputs.src == 'true' && github.ref != 'refs/heads/main'
       uses: dangoslen/changelog-enforcer@v3
 
-#Enable later
-  # api_consistency:
-  #   runs-on: ubuntu-latest
-  #   needs: setup
-  #   steps:
-  #   - uses: actions/checkout@v3
-  #   - uses: actions/cache@v3
-  #     id: virtualenv-cache
-  #     with:
-  #       path: |
-  #         .venv
-  #       key: ci-venv-${{ env.PIPELINE_FAMILY }}-${{ hashFiles('requirements/*.txt') }}
-  #   - name: API Consistency
-  #     run: |
-  #       source .venv/bin/activate
-  #       make api-check
+  api_consistency:
+    runs-on: ubuntu-latest
+    needs: setup
+    steps:
+    - uses: actions/checkout@v3
+    - uses: actions/cache@v3
+      id: virtualenv-cache
+      with:
+        path: |
+          .venv
+        key: ci-venv-${{ env.PIPELINE_FAMILY }}-${{ hashFiles('requirements/*.txt') }}
+    - name: API Consistency
+      run: |
+        source .venv/bin/activate
+        make api-check
