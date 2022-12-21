@@ -182,7 +182,7 @@ typing-extensions==4.3.0
     # via
     #   mypy
     #   pydantic
-unstructured==0.3.1
+unstructured==0.3.2
     # via -r base.in
 unstructured-api-tools==0.4.6
     # via -r base.in
