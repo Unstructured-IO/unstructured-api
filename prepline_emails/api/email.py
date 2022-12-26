@@ -21,6 +21,7 @@ router = APIRouter()
 RATE_LIMIT = os.environ.get("PIPELINE_API_RATE_LIMIT", "1/second")
 
 
+# pipeline-api
 def pipeline_api(text):
     pass
 
