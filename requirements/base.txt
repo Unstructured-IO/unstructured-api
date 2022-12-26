@@ -19,7 +19,9 @@ beautifulsoup4==4.11.1
 bleach==5.0.1
     # via nbconvert
 certifi==2022.12.7
-    # via httpx
+    # via
+    #   httpx
+    #   unstructured
 click==8.1.3
     # via
     #   nltk
@@ -182,7 +184,7 @@ typing-extensions==4.3.0
     # via
     #   mypy
     #   pydantic
-unstructured==0.3.2
+unstructured==0.3.4
     # via -r base.in
 unstructured-api-tools==0.4.6
     # via -r base.in
