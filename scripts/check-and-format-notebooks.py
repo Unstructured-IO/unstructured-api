@@ -26,9 +26,8 @@ def nb_paths(root_path: Union[str, Path]) -> List[Path]:
     return [
         fn
         for dir in root_path.iterdir()
-        # NOTE(alan): Search only in paths with 'notebooks' in the title such as pipeline-notebooks
-        # and exploration-notebooks
-        if "notebooks" in dir.stem and dir.is_dir()
+        # NOTE(robinson): Only check format for pipeline notebooks
+        if dir.stem == "pipeline-notebooks" and dir.is_dir()
         for fn in dir.iterdir()
         if fn.suffix == ".ipynb"
     ]
