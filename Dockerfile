@@ -7,7 +7,7 @@ FROM centos:centos7.9.2009
 ARG NB_USER=notebook-user
 ARG NB_UID=1000
 ARG PIP_VERSION
-ARG PIPELINE_FAMILY
+ARG PIPELINE_PACKAGE
 
 RUN yum -y update && \
   yum -y install gcc openssl-devel bzip2-devel libffi-devel make git sqlite-devel && \
@@ -29,7 +29,7 @@ ENV PATH="/home/${NB_USER}/.local/bin:${PATH}"
 
 COPY requirements/dev.txt requirements-dev.txt
 COPY requirements/base.txt requirements-base.txt
-COPY prepline_${PIPELINE_FAMILY}/ prepline_${PIPELINE_FAMILY}/
+COPY prepline_${PIPELINE_PACKAGE}/ prepline_${PIPELINE_PACKAGE}/
 COPY exploration-notebooks exploration-notebooks
 COPY pipeline-notebooks pipeline-notebooks
 

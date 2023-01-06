@@ -68,7 +68,7 @@ generate-api:
 
 .PHONY: docker-build
 docker-build:
-	PIP_VERSION=${PIP_VERSION} PIPELINE_FAMILY=${PIPELINE_FAMILY} ./scripts/docker-build.sh
+	PIP_VERSION=${PIP_VERSION} PIPELINE_FAMILY=${PIPELINE_FAMILY} PIPELINE_PACKAGE=${PIPELINE_PACKAGE} ./scripts/docker-build.sh
 
 .PHONY: docker-start-api
 docker-start-api:
