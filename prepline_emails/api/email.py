@@ -5,12 +5,18 @@
 
 import os
 from typing import List, Union
-
 from fastapi import status, FastAPI, File, Form, Request, UploadFile, APIRouter
 from slowapi.errors import RateLimitExceeded
 from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.util import get_remote_address
 from fastapi.responses import PlainTextResponse
+import json
+from fastapi.responses import StreamingResponse
+from starlette.types import Send
+from base64 import b64encode
+from typing import Optional, Mapping, Iterator, Tuple
+import secrets
+
 
 limiter = Limiter(key_func=get_remote_address)
 app = FastAPI()
@@ -24,14 +30,6 @@ RATE_LIMIT = os.environ.get("PIPELINE_API_RATE_LIMIT", "1/second")
 # pipeline-api
 def pipeline_api(text):
     pass
-
-
-import json
-from fastapi.responses import StreamingResponse
-from starlette.types import Send
-from base64 import b64encode
-from typing import Optional, Mapping, Iterator, Tuple
-import secrets
 
 
 class MultipartMixedResponse(StreamingResponse):
