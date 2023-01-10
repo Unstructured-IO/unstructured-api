@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:experimental
 
-FROM centos:centos7.9.2009
+from centos:centos7.9.2009
 
 # NOTE(crag): NB_USER ARG for mybinder.org compat:
 #             https://mybinder.readthedocs.io/en/latest/tutorials/dockerfile.html
