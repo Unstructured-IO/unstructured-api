@@ -80,6 +80,7 @@ lxml==4.9.1
     # via
     #   nbconvert
     #   python-docx
+    #   python-pptx
     #   unstructured
 markupsafe==2.1.1
     # via
@@ -124,7 +125,9 @@ pandas==1.5.2
 pandocfilters==1.5.0
     # via nbconvert
 pillow==9.4.0
-    # via unstructured
+    # via
+    #   python-pptx
+    #   unstructured
 pydantic==1.10.2
     # via
     #   argilla
@@ -143,8 +146,12 @@ python-docx==0.8.11
     # via unstructured
 python-dotenv==0.21.0
     # via uvicorn
+python-magic==0.4.27
+    # via unstructured
 python-multipart==0.0.5
     # via unstructured-api-tools
+python-pptx==0.6.21
+    # via unstructured
 pytz==2022.6
     # via pandas
 pyyaml==6.0
@@ -201,7 +208,7 @@ typing-extensions==4.3.0
     # via
     #   mypy
     #   pydantic
-unstructured==0.3.5
+unstructured==0.4.1
     # via -r base.in
 unstructured-api-tools==0.4.7
     # via -r base.in
@@ -223,3 +230,5 @@ wrapt==1.13.3
     # via
     #   argilla
     #   deprecated
+xlsxwriter==3.0.7
+    # via python-pptx
