@@ -37,11 +37,11 @@ Give a description of making API calls using example `curl` commands, and exampl
 For example:
 ```
 curl -X 'POST' \
-  'http://localhost:8000/emails/v0.0.1/email' \
+  'http://localhost:8000/emails/v0.0.2/email' \
   -H 'accept: application/json' \
   -H 'Content-Type: multipart/form-data' \
-  -F 'files=@example.pdf' \
-  -F 'some_parameter=something'  | jq -C . | less -R
+  -F 'files=@fake-email.eml' \
+  -F 'include_headers=False'  | jq -C . | less -R
 ```
 
 It's also nice to show how to call the API function using pure Python.
