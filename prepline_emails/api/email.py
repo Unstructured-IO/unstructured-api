@@ -17,7 +17,6 @@ from base64 import b64encode
 from typing import Optional, Mapping, Iterator, Tuple
 import secrets
 import email
-import signal
 from unstructured.partition.email import partition_email, extract_attachment_info
 from unstructured.staging.base import convert_to_isd
 
@@ -40,28 +39,6 @@ def is_expected_response_type(media_type, response_type):
         return False
 
 
-class timeout:
-    def __init__(self, seconds=1, error_message="Timeout"):
-        self.seconds = seconds
-        self.error_message = error_message
-
-    def handle_timeout(self, signum, frame):
-        raise TimeoutError(self.error_message)
-
-    def __enter__(self):
-        try:
-            signal.signal(signal.SIGALRM, self.handle_timeout)
-            signal.alarm(self.seconds)
-        except ValueError:
-            pass
-
-    def __exit__(self, type, value, traceback):
-        try:
-            signal.alarm(0)
-        except ValueError:
-            pass
-
-
 def pipeline_api(
     file,
     response_type="application/json",
@@ -70,12 +47,13 @@ def pipeline_api(
     m_output_dir=[],
 ):
 
-    elements = partition_email(filename=file, include_headers=m_include_headers)
-
     if m_extract_attachment:
-        with open(file) as f:
-            msg = email.message_from_file(f)
+        msg = email.message_from_file(file)
         attachment = extract_attachment_info(msg, output_dir=m_output_dir)
+
+    file.seek(0)
+    elements = partition_email(file=file, include_headers=m_include_headers)
+
     return elements, attachment
 
 
