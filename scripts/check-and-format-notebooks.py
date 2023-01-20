@@ -2,7 +2,10 @@
 
 import argparse
 from copy import deepcopy
+import difflib
+import json
 from pathlib import Path
+import sys
 from typing import List, Tuple, Union
 
 from nbdev import clean
@@ -26,8 +29,9 @@ def nb_paths(root_path: Union[str, Path]) -> List[Path]:
     return [
         fn
         for dir in root_path.iterdir()
-        # NOTE(robinson): Only check format for pipeline notebooks
-        if dir.stem == "pipeline-notebooks" and dir.is_dir()
+        # NOTE(alan): Search only in paths with 'notebooks' in the title such as pipeline-notebooks
+        # and exploration-notebooks
+        if "notebooks" in dir.stem and dir.is_dir()
         for fn in dir.iterdir()
         if fn.suffix == ".ipynb"
     ]
@@ -93,14 +97,23 @@ if __name__ == "__main__":
         clean.clean_nb(modified_nb, allowed_cell_metadata_keys=["tags"])
         if nb != modified_nb:
             nonmatching_nbs.append(str(fn))
+            nb_json = json.dumps(nb.dict(), indent=2, sort_keys=True)
+            modified_nb_json = json.dumps(modified_nb.dict(), indent=2, sort_keys=True)
+            sys.stderr.write(f"The following diff shows the modifications made to {fn}\n")
+            sys.stderr.writelines(
+                (
+                    difflib.unified_diff(
+                        nb_json.splitlines(keepends=True),
+                        modified_nb_json.splitlines(keepends=True),
+                    )
+                )
+            )
         if not check:
             nbformat.write(modified_nb, fn)
 
     summary_str, details_str = to_results_str(fns, nonmatching_nbs)
     print(summary_str)
     if check:
-        import sys
-
         sys.stderr.write(details_str)
         if nonmatching_nbs:
             sys.exit(1)
