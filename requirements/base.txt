@@ -163,7 +163,9 @@ ratelimit==2.2.1
 regex==2022.10.31
     # via nltk
 requests==2.28.2
-    # via -r base.in
+    # via
+    #   -r base.in
+    #   unstructured
 rfc3986[idna2008]==1.5.0
     # via httpx
 six==1.16.0
@@ -208,7 +210,7 @@ typing-extensions==4.3.0
     # via
     #   mypy
     #   pydantic
-unstructured==0.4.1
+unstructured==0.4.3
     # via -r base.in
 unstructured-api-tools==0.4.9
     # via -r base.in
