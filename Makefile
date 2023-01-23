@@ -36,10 +36,10 @@ install-dev:
 .PHONY: install-ci
 install-ci: install-base install-test
 
-.PHONE: install-nltk
+.PHONY: install-nltk
 install-nltk:
-	python -c "import nltk; nltk.download('punkt')"
-
+	pip install nltk
+	
 ## pip-compile:                 compiles all base/dev/test requirements
 .PHONY: pip-compile
 pip-compile:
