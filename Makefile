@@ -36,6 +36,9 @@ install-dev:
 .PHONY: install-ci
 install-ci: install-base install-test
 
+.PHONY: install-unstructured
+install-unstructured: python -c "import unstructured"
+
 .PHONE: install-nltk-models
 install-nltk-models:
 	python -c "import nltk; nltk.download('punkt')"
