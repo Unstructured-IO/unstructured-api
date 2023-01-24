@@ -16,6 +16,9 @@ from starlette.types import Send
 from base64 import b64encode
 from typing import Optional, Mapping, Iterator, Tuple
 import secrets
+import email
+from unstructured.partition.email import partition_email, extract_attachment_info
+from unstructured.staging.base import convert_to_isd
 
 
 limiter = Limiter(key_func=get_remote_address)
@@ -27,9 +30,32 @@ router = APIRouter()
 RATE_LIMIT = os.environ.get("PIPELINE_API_RATE_LIMIT", "1/second")
 
 
+def is_expected_response_type(media_type, response_type):
+    if media_type == "application/json" and response_type not in [dict, list]:
+        return True
+    elif media_type == "text/csv" and response_type != str:
+        return True
+    else:
+        return False
+
+
 # pipeline-api
-def pipeline_api(text):
-    pass
+def pipeline_api(
+    file,
+    response_type="application/json",
+    m_include_headers=[],
+    m_extract_attachment=[],
+    m_output_dir=[],
+):
+
+    if m_extract_attachment:
+        msg = email.message_from_file(file)
+        attachment = extract_attachment_info(msg, output_dir=m_output_dir)
+
+    file.seek(0)
+    elements = partition_email(file=file, include_headers=m_include_headers)
+
+    return elements, attachment
 
 
 class MultipartMixedResponse(StreamingResponse):
@@ -90,16 +116,26 @@ class MultipartMixedResponse(StreamingResponse):
         await send({"type": "http.response.body", "body": b"", "more_body": False})
 
 
-@router.post("/emails/v0.0.1/email")
+@router.post("/emails/v0.0.2/email")
 @limiter.limit(RATE_LIMIT)
 async def pipeline_1(
     request: Request,
-    text_files: Union[List[UploadFile], None] = File(default=None),
+    files: Union[List[UploadFile], None] = File(default=None),
+    output_format: Union[str, None] = Form(default=None),
+    include_headers: List[str] = Form(default=[]),
+    extract_attachment: List[str] = Form(default=[]),
+    output_dir: List[str] = Form(default=[]),
 ):
     content_type = request.headers.get("Accept")
 
-    if isinstance(text_files, list) and len(text_files):
-        if len(text_files) > 1:
+    default_response_type = output_format or "application/json"
+    if not content_type or content_type == "*/*" or content_type == "multipart/mixed":
+        media_type = default_response_type
+    else:
+        media_type = content_type
+
+    if isinstance(files, list) and len(files):
+        if len(files) > 1:
             if content_type and content_type not in [
                 "*/*",
                 "multipart/mixed",
@@ -114,12 +150,16 @@ async def pipeline_1(
                 )
 
             def response_generator(is_multipart):
-                for file in text_files:
+                for file in files:
 
-                    text = file.file.read().decode("utf-8")
+                    _file = file.file
 
                     response = pipeline_api(
-                        text,
+                        _file,
+                        m_include_headers=include_headers,
+                        m_extract_attachment=extract_attachment,
+                        m_output_dir=output_dir,
+                        response_type=media_type,
                     )
                     if is_multipart:
                         if type(response) not in [str, bytes]:
@@ -128,24 +168,43 @@ async def pipeline_1(
 
             if content_type == "multipart/mixed":
                 return MultipartMixedResponse(
-                    response_generator(is_multipart=True),
+                    response_generator(is_multipart=True), content_type=media_type
                 )
             else:
                 return response_generator(is_multipart=False)
         else:
 
-            text_file = text_files[0]
-            text = text_file.file.read().decode("utf-8")
+            file = files[0]
+            _file = file.file
 
             response = pipeline_api(
-                text,
+                _file,
+                m_include_headers=include_headers,
+                m_extract_attachment=extract_attachment,
+                m_output_dir=output_dir,
+                response_type=media_type,
             )
 
-            return response
+            if is_expected_response_type(media_type, type(response)):
+                return PlainTextResponse(
+                    content=(
+                        f"Conflict in media type {media_type}"
+                        f" with response type {type(response)}.\n"
+                    ),
+                    status_code=status.HTTP_406_NOT_ACCEPTABLE,
+                )
+            valid_response_types = ["application/json", "text/csv", "*/*"]
+            if media_type in valid_response_types:
+                return response
+            else:
+                return PlainTextResponse(
+                    content=f"Unsupported media type {media_type}.\n",
+                    status_code=status.HTTP_406_NOT_ACCEPTABLE,
+                )
 
     else:
         return PlainTextResponse(
-            content='Request parameter "text_files" is required.\n',
+            content='Request parameter "files" is required.\n',
             status_code=status.HTTP_400_BAD_REQUEST,
         )
 

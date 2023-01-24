@@ -3,26 +3,14 @@
 </h3>
 
 <h3 align="center">
-  <p>Pre-Processing Pipeline for Nothing in Particular</p>
+  <p>Pre-Processing Pipeline for Emails</p>
 </h3>
 
 
-The description for the pipeline repository goes here.
+This repo implements a pre-processing pipeline for emails (`.eml` files). Currently, the pipeline is capable of extracting the header, body, images, and attachments from emails.
+
 The API is hosted at `https://api.unstructured.io`.
 
-### TODO list after generating repo from cookiecutter template:
-
-- [ ] `git init`
-- [ ] Update the pipeline name and description in `README.md` (this file)
-- [ ] In a fresh Python environment, run `pip install pip-tools`
-- [ ] Add any additional requirements you need to `requirements/base.in` and run `make pip-compile`
-- [ ] Run `make install`
-- [ ] Create a preprocessing pipeline notebook in pipeline-notebooks relevant to your project. A barebones sample notebook `pipeline-notebooks/pipeline-hello-world.ipynb` is provided for reference
-- [ ] Generate the API with `make generate-api`
-- [ ] Update `README.md` (this file) with examples of using the API and python code.
-- [ ] Add tests in `test_emails`
-- [ ] Delete this checklist and commit changes
-- [ ] If needed, install additional dependencies in the `Dockerfile`. Note that the Dockerfile is provided for convenience and is not a hard requirement for local development. If that convenience provides little value to your audience, removal of the Dockerfile is another option.
 
 ## Developer Quick Start
 
@@ -48,12 +36,12 @@ Give a description of making API calls using example `curl` commands, and exampl
 
 For example:
 ```
-curl -X 'POST' \
-  'http://localhost:8000/emails/v0.0.1/hello-world' \
+ curl -X 'POST' \
+  'http://localhost:8000/emails/v0.0.2/email' \
   -H 'accept: application/json' \
   -H 'Content-Type: multipart/form-data' \
-  -F 'files=@example.pdf' \
-  -F 'some_parameter=something'  | jq -C . | less -R
+  -F 'files=@family_day.eml' \
+  | jq -C . | less -R
 ```
 
 It's also nice to show how to call the API function using pure Python.
