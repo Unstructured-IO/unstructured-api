@@ -37,7 +37,7 @@ install-dev:
 install-ci: install-base install-test
 
 .PHONY: install-unstructured
-install-unstructured: python -c "import unstructured"
+install-unstructured: pip install unstructured
 
 .PHONE: install-nltk-models
 install-nltk-models:
