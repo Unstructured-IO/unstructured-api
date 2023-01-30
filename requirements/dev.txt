@@ -51,7 +51,7 @@ fastcore==1.5.27
     #   nbdev
 fastjsonschema==2.16.2
     # via nbformat
-flake8==5.0.4
+flake8==6.0.0
     # via -r dev.in
 ghapi==1.0.3
     # via nbdev
@@ -184,11 +184,11 @@ ptyprocess==0.7.0
     #   terminado
 pure-eval==0.2.2
     # via stack-data
-pycodestyle==2.9.1
+pycodestyle==2.10.0
     # via flake8
 pycparser==2.21
     # via cffi
-pyflakes==2.5.0
+pyflakes==3.0.1
     # via flake8
 pygments==2.13.0
     # via
