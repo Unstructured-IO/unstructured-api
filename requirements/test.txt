@@ -6,7 +6,7 @@
 #
 attrs==22.1.0
     # via pytest
-black==22.12.0
+black==23.1.0
     # via -r test.in
 click==8.1.3
     # via
@@ -26,8 +26,10 @@ mypy-extensions==0.4.3
     # via
     #   black
     #   mypy
-packaging==21.3
-    # via pytest
+packaging==23.0
+    # via
+    #   black
+    #   pytest
 pathspec==0.10.1
     # via black
 platformdirs==2.5.2
@@ -40,8 +42,6 @@ pycodestyle==2.10.0
     # via flake8
 pyflakes==3.0.1
     # via flake8
-pyparsing==3.0.9
-    # via packaging
 pytest==7.1.3
     # via pytest-cov
 pytest-cov==4.0.0
