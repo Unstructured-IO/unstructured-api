@@ -131,7 +131,7 @@ nbconvert==7.0.0
     # via
     #   jupyter
     #   notebook
-nbdev==2.3.9
+nbdev==2.3.11
     # via -r dev.in
 nbformat==5.6.0
     # via
