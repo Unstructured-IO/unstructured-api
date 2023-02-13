@@ -5,4 +5,4 @@ mypy
 nbdev
 pip-tools
 # NOTE(crag): consistency with unstructured-api-tools. pinned for a reason, see there.
-ipython==8.9.0
+ipython==8.10.0
