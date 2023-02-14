@@ -3,11 +3,11 @@
 </h3>
 
 <h3 align="center">
-  <p>Pre-Processing Pipeline for Emails</p>
+  <p>General Pre-Processing Pipeline for Documents</p>
 </h3>
 
 
-This repo implements a pre-processing pipeline for emails (`.eml` files). Currently, the pipeline is capable of extracting the header, body, images, and attachments from emails.
+This repo implements a pre-processing pipeline for `.txt`, `.docx`, `.pptx`, `.jpg`, `.png`, `.eml`, `.html`, and `.pdf` documents. Currently, the pipeline is capable of recognizing the file type and choosing the relevant partition function to process the file.
 
 The API is hosted at `https://api.unstructured.io`.
 
@@ -20,10 +20,10 @@ The API is hosted at `https://api.unstructured.io`.
 	  * `pyenv install 3.8.15`
   * Linux instructions are available [here](https://github.com/Unstructured-IO/community#linux).
 
-  * Create a virtualenv to work in and activate it, e.g. for one named `emails`:
+  * Create a virtualenv to work in and activate it, e.g. for one named `document-processing`:
 
-	`pyenv  virtualenv 3.8.15 emails` <br />
-	`pyenv activate emails`
+	`pyenv  virtualenv 3.8.15 document-processing` <br />
+	`pyenv activate document-processing`
 
 * Run `make install`
 * Start a local jupyter notebook server with `make run-jupyter` <br />
@@ -37,7 +37,7 @@ Give a description of making API calls using example `curl` commands, and exampl
 For example:
 ```
  curl -X 'POST' \
-  'http://localhost:8000/emails/v0.0.2/email' \
+  'http://localhost:8000/documents/v0.0.2/documents' \
   -H 'accept: application/json' \
   -H 'Content-Type: multipart/form-data' \
   -F 'files=@family_day.eml' \
