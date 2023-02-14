@@ -1,6 +1,8 @@
-unstructured>=0.4.3
+unstructured>=0.4.8
 unstructured-api-tools>=0.4.4
 
 ratelimit
 requests
 email
+
+
