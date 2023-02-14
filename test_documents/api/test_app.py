@@ -1,10 +1,10 @@
 from fastapi.testclient import TestClient
 
 
-from prepline_emails.api.app import app
+from prepline_documents.api.app import app
 
 
-def test_emails_api_health_check():
+def test_documents_api_health_check():
     client = TestClient(app)
     response = client.get("/healthcheck")
 

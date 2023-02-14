@@ -16,7 +16,8 @@ from starlette.types import Send
 from base64 import b64encode
 from typing import Optional, Mapping, Iterator, Tuple
 import secrets
-from unstructured.partition.auto import partition
+import email
+from unstructured.partition.email import partition_email, extract_attachment_info
 from unstructured.staging.base import convert_to_isd
 
 
@@ -38,11 +39,23 @@ def is_expected_response_type(media_type, response_type):
         return False
 
 
-def pipeline_api(file, response_type="application/json"):
+# pipeline-api
+def pipeline_api(
+    file,
+    response_type="application/json",
+    m_include_headers=[],
+    m_extract_attachment=[],
+    m_output_dir=[],
+):
 
-    elements = partition(file=file)
+    if m_extract_attachment:
+        msg = email.message_from_file(file)
+        attachment = extract_attachment_info(msg, output_dir=m_output_dir)
 
-    return convert_to_isd(elements)
+    file.seek(0)
+    elements = partition_email(file=file, include_headers=m_include_headers)
+
+    return elements, attachment
 
 
 class MultipartMixedResponse(StreamingResponse):
@@ -103,12 +116,15 @@ class MultipartMixedResponse(StreamingResponse):
         await send({"type": "http.response.body", "body": b"", "more_body": False})
 
 
-@router.post("/emails/v0.0.2/general")
+@router.post("/documents/v0.0.2/document")
 @limiter.limit(RATE_LIMIT)
 async def pipeline_1(
     request: Request,
     files: Union[List[UploadFile], None] = File(default=None),
     output_format: Union[str, None] = Form(default=None),
+    include_headers: List[str] = Form(default=[]),
+    extract_attachment: List[str] = Form(default=[]),
+    output_dir: List[str] = Form(default=[]),
 ):
     content_type = request.headers.get("Accept")
 
@@ -140,6 +156,9 @@ async def pipeline_1(
 
                     response = pipeline_api(
                         _file,
+                        m_include_headers=include_headers,
+                        m_extract_attachment=extract_attachment,
+                        m_output_dir=output_dir,
                         response_type=media_type,
                     )
                     if is_multipart:
@@ -160,6 +179,9 @@ async def pipeline_1(
 
             response = pipeline_api(
                 _file,
+                m_include_headers=include_headers,
+                m_extract_attachment=extract_attachment,
+                m_output_dir=output_dir,
                 response_type=media_type,
             )
 

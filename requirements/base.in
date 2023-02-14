@@ -1,4 +1,5 @@
 unstructured>=0.4.8
+unstructured[local-inference]>=0.4.4
 unstructured-api-tools>=0.4.4
 
 ratelimit
