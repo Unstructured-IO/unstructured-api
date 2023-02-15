@@ -8,7 +8,7 @@ on:
 
 env:
   PYTHON_VERSION: "3.8"
-  PIPELINE_FAMILY: "emails"
+  PIPELINE_FAMILY: "documents"
 
 jobs:
   setup:
