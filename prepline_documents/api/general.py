@@ -103,7 +103,7 @@ class MultipartMixedResponse(StreamingResponse):
         await send({"type": "http.response.body", "body": b"", "more_body": False})
 
 
-@router.post("/document/v0.0.2/general")
+@router.post("/documents/v0.0.4/general")
 @limiter.limit(RATE_LIMIT)
 async def pipeline_1(
     request: Request,
