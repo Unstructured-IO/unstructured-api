@@ -1,3 +1,8 @@
+## 0.0.4
+
+* Changed pipeline name to `pipeline-documents`
+* Changed pipeline to handle a variety of documents not just emails
+
 ## 0.0.3
 
 * Add emails pipeline Dockerfile
