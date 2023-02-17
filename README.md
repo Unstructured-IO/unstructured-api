@@ -40,7 +40,7 @@ For example:
   'http://localhost:8000/general/v0.0.4/general' \
   -H 'accept: application/json' \
   -H 'Content-Type: multipart/form-data' \
-  -F 'files=@family_day.eml' \
+  -F 'files=@family-day.eml' \
   | jq -C . | less -R
 ```
 
