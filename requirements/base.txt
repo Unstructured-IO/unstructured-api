@@ -108,8 +108,6 @@ jinja2==3.1.2
     #   unstructured-api-tools
 joblib==1.2.0
     # via nltk
-jsons==1.6.3
-    # via unstructured-inference
 jsonschema==4.17.3
     # via nbformat
 jupyter-client==8.0.3
@@ -366,13 +364,11 @@ typing-extensions==4.5.0
     #   starlette
     #   torch
     #   torchvision
-typish==1.9.3
-    # via jsons
 unstructured[local-inference]==0.4.15
     # via -r requirements/base.in
 unstructured-api-tools==0.4.9
     # via -r requirements/base.in
-unstructured-inference==0.2.7
+unstructured-inference==0.2.8
     # via unstructured
 urllib3==1.26.14
     # via requests

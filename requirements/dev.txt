@@ -33,10 +33,13 @@ arrow==1.2.3
     # via isoduration
 asttokens==2.2.1
     # via
+    #   -r requirements/test.txt
     #   nbdev
     #   stack-data
 astunparse==1.6.3
-    # via nbdev
+    # via
+    #   -r requirements/test.txt
+    #   nbdev
 attrs==22.2.0
     # via
     #   -r requirements/base.txt
@@ -44,7 +47,9 @@ attrs==22.2.0
     #   jsonschema
     #   pytest
 backcall==0.2.0
-    # via ipython
+    # via
+    #   -r requirements/test.txt
+    #   ipython
 backoff==2.2.1
     # via
     #   -r requirements/base.txt
@@ -124,7 +129,9 @@ cycler==0.11.0
 debugpy==1.6.6
     # via ipykernel
 decorator==5.1.1
-    # via ipython
+    # via
+    #   -r requirements/test.txt
+    #   ipython
 defusedxml==0.7.1
     # via
     #   -r requirements/base.txt
@@ -151,9 +158,13 @@ exceptiongroup==1.1.0
     #   -r requirements/test.txt
     #   pytest
 execnb==0.1.5
-    # via nbdev
+    # via
+    #   -r requirements/test.txt
+    #   nbdev
 executing==1.2.0
-    # via stack-data
+    # via
+    #   -r requirements/test.txt
+    #   stack-data
 fastapi==0.92.0
     # via
     #   -r requirements/base.txt
@@ -162,6 +173,7 @@ fastapi==0.92.0
     #   unstructured-inference
 fastcore==1.5.28
     # via
+    #   -r requirements/test.txt
     #   execnb
     #   ghapi
     #   nbdev
@@ -193,7 +205,9 @@ fonttools==4.38.0
 fqdn==1.5.1
     # via jsonschema
 ghapi==1.0.3
-    # via nbdev
+    # via
+    #   -r requirements/test.txt
+    #   nbdev
 h11==0.14.0
     # via
     #   -r requirements/base.txt
@@ -267,6 +281,7 @@ ipykernel==6.21.2
 ipython==8.10.0
     # via
     #   -r requirements/dev.in
+    #   -r requirements/test.txt
     #   execnb
     #   ipykernel
     #   ipywidgets
@@ -281,7 +296,9 @@ ipywidgets==8.0.4
 isoduration==20.11.0
     # via jsonschema
 jedi==0.18.2
-    # via ipython
+    # via
+    #   -r requirements/test.txt
+    #   ipython
 jinja2==3.1.2
     # via
     #   -r requirements/base.txt
@@ -298,11 +315,6 @@ joblib==1.2.0
     #   nltk
 jsonpointer==2.3
     # via jsonschema
-jsons==1.6.3
-    # via
-    #   -r requirements/base.txt
-    #   -r requirements/test.txt
-    #   unstructured-inference
 jsonschema[format-nongpl]==4.17.3
     # via
     #   -r requirements/base.txt
@@ -388,6 +400,7 @@ matplotlib==3.7.0
     #   pycocotools
 matplotlib-inline==0.1.6
     # via
+    #   -r requirements/test.txt
     #   ipykernel
     #   ipython
 mccabe==0.7.0
@@ -438,7 +451,7 @@ nbconvert==7.2.9
     #   notebook
     #   unstructured-api-tools
 nbdev==2.3.12
-    # via -r requirements/dev.in
+    # via -r requirements/test.txt
 nbformat==5.7.3
     # via
     #   -r requirements/base.txt
@@ -552,7 +565,9 @@ pandocfilters==1.5.0
     #   -r requirements/test.txt
     #   nbconvert
 parso==0.8.3
-    # via jedi
+    # via
+    #   -r requirements/test.txt
+    #   jedi
 pathspec==0.11.0
     # via
     #   -r requirements/test.txt
@@ -573,9 +588,13 @@ pdfplumber==0.8.0
     #   -r requirements/test.txt
     #   layoutparser
 pexpect==4.8.0
-    # via ipython
+    # via
+    #   -r requirements/test.txt
+    #   ipython
 pickleshare==0.7.5
-    # via ipython
+    # via
+    #   -r requirements/test.txt
+    #   ipython
 pillow==9.4.0
     # via
     #   -r requirements/base.txt
@@ -617,6 +636,7 @@ prometheus-client==0.16.0
     #   notebook
 prompt-toolkit==3.0.37
     # via
+    #   -r requirements/test.txt
     #   ipython
     #   jupyter-console
 protobuf==4.22.0
@@ -628,10 +648,13 @@ psutil==5.9.4
     # via ipykernel
 ptyprocess==0.7.0
     # via
+    #   -r requirements/test.txt
     #   pexpect
     #   terminado
 pure-eval==0.2.2
-    # via stack-data
+    # via
+    #   -r requirements/test.txt
+    #   stack-data
 pycocotools==2.0.6
     # via
     #   -r requirements/base.txt
@@ -823,7 +846,9 @@ soupsieve==2.4
     #   -r requirements/test.txt
     #   beautifulsoup4
 stack-data==0.6.2
-    # via ipython
+    # via
+    #   -r requirements/test.txt
+    #   ipython
 starlette==0.25.0
     # via
     #   -r requirements/base.txt
@@ -952,11 +977,6 @@ typing-extensions==4.5.0
     #   starlette
     #   torch
     #   torchvision
-typish==1.9.3
-    # via
-    #   -r requirements/base.txt
-    #   -r requirements/test.txt
-    #   jsons
 unstructured[local-inference]==0.4.15
     # via
     #   -r requirements/base.txt
@@ -965,7 +985,7 @@ unstructured-api-tools==0.4.9
     # via
     #   -r requirements/base.txt
     #   -r requirements/test.txt
-unstructured-inference==0.2.7
+unstructured-inference==0.2.8
     # via
     #   -r requirements/base.txt
     #   -r requirements/test.txt
@@ -994,14 +1014,18 @@ wand==0.6.11
     #   -r requirements/test.txt
     #   pdfplumber
 watchdog==2.3.0
-    # via nbdev
+    # via
+    #   -r requirements/test.txt
+    #   nbdev
 watchfiles==0.18.1
     # via
     #   -r requirements/base.txt
     #   -r requirements/test.txt
     #   uvicorn
 wcwidth==0.2.6
-    # via prompt-toolkit
+    # via
+    #   -r requirements/test.txt
+    #   prompt-toolkit
 webcolors==1.12
     # via jsonschema
 webencodings==0.5.1
