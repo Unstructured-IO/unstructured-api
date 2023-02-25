@@ -17,17 +17,17 @@ help: Makefile
 install-base: install-base-pip-packages install-nltk-models
 
 ## install:                     installs all test and dev requirements
-.PHONY: install
-install: install-test
+.PHONY: install 
+install:install-base  install-test
 
 .PHONY: install-base-pip-packages
 install-base-pip-packages:
 	python3 -m pip install pip==${PIP_VERSION}
-	pip install -r requirements/base.txt
+	python3 -m pip install -r requirements/base.txt
 
 .PHONY: install-test
 install-test: install-base
-	pip install -r requirements/test.txt
+	python3 -m pip install -r requirements/test.txt
 
 .PHONY: install-ci
 install-ci: install-test
