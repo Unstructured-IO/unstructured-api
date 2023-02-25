@@ -45,9 +45,8 @@ install-nltk-models:
 .PHONY: pip-compile
 pip-compile:
 	pip-compile requirements/base.in
-	pip-compile requirements/dev.in
-	pip-compile requirements/test.in
-
+	pip-compile -o requirements/test.txt requirements/base.txt requirements/test.in 
+	pip-compile -o requirements/dev.txt requirements/base.txt requirements/test.txt requirements/dev.in
 
 #########
 # Build #
