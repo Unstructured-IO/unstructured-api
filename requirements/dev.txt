@@ -69,8 +69,6 @@ bleach==6.0.0
     #   -r requirements/base.txt
     #   -r requirements/test.txt
     #   nbconvert
-build==0.10.0
-    # via pip-tools
 certifi==2022.12.7
     # via
     #   -r requirements/base.txt
@@ -97,7 +95,6 @@ click==8.1.3
     #   -r requirements/test.txt
     #   black
     #   nltk
-    #   pip-tools
     #   unstructured-api-tools
     #   uvicorn
 coloredlogs==15.0.1
@@ -538,7 +535,6 @@ packaging==22.0
     #   -r requirements/test.txt
     #   argilla
     #   black
-    #   build
     #   fastcore
     #   ghapi
     #   huggingface-hub
@@ -607,8 +603,6 @@ pillow==9.4.0
     #   python-pptx
     #   torchvision
     #   unstructured
-pip-tools==6.12.2
-    # via -r requirements/dev.in
 pkgutil-resolve-name==1.3.10
     # via
     #   -r requirements/base.txt
@@ -692,8 +686,6 @@ pyparsing==3.0.9
     #   -r requirements/base.txt
     #   -r requirements/test.txt
     #   matplotlib
-pyproject-hooks==1.0.0
-    # via build
 pyrsistent==0.19.3
     # via
     #   -r requirements/base.txt
@@ -885,10 +877,8 @@ tomli==2.0.1
     #   -r requirements/base.txt
     #   -r requirements/test.txt
     #   black
-    #   build
     #   coverage
     #   mypy
-    #   pyproject-hooks
     #   pytest
 torch==1.13.1
     # via
@@ -1048,7 +1038,6 @@ wheel==0.38.4
     #   astunparse
     #   nvidia-cublas-cu11
     #   nvidia-cuda-runtime-cu11
-    #   pip-tools
 widgetsnbextension==4.0.5
     # via ipywidgets
 wrapt==1.14.1
