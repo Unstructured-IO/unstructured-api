@@ -18,7 +18,7 @@ install-base: install-base-pip-packages install-nltk-models
 
 ## install:                     installs all test and dev requirements
 .PHONY: install
-install: install-install-dev
+install: install-install-test
 
 .PHONY: install-base-pip-packages
 install-base-pip-packages:
@@ -28,10 +28,6 @@ install-base-pip-packages:
 .PHONY: install-test
 install-test: install-base
 	pip install -r requirements/test.txt
-
-.PHONY: install-dev
-install-dev: install-base
-	pip install -r requirements/dev.txt
 
 .PHONY: install-ci
 install-ci: install-test
@@ -46,7 +42,6 @@ install-nltk-models:
 pip-compile:
 	pip-compile --upgrade requirements/base.in
 	pip-compile --upgrade -o requirements/test.txt requirements/base.txt requirements/test.in 
-	pip-compile --upgrade -o requirements/dev.txt requirements/base.txt requirements/test.txt requirements/dev.in
 
 #########
 # Build #
