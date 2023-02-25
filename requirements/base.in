@@ -1,4 +1,4 @@
-unstructured>=0.4.8
+unstructured>=0.4.15
 unstructured[local-inference]>=0.4.4
 unstructured-api-tools>=0.4.4
 
