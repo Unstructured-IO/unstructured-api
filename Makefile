@@ -14,11 +14,11 @@ help: Makefile
 
 ## install-base:                installs minimum requirements to run the API
 .PHONY: install-base
-install-base: install-base-pip-packages
+install-base: install-base-pip-packages install-nltk-models
 
 ## install:                     installs all test and dev requirements
 .PHONY: install
-install: install-base install-test install-dev
+install: install-install-dev
 
 .PHONY: install-base-pip-packages
 install-base-pip-packages:
@@ -26,15 +26,15 @@ install-base-pip-packages:
 	pip install -r requirements/base.txt
 
 .PHONY: install-test
-install-test:
+install-test: install-base
 	pip install -r requirements/test.txt
 
 .PHONY: install-dev
-install-dev:
+install-dev: install-base
 	pip install -r requirements/dev.txt
 
 .PHONY: install-ci
-install-ci: install-base install-test
+install-ci: install-test
 
 .PHONE: install-nltk-models
 install-nltk-models:

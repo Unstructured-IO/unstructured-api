@@ -30,7 +30,7 @@ jobs:
       run: |
         python${{ env.PYTHON_VERSION }} -m venv .venv
         source .venv/bin/activate
-        make install
+        make install-ci
 
   lint:
     runs-on: ubuntu-latest
