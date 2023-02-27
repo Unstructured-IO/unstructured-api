@@ -18,7 +18,7 @@ install-base: install-base-pip-packages install-nltk-models install-detectron
 
 ## install:                     installs all test and dev requirements
 .PHONY: install 
-install:install-base  install-test
+install:install-base install-test
 
 
 .PHONY: install-detectron
