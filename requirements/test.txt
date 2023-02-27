@@ -90,7 +90,7 @@ contourpy==1.0.7
     # via
     #   -r requirements/base.txt
     #   matplotlib
-coverage[toml]==7.2.0
+coverage[toml]==7.2.1
     # via pytest-cov
 cryptography==39.0.1
     # via
@@ -137,7 +137,7 @@ fastcore==1.5.28
     #   execnb
     #   ghapi
     #   nbdev
-fastjsonschema==2.16.2
+fastjsonschema==2.16.3
     # via
     #   -r requirements/base.txt
     #   nbformat
@@ -467,7 +467,7 @@ parso==0.8.3
     # via jedi
 pathspec==0.11.0
     # via black
-pdf2image==1.16.2
+pdf2image==1.16.3
     # via
     #   -r requirements/base.txt
     #   layoutparser
@@ -774,7 +774,7 @@ transformers==4.26.1
     # via
     #   -r requirements/base.txt
     #   unstructured-inference
-types-requests==2.28.11.14
+types-requests==2.28.11.15
     # via
     #   -r requirements/base.txt
     #   unstructured-api-tools
@@ -782,7 +782,7 @@ types-ujson==5.7.0.1
     # via
     #   -r requirements/base.txt
     #   unstructured-api-tools
-types-urllib3==1.26.25.7
+types-urllib3==1.26.25.8
     # via
     #   -r requirements/base.txt
     #   types-requests
