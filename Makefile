@@ -14,41 +14,40 @@ help: Makefile
 
 ## install-base:                installs minimum requirements to run the API
 .PHONY: install-base
-install-base: install-base-pip-packages
+install-base: install-base-pip-packages install-nltk-models install-detectron
 
 ## install:                     installs all test and dev requirements
-.PHONY: install
-install: install-base install-test install-dev
+.PHONY: install 
+install:install-base install-test
+
+
+.PHONY: install-detectron
+install-detectron:
+	python3 -m pip install "detectron2@git+https://github.com/facebookresearch/detectron2.git@v0.6#egg=detectron2"
 
 .PHONY: install-base-pip-packages
 install-base-pip-packages:
 	python3 -m pip install pip==${PIP_VERSION}
-	pip install -r requirements/base.txt
+	python3 -m pip install -r requirements/base.txt
 
 .PHONY: install-test
-install-test:
-	pip install -r requirements/test.txt
-
-.PHONY: install-dev
-install-dev:
-	pip install -r requirements/dev.txt
+install-test: install-base
+	python3 -m pip install -r requirements/test.txt
 
 .PHONY: install-ci
-install-ci: install-base install-test
+install-ci: install-test
 
 .PHONE: install-nltk-models
 install-nltk-models:
-	python -c "import nltk; nltk.download('punkt')"
-	python -c "import nltk; nltk.download('averaged_perceptron_tagger')"
+	python3 -c "import nltk; nltk.download('punkt')"
+	python3 -c "import nltk; nltk.download('averaged_perceptron_tagger')"
 
 ## pip-compile:                 compiles all base/dev/test requirements
 .PHONY: pip-compile
 pip-compile:
-	pip-compile requirements/base.in
-	pip-compile requirements/dev.in
-	pip-compile requirements/test.in
-
-
+	pip-compile --upgrade requirements/base.in
+	pip-compile --upgrade -o requirements/test.txt requirements/base.txt requirements/test.in
+ 
 #########
 # Build #
 #########
