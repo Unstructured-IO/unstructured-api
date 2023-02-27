@@ -14,11 +14,16 @@ help: Makefile
 
 ## install-base:                installs minimum requirements to run the API
 .PHONY: install-base
-install-base: install-base-pip-packages install-nltk-models
+install-base: install-base-pip-packages install-nltk-models install-detectron
 
 ## install:                     installs all test and dev requirements
 .PHONY: install 
 install:install-base  install-test
+
+
+.PHONY: install-detectron
+install-detectron:
+	python3 -m pip install "detectron2@git+https://github.com/facebookresearch/detectron2.git@v0.6#egg=detectron2"
 
 .PHONY: install-base-pip-packages
 install-base-pip-packages:
@@ -34,8 +39,8 @@ install-ci: install-test
 
 .PHONE: install-nltk-models
 install-nltk-models:
-	python -c "import nltk; nltk.download('punkt')"
-	python -c "import nltk; nltk.download('averaged_perceptron_tagger')"
+	python3 -c "import nltk; nltk.download('punkt')"
+	python3 -c "import nltk; nltk.download('averaged_perceptron_tagger')"
 
 ## pip-compile:                 compiles all base/dev/test requirements
 .PHONY: pip-compile
