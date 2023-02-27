@@ -25,6 +25,7 @@ The API is hosted at `https://api.unstructured.io`.
 	`pyenv  virtualenv 3.8.15 document-processing` <br />
 	`pyenv activate document-processing`
 
+# See the [Unstructured Quick Start](https://github.com/Unstructured-IO/unstructured#eight_pointed_black_star-quick-start) for the many OS dependencies that are required, if the ability to process all file types is desired.
 * Run `make install`
 * Start a local jupyter notebook server with `make run-jupyter` <br />
 	**OR** <br />
