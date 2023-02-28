@@ -19,6 +19,7 @@ RUN yum -y install devtoolset-7-gcc*
 SHELL [ "/usr/bin/scl", "enable", "devtoolset-7"]
 
 RUN yum -y update && \
+  yum -y install libreoffice && \
   yum -y install openssl-devel bzip2-devel libffi-devel make git sqlite-devel && \
   curl -O https://www.python.org/ftp/python/3.8.15/Python-3.8.15.tgz && tar -xzf Python-3.8.15.tgz && \
   cd Python-3.8.15/ && ./configure --enable-optimizations && make altinstall && \
