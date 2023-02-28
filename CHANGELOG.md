@@ -2,6 +2,7 @@
 
 * Changed pipeline name to `pipeline-general`
 * Changed pipeline to handle a variety of documents not just emails
+* Update Dockerfile, image parsing `.html`, `.eml`, and `.pptx` files.
 
 ## 0.0.3
 
