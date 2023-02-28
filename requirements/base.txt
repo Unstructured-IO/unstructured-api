@@ -95,6 +95,7 @@ idna==3.4
 importlib-metadata==6.0.0
     # via
     #   jupyter-client
+    #   markdown
     #   nbconvert
 importlib-resources==5.12.0
     # via
@@ -108,6 +109,8 @@ jinja2==3.1.2
     #   unstructured-api-tools
 joblib==1.2.0
     # via nltk
+jsons==1.6.3
+    # via unstructured-inference
 jsonschema==4.17.3
     # via nbformat
 jupyter-client==8.0.3
@@ -131,6 +134,8 @@ lxml==4.9.2
     #   python-docx
     #   python-pptx
     #   unstructured
+markdown==3.4.1
+    # via unstructured
 markupsafe==2.1.2
     # via
     #   jinja2
@@ -170,19 +175,9 @@ numpy==1.23.5
     #   scipy
     #   torchvision
     #   transformers
-nvidia-cublas-cu11==11.10.3.66
-    # via
-    #   nvidia-cudnn-cu11
-    #   torch
-nvidia-cuda-nvrtc-cu11==11.7.99
-    # via torch
-nvidia-cuda-runtime-cu11==11.7.99
-    # via torch
-nvidia-cudnn-cu11==8.5.0.96
-    # via torch
 omegaconf==2.3.0
     # via effdet
-onnxruntime==1.14.0
+onnxruntime==1.14.1
     # via unstructured-inference
 opencv-python==4.6.0.66
     # via
@@ -258,7 +253,7 @@ python-dotenv==1.0.0
     # via uvicorn
 python-magic==0.4.27
     # via unstructured
-python-multipart==0.0.5
+python-multipart==0.0.6
     # via
     #   unstructured-api-tools
     #   unstructured-inference
@@ -297,7 +292,6 @@ six==1.16.0
     # via
     #   bleach
     #   python-dateutil
-    #   python-multipart
 slowapi==0.1.7
     # via unstructured-api-tools
 sniffio==1.3.0
@@ -364,11 +358,13 @@ typing-extensions==4.5.0
     #   starlette
     #   torch
     #   torchvision
-unstructured[local-inference]==0.4.15
+typish==1.9.3
+    # via jsons
+unstructured[local-inference]==0.5.0
     # via -r requirements/base.in
 unstructured-api-tools==0.4.9
     # via -r requirements/base.in
-unstructured-inference==0.2.8
+unstructured-inference==0.2.7
     # via unstructured
 urllib3==1.26.14
     # via requests
@@ -388,10 +384,6 @@ webencodings==0.5.1
     #   tinycss2
 websockets==10.4
     # via uvicorn
-wheel==0.38.4
-    # via
-    #   nvidia-cublas-cu11
-    #   nvidia-cuda-runtime-cu11
 wrapt==1.14.1
     # via
     #   argilla
