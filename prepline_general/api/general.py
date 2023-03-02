@@ -18,6 +18,7 @@ from typing import Optional, Mapping, Iterator, Tuple
 import secrets
 from unstructured.partition.auto import partition
 from unstructured.staging.base import convert_to_isd
+import tempfile
 
 
 limiter = Limiter(key_func=get_remote_address)
@@ -38,9 +39,17 @@ def is_expected_response_type(media_type, response_type):
         return False
 
 
-# pipeline-api
 def pipeline_api(file, response_type="application/json"):
-    elements = partition(file=file)
+    # NOTE(robinson) - This is a hacky solution due to
+    # limitations in the SpooledTemporaryFile wrapper.
+    # Specifically, it does't have a `seekable` attribute,
+    # which is required for .pptx and .docx. See below
+    # the link below
+    # ref: https://stackoverflow.com/questions/47160211
+    # /why-doesnt-tempfile-spooledtemporaryfile-implement-readable-writable-seekable
+    with tempfile.NamedTemporaryFile() as temp_file:
+        temp_file.write(file.read())
+        elements = partition(filename=temp_file.name)
 
     return convert_to_isd(elements)
 
