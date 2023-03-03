@@ -39,7 +39,7 @@ def is_expected_response_type(media_type, response_type):
         return False
 
 
-def pipeline_api(file, response_type="application/json"):
+def pipeline_api(file, filename, response_type="application/json"):
     # NOTE(robinson) - This is a hacky solution due to
     # limitations in the SpooledTemporaryFile wrapper.
     # Specifically, it does't have a `seekable` attribute,
@@ -47,9 +47,11 @@ def pipeline_api(file, response_type="application/json"):
     # the link below
     # ref: https://stackoverflow.com/questions/47160211
     # /why-doesnt-tempfile-spooledtemporaryfile-implement-readable-writable-seekable
-    with tempfile.NamedTemporaryFile() as temp_file:
-        temp_file.write(file.read())
-        elements = partition(filename=temp_file.name)
+    with tempfile.TemporaryDirectory() as tmpdir:
+        _filename = os.path.join(tmpdir, filename)
+        with open(_filename, "wb") as f:
+            f.write(file.read())
+        elements = partition(filename=_filename)
 
     return convert_to_isd(elements)
 
@@ -167,6 +169,7 @@ async def pipeline_1(
 
             response = pipeline_api(
                 _file,
+                filename=file.filename,
                 response_type=media_type,
             )
 
