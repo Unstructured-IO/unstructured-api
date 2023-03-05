@@ -42,7 +42,7 @@ coloredlogs==15.0.1
     # via onnxruntime
 contourpy==1.0.7
     # via matplotlib
-cryptography==39.0.1
+cryptography==39.0.2
     # via pdfminer-six
 cycler==0.11.0
     # via matplotlib
@@ -66,7 +66,7 @@ filelock==3.9.0
     # via
     #   huggingface-hub
     #   transformers
-flatbuffers==23.1.21
+flatbuffers==23.3.3
     # via onnxruntime
 fonttools==4.38.0
     # via matplotlib
@@ -140,7 +140,7 @@ markupsafe==2.1.2
     # via
     #   jinja2
     #   nbconvert
-matplotlib==3.7.0
+matplotlib==3.7.1
     # via pycocotools
 mistune==2.0.5
     # via nbconvert
@@ -220,7 +220,7 @@ pillow==9.4.0
     #   unstructured
 pkgutil-resolve-name==1.3.10
     # via jsonschema
-platformdirs==3.0.0
+platformdirs==3.1.0
     # via jupyter-core
 portalocker==2.7.0
     # via iopath
@@ -326,7 +326,7 @@ torchvision==0.14.1
     #   timm
 tornado==6.2
     # via jupyter-client
-tqdm==4.64.1
+tqdm==4.65.0
     # via
     #   argilla
     #   huggingface-hub
@@ -360,7 +360,7 @@ typing-extensions==4.5.0
     #   torchvision
 typish==1.9.3
     # via jsons
-unstructured[local-inference]==0.5.0
+unstructured[local-inference]==0.5.2
     # via -r requirements/base.in
 unstructured-api-tools==0.4.9
     # via -r requirements/base.in
