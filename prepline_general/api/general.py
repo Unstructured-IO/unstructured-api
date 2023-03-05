@@ -40,7 +40,9 @@ def is_expected_response_type(media_type, response_type):
 
 
 # pipeline-api
-def pipeline_api(file, filename=None, file_content_type=None, response_type="application/json"):
+def pipeline_api(
+    file, filename=None, file_content_type=None, response_type="application/json"
+):
     # NOTE(crag) - even though filename and file_content_type are not
     # used, they may be useful in the future (these will typically
     # be defined after getting a POST request in the context of FastAPI,
