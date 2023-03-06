@@ -39,6 +39,7 @@ def is_expected_response_type(media_type, response_type):
         return False
 
 
+# pipeline-api
 def pipeline_api(file, filename="", response_type="application/json"):
     # NOTE(robinson) - This is a hacky solution due to
     # limitations in the SpooledTemporaryFile wrapper.
