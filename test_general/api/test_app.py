@@ -21,7 +21,7 @@ def test_general_api_health_check():
     assert response.status_code == 200
 
 
-#@pytest.mark.parametrize(
+# @pytest.mark.parametrize(
 #    "example_filename",
 #    [
 #        "layout-parser-paper.pdf",
@@ -40,8 +40,8 @@ def test_general_api_health_check():
 #        "announcement.eml",
 #        "alert.eml",
 #    ],
-#)
-#def test_general_api(example_filename):
+# )
+# def test_general_api(example_filename):
 #    # NOTE(crag) - Reset below doesn't seem to be working, not sure why. But rate
 #    # limiting will be removed soon anyway
 #    time.sleep(1)
