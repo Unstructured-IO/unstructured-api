@@ -54,7 +54,13 @@ def pipeline_api(file, filename="", response_type="application/json"):
             f.write(file.read())
         elements = partition(filename=_filename)
 
-    return convert_to_isd(elements)
+    # Due to the above, elements have an ugly temp filename in their metadata
+    # For now, replace this with the basename
+    result = convert_to_isd(elements)
+    for element in result:
+        element["metadata"]["filename"] = os.path.basename(filename)
+
+    return result
 
 
 class MultipartMixedResponse(StreamingResponse):
