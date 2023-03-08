@@ -18,6 +18,7 @@ from typing import Optional, Mapping, Iterator, Tuple
 import secrets
 from unstructured.partition.auto import partition
 from unstructured.staging.base import convert_to_isd
+import tempfile
 
 
 limiter = Limiter(key_func=get_remote_address)
@@ -39,10 +40,27 @@ def is_expected_response_type(media_type, response_type):
 
 
 # pipeline-api
-def pipeline_api(file, response_type="application/json"):
-    elements = partition(file=file)
+def pipeline_api(file, filename="", response_type="application/json"):
+    # NOTE(robinson) - This is a hacky solution due to
+    # limitations in the SpooledTemporaryFile wrapper.
+    # Specifically, it does't have a `seekable` attribute,
+    # which is required for .pptx and .docx. See below
+    # the link below
+    # ref: https://stackoverflow.com/questions/47160211
+    # /why-doesnt-tempfile-spooledtemporaryfile-implement-readable-writable-seekable
+    with tempfile.TemporaryDirectory() as tmpdir:
+        _filename = os.path.join(tmpdir, filename.split("/")[-1])
+        with open(_filename, "wb") as f:
+            f.write(file.read())
+        elements = partition(filename=_filename)
 
-    return convert_to_isd(elements)
+    # Due to the above, elements have an ugly temp filename in their metadata
+    # For now, replace this with the basename
+    result = convert_to_isd(elements)
+    for element in result:
+        element["metadata"]["filename"] = os.path.basename(filename)
+
+    return result
 
 
 class MultipartMixedResponse(StreamingResponse):
@@ -140,6 +158,7 @@ async def pipeline_1(
                     response = pipeline_api(
                         _file,
                         response_type=media_type,
+                        filename=file.filename,
                     )
                     if is_multipart:
                         if type(response) not in [str, bytes]:
@@ -159,6 +178,7 @@ async def pipeline_1(
             response = pipeline_api(
                 _file,
                 response_type=media_type,
+                filename=file.filename,
             )
 
             if is_expected_response_type(media_type, type(response)):
