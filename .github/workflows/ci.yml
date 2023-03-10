@@ -71,6 +71,7 @@ jobs:
         source .venv/bin/activate
         sudo apt-get install --yes poppler-utils
         make install-nltk-models
+        apt list
         make test
         # NOTE(robinson) - Add check-coverage back in once we add real tests
         # make check-coverage
