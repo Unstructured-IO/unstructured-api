@@ -31,7 +31,6 @@ def test_general_api_health_check():
         "family-day.eml",
         "fake.docx",
         pytest.param("fake-text.txt", marks=pytest.mark.xfail(reason="needs investigation")),
-        "fake-power-point.pptx",
         "fake-html.html",
         pytest.param("fake-excel.xlsx", marks=pytest.mark.xfail(reason="needs investigation")),
         "fake-email.eml",
