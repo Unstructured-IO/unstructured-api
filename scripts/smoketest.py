@@ -8,7 +8,6 @@ api_url = "http://localhost:8000/general/v0.0.4/general"
 
 def send_document(filename):
     files = {"files": (str(filename), open(filename, "rb"), "text/plain")}
-
     return requests.post(api_url, files=files)
 
 @pytest.mark.parametrize(
@@ -34,12 +33,19 @@ def send_document(filename):
 )
 
 def test_happy_path(example_filename):
-    time.sleep(1)
+    """
+    For the files in sample-docs, verify that we get a 200
+    and some structured response
+    """
+    time.sleep(1)  # Avoid a 429
+
     test_file = Path("sample-docs") / example_filename
+    response = send_document(test_file)
 
-    res = send_document(test_file)
+    print(response.text)
 
-    print(res.text)
-    assert(res.status_code == 200)
+    assert(response.status_code == 200)
+    assert len(response.json()) > 0
+    assert len("".join(elem["text"] for elem in response.json())) > 20
 
     time.sleep(1)
