@@ -69,11 +69,10 @@ jobs:
     - name: Run core tests
       run: |
         source .venv/bin/activate
-        sudo apt-get install --yes poppler-utils
+        sudo apt-get install --yes poppler-utils libmagic-dev tesseract-ocr
         make install-nltk-models
         make test
-        # NOTE(robinson) - Add check-coverage back in once we add real tests
-        # make check-coverage
+        make check-coverage
         make check-notebooks
 
   changelog:
