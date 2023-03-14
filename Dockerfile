@@ -18,6 +18,13 @@ RUN yum -y install centos-release-scl
 RUN yum -y install devtoolset-7-gcc*
 SHELL [ "/usr/bin/scl", "enable", "devtoolset-7"]
 
+# Note(austin) Get a recent tesseract from this repo
+# See https://tesseract-ocr.github.io/tessdoc/Installation.html
+RUN yum-config-manager --add-repo https://download.opensuse.org/repositories/home:/Alexander_Pozdnyakov/CentOS_7/ && \
+  rpm --import https://build.opensuse.org/projects/home:Alexander_Pozdnyakov/public_key && \
+  yum -y update && \
+  yum -y install tesseract
+
 RUN yum -y update && \
   yum -y install libreoffice && \
   yum -y install openssl-devel bzip2-devel libffi-devel make git sqlite-devel && \
@@ -42,16 +49,16 @@ ENV PATH="/home/${NB_USER}/.local/bin:${PATH}"
 
 # COPY requirements/dev.txt requirements-dev.txt
 COPY requirements/base.txt requirements-base.txt
-COPY prepline_${PIPELINE_PACKAGE}/ prepline_${PIPELINE_PACKAGE}/
-COPY exploration-notebooks exploration-notebooks
-COPY pipeline-notebooks pipeline-notebooks
-
 RUN python3.8 -m pip install pip==${PIP_VERSION} \
   && pip3.8 install  --no-cache  -r requirements-base.txt \
   && pip3.8 install --no-cache "detectron2@git+https://github.com/facebookresearch/detectron2.git@v0.6#egg=detectron2"
 
+COPY prepline_${PIPELINE_PACKAGE}/ prepline_${PIPELINE_PACKAGE}/
+COPY exploration-notebooks exploration-notebooks
+COPY pipeline-notebooks pipeline-notebooks
+
 EXPOSE 5000
 
-ENTRYPOINT ["uvicorn", "unstructured_inference.api:app", \
+ENTRYPOINT ["uvicorn", "prepline_general.api.app:app", \
   "--host", "0.0.0.0", \
   "--port", "5000"]
