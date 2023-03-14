@@ -106,3 +106,13 @@ jobs:
       run: |
         source .venv/bin/activate
         make api-check
+
+  # TODO - figure out best practice for caching docker images
+  test_dockerfile:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Test Dockerfile
+      run: |
+        make docker-build
+        make docker-test

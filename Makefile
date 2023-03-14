@@ -84,6 +84,9 @@ docker-start-api:
 docker-start-jupyter:
 	docker run -p 8888:8888 --mount type=bind,source=$(realpath .),target=/home/notebook-user/local --entrypoint jupyter -t --rm pipeline-family-${PIPELINE_FAMILY}-dev:latest run --port 8888 --ip 0.0.0.0 --NotebookApp.token='' --NotebookApp.password=''
 
+.PHONY: docker-test
+docker-test:
+	./scripts/docker-smoke-test.sh
 
 #########
 # Local #
