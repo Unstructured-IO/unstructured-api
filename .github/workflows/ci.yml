@@ -108,11 +108,19 @@ jobs:
         make api-check
 
   # TODO - figure out best practice for caching docker images
+  # (Using the virtualenv to get pytest)
   test_dockerfile:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
+    - uses: actions/cache@v3
+      id: virtualenv-cache
+      with:
+        path: |
+          .venv
+        key: ci-venv-${{ env.PIPELINE_FAMILY }}-${{ hashFiles('requirements/dev.txt') }}
     - name: Test Dockerfile
       run: |
+        source .venv/bin/activate
         make docker-build
         make docker-test
