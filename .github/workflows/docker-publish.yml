@@ -41,7 +41,6 @@ jobs:
           GIT_SHA=$(git rev-parse --short HEAD)
           IMAGE_NAME=pipeline-family-${{ env.PIPELINE_FAMILY }}
           docker buildx build --platform ${{ env.IMAGE_PLATFORMS }} --provenance=false --push \
-          -f Dockerfile-test \
           --build-arg PIP_VERSION=${{ env.PIP_VERSION }} \
           --build-arg PIPELINE_PACKAGE=${{ env.PIPELINE_PACKAGE }} \
           -t ${{ env.DOCKER_REGISTRY }}/${{ env.DOCKER_NAMESPACE }}/${IMAGE_NAME}:${GIT_SHA} \
