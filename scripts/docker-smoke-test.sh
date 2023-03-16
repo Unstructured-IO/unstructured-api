@@ -19,14 +19,14 @@ start_container() {
 await_server_ready() {
     url=localhost:8000/healthcheck
 
-    for i in {1..5}; do
-        echo "$i" Waiting for response from "$url"...
+    for _ in {1..15}; do
+        echo Waiting for response from "$url"
         if curl $url 2> /dev/null; then
             echo
             return
         fi
 
-        sleep 5
+        sleep 1
     done
 
     echo Server did not respond!
