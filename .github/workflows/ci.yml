@@ -69,7 +69,7 @@ jobs:
     - name: Run core tests
       run: |
         source .venv/bin/activate
-        sudo apt-get install --yes poppler-utils libmagic-dev tesseract-ocr
+        sudo apt-get install --yes poppler-utils tesseract-ocr libreoffice
         make install-nltk-models
         make test
         make check-coverage
