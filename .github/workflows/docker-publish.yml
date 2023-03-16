@@ -11,7 +11,7 @@ on:
 env:
   DOCKER_REGISTRY: "quay.io"
   DOCKER_NAMESPACE: "unstructured"
-  PIPELINE_FAMILY: "general-test"
+  PIPELINE_FAMILY: "general"
   IMAGE_PLATFORMS: linux/amd64,linux/arm64
   PIPELINE_PACKAGE: "general"
   PIP_VERSION: "22.1.2"
