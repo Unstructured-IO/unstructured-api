@@ -43,5 +43,5 @@ jobs:
           docker buildx build --platform ${{ env.IMAGE_PLATFORMS }} --provenance=false --push \
           --build-arg PIP_VERSION=${{ env.PIP_VERSION }} \
           --build-arg PIPELINE_PACKAGE=${{ env.PIPELINE_PACKAGE }} \
-          -t ${{ env.DOCKER_REGISTRY }}/${{ env.DOCKER_NAMESPACE }}/${IMAGE_NAME}:${GIT_SHA} }} \
-          -t ${{ env.DOCKER_REGISTRY }}/${{ env.DOCKER_NAMESPACE }}/${IMAGE_NAME}:latest }} .
+          -t ${{ env.DOCKER_REGISTRY }}/${{ env.DOCKER_NAMESPACE }}/${IMAGE_NAME}:${GIT_SHA} \
+          -t ${{ env.DOCKER_REGISTRY }}/${{ env.DOCKER_NAMESPACE }}/${IMAGE_NAME}:latest .
