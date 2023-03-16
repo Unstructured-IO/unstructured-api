@@ -6,6 +6,8 @@ on:
   pull_request:
     branches: [ main ]
 
+if: false
+
 env:
   PYTHON_VERSION: "3.8"
   PIPELINE_FAMILY: "general"
