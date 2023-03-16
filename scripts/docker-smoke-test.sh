@@ -20,9 +20,8 @@ await_server_ready() {
     url=localhost:8000/healthcheck
 
     for i in {1..5}; do
-        echo Waiting for response from "$url"...
-        curl $url 2> /dev/null
-        if [[ $? = 0 ]]; then
+        echo "$i" Waiting for response from "$url"...
+        if curl $url 2> /dev/null; then
             echo
             return
         fi
