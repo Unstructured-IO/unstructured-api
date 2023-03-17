@@ -60,5 +60,4 @@ COPY pipeline-notebooks pipeline-notebooks
 EXPOSE 5000
 
 ENTRYPOINT ["uvicorn", "prepline_general.api.app:app", \
-  "--host", "0.0.0.0", \
-  "--port", "5000"]
+  "--host", "0.0.0.0"]
