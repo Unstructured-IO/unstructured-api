@@ -37,8 +37,6 @@ def test_happy_path(example_filename):
     For the files in sample-docs, verify that we get a 200
     and some structured response
     """
-    time.sleep(1)  # Avoid a 429
-
     test_file = Path("sample-docs") / example_filename
     response = send_document(test_file)
 
@@ -47,5 +45,3 @@ def test_happy_path(example_filename):
     assert(response.status_code == 200)
     assert len(response.json()) > 0
     assert len("".join(elem["text"] for elem in response.json())) > 20
-
-    time.sleep(1)
