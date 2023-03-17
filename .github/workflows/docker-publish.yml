@@ -38,10 +38,15 @@ jobs:
 
       - name: Build and push Docker image
         run: |
+          BUILD_TYPE_TAG_SUFFIX=""
+          if [[ ! "${{ github.ref }}" =~ ^refs/tags/ ]]; then
+            BUILD_TYPE_TAG_SUFFIX="-dev"
+          fi
           GIT_SHA=$(git rev-parse --short HEAD)
-          IMAGE_NAME=pipeline-family-${{ env.PIPELINE_FAMILY }}
-          docker buildx build --platform ${{ env.IMAGE_PLATFORMS }} --provenance=false --push \
+          IMAGE_NAME=pipeline-family-${{ env.PIPELINE_FAMILY }}${BUILD_TYPE_TAG_SUFFIX}
+          DOCKER_BUILDKIT=1 docker buildx build --platform all --provenance=false --push \
           --build-arg PIP_VERSION=${{ env.PIP_VERSION }} \
           --build-arg PIPELINE_PACKAGE=${{ env.PIPELINE_PACKAGE }} \
+          --progress plain \
           -t ${{ env.DOCKER_REGISTRY }}/${{ env.DOCKER_NAMESPACE }}/${IMAGE_NAME}:${GIT_SHA} \
           -t ${{ env.DOCKER_REGISTRY }}/${{ env.DOCKER_NAMESPACE }}/${IMAGE_NAME}:latest .
