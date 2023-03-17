@@ -22,7 +22,7 @@ jobs:
       with:
         path: |
           .venv
-        key: ci-venv-${{ env.PIPELINE_FAMILY }}-${{ hashFiles('requirements/dev.txt') }}
+        key: ci-venv-${{ env.PIPELINE_FAMILY }}-${{ hashFiles('requirements/test.txt') }}
     - name: Set up Python ${{ env.PYTHON_VERSION }}
       uses: actions/setup-python@v4
       with:
@@ -44,7 +44,7 @@ jobs:
       with:
         path: |
           .venv
-        key: ci-venv-${{ env.PIPELINE_FAMILY }}-${{ hashFiles('requirements/dev.txt') }}
+        key: ci-venv-${{ env.PIPELINE_FAMILY }}-${{ hashFiles('requirements/test.txt') }}
     - name: Lint
       run: |
         source .venv/bin/activate
@@ -67,11 +67,11 @@ jobs:
       with:
         path: |
           .venv
-        key: ci-venv-${{ env.PIPELINE_FAMILY }}-${{ hashFiles('requirements/dev.txt') }}
+        key: ci-venv-${{ env.PIPELINE_FAMILY }}-${{ hashFiles('requirements/test.txt') }}
     - name: Run core tests
       run: |
         source .venv/bin/activate
-        sudo apt-get install --yes poppler-utils libmagic-dev tesseract-ocr
+        sudo apt-get install --yes poppler-utils tesseract-ocr libreoffice
         make install-nltk-models
         make test
         make check-coverage
@@ -103,8 +103,27 @@ jobs:
       with:
         path: |
           .venv
-        key: ci-venv-${{ env.PIPELINE_FAMILY }}-${{ hashFiles('requirements/dev.txt') }}
+        key: ci-venv-${{ env.PIPELINE_FAMILY }}-${{ hashFiles('requirements/test.txt') }}
     - name: API Consistency
       run: |
         source .venv/bin/activate
         make api-check
+
+  # TODO - figure out best practice for caching docker images
+  # (Using the virtualenv to get pytest)
+  test_dockerfile:
+    runs-on: ubuntu-latest
+    needs: [setup, lint]
+    steps:
+    - uses: actions/checkout@v3
+    - uses: actions/cache@v3
+      id: virtualenv-cache
+      with:
+        path: |
+          .venv
+        key: ci-venv-${{ env.PIPELINE_FAMILY }}-${{ hashFiles('requirements/test.txt') }}
+    - name: Test Dockerfile
+      run: |
+        source .venv/bin/activate
+        make docker-build
+        make docker-test
