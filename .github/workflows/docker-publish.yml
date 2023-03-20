@@ -37,7 +37,7 @@ jobs:
           username: ${{ secrets.QUAY_IO_ROBOT_USERNAME }}
           password: ${{ secrets.QUAY_IO_ROBOT_TOKEN }}
 
-      # TODO(rniko): add a step to test the built image before pushing. Will add after https://unstructured-ai.atlassian.net/browse/CORE-745 is done
+      # TODO(rniko): add a step to test the built image before pushing. https://unstructured-ai.atlassian.net/browse/CORE-805
       - name: Build and push Docker image
         run: |
           VERSION=$(grep -m1 version preprocessing-pipeline-family.yaml | cut -d ' ' -f2)
