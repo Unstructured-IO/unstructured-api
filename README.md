@@ -51,6 +51,25 @@ It's also nice to show how to call the API function using pure Python.
 
 You can generate the FastAPI APIs from your pipeline notebooks by running `make generate-api`.
 
+## :dizzy: Instructions for using the Docker image
+
+The following instructions are intended to help you get up and running using Docker to interact with `unstructured-api`.
+See [here](https://docs.docker.com/get-docker/) if you don't already have docker installed on your machine.
+
+NOTE: the image is only supported for x86_64 hardware and known to have issues on Apple silicon.
+
+We build Docker images for all pushes to `main`. We tag each image with the corresponding short commit hash (e.g. `fbc7a69`) and the application version (e.g. `0.5.5-dev1`). We also tag the most recent image with `latest`. To leverage this, `docker pull` from our image repository.
+
+```bash
+docker pull quay.io/unstructured-io/unstructured-api:latest
+```
+
+Once pulled, you can launch the container as a web app on localhost:8000.
+
+```bash
+docker run -p 8000:8000 -d --rm --name unstructured-api quay.io/unstructured-io/unstructured-api:latest --port 8000 --host 0.0.0.0
+```
+
 ## Security Policy
 
 See our [security policy](https://github.com/Unstructured-IO/pipeline-emails/security/policy) for
