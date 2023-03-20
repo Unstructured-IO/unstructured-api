@@ -8,12 +8,12 @@
 
 # shellcheck disable=SC2317  # Shellcheck complains that trap functions are unreachable...
 
-container_name=pipeline-general
-image_name=pipeline-family-general-dev:latest
+CONTAINER_NAME=pipeline-general
+IMAGE_NAME="${1:-pipeline-family-general:latest}"
 
 start_container() {
-    echo Starting container "$container_name"
-    docker run -p 8000:8000 -d --rm --name "$container_name" "$image_name" --port 8000 --host 0.0.0.0
+    echo Starting container "$CONTAINER_NAME"
+    docker run -p 8000:8000 -d --rm --name "$CONTAINER_NAME" "$IMAGE_NAME" --port 8000 --host 0.0.0.0
 }
 
 await_server_ready() {
@@ -34,8 +34,8 @@ await_server_ready() {
 }
 
 stop_container() {
-    echo Stopping container "$container_name"
-    docker stop "$container_name"
+    echo Stopping container "$CONTAINER_NAME"
+    docker stop "$CONTAINER_NAME"
 }
 
 start_container

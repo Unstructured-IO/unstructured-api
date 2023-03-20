@@ -8,42 +8,88 @@ on:
 env:
   DOCKER_REGISTRY: "quay.io"
   DOCKER_NAMESPACE: "unstructured-io"
-  IMAGE_PLATFORMS: linux/amd64
   PACKAGE: "unstructured-api"
   PIPELINE_PACKAGE: "general"
   PIP_VERSION: "22.2.1"
   BUILD_TYPE_TAG_SUFFIX: ""
+  PYTHON_VERSION: "3.8"
+  PIPELINE_FAMILY: "general"
 
 jobs:
-  build:
+  setup:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+    - uses: actions/checkout@v3
+    - uses: actions/cache@v3
+      id: virtualenv-cache
+      with:
+        path: |
+          .venv
+        key: ci-venv-${{ env.PIPELINE_FAMILY }}-${{ hashFiles('requirements/test.txt') }}
+    - name: Set up Python ${{ env.PYTHON_VERSION }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+    - name: Setup virtual environment (no cache hit)
+      if: steps.virtualenv-cache.outputs.cache-hit != 'true'
+      run: |
+        python${{ env.PYTHON_VERSION }} -m venv .venv
+        source .venv/bin/activate
+        make install-ci
 
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v1
+  build:
+    runs-on: ubuntu-latest
+    needs: [setup]
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v1
+    - name: Set virtualenv cache
+      uses: actions/cache@v3
+      id: virtualenv-cache
+      with:
+        path: |
+          .venv
+        key: ci-venv-${{ env.PIPELINE_FAMILY }}-${{ hashFiles('requirements/test.txt') }}
 
-      - name: Login to Quay.io
-        uses: docker/login-action@v1
-        with:
-          registry: quay.io
-          username: ${{ secrets.QUAY_IO_ROBOT_USERNAME }}
-          password: ${{ secrets.QUAY_IO_ROBOT_TOKEN }}
+    - name: Set up QEMU
+      uses: docker/setup-qemu-action@v1
 
-      # TODO(rniko): add a step to test the built image before pushing. https://unstructured-ai.atlassian.net/browse/CORE-805
-      - name: Build and push Docker image
-        run: |
-          VERSION=$(grep -m1 version preprocessing-pipeline-family.yaml | cut -d ' ' -f2)
-          GIT_SHA=$(git rev-parse --short HEAD)
-          IMAGE_NAME=${{ env.PACKAGE }}
-          docker buildx build --platform=${{ env.IMAGE_PLATFORMS }} --provenance=false --push \
-          --build-arg PIP_VERSION=${{ env.PIP_VERSION }} \
-          --build-arg PIPELINE_PACKAGE=${{ env.PIPELINE_PACKAGE }} \
-          --progress plain \
-          -t ${{ env.DOCKER_REGISTRY }}/${{ env.DOCKER_NAMESPACE }}/${IMAGE_NAME}:${GIT_SHA} \
-          -t ${{ env.DOCKER_REGISTRY }}/${{ env.DOCKER_NAMESPACE }}/${IMAGE_NAME}:${VERSION} \
-          -t ${{ env.DOCKER_REGISTRY }}/${{ env.DOCKER_NAMESPACE }}/${IMAGE_NAME}:latest .
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v1
+
+    - name: Login to Quay.io
+      uses: docker/login-action@v1
+      with:
+        registry: quay.io
+        username: ${{ secrets.QUAY_IO_ROBOT_USERNAME }}
+        password: ${{ secrets.QUAY_IO_ROBOT_TOKEN }}
+
+    # TODO(rniko): add a step to test the built image before pushing. https://unstructured-ai.atlassian.net/browse/CORE-805
+    - name: Build and push Docker image
+      run: |
+        # define variables
+        VERSION=$(grep -m1 version preprocessing-pipeline-family.yaml | cut -d ' ' -f2)
+        GIT_SHA=$(git rev-parse --short HEAD)
+        BASE_REPOSITORY=${{ env.DOCKER_REGISTRY }}/${{ env.DOCKER_NAMESPACE }}/${IMAGE_NAME}
+        AMD_REPOSITORY=${BASE_REPOSITORY}-amd
+        ARM_REPOSITORY=${BASE_REPOSITORY}-arm
+        # locally build and test amd64 image
+        docker buildx build --platform linux/amd64  -t ${AMD_REPOSITORY} --load \
+        --build-arg PIP_VERSION=${{ env.PIP_VERSION }} \
+        --build-arg PIPELINE_PACKAGE=${{ env.PIPELINE_PACKAGE }} \
+        --progress plain .
+        make docker-test ${AMD_REPOSITORY}
+        # locally build arm64 image
+        docker buildx build --platform linux/arm64 -t ${ARM_REPOSITORY} --load \
+        --build-arg PIP_VERSION=${{ env.PIP_VERSION }} \
+        --build-arg PIPELINE_PACKAGE=${{ env.PIPELINE_PACKAGE }} \
+        --progress plain .
+        # create and push the manifest
+        docker manifest create ${BASE_REPOSITORY} ${AMD_REPOSITORY} ${ARM_REPOSITORY}
+        docker manifest annotate ${BASE_REPOSITORY} ${AMD_REPOSITORY} --os linux --arch amd64
+        docker manifest annotate ${BASE_REPOSITORY} ${ARM_REPOSITORY} --os linux --arch arm64
+        docker tag ${BASE_REPOSITORY} ${BASE_REPOSITORY}:${GIT_SHA}
+        docker tag ${BASE_REPOSITORY} ${BASE_REPOSITORY}:${VERSION}
+        docker tag ${BASE_REPOSITORY} ${BASE_REPOSITORY}:latest
+        docker manifest push ${BASE_REPOSITORY}
