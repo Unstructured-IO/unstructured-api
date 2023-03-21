@@ -66,13 +66,14 @@ jobs:
     # TODO(rniko): add a step to test the built image before pushing. https://unstructured-ai.atlassian.net/browse/CORE-805
     - name: Build and push Docker image
       run: |
+        source .venv/bin/activate
         # define variables
         VERSION=$(grep -m1 version preprocessing-pipeline-family.yaml | cut -d ' ' -f2)
         GIT_SHA=$(git rev-parse --short HEAD)
         IMAGE_NAME=${{ env.PACKAGE }}
         BASE_REPOSITORY=${{ env.DOCKER_REGISTRY }}/${{ env.DOCKER_NAMESPACE }}/${IMAGE_NAME}
-        AMD_REPOSITORY=${BASE_REPOSITORY}-amd
-        ARM_REPOSITORY=${BASE_REPOSITORY}-arm
+        AMD_REPOSITORY=${BASE_REPOSITORY}:manifest-amd64
+        ARM_REPOSITORY=${BASE_REPOSITORY}:manifest-arm64
         # locally build and test amd64 image
         docker buildx build --platform linux/amd64  -t ${AMD_REPOSITORY} --load \
         --build-arg PIP_VERSION=${{ env.PIP_VERSION }} \
