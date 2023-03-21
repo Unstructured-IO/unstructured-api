@@ -10,6 +10,7 @@
 
 CONTAINER_NAME=pipeline-general
 IMAGE_NAME="${IMAGE_NAME:-pipeline-family-general:latest}"
+echo Image name: "$IMAGE_NAME"
 
 start_container() {
     echo Starting container "$CONTAINER_NAME"
