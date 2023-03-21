@@ -84,8 +84,8 @@ jobs:
     - name: Test image
       run: | 
         source .venv/bin/activate 
-        IMAGE_NAME="${{ env.DOCKER_REGISTRY }}/${{ env.DOCKER_NAMESPACE }}/${IMAGE_NAME}:latest" make docker-test
+        IMAGE_NAME="${{ env.DOCKER_REGISTRY }}/${{ env.DOCKER_NAMESPACE }}/${{ env.PACKAGE }}:latest" make docker-test
 
     - name: Push image
       run: | 
-        docker image push --all-tags ${{ env.DOCKER_REGISTRY }}/${{ env.DOCKER_NAMESPACE }}/${IMAGE_NAME}
+        docker image push --all-tags ${{ env.DOCKER_REGISTRY }}/${{ env.DOCKER_NAMESPACE }}/${{ env.PACKAGE }}
