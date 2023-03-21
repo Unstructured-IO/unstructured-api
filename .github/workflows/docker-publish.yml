@@ -78,7 +78,7 @@ jobs:
         --build-arg PIP_VERSION=${{ env.PIP_VERSION }} \
         --build-arg PIPELINE_PACKAGE=${{ env.PIPELINE_PACKAGE }} \
         --progress plain .
-        make docker-test ${AMD_REPOSITORY}
+        IMAGE_NAME=$AMD_REPOSITORY make docker-test
         # locally build arm64 image
         docker buildx build --platform linux/arm64 -t ${ARM_REPOSITORY} --load \
         --build-arg PIP_VERSION=${{ env.PIP_VERSION }} \
