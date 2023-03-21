@@ -6,11 +6,11 @@
   <p>General Pre-Processing Pipeline for Documents</p>
 </h3>
 
+This repo implements a pre-processing pipeline for the following documents. Currently, the pipeline is capable of recognizing the file type and choosing the relevant partition function to process the file.
 
-This repo implements a pre-processing pipeline for `.txt`, `.docx`, `.pptx`, `.jpg`, `.png`, `.eml`, `.html`, and `.pdf` documents. Currently, the pipeline is capable of recognizing the file type and choosing the relevant partition function to process the file.
-
-The API is hosted at `https://api.unstructured.io`.
-
+* Various plaintext files: `.txt`, `.eml`, `.html`, `.md`, `.json`
+* Images: `.jpeg`, `.png`
+* Documents: `.doc`, `.docx`, `.ppt`, `.pptx`, `.pdf`, `.epub`
 
 ## Developer Quick Start
 
@@ -50,6 +50,25 @@ It's also nice to show how to call the API function using pure Python.
 ### Generating Python files from the pipeline notebooks
 
 You can generate the FastAPI APIs from your pipeline notebooks by running `make generate-api`.
+
+## :dizzy: Instructions for using the Docker image
+
+The following instructions are intended to help you get up and running using Docker to interact with `unstructured-api`.
+See [here](https://docs.docker.com/get-docker/) if you don't already have docker installed on your machine.
+
+NOTE: the image is only supported for x86_64 hardware and known to have issues on Apple silicon. Known issues are specific to processing files that need to use inference, i.e. .jpeg and .pdf. When running the amd64 container on a mac, this results in an unsupported hardware error that causes the server to hang.
+
+We build Docker images for all pushes to `main`. We tag each image with the corresponding short commit hash (e.g. `fbc7a69`) and the application version (e.g. `0.5.5-dev1`). We also tag the most recent image with `latest`. To leverage this, `docker pull` from our image repository.
+
+```bash
+docker pull quay.io/unstructured-io/unstructured-api:latest
+```
+
+Once pulled, you can launch the container as a web app on localhost:8000.
+
+```bash
+docker run -p 8000:8000 -d --rm --name unstructured-api quay.io/unstructured-io/unstructured-api:latest --port 8000 --host 0.0.0.0
+```
 
 ## Security Policy
 
