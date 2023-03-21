@@ -56,7 +56,7 @@ You can generate the FastAPI APIs from your pipeline notebooks by running `make 
 The following instructions are intended to help you get up and running using Docker to interact with `unstructured-api`.
 See [here](https://docs.docker.com/get-docker/) if you don't already have docker installed on your machine.
 
-NOTE: the image is only supported for x86_64 hardware and known to have issues on Apple silicon.
+NOTE: the image is only supported for x86_64 hardware and known to have issues on Apple silicon. Known issues are specific to processing files that need to use inference, i.e. .jpeg and .pdf. When running the amd64 container on a mac, this results in an unsupported hardware error that causes the server to hang.
 
 We build Docker images for all pushes to `main`. We tag each image with the corresponding short commit hash (e.g. `fbc7a69`) and the application version (e.g. `0.5.5-dev1`). We also tag the most recent image with `latest`. To leverage this, `docker pull` from our image repository.
 
