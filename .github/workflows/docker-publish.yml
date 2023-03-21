@@ -63,33 +63,23 @@ jobs:
         username: ${{ secrets.QUAY_IO_ROBOT_USERNAME }}
         password: ${{ secrets.QUAY_IO_ROBOT_TOKEN }}
 
-    # TODO(rniko): add a step to test the built image before pushing. https://unstructured-ai.atlassian.net/browse/CORE-805
-    - name: Build and push Docker image
+    - name: Build image
       run: |
-        source .venv/bin/activate
-        # define variables
         VERSION=$(grep -m1 version preprocessing-pipeline-family.yaml | cut -d ' ' -f2)
         GIT_SHA=$(git rev-parse --short HEAD)
         IMAGE_NAME=${{ env.PACKAGE }}
-        BASE_REPOSITORY=${{ env.DOCKER_REGISTRY }}/${{ env.DOCKER_NAMESPACE }}/${IMAGE_NAME}
-        AMD_REPOSITORY=${BASE_REPOSITORY}:manifest-amd64
-        ARM_REPOSITORY=${BASE_REPOSITORY}:manifest-arm64
-        # locally build and test amd64 image
-        docker buildx build --platform linux/amd64  -t ${AMD_REPOSITORY} --load \
+        docker buildx build --platform=${{ env.IMAGE_PLATFORMS }} --provenance=false --load \
         --build-arg PIP_VERSION=${{ env.PIP_VERSION }} \
         --build-arg PIPELINE_PACKAGE=${{ env.PIPELINE_PACKAGE }} \
-        --progress plain .
-        IMAGE_NAME=$AMD_REPOSITORY make docker-test
-        # locally build arm64 image
-        docker buildx build --platform linux/arm64 -t ${ARM_REPOSITORY} --load \
-        --build-arg PIP_VERSION=${{ env.PIP_VERSION }} \
-        --build-arg PIPELINE_PACKAGE=${{ env.PIPELINE_PACKAGE }} \
-        --progress plain .
-        # create and push the manifest
-        docker manifest create ${BASE_REPOSITORY} ${AMD_REPOSITORY} ${ARM_REPOSITORY}
-        docker manifest annotate ${BASE_REPOSITORY} ${AMD_REPOSITORY} --os linux --arch amd64
-        docker manifest annotate ${BASE_REPOSITORY} ${ARM_REPOSITORY} --os linux --arch arm64
-        docker tag ${BASE_REPOSITORY} ${BASE_REPOSITORY}:${GIT_SHA}
-        docker tag ${BASE_REPOSITORY} ${BASE_REPOSITORY}:${VERSION}
-        docker tag ${BASE_REPOSITORY} ${BASE_REPOSITORY}:latest
-        docker manifest push ${BASE_REPOSITORY}
+        --progress plain \
+        -t ${{ env.DOCKER_REGISTRY }}/${{ env.DOCKER_NAMESPACE }}/${IMAGE_NAME}:${GIT_SHA} \
+        -t ${{ env.DOCKER_REGISTRY }}/${{ env.DOCKER_NAMESPACE }}/${IMAGE_NAME}:${VERSION} \
+        -t ${{ env.DOCKER_REGISTRY }}/${{ env.DOCKER_NAMESPACE }}/${IMAGE_NAME}:latest .
+    - name: Test image
+      run: | 
+        source .venv/bin/activate 
+        IMAGE_NAME=${{ env.DOCKER_REGISTRY }}/${{ env.DOCKER_NAMESPACE }}/${IMAGE_NAME} make docker-test
+
+    - name: Push image
+      run: | 
+        docker image push --all-tags ${{ env.DOCKER_REGISTRY }}/${{ env.DOCKER_NAMESPACE }}/${IMAGE_NAME}
