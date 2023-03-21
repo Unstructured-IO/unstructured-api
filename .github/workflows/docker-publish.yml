@@ -2,6 +2,8 @@ name: Build And Push Docker Image
 
 on:
   push:
+    branches:
+      - main
 
 env:
   DOCKER_REGISTRY: "quay.io"
