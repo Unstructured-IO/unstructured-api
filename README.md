@@ -6,11 +6,11 @@
   <p>General Pre-Processing Pipeline for Documents</p>
 </h3>
 
+This repo implements a pre-processing pipeline for the following documents. Currently, the pipeline is capable of recognizing the file type and choosing the relevant partition function to process the file.
 
-This repo implements a pre-processing pipeline for `.txt`, `.docx`, `.pptx`, `.jpg`, `.png`, `.eml`, `.html`, and `.pdf` documents. Currently, the pipeline is capable of recognizing the file type and choosing the relevant partition function to process the file.
-
-The API is hosted at `https://api.unstructured.io`.
-
+* Various plaintext files: `.txt`, `.eml`, `.html`, `.md`, `.json`
+* Images: `.jpeg`, `.png`
+* Documents: `.doc`, `.docx`, `.ppt`, `.pptx`, `.pdf`, `.epub`
 
 ## Developer Quick Start
 
