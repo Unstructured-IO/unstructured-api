@@ -9,7 +9,7 @@
 # shellcheck disable=SC2317  # Shellcheck complains that trap functions are unreachable...
 
 CONTAINER_NAME=pipeline-general
-IMAGE_NAME="${IMAGE_NAME:-pipeline-family-general:latest}"
+IMAGE_NAME="${IMAGE_NAME:-pipeline-family-general-dev:latest}"
 
 start_container() {
     echo Starting container "$CONTAINER_NAME"
