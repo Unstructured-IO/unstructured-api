@@ -46,3 +46,12 @@ def test_general_api(example_filename):
     assert response.status_code == 200
     assert len(response.json()) > 0
     assert len("".join(elem["text"] for elem in response.json())) > 20
+
+    # Just hit the second path (posting multiple files) to bump the coverage
+    # We'll come back and make smarter tests
+    response = client.post(
+        MAIN_API_ROUTE, files=[("files", (str(test_file), open(test_file, "rb"), "text/plain")),
+                               ("files", (str(test_file), open(test_file, "rb"), "text/plain"))]
+    )
+    assert response.status_code == 200
+    assert len(response.json()) > 0
