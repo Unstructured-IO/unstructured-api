@@ -17,10 +17,45 @@ from unstructured_api_tools.pipelines.convert import read_notebook
 def process_nb(nb: nbformat.NotebookNode, working_dir: Union[str, Path]) -> nbformat.NotebookNode:
     """Execute cells in nb using working_dir as the working directory for imports, modifying the
     notebook in place (in memory)."""
+    # Clear existing outputs before executing the notebook
+    for cell in nb.cells:
+        if cell.cell_type == "code":
+            cell.outputs = []
     ep = ExecutePreprocessor(timeout=600)
     ep.preprocess(nb, {"metadata": {"path": working_dir}})
+    # Merge adjacent text outputs after executing the notebook
+    for cell in nb.cells:
+        merge_adjacent_text_outputs(cell)
     return nb
 
+def merge_adjacent_text_outputs(cell: nbformat.NotebookNode) -> nbformat.NotebookNode:
+    """Merges adjacent text stream outputs to avoid non-deterministic splits in output."""
+    if cell.cell_type != "code":
+        return cell
+
+    new_outputs = []
+    current_output = None
+
+    for output in cell.outputs:
+        if output.output_type == "stream":
+            if current_output is None:
+                current_output = output
+            elif current_output.name == output.name:
+                current_output.text += output.text
+            else:
+                new_outputs.append(current_output)
+                current_output = output
+        else:
+            if current_output is not None:
+                new_outputs.append(current_output)
+                current_output = None
+            new_outputs.append(output)
+
+    if current_output is not None:
+        new_outputs.append(current_output)
+
+    cell.outputs = new_outputs
+    return cell
 
 def nb_paths(root_path: Union[str, Path]) -> List[Path]:
     """Fetches all .ipynb filenames that belong to subdirectories of root_path (1 level deep) with
@@ -91,6 +126,7 @@ if __name__ == "__main__":
     nonmatching_nbs = []
     fns = notebooks if notebooks else nb_paths(root_path)
     for fn in fns:
+        print(f"{'checking' if check else 'processing'} {fn}")
         nb = read_notebook(fn)
         modified_nb = deepcopy(nb)
         process_nb(modified_nb, root_path)
