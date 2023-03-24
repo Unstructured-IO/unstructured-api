@@ -4,7 +4,7 @@ import time
 
 import pytest
 
-api_url = "http://localhost:8000/general/v0.0.4/general"
+api_url = "http://localhost:8000/general/v0.0.5/general"
 
 def send_document(filename):
     files = {"files": (str(filename), open(filename, "rb"), "text/plain")}
