@@ -160,7 +160,6 @@ check-version:
 # Fail if syncing version would produce changes
 	scripts/version-sync.sh -c \
 		-s CHANGELOG.md \
-		-f README.md api-release \
 		-f preprocessing-pipeline-family.yaml release
 
 ## check-notebooks:             check that executing and cleaning notebooks doesn't produce changes
