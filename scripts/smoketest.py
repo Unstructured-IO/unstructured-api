@@ -4,11 +4,11 @@ import time
 
 import pytest
 
-api_url = "http://localhost:8000/general/v0.0.4/general"
+API_URL = "http://localhost:8000/general/v0/general"
 
 def send_document(filename):
     files = {"files": (str(filename), open(filename, "rb"), "text/plain")}
-    return requests.post(api_url, files=files)
+    return requests.post(API_URL, files=files)
 
 @pytest.mark.parametrize(
     "example_filename",
@@ -37,8 +37,6 @@ def test_happy_path(example_filename):
     For the files in sample-docs, verify that we get a 200
     and some structured response
     """
-    time.sleep(1)  # Avoid a 429
-
     test_file = Path("sample-docs") / example_filename
     response = send_document(test_file)
 
@@ -47,5 +45,3 @@ def test_happy_path(example_filename):
     assert(response.status_code == 200)
     assert len(response.json()) > 0
     assert len("".join(elem["text"] for elem in response.json())) > 20
-
-    time.sleep(1)

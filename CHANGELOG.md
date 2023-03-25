@@ -1,3 +1,10 @@
+## 0.0.5
+
+* Updated Dockerfile for public release
+* Remove rate limiting in the API
+* Add file type validation via UNSTRUCTURED_ALLOWED_MIMETYPES
+* Major semver route also supported: /general/v0/general 
+
 ## 0.0.4
 
 * Changed pipeline name to `pipeline-general`
