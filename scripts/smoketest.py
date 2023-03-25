@@ -4,11 +4,11 @@ import time
 
 import pytest
 
-api_url = "http://localhost:8000/general/v0.0.5/general"
+API_URL = "http://localhost:8000/general/v0/general"
 
 def send_document(filename):
     files = {"files": (str(filename), open(filename, "rb"), "text/plain")}
-    return requests.post(api_url, files=files)
+    return requests.post(API_URL, files=files)
 
 @pytest.mark.parametrize(
     "example_filename",

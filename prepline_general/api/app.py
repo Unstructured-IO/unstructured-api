@@ -13,6 +13,7 @@ app = FastAPI(
     title="Unstructured Pipeline API",
     description="""""",
     version="1.0.0",
+    docs_url="/general/docs",
 )
 
 app.include_router(general_router)

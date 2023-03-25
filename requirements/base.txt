@@ -44,7 +44,7 @@ commonmark==0.9.1
     # via rich
 contourpy==1.0.7
     # via matplotlib
-cryptography==39.0.2
+cryptography==40.0.0
     # via pdfminer-six
 cycler==0.11.0
     # via matplotlib
@@ -62,7 +62,7 @@ fastapi==0.95.0
     #   unstructured-inference
 fastjsonschema==2.16.3
     # via nbformat
-filelock==3.10.2
+filelock==3.10.4
     # via
     #   huggingface-hub
     #   torch
@@ -276,7 +276,7 @@ pyzmq==25.0.2
     # via jupyter-client
 ratelimit==2.2.1
     # via -r requirements/base.in
-regex==2023.3.22
+regex==2023.3.23
     # via
     #   nltk
     #   transformers
@@ -310,7 +310,7 @@ sympy==1.11.1
     # via
     #   onnxruntime
     #   torch
-timm==0.6.12
+timm==0.6.13
     # via effdet
 tinycss2==1.2.1
     # via nbconvert
@@ -345,7 +345,7 @@ traitlets==5.9.0
     #   nbclient
     #   nbconvert
     #   nbformat
-transformers==4.27.2
+transformers==4.27.3
     # via unstructured-inference
 types-requests==2.28.11.16
     # via unstructured-api-tools
@@ -362,9 +362,9 @@ typing-extensions==4.5.0
     #   rich
     #   starlette
     #   torch
-unstructured[local-inference]==0.5.6
+unstructured[local-inference]==0.5.7
     # via -r requirements/base.in
-unstructured-api-tools==0.6.0
+unstructured-api-tools==0.8.0
     # via -r requirements/base.in
 unstructured-inference==0.2.11
     # via unstructured
