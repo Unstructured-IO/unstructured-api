@@ -145,7 +145,7 @@ check-tests:
 ## tidy:                        run black
 .PHONY: tidy
 tidy:
-	black --line-length 100 ${PACKAGE_NAME}
+	black --line-length 100 ${PACKAGE_NAME} --exclude ${PACKAGE_NAME}/api
 	black --line-length 100 test_${PIPELINE_PACKAGE}
 
 ## check-scripts:               run shellcheck
