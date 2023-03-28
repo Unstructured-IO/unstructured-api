@@ -1,3 +1,7 @@
+## 0.0.6
+
+* Minor version bump
+
 ## 0.0.5
 
 * Updated Dockerfile for public release
