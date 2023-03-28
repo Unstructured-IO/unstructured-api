@@ -20,5 +20,5 @@ app.include_router(general_router)
 
 
 @app.get("/healthcheck", status_code=status.HTTP_200_OK)
-async def healthcheck(request: Request):
+def healthcheck(request: Request):
     return {"healthcheck": "HEALTHCHECK STATUS: EVERYTHING OK!"}
