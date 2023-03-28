@@ -31,7 +31,9 @@ RUN yum -y update && \
   curl -O https://www.python.org/ftp/python/3.8.15/Python-3.8.15.tgz && tar -xzf Python-3.8.15.tgz && \
   cd Python-3.8.15/ && ./configure --enable-optimizations && make altinstall && \
   cd .. && rm -rf Python-3.8.15* && \
-  ln -s /usr/local/bin/python3.8 /usr/local/bin/python3
+  ln -s /usr/local/bin/python3.8 /usr/local/bin/python3 && \
+  ln -s /home/notebook-user/.local/bin/pip /usr/local/bin/pip
+# Note, the above pip locations is created later in the Dockerfile, OK to ln -s now as root
 
 # create user with a home directory
 ENV USER ${NB_USER}
