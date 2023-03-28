@@ -4,11 +4,18 @@
 #####################################################################
 
 import os
+import mimetypes
 from typing import List, Union
-from fastapi import status, FastAPI, File, Form, Request, UploadFile, APIRouter
-from slowapi.errors import RateLimitExceeded
-from slowapi import Limiter, _rate_limit_exceeded_handler
-from slowapi.util import get_remote_address
+from fastapi import (
+    status,
+    FastAPI,
+    File,
+    Form,
+    Request,
+    UploadFile,
+    APIRouter,
+    HTTPException,
+)
 from fastapi.responses import PlainTextResponse
 import json
 from fastapi.responses import StreamingResponse
@@ -21,13 +28,8 @@ from unstructured.staging.base import convert_to_isd
 import tempfile
 
 
-limiter = Limiter(key_func=get_remote_address)
 app = FastAPI()
-app.state.limiter = limiter
-app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 router = APIRouter()
-
-RATE_LIMIT = os.environ.get("PIPELINE_API_RATE_LIMIT", "1/second")
 
 
 def is_expected_response_type(media_type, response_type):
@@ -61,6 +63,32 @@ def pipeline_api(file, filename="", response_type="application/json"):
         element["metadata"]["filename"] = os.path.basename(filename)
 
     return result
+
+
+def get_validated_mimetype(file):
+    """
+    Return a file's mimetype, either via the file.content_type or the mimetypes lib if that's too
+    generic. If the user has set UNSTRUCTURED_ALLOWED_MIMETYPES, validate against this list and
+    return HTTP 400 for an invalid type.
+    """
+    content_type = file.content_type
+    if content_type == "application/octet-stream":
+        content_type = mimetypes.guess_type(str(file.filename))[0]
+
+        # Markdown mimetype is too new for the library - just hardcode that one in for now
+        if not content_type and ".md" in file.filename:
+            content_type = "text/markdown"
+
+    allowed_mimetypes_str = os.environ.get("UNSTRUCTURED_ALLOWED_MIMETYPES")
+    if allowed_mimetypes_str is not None:
+        allowed_mimetypes = allowed_mimetypes_str.split(",")
+
+        if content_type not in allowed_mimetypes:
+            raise HTTPException(
+                status_code=400, detail=f"File type not supported: {file.filename}"
+            )
+
+    return content_type
 
 
 class MultipartMixedResponse(StreamingResponse):
@@ -121,9 +149,9 @@ class MultipartMixedResponse(StreamingResponse):
         await send({"type": "http.response.body", "body": b"", "more_body": False})
 
 
+@router.post("/general/v0/general")
 @router.post("/general/v0.0.7/general")
-@limiter.limit(RATE_LIMIT)
-async def pipeline_1(
+def pipeline_1(
     request: Request,
     files: Union[List[UploadFile], None] = File(default=None),
     output_format: Union[str, None] = Form(default=None),
@@ -153,6 +181,8 @@ async def pipeline_1(
 
             def response_generator(is_multipart):
                 for file in files:
+                    _ = get_validated_mimetype(file)
+
                     _file = file.file
 
                     response = pipeline_api(
@@ -174,6 +204,8 @@ async def pipeline_1(
         else:
             file = files[0]
             _file = file.file
+
+            _ = get_validated_mimetype(file)
 
             response = pipeline_api(
                 _file,
@@ -206,7 +238,7 @@ async def pipeline_1(
 
 
 @app.get("/healthcheck", status_code=status.HTTP_200_OK)
-async def healthcheck(request: Request):
+def healthcheck(request: Request):
     return {"healthcheck": "HEALTHCHECK STATUS: EVERYTHING OK!"}
 
 

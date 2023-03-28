@@ -6,25 +6,19 @@
 
 from fastapi import FastAPI, Request, status
 
-from slowapi import Limiter, _rate_limit_exceeded_handler
-from slowapi.errors import RateLimitExceeded
-from slowapi.util import get_remote_address
-
 from .general import router as general_router
 
 
-limiter = Limiter(key_func=get_remote_address)
 app = FastAPI(
     title="Unstructured Pipeline API",
     description="""""",
     version="1.0.0",
+    docs_url="/general/docs",
 )
-app.state.limiter = limiter
-app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 app.include_router(general_router)
 
 
 @app.get("/healthcheck", status_code=status.HTTP_200_OK)
-async def healthcheck(request: Request):
+def healthcheck(request: Request):
     return {"healthcheck": "HEALTHCHECK STATUS: EVERYTHING OK!"}
