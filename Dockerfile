@@ -31,9 +31,7 @@ RUN yum -y update && \
   curl -O https://www.python.org/ftp/python/3.8.15/Python-3.8.15.tgz && tar -xzf Python-3.8.15.tgz && \
   cd Python-3.8.15/ && ./configure --enable-optimizations && make altinstall && \
   cd .. && rm -rf Python-3.8.15* && \
-  ln -s /usr/local/bin/python3.8 /usr/local/bin/python3 && \
-  ln -s /home/notebook-user/.local/bin/pip /usr/local/bin/pip
-# Note, the above pip locations is created later in the Dockerfile, OK to ln -s now as root
+  ln -s /usr/local/bin/python3.8 /usr/local/bin/python3
 
 # create user with a home directory
 ENV USER ${NB_USER}
@@ -54,6 +52,11 @@ COPY requirements/base.txt requirements-base.txt
 RUN python3.8 -m pip install pip==${PIP_VERSION} \
   && pip3.8 install  --no-cache  -r requirements-base.txt \
   && pip3.8 install --no-cache "detectron2@git+https://github.com/facebookresearch/detectron2.git@v0.6#egg=detectron2"
+
+# NOTE(Crag): work around annoying complaint that sometimes occurs about /usr/local/bin/pip not existing
+USER root
+ln -s /home/notebook-user/.local/bin/pip /usr/local/bin/pip
+USER ${NB_USER}
 
 COPY --chown=${NB_USER}:${NB_USER} prepline_${PIPELINE_PACKAGE}/ prepline_${PIPELINE_PACKAGE}/
 COPY --chown=${NB_USER}:${NB_USER} exploration-notebooks exploration-notebooks
