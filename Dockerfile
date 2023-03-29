@@ -58,6 +58,7 @@ USER root
 RUN ln -s /home/notebook-user/.local/bin/pip /usr/local/bin/pip
 USER ${NB_USER}
 
+COPY --chown=${NB_USER}:${NB_USER} logger_config.yaml logger_config.yaml
 COPY --chown=${NB_USER}:${NB_USER} prepline_${PIPELINE_PACKAGE}/ prepline_${PIPELINE_PACKAGE}/
 COPY --chown=${NB_USER}:${NB_USER} exploration-notebooks exploration-notebooks
 COPY --chown=${NB_USER}:${NB_USER} pipeline-notebooks pipeline-notebooks
@@ -65,4 +66,5 @@ COPY --chown=${NB_USER}:${NB_USER} pipeline-notebooks pipeline-notebooks
 EXPOSE 5000
 
 ENTRYPOINT ["uvicorn", "prepline_general.api.app:app", \
+   "--log-config", "logger_config.yaml", \
   "--host", "0.0.0.0"]

@@ -1,3 +1,7 @@
+## 0.0.8
+
+* Sensible logging config
+
 ## 0.0.7
 
 * Minor version bump
