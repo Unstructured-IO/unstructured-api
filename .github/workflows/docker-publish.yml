@@ -6,7 +6,7 @@ on:
       - main
   pull_request:
     branches:
-      - main
+      - main 
 
 env:
   DOCKER_REPOSITORY: quay.io/unstructured-io/unstructured-api-multiarch
