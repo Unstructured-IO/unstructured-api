@@ -42,25 +42,61 @@ def is_expected_response_type(media_type, response_type):
 
 
 # pipeline-api
-def pipeline_api(file, filename="", m_strategy=[], response_type="application/json"):
+
+
+# TODO: uncomment once error in unstructured-api-tools is uncovered
+# DEFAULT_MIMETYPES = "application/pdf,application/msword,image/jpeg,image/png,text/markdown," \
+#                     "text/x-markdown,application/epub,application/epub+zip,text/html," \
+#                     "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet," \
+#                     "application/vnd.ms-excel,application/vnd.openxmlformats-officedocument." \
+#                     "presentationml.presentation," \
+#                     "application/vnd.ms-powerpoint,application/xml"
+#
+# if not os.environ.get("UNSTRUCTURED_ALLOWED_MIMETYPES", None):
+#     os.environ["UNSTRUCTURED_ALLOWED_MIMETYPES"] =  DEFAULT_MIMETYPES
+
+
+def pipeline_api(
+    file,
+    filename="",
+    m_strategy=[],
+    file_content_type=None,
+    response_type="application/json",
+):
     strategy = (m_strategy[0] if len(m_strategy) else "fast").lower()
     if strategy not in ["fast", "hi_res"]:
         raise HTTPException(
             status_code=400,
             detail=f"Invalid strategy: {strategy}. Must be one of ['fast', 'hi_res']",
         )
-    # NOTE(robinson) - This is a hacky solution due to
-    # limitations in the SpooledTemporaryFile wrapper.
-    # Specifically, it does't have a `seekable` attribute,
-    # which is required for .pptx and .docx. See below
-    # the link below
-    # ref: https://stackoverflow.com/questions/47160211
-    # /why-doesnt-tempfile-spooledtemporaryfile-implement-readable-writable-seekable
-    with tempfile.TemporaryDirectory() as tmpdir:
-        _filename = os.path.join(tmpdir, filename.split("/")[-1])
-        with open(_filename, "wb") as f:
-            f.write(file.read())
-        elements = partition(filename=_filename, strategy=strategy)
+    if filename.endswith((".docx", ".pptx")):
+        # NOTE(robinson) - This is a hacky solution due to
+        # limitations in the SpooledTemporaryFile wrapper.
+        # Specifically, it doesn't have a `seekable` attribute,
+        # which is required for .pptx and .docx. See below
+        # the link below
+        # ref: https://stackoverflow.com/questions/47160211
+        # /why-doesnt-tempfile-spooledtemporaryfile-implement-readable-writable-seekable
+        with tempfile.TemporaryDirectory() as tmpdir:
+            _filename = os.path.join(tmpdir, filename.split("/")[-1])
+            with open(_filename, "wb") as f:
+                f.write(file.read())
+            elements = partition(filename=_filename, strategy=strategy)
+    else:
+        try:
+            elements = partition(
+                file=file,
+                file_filename=filename,
+                content_type=file_content_type,
+                strategy=strategy,
+            )
+        except ValueError as e:
+            if "Invalid file" in e.args[0]:
+                raise HTTPException(
+                    status_code=400,
+                    detail=f"{file_content_type} not currently supported",
+                )
+            raise e
 
     # Due to the above, elements have an ugly temp filename in their metadata
     # For now, replace this with the basename
@@ -188,7 +224,7 @@ def pipeline_1(
 
             def response_generator(is_multipart):
                 for file in files:
-                    _ = get_validated_mimetype(file)
+                    file_content_type = get_validated_mimetype(file)
 
                     _file = file.file
 
@@ -197,6 +233,7 @@ def pipeline_1(
                         m_strategy=strategy,
                         response_type=media_type,
                         filename=file.filename,
+                        file_content_type=file_content_type,
                     )
                     if is_multipart:
                         if type(response) not in [str, bytes]:
@@ -213,13 +250,14 @@ def pipeline_1(
             file = files[0]
             _file = file.file
 
-            _ = get_validated_mimetype(file)
+            file_content_type = get_validated_mimetype(file)
 
             response = pipeline_api(
                 _file,
                 m_strategy=strategy,
                 response_type=media_type,
                 filename=file.filename,
+                file_content_type=file_content_type,
             )
 
             if is_expected_response_type(media_type, type(response)):

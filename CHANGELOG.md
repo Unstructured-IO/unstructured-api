@@ -1,7 +1,8 @@
-## 0.0.9-dev1
+## 0.0.9-dev2
 
 * Updated detectron version
-* Adds a strategy parameter to pipeline_api 
+* Adds a strategy parameter to pipeline_api
+* Passing file, file_filename, and content_type to `partition`
 
 ## 0.0.8
 
