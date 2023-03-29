@@ -60,23 +60,25 @@ jobs:
         password: ${{ secrets.QUAY_IO_ROBOT_TOKEN }}
     - name: Build AMD image
       run: |
+        WRITE_TAG=$DOCKER_BUILD_REPOSITORY:amd_${{ env.SHORT_SHA }}
+        echo "Building image $WRITE_TAG"
         DOCKER_BUILDKIT=1 docker buildx build --platform=linux/amd64 --load \
           --build-arg PIP_VERSION=$PIP_VERSION \
           --build-arg BUILDKIT_INLINE_CACHE=1 \
           --build-arg PIPELINE_PACKAGE=${{ env.PIPELINE_PACKAGE }} \
           --progress plain \
           --cache-from $DOCKER_BUILD_REPOSITORY:amd \
-          -t $DOCKER_BUILD_REPOSITORY:amd-${{ env.SHORT_SHA }} .
+          -t $WRITE_TAG .
         docker images
-        echo "Pushing image to $DOCKER_BUILD_REPOSITORY:amd-${{ env.SHORT_SHA }}"
-        docker push $DOCKER_BUILD_REPOSITORY:amd-${{ env.SHORT_SHA }}
+        echo "Pushing image to $WRITE_TAG"
+        docker push $DOCKER_BUILD_REPOSITORY:amd_${{ env.SHORT_SHA }}
     - name: Test AMD image
       run: |
-        IMAGE_NAME="$DOCKER_BUILD_REPOSITORY:amd-${{ env.SHORT_SHA }}" make docker-test 
+        IMAGE_NAME="$DOCKER_BUILD_REPOSITORY:amd_${{ env.SHORT_SHA }}" make docker-test 
     - name: Push AMD image
       run: |
         # write to the build repository to cache for the publish-images job
-        docker push $DOCKER_BUILD_REPOSITORY:amd-${{ env.SHORT_SHA }}
+        docker push $DOCKER_BUILD_REPOSITORY:amd_${{ env.SHORT_SHA }}
   # build-arm:
   #   runs-on: ubuntu-latest
   #   needs: [setup]
