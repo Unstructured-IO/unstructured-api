@@ -58,6 +58,7 @@ USER root
 RUN ln -s /home/notebook-user/.local/bin/pip /usr/local/bin/pip
 USER ${NB_USER}
 
+COPY --chown=${NB_USER}:${NB_USER} logger_config.yaml logger_config.yaml
 COPY --chown=${NB_USER}:${NB_USER} prepline_${PIPELINE_PACKAGE}/ prepline_${PIPELINE_PACKAGE}/
 COPY --chown=${NB_USER}:${NB_USER} exploration-notebooks exploration-notebooks
 COPY --chown=${NB_USER}:${NB_USER} pipeline-notebooks pipeline-notebooks
