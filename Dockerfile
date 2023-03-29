@@ -65,4 +65,5 @@ COPY --chown=${NB_USER}:${NB_USER} pipeline-notebooks pipeline-notebooks
 EXPOSE 5000
 
 ENTRYPOINT ["uvicorn", "prepline_general.api.app:app", \
+   "--log-config", "logger_config.yaml", \
   "--host", "0.0.0.0"]
