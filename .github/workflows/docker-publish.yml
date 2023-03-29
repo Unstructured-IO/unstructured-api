@@ -74,8 +74,17 @@ jobs:
           --build-arg BUILDKIT_INLINE_CACHE=1 \
           --build-arg PIPELINE_PACKAGE=${{ env.PIPELINE_PACKAGE }} \
           --progress plain \
+          --cache-from $DOCKER_BUILD_REPOSITORY:amd \
           -t $DOCKER_BUILD_REPOSITORY:amd-$SHORT_SHA .
-        docker push $DOCKER_BUILD_REPOSITORY:amd-$SHORT_SHA
+        docker images
+        echo "Pushing image to $DOCKER_BUILD_REPOSITORY:amd-$SHORT_SHA"
+        if [[ "$(docker images -q $DOCKER_BUILD_REPOSITORY:amd-$SHORT_SHA 2> /dev/null)" != "" ]]; then
+          echo "Image exists, pushing"
+          docker push $DOCKER_BUILD_REPOSITORY:amd-$SHORT_SHA
+        else
+          echo "Image does not exist, not pushing"
+        fi
+        # docker push $DOCKER_BUILD_REPOSITORY:amd-$SHORT_SHA
     - name: Test AMD image
       run: |
         IMAGE_NAME="$DOCKER_BUILD_REPOSITORY:amd-$SHORT_SHA" make docker-test 
