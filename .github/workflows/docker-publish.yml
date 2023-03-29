@@ -69,8 +69,8 @@ jobs:
           --cache-from $DOCKER_BUILD_REPOSITORY:amd \
           -t $DOCKER_BUILD_REPOSITORY:amd-$SHORT_SHA .
         docker images
-    #     echo "Pushing image to $DOCKER_BUILD_REPOSITORY:amd-$SHORT_SHA"
-    #     docker push $DOCKER_BUILD_REPOSITORY:amd-$SHORT_SHA
+        echo "Pushing image to $DOCKER_BUILD_REPOSITORY:amd-$SHORT_SHA"
+        docker push $DOCKER_BUILD_REPOSITORY:amd-$SHORT_SHA
     # - name: Test AMD image
     #   run: |
     #     IMAGE_NAME="$DOCKER_BUILD_REPOSITORY:amd-$SHORT_SHA" make docker-test 
