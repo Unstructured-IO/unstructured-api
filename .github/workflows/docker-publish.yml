@@ -40,8 +40,8 @@ jobs:
   set-short-sha:
     runs-on: ubuntu-latest
     steps:
-      - name: Set Short SHA
-        id: set_short_sha
+      # Write the short SHA-1 hash of the commit to an environment file
+      - name: Write Env File
         run: echo "SHORT_SHA=$(git rev-parse --short HEAD)" >> short-sha.env
   build-amd:
     runs-on: ubuntu-latest
