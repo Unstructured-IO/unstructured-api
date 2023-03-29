@@ -42,7 +42,9 @@ def is_expected_response_type(media_type, response_type):
 
 
 # pipeline-api
-def pipeline_api(file, filename="", response_type="application/json"):
+def pipeline_api(
+    file, filename="", file_content_type=None, response_type="application/json"
+):
     # NOTE(robinson) - This is a hacky solution due to
     # limitations in the SpooledTemporaryFile wrapper.
     # Specifically, it does't have a `seekable` attribute,
@@ -54,7 +56,7 @@ def pipeline_api(file, filename="", response_type="application/json"):
         _filename = os.path.join(tmpdir, filename.split("/")[-1])
         with open(_filename, "wb") as f:
             f.write(file.read())
-        elements = partition(filename=_filename)
+        elements = partition(filename=_filename, content_type=file_content_type)
 
     # Due to the above, elements have an ugly temp filename in their metadata
     # For now, replace this with the basename
@@ -181,7 +183,7 @@ def pipeline_1(
 
             def response_generator(is_multipart):
                 for file in files:
-                    _ = get_validated_mimetype(file)
+                    file_content_type = get_validated_mimetype(file)
 
                     _file = file.file
 
@@ -189,6 +191,7 @@ def pipeline_1(
                         _file,
                         response_type=media_type,
                         filename=file.filename,
+                        file_content_type=file_content_type,
                     )
                     if is_multipart:
                         if type(response) not in [str, bytes]:
@@ -205,12 +208,13 @@ def pipeline_1(
             file = files[0]
             _file = file.file
 
-            _ = get_validated_mimetype(file)
+            file_content_type = get_validated_mimetype(file)
 
             response = pipeline_api(
                 _file,
                 response_type=media_type,
                 filename=file.filename,
+                file_content_type=file_content_type,
             )
 
             if is_expected_response_type(media_type, type(response)):
