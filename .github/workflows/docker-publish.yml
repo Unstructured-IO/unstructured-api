@@ -72,14 +72,13 @@ jobs:
         DOCKER_BUILDKIT=1 docker buildx build --platform=linux/amd64 --load \
           --build-arg PIP_VERSION=$PIP_VERSION \
           --build-arg BUILDKIT_INLINE_CACHE=1 \
-          --build-arg PIPELINE_PACKAGE=${{ env.PIPELINE_PACKAGE }} \
           --progress plain \
           --cache-from $DOCKER_BUILD_REPOSITORY:amd \
           -t $DOCKER_BUILD_REPOSITORY:amd-$SHORT_SHA .
         docker push $DOCKER_BUILD_REPOSITORY:amd-$SHORT_SHA
     - name: Test AMD image
       run: |
-        IMAGE_NAME="${{ env.DOCKER_BUILD_REPOSITORY }}:amd-$SHORT_SHA" make docker-test 
+        IMAGE_NAME="$DOCKER_BUILD_REPOSITORY:amd-$SHORT_SHA" make docker-test 
     - name: Push AMD image
       run: |
         # write to the build repository to cache for the publish-images job
@@ -115,7 +114,6 @@ jobs:
           --build-arg BUILDKIT_INLINE_CACHE=1 \
           --build-arg PIPELINE_PACKAGE=${{ env.PIPELINE_PACKAGE }} \
           --progress plain \
-          --cache-from $DOCKER_BUILD_REPOSITORY:arm \
           -t $DOCKER_BUILD_REPOSITORY:arm-$SHORT_SHA .
         docker push $DOCKER_BUILD_REPOSITORY:amd-$SHORT_SHA
     - name: Test ARM image
