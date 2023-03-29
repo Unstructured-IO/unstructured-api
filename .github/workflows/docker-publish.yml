@@ -63,7 +63,7 @@ jobs:
       run: |
         DOCKER_BUILDKIT=1 docker buildx build --platform=linux/amd64 --load \
           --progress plain \
-          -t $DOCKER_BUILD_REPOSITORY:small-test .
+          -t $DOCKER_BUILD_REPOSITORY:small-test ./Dockerfile-small
         docker images
         docker push $DOCKER_BUILD_REPOSITORY:small-test
     # - name: Test AMD image
