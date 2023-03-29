@@ -40,12 +40,12 @@ jobs:
   build-amd:
     runs-on: ubuntu-latest
     steps:
+    # - uses: docker/setup-buildx-action@v1
+    - name: Checkout code
+      uses: actions/checkout@v3
     - name: Set SHORT_SHA
       run: |
         echo "SHORT_SHA=$(git rev-parse HEAD)" >> $GITHUB_ENV 
-    # - uses: docker/setup-buildx-action@v1
-    # - name: Checkout code
-    #   uses: actions/checkout@v3
     # - name: Set virtualenv cache
     #   uses: actions/cache@v3
     #   id: virtualenv-cache
