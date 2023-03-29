@@ -60,25 +60,23 @@ jobs:
         password: ${{ secrets.QUAY_IO_ROBOT_TOKEN }}
     - name: Build AMD image
       run: |
-        WRITE_TAG=$DOCKER_BUILD_REPOSITORY:amd_${{ env.SHORT_SHA }}
-        echo "Building image $WRITE_TAG"
         DOCKER_BUILDKIT=1 docker buildx build --platform=linux/amd64 --load \
           --build-arg PIP_VERSION=$PIP_VERSION \
           --build-arg BUILDKIT_INLINE_CACHE=1 \
           --build-arg PIPELINE_PACKAGE=${{ env.PIPELINE_PACKAGE }} \
           --progress plain \
           --cache-from $DOCKER_BUILD_REPOSITORY:amd \
-          -t $WRITE_TAG .
+          -t $DOCKER_BUILD_REPOSITORY:amd-$SHORT_SHA .
         docker images
-        echo "Pushing image to $WRITE_TAG"
-        docker push $DOCKER_BUILD_REPOSITORY:amd_${{ env.SHORT_SHA }}
+        echo "Pushing image to $DOCKER_BUILD_REPOSITORY:amd-$SHORT_SHA"
+        docker push $DOCKER_BUILD_REPOSITORY:amd-$SHORT_SHA
     - name: Test AMD image
       run: |
-        IMAGE_NAME="$DOCKER_BUILD_REPOSITORY:amd_${{ env.SHORT_SHA }}" make docker-test 
+        IMAGE_NAME="$DOCKER_BUILD_REPOSITORY:amd-$SHORT_SHA" make docker-test 
     - name: Push AMD image
       run: |
         # write to the build repository to cache for the publish-images job
-        docker push $DOCKER_BUILD_REPOSITORY:amd_${{ env.SHORT_SHA }}
+        docker push $DOCKER_BUILD_REPOSITORY:amd-$SHORT_SHA
   # build-arm:
   #   runs-on: ubuntu-latest
   #   needs: [setup]
@@ -110,17 +108,17 @@ jobs:
   #         --build-arg BUILDKIT_INLINE_CACHE=1 \
   #         --build-arg PIPELINE_PACKAGE=${{ env.PIPELINE_PACKAGE }} \
   #         --progress plain \
-  #         -t $DOCKER_BUILD_REPOSITORY:arm-${{ env.SHORT_SHA }} .
-  #       docker push $DOCKER_BUILD_REPOSITORY:amd-${{ env.SHORT_SHA }}
+  #         -t $DOCKER_BUILD_REPOSITORY:arm-$SHORT_SHA .
+  #       docker push $DOCKER_BUILD_REPOSITORY:amd-$SHORT_SHA
   #   - name: Test ARM image
   #     run: |
-  #       IMAGE_NAME="${{ env.DOCKER_BUILD_REPOSITORY }}:arm-${{ env.SHORT_SHA }}" make docker-test 
+  #       IMAGE_NAME="${{ env.DOCKER_BUILD_REPOSITORY }}:arm-$SHORT_SHA" make docker-test 
   #       # only run a subset of tests on ARM, since they take a long time with emulation
-  #       # IMAGE_NAME="${{ env.DOCKER_BUILD_REPOSITORY }}:arm-${{ env.SHORT_SHA }}" make docker-test    
+  #       # IMAGE_NAME="${{ env.DOCKER_BUILD_REPOSITORY }}:arm-$SHORT_SHA" make docker-test    
   #   - name: Push ARM image
   #     run: |
   #       # write to the build repository to cache for the publish-images job
-  #       docker push $DOCKER_BUILD_REPOSITORY:arm-${{ env.SHORT_SHA }}
+  #       docker push $DOCKER_BUILD_REPOSITORY:arm-$SHORT_SHA
   # publish-images:
   #   runs-on: ubuntu-latest
   #   needs: [setup, build-amd, build-arm]
@@ -138,23 +136,23 @@ jobs:
   #       password: ${{ secrets.QUAY_IO_ROBOT_TOKEN }}
   #   - name: Pull AMD image
   #     run: |
-  #       docker pull $DOCKER_BUILD_REPOSITORY:amd-${{ env.SHORT_SHA }}
+  #       docker pull $DOCKER_BUILD_REPOSITORY:amd-$SHORT_SHA
   #   - name: Pull ARM image
   #     run: |
-  #       docker pull $DOCKER_BUILD_REPOSITORY:arm-${{ env.SHORT_SHA }}
+  #       docker pull $DOCKER_BUILD_REPOSITORY:arm-$SHORT_SHA
   #   - name: Push AMD and ARM tags
   #     run: |
   #       # these are used to construct the final manifest but also cache-from in subsequent runs
-  #       docker tag $DOCKER_BUILD_REPOSITORY:amd-${{ env.SHORT_SHA }} $DOCKER_BUILD_REPOSITORY:amd
+  #       docker tag $DOCKER_BUILD_REPOSITORY:amd-$SHORT_SHA $DOCKER_BUILD_REPOSITORY:amd
   #       docker push $DOCKER_BUILD_REPOSITORY:amd
-  #       docker tag $DOCKER_BUILD_REPOSITORY:arm-${{ env.SHORT_SHA }} $DOCKER_BUILD_REPOSITORY:arm
+  #       docker tag $DOCKER_BUILD_REPOSITORY:arm-$SHORT_SHA $DOCKER_BUILD_REPOSITORY:arm
   #       docker push $DOCKER_BUILD_REPOSITORY:arm
   #   - name: Push multiarch manifest
   #     run: |
   #       docker manifest create ${DOCKER_REPOSITORY}:latest $DOCKER_BUILD_REPOSITORY:amd $DOCKER_BUILD_REPOSITORY:arm
   #       docker manifest push $DOCKER_REPOSITORY:latest
-  #       docker manifest create ${DOCKER_REPOSITORY}:${{ env.SHORT_SHA }} $DOCKER_BUILD_REPOSITORY:amd $DOCKER_BUILD_REPOSITORY:arm
-  #       docker manifest push $DOCKER_REPOSITORY:${{ env.SHORT_SHA }}
+  #       docker manifest create ${DOCKER_REPOSITORY}:$SHORT_SHA $DOCKER_BUILD_REPOSITORY:amd $DOCKER_BUILD_REPOSITORY:arm
+  #       docker manifest push $DOCKER_REPOSITORY:$SHORT_SHA
   #       VERSION=$(grep -m1 version preprocessing-pipeline-family.yaml | cut -d ' ' -f2)
   #       docker manifest create ${DOCKER_REPOSITORY}:$VERSION $DOCKER_BUILD_REPOSITORY:amd $DOCKER_BUILD_REPOSITORY:arm
   #       docker manifest push ${DOCKER_REPOSITORY}:$VERSION
