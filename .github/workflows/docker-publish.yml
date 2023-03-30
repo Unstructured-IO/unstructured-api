@@ -87,7 +87,7 @@ jobs:
     #   run: |
     #     # write to the build repository to cache for the publish-images job
     #     docker push $DOCKER_BUILD_REPOSITORY:amd-$SHORT_SHA
-  build-arm:
+  build-amd:
     runs-on: ubuntu-latest
     needs: [setup, set-short-sha]
     env:
@@ -111,18 +111,18 @@ jobs:
         password: ${{ secrets.QUAY_IO_ROBOT_TOKEN }}
     - name: Set up QEMU
       uses: docker/setup-qemu-action@v2
-    - name: Build ARM image
+    - name: Build AMD image
       run: |
-        DOCKER_BUILDKIT=1 docker buildx build --platform=linux/arm64 --load \
+        DOCKER_BUILDKIT=1 docker buildx build --platform=linux/amd64 --load \
           --build-arg PIP_VERSION=$PIP_VERSION \
           --build-arg BUILDKIT_INLINE_CACHE=1 \
           --build-arg PIPELINE_PACKAGE=${{ env.PIPELINE_PACKAGE }} \
           --progress plain \
-          --cache-from $DOCKER_BUILD_REPOSITORY:arm \
-          -t $DOCKER_BUILD_REPOSITORY:arm-$SHORT_SHA .
+          --cache-from $DOCKER_BUILD_REPOSITORY:amd \
+          -t $DOCKER_BUILD_REPOSITORY:amd-$SHORT_SHA .
         docker images
-        echo "Pushing image to $DOCKER_BUILD_REPOSITORY:arm-$SHORT_SHA"
-        docker push $DOCKER_BUILD_REPOSITORY:arm-$SHORT_SHA
+        echo "Pushing image to $DOCKER_BUILD_REPOSITORY:amd-$SHORT_SHA"
+        docker push $DOCKER_BUILD_REPOSITORY:amd-$SHORT_SHA
   #   - name: Test ARM image
   #     run: |
   #       IMAGE_NAME="${{ env.DOCKER_BUILD_REPOSITORY }}:arm-$SHORT_SHA" make docker-test 
