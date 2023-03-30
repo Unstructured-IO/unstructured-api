@@ -68,16 +68,15 @@ jobs:
     - name: Build AMD image
       run: |
         DOCKER_BUILDKIT=1 docker buildx build --platform=linux/amd64 --load \
+          --no-cache \
           --build-arg PIP_VERSION=$PIP_VERSION \
-          --build-arg BUILDKIT_INLINE_CACHE=1 \
           --build-arg PIPELINE_PACKAGE=${{ env.PIPELINE_PACKAGE }} \
-          --provenance false \
+          --provenance=false \
           --progress plain \
-          --cache-from $DOCKER_BUILD_REPOSITORY:amd \
           -t $DOCKER_BUILD_REPOSITORY:amd-$SHORT_SHA .
         docker images
         echo "Pushing image to $DOCKER_BUILD_REPOSITORY:amd-$SHORT_SHA"
-        # docker push $DOCKER_BUILD_REPOSITORY:amd-$SHORT_SHA
+        docker push $DOCKER_BUILD_REPOSITORY:amd-$SHORT_SHA
     - name: Setup TMate session
       uses: mxschmitt/action-tmate@v3
     # - name: Test AMD image
