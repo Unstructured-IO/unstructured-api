@@ -61,13 +61,13 @@ jobs:
         password: ${{ secrets.QUAY_IO_ROBOT_TOKEN }}
     - name: Build AMD image
       run: |
+        docker buildx create --name multiarch-builder --use
         DOCKER_BUILDKIT=1 docker buildx build --platform=linux/amd64 --load \
           --build-arg PIP_VERSION=$PIP_VERSION \
           --build-arg BUILDKIT_INLINE_CACHE=1 \
           --build-arg PIPELINE_PACKAGE=${{ env.PIPELINE_PACKAGE }} \
           --progress plain \
           --cache-from $DOCKER_BUILD_REPOSITORY:amd \
-          -f Dockerfile-small \
           -t $DOCKER_BUILD_REPOSITORY:amd-$SHORT_SHA .
         docker images
         echo "Pushing image to $DOCKER_BUILD_REPOSITORY:amd-$SHORT_SHA"
