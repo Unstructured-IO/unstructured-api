@@ -67,6 +67,7 @@ jobs:
           --build-arg PIPELINE_PACKAGE=${{ env.PIPELINE_PACKAGE }} \
           --progress plain \
           --cache-from $DOCKER_BUILD_REPOSITORY:amd \
+          -f Dockerfile-small \
           -t $DOCKER_BUILD_REPOSITORY:amd-$SHORT_SHA .
         docker images
         echo "Pushing image to $DOCKER_BUILD_REPOSITORY:amd-$SHORT_SHA"
