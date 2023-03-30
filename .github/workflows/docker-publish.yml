@@ -67,7 +67,7 @@ jobs:
         password: ${{ secrets.QUAY_IO_ROBOT_TOKEN }}
     - name: Build AMD image
       run: |
-        DOCKER_BUILDKIT=1 docker buildx build --platform=linux/amd64 --load \
+        DOCKER_BUILDKIT=1 docker buildx build --platform=linux/amd64 --push \
           --no-cache \
           --build-arg PIP_VERSION=$PIP_VERSION \
           --build-arg PIPELINE_PACKAGE=${{ env.PIPELINE_PACKAGE }} \
