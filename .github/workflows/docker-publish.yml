@@ -71,7 +71,6 @@ jobs:
         password: ${{ secrets.QUAY_IO_ROBOT_TOKEN }}
     - name: Build AMD image
       run: |
-        docker buildx create --name multiarch-builder --use
         DOCKER_BUILDKIT=1 docker buildx build --platform=linux/amd64 --load \
           --build-arg PIP_VERSION=$PIP_VERSION \
           --build-arg BUILDKIT_INLINE_CACHE=1 \
@@ -120,6 +119,7 @@ jobs:
   #         --build-arg PIP_VERSION=$PIP_VERSION \
   #         --build-arg BUILDKIT_INLINE_CACHE=1 \
   #         --build-arg PIPELINE_PACKAGE=${{ env.PIPELINE_PACKAGE }} \
+  #         --provenance=false \
   #         --progress plain \
   #         --cache-from $DOCKER_BUILD_REPOSITORY:arm \
   #         -t $DOCKER_BUILD_REPOSITORY:arm-$SHORT_SHA .
