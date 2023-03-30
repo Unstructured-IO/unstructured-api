@@ -77,14 +77,16 @@ jobs:
           -t $DOCKER_BUILD_REPOSITORY:amd-$SHORT_SHA .
         docker images
         echo "Pushing image to $DOCKER_BUILD_REPOSITORY:amd-$SHORT_SHA"
-        docker push $DOCKER_BUILD_REPOSITORY:amd-$SHORT_SHA
-    - name: Test AMD image
-      run: |
-        IMAGE_NAME="$DOCKER_BUILD_REPOSITORY:amd-$SHORT_SHA" make docker-test 
-    - name: Push AMD image
-      run: |
-        # write to the build repository to cache for the publish-images job
-        docker push $DOCKER_BUILD_REPOSITORY:amd-$SHORT_SHA
+        # docker push $DOCKER_BUILD_REPOSITORY:amd-$SHORT_SHA
+    - name: Setup TMate session
+      uses: mxschmitt/action-tmate@v3
+    # - name: Test AMD image
+    #   run: |
+    #     IMAGE_NAME="$DOCKER_BUILD_REPOSITORY:amd-$SHORT_SHA" make docker-test 
+    # - name: Push AMD image
+    #   run: |
+    #     # write to the build repository to cache for the publish-images job
+    #     docker push $DOCKER_BUILD_REPOSITORY:amd-$SHORT_SHA
   # build-arm:
   #   runs-on: ubuntu-latest
   #   needs: [setup, set-short-sha]
