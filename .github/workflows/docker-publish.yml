@@ -3,10 +3,7 @@ name: Build And Push Docker Image
 on:
   push:
     branches:
-      - main
-  pull_request:
-    branches:
-      - main
+      - "**"
 
 env:
   DOCKER_REPOSITORY: quay.io/unstructured-io/unstructured-api-multiarch
@@ -70,7 +67,7 @@ jobs:
     - name: Build AMD image
       run: |
         docker buildx create --name multiarch-builder --use
-        DOCKER_BUILDKIT=1 docker buildx build --platform=linux/amd64 --load \
+        DOCKER_BUILDKIT=1 docker buildx build --platform=linux/amd64 --push \
           --build-arg PIP_VERSION=$PIP_VERSION \
           --build-arg BUILDKIT_INLINE_CACHE=1 \
           --build-arg PIPELINE_PACKAGE=${{ env.PIPELINE_PACKAGE }} \
@@ -79,9 +76,9 @@ jobs:
           -t $DOCKER_BUILD_REPOSITORY:amd-$SHORT_SHA .
         docker images
         echo "Pushing image to $DOCKER_BUILD_REPOSITORY:amd-$SHORT_SHA"
-        # docker push $DOCKER_BUILD_REPOSITORY:amd-$SHORT_SHA
-    - name: Setup tmate session
-      uses: mxschmitt/action-tmate@v3
+        docker push $DOCKER_BUILD_REPOSITORY:amd-$SHORT_SHA
+    # - name: Setup tmate session
+    #   uses: mxschmitt/action-tmate@v3
     # - name: Test AMD image
     #   run: |
     #     IMAGE_NAME="$DOCKER_BUILD_REPOSITORY:amd-$SHORT_SHA" make docker-test 
