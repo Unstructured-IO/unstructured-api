@@ -19,7 +19,8 @@ start_container() {
 await_server_ready() {
     url=localhost:8000/healthcheck
 
-    for _ in {1..15}; do
+    # NOTE(rniko): Increasing the timeout to 60 seconds because emulated arm tests are slow to start
+    for _ in {1..60}; do
         echo Waiting for response from "$url"
         if curl $url 2> /dev/null; then
             echo
