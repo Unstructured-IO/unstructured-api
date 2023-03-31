@@ -114,6 +114,7 @@ jobs:
           --progress plain \
           --cache-from $DOCKER_BUILD_REPOSITORY:arm \
           -t $DOCKER_BUILD_REPOSITORY:arm-$SHORT_SHA .
+          docker push $DOCKER_BUILD_REPOSITORY:arm
     - name: Set virtualenv cache
       uses: actions/cache@v3
       id: virtualenv-cache
