@@ -114,8 +114,8 @@ jobs:
         #   --progress plain \
         #   --cache-from $DOCKER_BUILD_REPOSITORY:arm \
         #   -t $DOCKER_BUILD_REPOSITORY:arm-$SHORT_SHA .
-        docker pull $DOCKER_BUILD_REPOSITORY:amd
-        docker tag $DOCKER_BUILD_REPOSITORY:amd $DOCKER_BUILD_REPOSITORY:arm-$SHORT_SHA
+        docker pull $DOCKER_BUILD_REPOSITORY:arm
+        docker tag $DOCKER_BUILD_REPOSITORY:arm $DOCKER_BUILD_REPOSITORY:arm-$SHORT_SHA
     - name: Print all images
       run: |
         docker images
@@ -126,16 +126,14 @@ jobs:
         path: |
           .venv
         key: ci-venv-${{ env.PIPELINE_FAMILY }}-${{ hashFiles('requirements/test.txt') }}
-    - name: Tmate session
-      uses: mxschmitt/action-tmate@v3
     - name: Test ARM image
       run: |
         source .venv/bin/activate
         IMAGE_NAME="$DOCKER_BUILD_REPOSITORY:arm-$SHORT_SHA" make docker-test 
-    - name: Push ARM image
-      run: |
-        # write to the build repository to cache for the publish-images job
-        docker push $DOCKER_BUILD_REPOSITORY:arm-$SHORT_SHA
+    # - name: Push ARM image
+    #   run: |
+    #     # write to the build repository to cache for the publish-images job
+    #     docker push $DOCKER_BUILD_REPOSITORY:arm-$SHORT_SHA
   # publish-images:
   #   runs-on: ubuntu-latest
   #   needs: [setup, set-short-sha, build-amd, build-arm]
