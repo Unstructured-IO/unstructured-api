@@ -3,10 +3,10 @@ name: Build And Push Docker Image
 on:
   push:
     branches:
-      - "**"
+      - main
 
 env:
-  DOCKER_REPOSITORY: quay.io/unstructured-io/unstructured-api-multiarch
+  DOCKER_REPOSITORY: quay.io/unstructured-io/unstructured-api
   DOCKER_BUILD_REPOSITORY: quay.io/unstructured-io/build-unstructured-api
   PACKAGE: "unstructured-api"
   PIPELINE_PACKAGE: "general"
