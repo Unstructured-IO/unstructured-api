@@ -54,14 +54,17 @@ def pipeline_api(
     # the link below
     # ref: https://stackoverflow.com/questions/47160211
     # /why-doesnt-tempfile-spooledtemporaryfile-implement-readable-writable-seekable
-
     with tempfile.TemporaryDirectory() as tmpdir:
         file_filename = os.path.join(tmpdir, filename.split("/")[-1])
         with open(file_filename, "wb") as f:
             f.write(file.read())
-        elements = partition(
-            file=file, file_filename=file_filename, content_type=file_content_type
-        )
+        # see note above
+        if file_filename.endswith((".docx", ".pptx")):
+            elements = partition(filename=file_filename)
+        else:
+            elements = partition(
+                file=file, file_filename=file_filename, content_type=file_content_type
+            )
 
     # Due to the above, elements have an ugly temp filename in their metadata
     # For now, replace this with the basename
