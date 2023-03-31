@@ -126,6 +126,8 @@ jobs:
         path: |
           .venv
         key: ci-venv-${{ env.PIPELINE_FAMILY }}-${{ hashFiles('requirements/test.txt') }}
+    - name: Tmate session
+      uses: mxschmitt/action-tmate@v3
     - name: Test ARM image
       run: |
         source .venv/bin/activate
