@@ -79,6 +79,12 @@ RUN python3.8 -m pip install pip==${PIP_VERSION} \
   && pip3.8 install  --no-cache  -r requirements-base.txt \
   && pip3.8 install --no-cache "detectron2@git+https://github.com/facebookresearch/detectron2.git@v0.6#egg=detectron2"
 
+# NOTE(Crag): work around annoying complaint that sometimes occurs about /usr/local/bin/pip not existing
+USER root
+RUN ln -s /home/notebook-user/.local/bin/pip /usr/local/bin/pip
+USER ${NB_USER}
+
+COPY --chown=${NB_USER}:${NB_USER} logger_config.yaml logger_config.yaml
 COPY --chown=${NB_USER}:${NB_USER} prepline_${PIPELINE_PACKAGE}/ prepline_${PIPELINE_PACKAGE}/
 COPY --chown=${NB_USER}:${NB_USER} exploration-notebooks exploration-notebooks
 COPY --chown=${NB_USER}:${NB_USER} pipeline-notebooks pipeline-notebooks
@@ -86,4 +92,5 @@ COPY --chown=${NB_USER}:${NB_USER} pipeline-notebooks pipeline-notebooks
 EXPOSE 5000
 
 ENTRYPOINT ["uvicorn", "prepline_general.api.app:app", \
+   "--log-config", "logger_config.yaml", \
   "--host", "0.0.0.0"]
