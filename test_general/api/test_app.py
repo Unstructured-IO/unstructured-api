@@ -29,12 +29,12 @@ def test_general_api_health_check():
         pytest.param("fake-excel.xlsx", marks=pytest.mark.xfail(reason="not supported yet")),
         "fake-html.html",
         "fake-power-point.ppt",
-        # "fake-text.txt",
+        "fake-text.txt",
         "fake.doc",
         "fake.docx",
         "family-day.eml",
-        # "layout-parser-paper-fast.jpg",
-        # "layout-parser-paper.pdf",
+        "layout-parser-paper-fast.jpg",
+        "layout-parser-paper.pdf",
     ],
 )
 def test_general_api(example_filename):
@@ -59,9 +59,6 @@ def test_general_api(example_filename):
         ],
     )
     assert response.status_code == 200
-    # for i in response.json():
-    #     for n in i:
-    #         assert n["metadata"]["filename"] == example_filename
     assert all(x["metadata"]["filename"] == example_filename for i in response.json() for x in i)
 
     assert len(response.json()) > 0
