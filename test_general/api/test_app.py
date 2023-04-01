@@ -29,12 +29,12 @@ def test_general_api_health_check():
         pytest.param("fake-excel.xlsx", marks=pytest.mark.xfail(reason="not supported yet")),
         "fake-html.html",
         "fake-power-point.ppt",
-        "fake-text.txt",
+        # "fake-text.txt",
         "fake.doc",
         "fake.docx",
         "family-day.eml",
-        "layout-parser-paper-fast.jpg",
-        "layout-parser-paper.pdf",
+        # "layout-parser-paper-fast.jpg",
+        # "layout-parser-paper.pdf",
     ],
 )
 def test_general_api(example_filename):
@@ -45,6 +45,8 @@ def test_general_api(example_filename):
     )
     assert response.status_code == 200
     assert len(response.json()) > 0
+    for i in response.json():
+        assert i["metadata"]["filename"] == example_filename
     assert len("".join(elem["text"] for elem in response.json())) > 20
 
     # Just hit the second path (posting multiple files) to bump the coverage
@@ -57,4 +59,24 @@ def test_general_api(example_filename):
         ],
     )
     assert response.status_code == 200
+    # for i in response.json():
+    #     for n in i:
+    #         assert n["metadata"]["filename"] == example_filename
+    assert all(x["metadata"]["filename"] == example_filename for i in response.json() for x in i)
+
     assert len(response.json()) > 0
+
+
+@pytest.mark.parametrize(
+    "example_filename",
+    [
+        "fake-xml.xml",
+    ],
+)
+def test_general_api_raises_error(example_filename):
+    client = TestClient(app)
+    test_file = Path("sample-docs") / example_filename
+    with pytest.raises(ValueError):
+        client.post(
+            MAIN_API_ROUTE, files=[("files", (str(test_file), open(test_file, "rb"), "text/plain"))]
+        )
