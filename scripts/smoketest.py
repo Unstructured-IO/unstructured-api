@@ -1,10 +1,13 @@
-from pathlib import Path
-import requests
+import os
 import time
+from pathlib import Path
 
 import pytest
+import requests
 
 API_URL = "http://localhost:8000/general/v0/general"
+# NOTE(rniko): Skip inference tests if we're running on an emulated architecture
+skip_inference_tests = os.getenv("SKIP_INFERENCE_TESTS", "").lower() in {"true", "yes", "y", "1"}
 
 def send_document(filename):
     files = {"files": (str(filename), open(filename, "rb"), "text/plain")}
@@ -27,8 +30,12 @@ def send_document(filename):
         pytest.param("fake-excel.xlsx", marks=pytest.mark.xfail(reason="not supported yet")),
         # Note(austin) The two inference calls will hang on mac with unsupported hardware error
         # Need to handle this better
-        "layout-parser-paper.pdf",
-        "layout-parser-paper-fast.jpg",
+        pytest.param("layout-parser-paper.pdf", marks=pytest.mark.skipif(
+            skip_inference_tests, reason="emulated architecture")
+        ),
+        pytest.param("layout-parser-paper-fast.jpg", marks=pytest.mark.skipif(
+            skip_inference_tests, reason="emulated architecture")
+        )
     ]
 )
 
