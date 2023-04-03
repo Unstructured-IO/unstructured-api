@@ -76,7 +76,7 @@ def test_general_api_returns_400(example_filename):
     test_file = Path("sample-docs") / example_filename
     filetype = "application/xml"
     response = client.post(
-                MAIN_API_ROUTE, files=[("files", (str(test_file), open(test_file, "rb"), filetype))]
-            )
-    assert response.json() == {'detail': f'{filetype} not currently supported'}
+        MAIN_API_ROUTE, files=[("files", (str(test_file), open(test_file, "rb"), filetype))]
+    )
+    assert response.json() == {"detail": f"{filetype} not currently supported"}
     assert response.status_code == 400
