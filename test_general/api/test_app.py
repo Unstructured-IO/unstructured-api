@@ -2,6 +2,7 @@ from pathlib import Path
 
 import pytest
 
+from fastapi import HTTPException
 from fastapi.testclient import TestClient
 
 from unstructured_api_tools.pipelines.api_conventions import get_pipeline_path
@@ -70,10 +71,12 @@ def test_general_api(example_filename):
         "fake-xml.xml",
     ],
 )
-def test_general_api_raises_error(example_filename):
+def test_general_api_returns_400(example_filename):
     client = TestClient(app)
     test_file = Path("sample-docs") / example_filename
-    with pytest.raises(ValueError):
-        client.post(
-            MAIN_API_ROUTE, files=[("files", (str(test_file), open(test_file, "rb"), "text/plain"))]
-        )
+    filetype = "application/xml"
+    response = client.post(
+                MAIN_API_ROUTE, files=[("files", (str(test_file), open(test_file, "rb"), filetype))]
+            )
+    assert response.json() == {'detail': f'{filetype} not currently supported'}
+    assert response.status_code == 400

@@ -44,27 +44,45 @@ def is_expected_response_type(media_type, response_type):
 # pipeline-api
 
 
+# TODO: uncomment once error in unstructured-api-tools is uncovered
+# DEFAULT_MIMETYPES = "application/pdf,application/msword,image/jpeg,image/png,text/markdown," \
+#                     "text/x-markdown,application/epub,application/epub+zip,text/html," \
+#                     "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet," \
+#                     "application/vnd.ms-excel,application/vnd.openxmlformats-officedocument." \
+#                     "presentationml.presentation," \
+#                     "application/vnd.ms-powerpoint,application/xml"
+#
+# if not os.environ.get("UNSTRUCTURED_ALLOWED_MIMETYPES", None):
+#     os.environ["UNSTRUCTURED_ALLOWED_MIMETYPES"] =  DEFAULT_MIMETYPES
+
+
 def pipeline_api(
     file, filename="", file_content_type=None, response_type="application/json"
 ):
-    # NOTE(robinson) - This is a hacky solution due to
-    # limitations in the SpooledTemporaryFile wrapper.
-    # Specifically, it doesn't have a `seekable` attribute,
-    # which is required for .pptx and .docx. See below
-    # the link below
-    # ref: https://stackoverflow.com/questions/47160211
-    # /why-doesnt-tempfile-spooledtemporaryfile-implement-readable-writable-seekable
-    with tempfile.TemporaryDirectory() as tmpdir:
-        file_filename = os.path.join(tmpdir, filename.split("/")[-1])
-        with open(file_filename, "wb") as f:
-            f.write(file.read())
-        # see note above
-        if file_filename.endswith((".docx", ".pptx")):
-            elements = partition(filename=file_filename)
-        else:
+    if filename.endswith((".docx", ".pptx")):
+        # NOTE(robinson) - This is a hacky solution due to
+        # limitations in the SpooledTemporaryFile wrapper.
+        # Specifically, it doesn't have a `seekable` attribute,
+        # which is required for .pptx and .docx. See below
+        # the link below
+        # ref: https://stackoverflow.com/questions/47160211
+        # /why-doesnt-tempfile-spooledtemporaryfile-implement-readable-writable-seekable
+        with tempfile.TemporaryDirectory() as tmpdir:
+            _filename = os.path.join(tmpdir, filename.split("/")[-1])
+            with open(_filename, "wb") as f:
+                f.write(file.read())
+            elements = partition(filename=_filename)
+    else:
+        try:
             elements = partition(
-                file=file, file_filename=file_filename, content_type=file_content_type
+                file=file, file_filename=filename, content_type=file_content_type
             )
+        except ValueError as e:
+            if "Invalid file" in e.args[0]:
+                raise HTTPException(
+                    status_code=400,
+                    detail=f"{file_content_type} not currently supported",
+                )
 
     # Due to the above, elements have an ugly temp filename in their metadata
     # For now, replace this with the basename
