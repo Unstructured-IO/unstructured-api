@@ -2,7 +2,6 @@ from pathlib import Path
 
 import pytest
 
-from fastapi import HTTPException
 from fastapi.testclient import TestClient
 
 from unstructured_api_tools.pipelines.api_conventions import get_pipeline_path
