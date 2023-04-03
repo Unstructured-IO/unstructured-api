@@ -10,6 +10,7 @@
 
 CONTAINER_NAME=pipeline-general
 IMAGE_NAME="${IMAGE_NAME:-pipeline-family-general-dev:latest}"
+SKIP_INFERENCE_TESTS="${SKIP_INFERENCE_TESTS:-false}"
 
 start_container() {
     echo Starting container "$CONTAINER_NAME"
@@ -19,7 +20,8 @@ start_container() {
 await_server_ready() {
     url=localhost:8000/healthcheck
 
-    for _ in {1..15}; do
+    # NOTE(rniko): Increasing the timeout to 120 seconds because emulated arm tests are slow to start
+    for _ in {1..120}; do
         echo Waiting for response from "$url"
         if curl $url 2> /dev/null; then
             echo
@@ -46,7 +48,7 @@ trap stop_container EXIT
 await_server_ready
 
 echo Running tests
-PYTHONPATH=. pytest scripts/smoketest.py
+PYTHONPATH=. SKIP_INFERENCE_TESTS=$SKIP_INFERENCE_TESTS pytest scripts/smoketest.py
 
 result=$?
 exit $result
