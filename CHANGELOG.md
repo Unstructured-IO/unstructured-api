@@ -1,6 +1,7 @@
-## 0.0.9-dev0
+## 0.0.9-dev1
 
 * Updated detectron version
+* Passing file, file_filename, and content_type to `partition`
 
 ## 0.0.8
 
