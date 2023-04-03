@@ -83,6 +83,10 @@ def pipeline_api(
                     status_code=400,
                     detail=f"{file_content_type} not currently supported",
                 )
+            else:
+                raise HTTPException(
+                    status_code=400, detail=f"ValueError encountered {e}"
+                )
 
     # Due to the above, elements have an ugly temp filename in their metadata
     # For now, replace this with the basename
