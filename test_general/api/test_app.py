@@ -19,29 +19,29 @@ def test_general_api_health_check():
 
 
 @pytest.mark.parametrize(
-    "example_filename",
+    "example_filename, content_type",
     [
-        "alert.eml",
-        "announcement.eml",
-        "fake-email-attachment.eml",
-        "fake-email-image-embedded.eml",
-        "fake-email.eml",
-        pytest.param("fake-excel.xlsx", marks=pytest.mark.xfail(reason="not supported yet")),
-        "fake-html.html",
-        "fake-power-point.ppt",
-        "fake-text.txt",
-        "fake.doc",
-        "fake.docx",
-        "family-day.eml",
-        "layout-parser-paper-fast.jpg",
-        "layout-parser-paper.pdf",
+        ("alert.eml", None),
+        ("announcement.eml", None),
+        ("fake-email-attachment.eml", None),
+        ("fake-email-image-embedded.eml", None),
+        ("fake-email.eml", None),
+        ("fake-html.html", "text/html"),
+        ("fake-power-point.ppt", "application/pdf"),
+        ("fake-text.txt", "text/plain"),
+        ("fake.doc", "application/msword"),
+        ("fake.docx", None),
+        ("family-day.eml", None),
+        pytest.param("fake-excel.xlsx", None, marks=pytest.mark.xfail(reason="not supported yet")),
+        ("layout-parser-paper.pdf", None),
+        ("layout-parser-paper-fast.jpg", None),
     ],
 )
-def test_general_api(example_filename):
+def test_general_api(example_filename, content_type):
     client = TestClient(app)
     test_file = Path("sample-docs") / example_filename
     response = client.post(
-        MAIN_API_ROUTE, files=[("files", (str(test_file), open(test_file, "rb"), "text/plain"))]
+        MAIN_API_ROUTE, files=[("files", (str(test_file), open(test_file, "rb"), content_type))]
     )
     assert response.status_code == 200
     assert len(response.json()) > 0

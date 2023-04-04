@@ -43,13 +43,13 @@ def send_document(filename, content_type):
         )
     ]
 )
-def test_happy_path(example_filename, file_content_type):
+def test_happy_path(example_filename, content_type):
     """
     For the files in sample-docs, verify that we get a 200
     and some structured response
     """
     test_file = Path("sample-docs") / example_filename
-    response = send_document(test_file, file_content_type)
+    response = send_document(test_file, content_type)
 
     print(response.text)
 
