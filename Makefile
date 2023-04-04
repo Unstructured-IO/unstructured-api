@@ -23,7 +23,7 @@ install:install-base install-test
 
 .PHONY: install-detectron
 install-detectron:
-	python3 -m pip install "detectron2@git+https://github.com/facebookresearch/detectron2.git@v0.6#egg=detectron2"
+	python3 -m pip install "detectron2@git+https://github.com/facebookresearch/detectron2.git@e2ce8dc#egg=detectron2"
 
 .PHONY: install-base-pip-packages
 install-base-pip-packages:

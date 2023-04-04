@@ -1,3 +1,7 @@
+## 0.0.9-dev0
+
+* Updated detectron version
+
 ## 0.0.8
 
 * Sensible logging config

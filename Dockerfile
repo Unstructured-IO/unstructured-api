@@ -77,7 +77,7 @@ ENV PATH="/home/${NB_USER}/.local/bin:${PATH}"
 COPY requirements/base.txt requirements-base.txt
 RUN python3.8 -m pip install pip==${PIP_VERSION} \
   && pip3.8 install  --no-cache  -r requirements-base.txt \
-  && pip3.8 install --no-cache "detectron2@git+https://github.com/facebookresearch/detectron2.git@v0.6#egg=detectron2"
+  && pip3.8 install --no-cache "detectron2@git+https://github.com/facebookresearch/detectron2.git@e2ce8dc#egg=detectron2"
 
 # NOTE(Crag): work around annoying complaint that sometimes occurs about /usr/local/bin/pip not existing
 USER root
