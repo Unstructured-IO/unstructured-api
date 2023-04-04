@@ -24,13 +24,13 @@ def send_document(filename, content_type):
         ("fake-email-image-embedded.eml", None),
         ("fake-email.eml", None),
         ("fake-html.html", "text/html"),
-        pytest.param("fake-power-point.ppt", "application/pdf",
+        pytest.param("fake-power-point.ppt", None,
                      marks=pytest.mark.xfail(reason="See CORE-796")),
 
         ("fake-text.txt", "text/plain"),
-        ("fake.doc", ""),
-        ("fake.docx", "application/msword"),
-        ("family-day.eml", ),
+        ("fake.doc", "application/msword"),
+        ("fake.docx", None),
+        ("family-day.eml", None),
         pytest.param("fake-excel.xlsx", None,
                      marks=pytest.mark.xfail(reason="not supported yet")),
         # Note(austin) The two inference calls will hang on mac with unsupported hardware error
