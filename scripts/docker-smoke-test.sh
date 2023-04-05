@@ -8,7 +8,7 @@
 
 # shellcheck disable=SC2317  # Shellcheck complains that trap functions are unreachable...
 
-CONTAINER_NAME=unstructured-api-test
+CONTAINER_NAME=unstructured-api-smoke-test
 IMAGE_NAME="${IMAGE_NAME:-unstructured-api:dev}"
 SKIP_INFERENCE_TESTS="${SKIP_INFERENCE_TESTS:-false}"
 

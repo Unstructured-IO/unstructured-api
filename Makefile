@@ -70,23 +70,26 @@ generate-api:
 # is mounted under /home/notebook-user/local/ when the image is started with
 # docker-start-api or docker-start-jupyter
 
+DOCKER_PLATFORM ?= linux/amd64
+DOCKER_IMAGE ?= unstructured-api:dev
+
 .PHONY: docker-build
 docker-build:
-	PIP_VERSION=${PIP_VERSION} PIPELINE_FAMILY=${PIPELINE_FAMILY} PIPELINE_PACKAGE=${PIPELINE_PACKAGE} ./scripts/docker-build.sh
+	PIP_VERSION=${PIP_VERSION} PIPELINE_PACKAGE=${PIPELINE_PACKAGE} DOCKER_BUILD_IMAGE_NAME=${DOCKER_IMAGE} DOCKER_BUILD_PLATFORM=${DOCKER_PLATFORM} ./scripts/docker-build.sh
 
 .PHONY: docker-start-api
 docker-start-api:
-	docker run -p 8000:8000 --mount type=bind,source=$(realpath .),target=/home/notebook-user/local -t --rm pipeline-family-${PIPELINE_FAMILY}-dev:latest --log-config logger_config.yaml --host 0.0.0.0 --port 8000
+	docker run -p 8000:8000 --mount type=bind,source=$(realpath .),target=/home/notebook-user/local -t --rm ${DOCKER_IMAGE} --log-config logger_config.yaml --host 0.0.0.0 --port 8000
 
 # Note(austin) we need to install the dev dependencies for this to work
 # Do we want to build separate dev images?
 .PHONY: docker-start-jupyter
 docker-start-jupyter:
-	docker run -p 8888:8888 --mount type=bind,source=$(realpath .),target=/home/notebook-user/local --entrypoint jupyter -t --rm pipeline-family-${PIPELINE_FAMILY}-dev:latest run --port 8888 --ip 0.0.0.0 --NotebookApp.token='' --NotebookApp.password=''
+	docker run -p 8888:8888 --mount type=bind,source=$(realpath .),target=/home/notebook-user/local --entrypoint jupyter -t --rm ${DOCKER_IMAGE} run --port 8888 --ip 0.0.0.0 --NotebookApp.token='' --NotebookApp.password=''
 
 .PHONY: docker-test
 docker-test:
-	./scripts/docker-smoke-test.sh
+	IMAGE_NAME=${DOCKER_IMAGE} ./scripts/docker-smoke-test.sh
 
 #########
 # Local #
