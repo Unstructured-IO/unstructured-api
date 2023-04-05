@@ -11,7 +11,6 @@ echo "Building for platform: $DOCKER_BUILD_PLATFORM"
 echo "Using PIP_VERSION: $PIP_VERSION"
 echo "Using PIPELINE_PACKAGE: $PIPELINE_PACKAGE"
 echo "Using DOCKER_BUILD_REPOSITORY: $DOCKER_BUILD_REPOSITORY"
-echo "Using DOCKER_ARCH_TAG: $DOCKER_ARCH_TAG"
 
 DOCKER_BUILDKIT=1 docker buildx build --load --platform="$DOCKER_BUILD_PLATFORM" -f Dockerfile \
   --build-arg PIP_VERSION="$PIP_VERSION" \
