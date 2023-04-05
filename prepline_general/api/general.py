@@ -41,6 +41,7 @@ def is_expected_response_type(media_type, response_type):
         return False
 
 
+# pipeline-api
 def pipeline_api(file, filename="", m_strategy=[], response_type="application/json"):
     strategy = (m_strategy[0] if len(m_strategy) else "fast").lower()
     if strategy not in ["fast", "hi_res"]:
