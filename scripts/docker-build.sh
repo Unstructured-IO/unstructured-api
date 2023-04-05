@@ -2,7 +2,7 @@
 
 set -euo pipefail
 DOCKER_BUILD_PLATFORM="${DOCKER_BUILD_PLATFORM:-linux/amd64}"
-DOCKER_BUILD_REPOSITORY="${DOCKER_BUILD_REPOSITORY:-quay.io/unstructured-io/build-unstructured-api}"
+DOCKER_BUILD_REPOSITORY="${DOCKER_BUILD_REPOSITORY:-quay.io/unstructured-io/unstructured-api}"
 PIPELINE_PACKAGE="${PIPELINE_PACKAGE:-general}"
 PIP_VERSION="${PIP_VERSION:-21.0.1}"
 
