@@ -10,11 +10,6 @@ API_URL = "http://localhost:8000/general/v0/general"
 skip_inference_tests = os.getenv("SKIP_INFERENCE_TESTS", "").lower() in {"true", "yes", "y", "1"}
 
 
-def send_document(filename, content_type):
-    files = {"files": (str(filename), open(filename, "rb"), content_type)}
-    return requests.post(API_URL, files=files)
-
-
 @pytest.mark.parametrize(
     "example_filename, content_type",
     [
@@ -49,7 +44,8 @@ def test_happy_path(example_filename, content_type):
     and some structured response
     """
     test_file = Path("sample-docs") / example_filename
-    response = send_document(test_file, content_type)
+    files = {"files": (str(test_file), open(test_file, "rb"), content_type)}
+    response = requests.post(API_URL, files=files)
 
     print(response.text)
 
