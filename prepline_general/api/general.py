@@ -3,7 +3,9 @@
 # DO NOT MODIFY DIRECTLY
 #####################################################################
 
+import io
 import os
+import gzip
 import mimetypes
 from typing import List, Union
 from fastapi import (
@@ -19,6 +21,7 @@ from fastapi import (
 from fastapi.responses import PlainTextResponse
 import json
 from fastapi.responses import StreamingResponse
+from starlette.datastructures import Headers
 from starlette.types import Send
 from base64 import b64encode
 from typing import Optional, Mapping, Iterator, Tuple
@@ -191,6 +194,17 @@ class MultipartMixedResponse(StreamingResponse):
         await send({"type": "http.response.body", "body": b"", "more_body": False})
 
 
+def ungz_file(file: UploadFile) -> UploadFile:
+    filename = str(file.filename) if file.filename else ""
+    gzip_file = gzip.open(file.file)
+    return UploadFile(
+        file=io.BytesIO(gzip_file.read()),
+        size=len(gzip_file.read()),
+        filename=filename[:-3] if len(filename) > 3 else "",
+        headers=Headers({"content-type": str(mimetypes.guess_type(filename)[0])}),
+    )
+
+
 @router.post("/general/v0/general")
 @router.post("/general/v0.0.8/general")
 def pipeline_1(
@@ -199,6 +213,11 @@ def pipeline_1(
     output_format: Union[str, None] = Form(default=None),
     strategy: List[str] = Form(default=[]),
 ):
+    if files:
+        for file_index in range(len(files)):
+            if files[file_index].content_type == "application/gzip":
+                files[file_index] = ungz_file(files[file_index])
+
     content_type = request.headers.get("Accept")
 
     default_response_type = output_format or "application/json"

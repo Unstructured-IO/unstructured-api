@@ -64,12 +64,12 @@ def test_strategy_performance():
     test_file = Path("sample-docs") / "layout-parser-paper.pdf"
 
     start_time = time.time()
-    response = send_document(test_file, strategy="hi_res")
+    response = send_document(test_file, content_type="application/pdf", strategy="hi_res")
     hi_res_time = time.time() - start_time
     assert(response.status_code == 200)
 
     start_time = time.time()
-    response = send_document(test_file, strategy="fast")
+    response = send_document(test_file, content_type="application/pdf", strategy="fast")
     fast_time = time.time() - start_time
     assert(response.status_code == 200)
 
