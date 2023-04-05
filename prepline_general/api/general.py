@@ -42,7 +42,13 @@ def is_expected_response_type(media_type, response_type):
 
 
 # pipeline-api
-def pipeline_api(file, filename="", response_type="application/json"):
+def pipeline_api(file, filename="", m_strategy=[], response_type="application/json"):
+    strategy = (m_strategy[0] if len(m_strategy) else "fast").lower()
+    if strategy not in ["fast", "hi_res"]:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Invalid strategy: {strategy}. Must be one of ['fast', 'hi_res']",
+        )
     # NOTE(robinson) - This is a hacky solution due to
     # limitations in the SpooledTemporaryFile wrapper.
     # Specifically, it does't have a `seekable` attribute,
@@ -54,7 +60,7 @@ def pipeline_api(file, filename="", response_type="application/json"):
         _filename = os.path.join(tmpdir, filename.split("/")[-1])
         with open(_filename, "wb") as f:
             f.write(file.read())
-        elements = partition(filename=_filename)
+        elements = partition(filename=_filename, strategy=strategy)
 
     # Due to the above, elements have an ugly temp filename in their metadata
     # For now, replace this with the basename
@@ -155,6 +161,7 @@ def pipeline_1(
     request: Request,
     files: Union[List[UploadFile], None] = File(default=None),
     output_format: Union[str, None] = Form(default=None),
+    strategy: List[str] = Form(default=[]),
 ):
     content_type = request.headers.get("Accept")
 
@@ -187,6 +194,7 @@ def pipeline_1(
 
                     response = pipeline_api(
                         _file,
+                        m_strategy=strategy,
                         response_type=media_type,
                         filename=file.filename,
                     )
@@ -209,6 +217,7 @@ def pipeline_1(
 
             response = pipeline_api(
                 _file,
+                m_strategy=strategy,
                 response_type=media_type,
                 filename=file.filename,
             )

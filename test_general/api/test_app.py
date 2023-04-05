@@ -1,9 +1,7 @@
 from pathlib import Path
 
 import pytest
-
 from fastapi.testclient import TestClient
-
 from unstructured_api_tools.pipelines.api_conventions import get_pipeline_path
 
 from prepline_general.api.app import app
@@ -58,3 +56,15 @@ def test_general_api(example_filename):
     )
     assert response.status_code == 200
     assert len(response.json()) > 0
+
+
+def test_strategy_param_400():
+    """Verify that we get a 400 if we pass in a bad strategy"""
+    client = TestClient(app)
+    test_file = Path("sample-docs") / "layout-parser-paper.pdf"
+    response = client.post(
+        MAIN_API_ROUTE,
+        files=[("files", (str(test_file), open(test_file, "rb"), "text/plain"))],
+        data={"strategy": "not_a_strategy"},
+    )
+    assert response.status_code == 400
