@@ -1,7 +1,7 @@
 PIPELINE_FAMILY := general
 PIPELINE_PACKAGE := general
 PACKAGE_NAME := prepline_${PIPELINE_PACKAGE}
-PIP_VERSION := 22.1.2
+PIP_VERSION := 22.2.1
 
 .PHONY: help
 help: Makefile
