@@ -59,7 +59,6 @@ def pipeline_api(file, filename="", m_strategy=[], response_type="application/js
         _filename = os.path.join(tmpdir, filename.split("/")[-1])
         with open(_filename, "wb") as f:
             f.write(file.read())
-        print(f"route strategy: {strategy}")
         elements = partition(filename=_filename, strategy=strategy)
 
     # Due to the above, elements have an ugly temp filename in their metadata

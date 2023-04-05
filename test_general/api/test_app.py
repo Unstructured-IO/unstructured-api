@@ -57,6 +57,7 @@ def test_general_api(example_filename):
     assert response.status_code == 200
     assert len(response.json()) > 0
 
+
 def test_strategy_param_400():
     """Verify that we get a 400 if we pass in a bad strategy"""
     client = TestClient(app)
