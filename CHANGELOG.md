@@ -2,6 +2,7 @@
 
 * Updated detectron version
 * Update docker-build to use the public registry as a cache
+* Adds a strategy parameter to pipeline_api 
 
 ## 0.0.8
 
