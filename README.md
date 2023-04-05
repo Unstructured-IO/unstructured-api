@@ -53,6 +53,7 @@ We have two strategies for processing PDF files: `hi_res` and `fast`. `hi_res` t
   -H 'accept: application/json' \
   -H 'Content-Type: multipart/form-data' \
   -F 'files=@sample-docs/layout-parser-paper.pdf' \
+  -F 'strategy=hi_res' \
   | jq -C . | less -R
 ```
 
