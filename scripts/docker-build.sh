@@ -13,4 +13,3 @@ DOCKER_BUILDKIT=1 docker buildx build --load --platform="$DOCKER_BUILD_PLATFORM"
   --progress plain \
   --cache-from "$DOCKER_BUILD_REPOSITORY":latest \
   -t pipeline-family-"$PIPELINE_FAMILY"-dev:latest .
-  
