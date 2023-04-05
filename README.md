@@ -45,7 +45,7 @@ For example:
   | jq -C . | less -R
 ```
 
-We have two strategies for processing PDF files: `hi_res` and `fast`. `hi_res` takes a bit longer but provides better quality results. You can specify which you prefer with the `strategy` parameter.
+We have two strategies for processing PDF files: `hi_res` and `fast`. `hi_res` takes longer but provides better quality results. Conversely, `fast` is ideal for scenarios where time-to-result is the priority (`fast` is also the default)  You can specify which you prefer with the `strategy` parameter.
 
 ```
  curl -X 'POST' \
