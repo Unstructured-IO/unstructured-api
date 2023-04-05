@@ -49,7 +49,6 @@ def test_general_api(example_filename, content_type):
     response = client.post(
         MAIN_API_ROUTE, files=[("files", (str(test_file), open(test_file, "rb"), content_type))]
     )
-    print(response.json())
     assert response.status_code == 200
     assert len(response.json()) > 0
     for i in response.json():

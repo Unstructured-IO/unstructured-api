@@ -49,7 +49,7 @@ def is_expected_response_type(media_type, response_type):
 
 DEFAULT_MIMETYPES = (
     "application/pdf,application/msword,image/jpeg,image/png,text/markdown,"
-    "text/x-markdown,application/epub,application/epub+zip,text/html,"
+    "text/x-markdown,text/html,"
     "application/vnd.openxmlformats-officedocument.wordprocessingml.document,"
     "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,"
     "application/vnd.ms-excel,application/vnd.openxmlformats-officedocument."
