@@ -1,6 +1,7 @@
-## 0.0.9-dev0
+## 0.0.9-dev1
 
 * Updated detectron version
+* Update docker-build to use the public registry as a cache
 
 ## 0.0.8
 
