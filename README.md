@@ -41,11 +41,21 @@ For example:
   'http://localhost:8000/general/v0/general' \
   -H 'accept: application/json' \
   -H 'Content-Type: multipart/form-data' \
-  -F 'files=@family-day.eml' \
+  -F 'files=@sample-docs/family-day.eml' \
   | jq -C . | less -R
 ```
 
-It's also nice to show how to call the API function using pure Python.
+We have two strategies for processing PDF files: `hi_res` and `fast`. `hi_res` takes a bit longer but provides better quality results. You can specify which you prefer with the `strategy` parameter.
+
+```
+ curl -X 'POST' \
+  'http://localhost:8000/general/v0/general' \
+  -H 'accept: application/json' \
+  -H 'Content-Type: multipart/form-data' \
+  -F 'files=@sample-docs/layout-parser-paper.pdf' \
+  | jq -C . | less -R
+```
+
 
 ### Generating Python files from the pipeline notebooks
 
