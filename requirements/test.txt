@@ -108,7 +108,7 @@ cycler==0.11.0
     # via
     #   -r requirements/base.txt
     #   matplotlib
-debugpy==1.6.6
+debugpy==1.6.7
     # via ipykernel
 decorator==5.1.1
     # via ipython
@@ -808,7 +808,7 @@ typing-extensions==4.5.0
     #   rich
     #   starlette
     #   torch
-unstructured[local-inference]==0.5.10
+unstructured[local-inference]==0.5.11
     # via -r requirements/base.txt
 unstructured-api-tools==0.9.1
     # via -r requirements/base.txt
