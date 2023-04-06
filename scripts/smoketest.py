@@ -53,7 +53,7 @@ def test_happy_path(example_filename, content_type):
     assert len("".join(elem["text"] for elem in response.json())) > 20
 
 
-@pytest.mark.skipif(skip_inference_tests)
+@pytest.mark.skipif(skip_inference_tests, reason="emulated architecture")
 def test_strategy_performance():
     """
     For the files in sample-docs, verify that the fast strategy
