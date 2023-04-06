@@ -11,7 +11,7 @@ ARG PIPELINE_PACKAGE
 
 # Install dependency packages
 RUN yum -y update && \
-  yum -y install poppler-utils xz-devel wget tar curl make which && \
+  yum -y install poppler-utils xz-devel wget tar curl make which mailcap && \
   yum install -y epel-release && \
   yum -y install libreoffice && \
   yum clean all
