@@ -25,9 +25,11 @@ Try our hosted API! It's freely available to use with any of the filetypes liste
   | jq -C . | less -R
 ```
 
-### PDF Strategy
+### PDF Strategies
 
-We have two strategies for processing PDF files: `hi_res` and `fast`. `hi_res` takes longer but provides better quality results. Conversely, `fast` is ideal for scenarios where time-to-results is the priority (`fast` is also the default)  You can specify which you prefer with the `strategy` parameter.
+Two strategies are available for processing PDF files: `hi_res` and `fast`. `fast` is the default `strategy` and works well for documents that do not have text embedded in images.
+
+On the other hand, `hi_res` is the better choice for PDF's that may have text within embedded images, or for achieving greater precision of [element types](https://unstructured-io.github.io/unstructured/getting_started.html#document-elements) in the response JSON. Please be aware that, as of writing, `hi_res` requests may take 20 times longer to process compared to the`fast` option. See the example below for making a `hi_res` request.
 
 ```
  curl -X 'POST' \
