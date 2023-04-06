@@ -209,7 +209,7 @@ def ungz_file(file: UploadFile) -> UploadFile:
 
 
 @router.post("/general/v0/general")
-@router.post("/general/v0.0.8/general")
+@router.post("/general/v0.0.9/general")
 def pipeline_1(
     request: Request,
     files: Union[List[UploadFile], None] = File(default=None),
