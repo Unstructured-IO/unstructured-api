@@ -1,3 +1,7 @@
+## 0.0.10
+
+* Bump unstructured-api-tools for better 'file type not supported' response messages
+
 ## 0.0.9
 
 * Updated detectron version

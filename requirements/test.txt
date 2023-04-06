@@ -810,7 +810,7 @@ typing-extensions==4.5.0
     #   torch
 unstructured[local-inference]==0.5.11
     # via -r requirements/base.txt
-unstructured-api-tools==0.9.1
+unstructured-api-tools==0.9.2
     # via -r requirements/base.txt
 unstructured-inference==0.3.2
     # via
@@ -852,7 +852,7 @@ webencodings==0.5.1
     #   tinycss2
 websocket-client==1.5.1
     # via jupyter-server
-websockets==11.0
+websockets==11.0.1
     # via
     #   -r requirements/base.txt
     #   uvicorn
