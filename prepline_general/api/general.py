@@ -133,7 +133,11 @@ def get_validated_mimetype(file):
 
         if content_type not in allowed_mimetypes:
             raise HTTPException(
-                status_code=400, detail=f"File type not supported: {file.filename}"
+                status_code=400,
+                detail=(
+                    f"Unable to process {file.filename}: "
+                    f"File type {content_type} is not supported."
+                ),
             )
 
     return content_type
@@ -209,7 +213,7 @@ def ungz_file(file: UploadFile) -> UploadFile:
 
 
 @router.post("/general/v0/general")
-@router.post("/general/v0.0.9/general")
+@router.post("/general/v0.0.10/general")
 def pipeline_1(
     request: Request,
     files: Union[List[UploadFile], None] = File(default=None),
