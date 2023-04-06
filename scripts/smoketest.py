@@ -27,7 +27,7 @@ def send_document(filename, content_type, strategy="fast"):
         pytest.param("fake-power-point.ppt", None, marks=pytest.mark.xfail(reason="See CORE-796")),
         ("fake-text.txt", "text/plain"),
         ("fake.doc", "application/msword"),
-        ("fake.docx", "application/vnd.openxmlformats-officedocument.wordprocessingml.document,"),
+        ("fake.docx", "application/vnd.openxmlformats-officedocument.wordprocessingml.document"),
         ("family-day.eml", "message/rfc822"),
         pytest.param("fake-excel.xlsx", None, marks=pytest.mark.xfail(reason="not supported yet")),
         # Note(austin) The two inference calls will hang on mac with unsupported hardware error
@@ -53,6 +53,7 @@ def test_happy_path(example_filename, content_type):
     assert len("".join(elem["text"] for elem in response.json())) > 20
 
 
+@pytest.mark.skipif(skip_inference_tests)
 def test_strategy_performance():
     """
     For the files in sample-docs, verify that the fast strategy
