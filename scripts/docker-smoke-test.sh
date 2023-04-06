@@ -9,12 +9,13 @@
 # shellcheck disable=SC2317  # Shellcheck complains that trap functions are unreachable...
 
 CONTAINER_NAME=unstructured-api-smoke-test
-IMAGE_NAME="${IMAGE_NAME:-unstructured-api:dev}"
+PIPELINE_FAMILY=${PIPELINE_FAMILY:-"general"}
+DOCKER_IMAGE="${DOCKER_IMAGE:-pipeline-family-${PIPELINE_FAMILY}-dev:latest}"
 SKIP_INFERENCE_TESTS="${SKIP_INFERENCE_TESTS:-false}"
 
 start_container() {
     echo Starting container "$CONTAINER_NAME"
-    docker run -p 8000:8000 -d --rm --name "$CONTAINER_NAME" "$IMAGE_NAME" --port 8000 --host 0.0.0.0
+    docker run -p 8000:8000 -d --rm --name "$CONTAINER_NAME" "$DOCKER_IMAGE" --port 8000 --host 0.0.0.0
 }
 
 await_server_ready() {
