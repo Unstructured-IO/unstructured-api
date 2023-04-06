@@ -11,7 +11,7 @@ ARG PIPELINE_PACKAGE
 
 # Install dependency packages
 RUN yum -y update && \
-  yum -y install poppler-utils xz-devel wget tar curl make which && \
+  yum -y install poppler-utils xz-devel wget tar curl make which mailcap && \
   yum install -y epel-release && \
   yum -y install libreoffice && \
   yum clean all
@@ -84,6 +84,7 @@ USER root
 RUN ln -s /home/notebook-user/.local/bin/pip /usr/local/bin/pip
 USER ${NB_USER}
 
+COPY --chown=${NB_USER}:${NB_USER} CHANGELOG.md CHANGELOG.md
 COPY --chown=${NB_USER}:${NB_USER} logger_config.yaml logger_config.yaml
 COPY --chown=${NB_USER}:${NB_USER} prepline_${PIPELINE_PACKAGE}/ prepline_${PIPELINE_PACKAGE}/
 COPY --chown=${NB_USER}:${NB_USER} exploration-notebooks exploration-notebooks

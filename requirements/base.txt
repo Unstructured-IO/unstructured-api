@@ -366,9 +366,9 @@ typing-extensions==4.5.0
     #   rich
     #   starlette
     #   torch
-unstructured[local-inference]==0.5.10
+unstructured[local-inference]==0.5.11
     # via -r requirements/base.in
-unstructured-api-tools==0.9.1
+unstructured-api-tools==0.9.2
     # via -r requirements/base.in
 unstructured-inference==0.3.2
     # via unstructured
@@ -388,7 +388,7 @@ webencodings==0.5.1
     # via
     #   bleach
     #   tinycss2
-websockets==11.0
+websockets==11.0.1
     # via uvicorn
 wrapt==1.14.1
     # via

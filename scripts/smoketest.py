@@ -18,17 +18,17 @@ def send_document(filename, content_type, strategy="fast"):
 @pytest.mark.parametrize(
     "example_filename, content_type",
     [
-        ("alert.eml", None),
-        ("announcement.eml", None),
-        ("fake-email-attachment.eml", None),
-        ("fake-email-image-embedded.eml", None),
-        ("fake-email.eml", None),
-        ("fake-html.html", None),
+        ("alert.eml", "message/rfc822"),
+        ("announcement.eml", "message/rfc822"),
+        ("fake-email-attachment.eml", "message/rfc822"),
+        ("fake-email-image-embedded.eml", "message/rfc822"),
+        ("fake-email.eml", "message/rfc822"),
+        ("fake-html.html", "text/html"),
         pytest.param("fake-power-point.ppt", None, marks=pytest.mark.xfail(reason="See CORE-796")),
         ("fake-text.txt", "text/plain"),
         ("fake.doc", "application/msword"),
-        ("fake.docx", None),
-        ("family-day.eml", None),
+        ("fake.docx", "application/vnd.openxmlformats-officedocument.wordprocessingml.document"),
+        ("family-day.eml", "message/rfc822"),
         pytest.param("fake-excel.xlsx", None, marks=pytest.mark.xfail(reason="not supported yet")),
         # Note(austin) The two inference calls will hang on mac with unsupported hardware error
         # Need to handle this better
@@ -48,13 +48,12 @@ def test_happy_path(example_filename, content_type):
     test_file = Path("sample-docs") / example_filename
     response = send_document(test_file, content_type)
 
-    print(response.text)
-
     assert(response.status_code == 200)
     assert len(response.json()) > 0
     assert len("".join(elem["text"] for elem in response.json())) > 20
 
 
+@pytest.mark.skipif(skip_inference_tests, reason="emulated architecture")
 def test_strategy_performance():
     """
     For the files in sample-docs, verify that the fast strategy

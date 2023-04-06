@@ -47,16 +47,19 @@ def is_expected_response_type(media_type, response_type):
 # pipeline-api
 
 
-# TODO: uncomment once error in unstructured-api-tools is uncovered
-# DEFAULT_MIMETYPES = "application/pdf,application/msword,image/jpeg,image/png,text/markdown," \
-#                     "text/x-markdown,application/epub,application/epub+zip,text/html," \
-#                     "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet," \
-#                     "application/vnd.ms-excel,application/vnd.openxmlformats-officedocument." \
-#                     "presentationml.presentation," \
-#                     "application/vnd.ms-powerpoint,application/xml"
-#
-# if not os.environ.get("UNSTRUCTURED_ALLOWED_MIMETYPES", None):
-#     os.environ["UNSTRUCTURED_ALLOWED_MIMETYPES"] =  DEFAULT_MIMETYPES
+DEFAULT_MIMETYPES = (
+    "application/pdf,application/msword,image/jpeg,image/png,text/markdown,"
+    "text/x-markdown,text/html,"
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document,"
+    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,"
+    "application/vnd.ms-excel,application/vnd.openxmlformats-officedocument."
+    "presentationml.presentation,"
+    "application/vnd.ms-powerpoint,application/xml"
+    "text/html,message/rfc822,text/plain,image/png,"
+)
+
+if not os.environ.get("UNSTRUCTURED_ALLOWED_MIMETYPES", None):
+    os.environ["UNSTRUCTURED_ALLOWED_MIMETYPES"] = DEFAULT_MIMETYPES
 
 
 def pipeline_api(
@@ -130,7 +133,11 @@ def get_validated_mimetype(file):
 
         if content_type not in allowed_mimetypes:
             raise HTTPException(
-                status_code=400, detail=f"File type not supported: {file.filename}"
+                status_code=400,
+                detail=(
+                    f"Unable to process {file.filename}: "
+                    f"File type {content_type} is not supported."
+                ),
             )
 
     return content_type
@@ -206,7 +213,7 @@ def ungz_file(file: UploadFile) -> UploadFile:
 
 
 @router.post("/general/v0/general")
-@router.post("/general/v0.0.8/general")
+@router.post("/general/v0.0.10/general")
 def pipeline_1(
     request: Request,
     files: Union[List[UploadFile], None] = File(default=None),
