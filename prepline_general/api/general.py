@@ -47,16 +47,19 @@ def is_expected_response_type(media_type, response_type):
 # pipeline-api
 
 
-# TODO: uncomment once error in unstructured-api-tools is uncovered
-# DEFAULT_MIMETYPES = "application/pdf,application/msword,image/jpeg,image/png,text/markdown," \
-#                     "text/x-markdown,application/epub,application/epub+zip,text/html," \
-#                     "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet," \
-#                     "application/vnd.ms-excel,application/vnd.openxmlformats-officedocument." \
-#                     "presentationml.presentation," \
-#                     "application/vnd.ms-powerpoint,application/xml"
-#
-# if not os.environ.get("UNSTRUCTURED_ALLOWED_MIMETYPES", None):
-#     os.environ["UNSTRUCTURED_ALLOWED_MIMETYPES"] =  DEFAULT_MIMETYPES
+DEFAULT_MIMETYPES = (
+    "application/pdf,application/msword,image/jpeg,image/png,text/markdown,"
+    "text/x-markdown,text/html,"
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document,"
+    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,"
+    "application/vnd.ms-excel,application/vnd.openxmlformats-officedocument."
+    "presentationml.presentation,"
+    "application/vnd.ms-powerpoint,application/xml"
+    "text/html,message/rfc822,text/plain,image/png,"
+)
+
+if not os.environ.get("UNSTRUCTURED_ALLOWED_MIMETYPES", None):
+    os.environ["UNSTRUCTURED_ALLOWED_MIMETYPES"] = DEFAULT_MIMETYPES
 
 
 def pipeline_api(

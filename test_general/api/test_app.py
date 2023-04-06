@@ -25,18 +25,22 @@ def test_general_api_health_check():
         ("fake-email-image-embedded.eml", None),
         ("fake-email.eml", None),
         ("fake-html.html", "text/html"),
-        pytest.param("fake-power-point.ppt", None, marks=pytest.mark.xfail(reason="See CORE-796")),
+        pytest.param(
+            "fake-power-point.ppt",
+            "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+            marks=pytest.mark.xfail(reason="See CORE-796"),
+        ),
         ("fake-text.txt", "text/plain"),
         pytest.param(
             "fake.doc",
             "application/msword",
             marks=pytest.mark.xfail(reason="Encoding not supported yet"),
         ),
-        ("fake.docx", None),
+        ("fake.docx", "application/vnd.openxmlformats-officedocument.wordprocessingml.document"),
         ("family-day.eml", None),
         pytest.param("fake-excel.xlsx", None, marks=pytest.mark.xfail(reason="not supported yet")),
-        ("layout-parser-paper.pdf", None),
-        ("layout-parser-paper-fast.jpg", None),
+        ("layout-parser-paper.pdf", "application/pdf"),
+        ("layout-parser-paper-fast.jpg", "image/jpeg"),
     ],
 )
 def test_general_api(example_filename, content_type):
@@ -56,8 +60,8 @@ def test_general_api(example_filename, content_type):
     response = client.post(
         MAIN_API_ROUTE,
         files=[
-            ("files", (str(test_file), open(test_file, "rb"), "text/plain")),
-            ("files", (str(test_file), open(test_file, "rb"), "text/plain")),
+            ("files", (str(test_file), open(test_file, "rb"), content_type)),
+            ("files", (str(test_file), open(test_file, "rb"), content_type)),
         ],
     )
     assert response.status_code == 200
@@ -91,5 +95,5 @@ def test_general_api_returns_400_unsupported_file(example_filename):
     response = client.post(
         MAIN_API_ROUTE, files=[("files", (str(test_file), open(test_file, "rb"), filetype))]
     )
-    assert response.json() == {"detail": f"{filetype} not currently supported"}
+    assert response.json() == {"detail": f"File type not supported: {str(test_file)}"}
     assert response.status_code == 400
