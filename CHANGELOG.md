@@ -1,4 +1,4 @@
-## 0.0.9-dev2
+## 0.0.9
 
 * Updated detectron version
 * Adds a strategy parameter to pipeline_api
