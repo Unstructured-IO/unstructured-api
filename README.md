@@ -8,9 +8,36 @@
 
 This repo implements a pre-processing pipeline for the following documents. Currently, the pipeline is capable of recognizing the file type and choosing the relevant partition function to process the file.
 
-* Various plaintext files: `.txt`, `.eml`, `.html`, `.md`, `.json`
+* Plaintext: `.txt`, `.eml`, `.html`, `.md`, `.json`
 * Images: `.jpeg`, `.png`
 * Documents: `.doc`, `.docx`, `.ppt`, `.pptx`, `.pdf`
+
+## :rocket: Unstructured API
+
+Try our hosted API! It's freely available to use with any of the filetypes listed above. This is the easiest way to get started. If you'd like to host your own version of the API, jump down to the [Developer Quickstart Guide](#developer-quick-start).
+
+```
+ curl -X 'POST' \
+  'https://api.unstructured.io/general/v0/general' \
+  -H 'accept: application/json' \
+  -H 'Content-Type: multipart/form-data' \
+  -F 'files=@sample-docs/family-day.eml' \
+  | jq -C . | less -R
+```
+
+### PDF Strategy
+
+We have two strategies for processing PDF files: `hi_res` and `fast`. `hi_res` takes longer but provides better quality results. Conversely, `fast` is ideal for scenarios where time-to-results is the priority (`fast` is also the default)  You can specify which you prefer with the `strategy` parameter.
+
+```
+ curl -X 'POST' \
+  'https://api.unstructured.io/general/v0/general' \
+  -H 'accept: application/json' \
+  -H 'Content-Type: multipart/form-data' \
+  -F 'files=@sample-docs/layout-parser-paper.pdf' \
+  -F 'strategy=hi_res' \
+  | jq -C . | less -R
+```
 
 ## Developer Quick Start
 
@@ -25,15 +52,16 @@ This repo implements a pre-processing pipeline for the following documents. Curr
 	`pyenv  virtualenv 3.8.15 document-processing` <br />
 	`pyenv activate document-processing`
 
-# See the [Unstructured Quick Start](https://github.com/Unstructured-IO/unstructured#eight_pointed_black_star-quick-start) for the many OS dependencies that are required, if the ability to process all file types is desired.
+See the [Unstructured Quick Start](https://github.com/Unstructured-IO/unstructured#eight_pointed_black_star-quick-start) for the many OS dependencies that are required, if the ability to process all file types is desired.
+
 * Run `make install`
 * Start a local jupyter notebook server with `make run-jupyter` <br />
 	**OR** <br />
 	just start the fast-API locally with `make run-web-app`
 
-#### Extracting whatever from some type of document
+#### Using the API locally
 
-Give a description of making API calls using example `curl` commands, and example JSON responses.
+After running `make run-web-app` (or `make docker-start-api` to run in the container), you can now hit the API locally at port 8000. The `sample-docs` directory has a number of example file types that are currently supported.
 
 For example:
 ```
@@ -45,16 +73,28 @@ For example:
   | jq -C . | less -R
 ```
 
-We have two strategies for processing PDF files: `hi_res` and `fast`. `hi_res` takes longer but provides better quality results. Conversely, `fast` is ideal for scenarios where time-to-results is the priority (`fast` is also the default)  You can specify which you prefer with the `strategy` parameter.
-
+The response will be a list of the extracted elements:
 ```
- curl -X 'POST' \
-  'http://localhost:8000/general/v0/general' \
-  -H 'accept: application/json' \
-  -H 'Content-Type: multipart/form-data' \
-  -F 'files=@sample-docs/layout-parser-paper.pdf' \
-  -F 'strategy=hi_res' \
-  | jq -C . | less -R
+[
+  {
+    "element_id": "db1ca22813f01feda8759ff04a844e56",
+    "coordinates": null,
+    "text": "Hi All,",
+    "type": "UncategorizedText",
+    "metadata": {
+      "date": "2022-12-21T10:28:53-06:00",
+      "sent_from": [
+        "Mallori Harrell <mallori@unstructured.io>"
+      ],
+      "sent_to": [
+        "Mallori Harrell <mallori@unstructured.io>"
+      ],
+      "subject": "Family Day",
+      "filename": "family-day.eml"
+    }
+  },
+...
+...
 ```
 
 
