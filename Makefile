@@ -1,7 +1,7 @@
 PIPELINE_FAMILY := general
 PIPELINE_PACKAGE := general
 PACKAGE_NAME := prepline_${PIPELINE_PACKAGE}
-PIP_VERSION := 22.1.2
+PIP_VERSION := 22.2.1
 
 .PHONY: help
 help: Makefile
@@ -70,6 +70,8 @@ generate-api:
 # is mounted under /home/notebook-user/local/ when the image is started with
 # docker-start-api or docker-start-jupyter
 
+DOCKER_IMAGE ?= pipeline-family-${PIPELINE_FAMILY}-dev:latest
+
 .PHONY: docker-build
 docker-build:
 	PIP_VERSION=${PIP_VERSION} PIPELINE_FAMILY=${PIPELINE_FAMILY} PIPELINE_PACKAGE=${PIPELINE_PACKAGE} ./scripts/docker-build.sh
@@ -86,7 +88,7 @@ docker-start-jupyter:
 
 .PHONY: docker-test
 docker-test:
-	./scripts/docker-smoke-test.sh
+	DOCKER_IMAGE=${DOCKER_IMAGE} ./scripts/docker-smoke-test.sh
 
 #########
 # Local #
