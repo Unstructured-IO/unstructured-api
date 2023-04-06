@@ -10,7 +10,7 @@ This repo implements a pre-processing pipeline for the following documents. Curr
 
 * Various plaintext files: `.txt`, `.eml`, `.html`, `.md`, `.json`
 * Images: `.jpeg`, `.png`
-* Documents: `.doc`, `.docx`, `.ppt`, `.pptx`, `.pdf`, `.epub`
+* Documents: `.doc`, `.docx`, `.ppt`, `.pptx`, `.pdf`
 
 ## Developer Quick Start
 
