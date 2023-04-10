@@ -19,6 +19,6 @@ app = FastAPI(
 app.include_router(general_router)
 
 
-@app.get("/healthcheck", status_code=status.HTTP_200_OK)
+@app.get("/healthcheck", status_code=status.HTTP_200_OK, include_in_schema=False)
 def healthcheck(request: Request):
     return {"healthcheck": "HEALTHCHECK STATUS: EVERYTHING OK!"}

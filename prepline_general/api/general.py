@@ -120,7 +120,7 @@ def get_validated_mimetype(file):
     return HTTP 400 for an invalid type.
     """
     content_type = file.content_type
-    if content_type == "application/octet-stream":
+    if not content_type or content_type == "application/octet-stream":
         content_type = mimetypes.guess_type(str(file.filename))[0]
 
         # Markdown mimetype is too new for the library - just hardcode that one in for now
@@ -213,7 +213,7 @@ def ungz_file(file: UploadFile) -> UploadFile:
 
 
 @router.post("/general/v0/general")
-@router.post("/general/v0.0.10/general")
+@router.post("/general/v0.0.11/general")
 def pipeline_1(
     request: Request,
     files: Union[List[UploadFile], None] = File(default=None),
@@ -308,11 +308,6 @@ def pipeline_1(
             content='Request parameter "files" is required.\n',
             status_code=status.HTTP_400_BAD_REQUEST,
         )
-
-
-@app.get("/healthcheck", status_code=status.HTTP_200_OK)
-def healthcheck(request: Request):
-    return {"healthcheck": "HEALTHCHECK STATUS: EVERYTHING OK!"}
 
 
 app.include_router(router)

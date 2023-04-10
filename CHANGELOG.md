@@ -1,6 +1,7 @@
-## 0.0.10-dev0
+## 0.0.11
 
 * Add caching from the registry for `make docker-build`
+* Add fix for empty content type error
 
 ## 0.0.10
 
