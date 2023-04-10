@@ -11,7 +11,7 @@ skip_inference_tests = os.getenv("SKIP_INFERENCE_TESTS", "").lower() in {"true",
 
 
 def send_document(filename, content_type, strategy="fast"):
-    files = {"files": (str(filename), open(filename, "rb"), content_type)}
+    files = {"files": (str(filename), open(filename, "rb"))}
     return requests.post(API_URL, files=files, data={"strategy": strategy})
 
 
