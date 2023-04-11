@@ -25,7 +25,9 @@ Try our hosted API! It's freely available to use with any of the filetypes liste
   | jq -C . | less -R
 ```
 
-### PDF Strategies
+### Parameters
+
+#### PDF Strategies
 
 Two strategies are available for processing PDF files: `hi_res` and `fast`. `fast` is the default `strategy` and works well for documents that do not have text embedded in images.
 
@@ -40,6 +42,21 @@ On the other hand, `hi_res` is the better choice for PDF's that may have text wi
   -F 'strategy=hi_res' \
   | jq -C . | less -R
 ```
+
+#### Coordinates
+
+When elements are extracted from PDFs or images, it may be useful to get their bounding boxes as well. Set the `coordinates` parameter to `true` to add this field to the elements in the response.
+
+```
+ curl -X 'POST' \
+  'https://api.unstructured.io/general/v0/general' \
+  -H 'accept: application/json' \
+  -H 'Content-Type: multipart/form-data' \
+  -F 'files=@sample-docs/layout-parser-paper.pdf' \
+  -F 'coordinates=true' \
+  | jq -C . | less -R
+```
+
 
 ## Developer Quick Start
 
