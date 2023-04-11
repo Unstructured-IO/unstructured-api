@@ -1,3 +1,7 @@
+## 0.0.12
+
+* Remove coordinates field from response elements by default
+
 ## 0.0.11
 
 * Add caching from the registry for `make docker-build`
