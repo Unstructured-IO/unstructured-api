@@ -24,14 +24,14 @@ def send_document(filename, content_type, strategy="fast"):
         ("fake-email-image-embedded.eml", "message/rfc822"),
         ("fake-email.eml", "message/rfc822"),
         ("fake-html.html", "text/html"),
-        pytest.param("fake-power-point.ppt", None, marks=pytest.mark.xfail(reason="See CORE-796")),
+        ("fake-power-point.ppt", "application/vnd.openxmlformats-officedocument.presentationml.presentation"),
         ("fake-text.txt", "text/plain"),
         ("fake.doc", "application/msword"),
         ("fake.docx", "application/vnd.openxmlformats-officedocument.wordprocessingml.document"),
         ("family-day.eml", "message/rfc822"),
         pytest.param("fake-excel.xlsx", None, marks=pytest.mark.xfail(reason="not supported yet")),
         # Note(austin) The two inference calls will hang on mac with unsupported hardware error
-        # Need to handle this better
+        # Skip these with SKIP_INFERENCE_TESTS=true make docker-test
         pytest.param("layout-parser-paper.pdf", "application/pdf", marks=pytest.mark.skipif(
             skip_inference_tests, reason="emulated architecture")
         ),
