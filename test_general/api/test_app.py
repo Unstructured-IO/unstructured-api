@@ -70,6 +70,36 @@ def test_general_api(example_filename, content_type):
     assert len(response.json()) > 0
 
 
+def test_coordinates_param():
+    """
+    Verify that responses do not include coordinates unless requested
+    """
+    client = TestClient(app)
+    test_file = Path("sample-docs") / "layout-parser-paper-fast.jpg"
+    response = client.post(
+        MAIN_API_ROUTE,
+        files=[("files", (str(test_file), open(test_file, "rb")))],
+    )
+
+    assert response.status_code == 200
+    response_without_coords = response.json()
+
+    response = client.post(
+        MAIN_API_ROUTE,
+        files=[("files", (str(test_file), open(test_file, "rb")))],
+        data={"coordinates": "true"},
+    )
+
+    assert response.status_code == 200
+    response_with_coords = response.json()
+
+    # Each element should be the same except for the coordinates field
+    for i in range(len(response_with_coords)):
+        assert "coordinates" in response_with_coords[i]
+        del response_with_coords[i]["coordinates"]
+        assert response_with_coords[i] == response_without_coords[i]
+
+
 def test_strategy_param_400():
     """Verify that we get a 400 if we pass in a bad strategy"""
     client = TestClient(app)

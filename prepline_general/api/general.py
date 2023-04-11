@@ -66,6 +66,7 @@ def pipeline_api(
     file,
     filename="",
     m_strategy=[],
+    m_coordinates=[],
     file_content_type=None,
     response_type="application/json",
 ):
@@ -75,6 +76,10 @@ def pipeline_api(
             status_code=400,
             detail=f"Invalid strategy: {strategy}. Must be one of ['fast', 'hi_res']",
         )
+
+    show_coordinates_str = (m_coordinates[0] if len(m_coordinates) else "false").lower()
+    show_coordinates = show_coordinates_str == "true"
+
     if filename.endswith((".docx", ".pptx")):
         # NOTE(robinson) - This is a hacky solution due to
         # limitations in the SpooledTemporaryFile wrapper.
@@ -109,6 +114,9 @@ def pipeline_api(
     result = convert_to_isd(elements)
     for element in result:
         element["metadata"]["filename"] = os.path.basename(filename)
+
+        if not show_coordinates:
+            del element["coordinates"]
 
     return result
 
@@ -213,12 +221,13 @@ def ungz_file(file: UploadFile) -> UploadFile:
 
 
 @router.post("/general/v0/general")
-@router.post("/general/v0.0.11/general")
+@router.post("/general/v0.0.12/general")
 def pipeline_1(
     request: Request,
     files: Union[List[UploadFile], None] = File(default=None),
     output_format: Union[str, None] = Form(default=None),
     strategy: List[str] = Form(default=[]),
+    coordinates: List[str] = Form(default=[]),
 ):
     if files:
         for file_index in range(len(files)):
@@ -257,6 +266,7 @@ def pipeline_1(
                     response = pipeline_api(
                         _file,
                         m_strategy=strategy,
+                        m_coordinates=coordinates,
                         response_type=media_type,
                         filename=file.filename,
                         file_content_type=file_content_type,
@@ -281,6 +291,7 @@ def pipeline_1(
             response = pipeline_api(
                 _file,
                 m_strategy=strategy,
+                m_coordinates=coordinates,
                 response_type=media_type,
                 filename=file.filename,
                 file_content_type=file_content_type,
