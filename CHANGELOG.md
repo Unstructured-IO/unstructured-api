@@ -1,6 +1,18 @@
-## 0.0.9-dev0
+## 0.0.11
+
+* Add caching from the registry for `make docker-build`
+* Add fix for empty content type error
+
+## 0.0.10
+
+* Bump unstructured-api-tools for better 'file type not supported' response messages
+
+## 0.0.9
 
 * Updated detectron version
+* Update docker-build to use the public registry as a cache
+* Adds a strategy parameter to pipeline_api
+* Passing file, file_filename, and content_type to `partition`
 
 ## 0.0.8
 

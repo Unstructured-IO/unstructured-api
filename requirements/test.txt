@@ -19,7 +19,7 @@ appnope==0.1.3
     # via
     #   ipykernel
     #   ipython
-argilla==1.5.0
+argilla==1.6.0
     # via
     #   -r requirements/base.txt
     #   unstructured
@@ -42,18 +42,17 @@ attrs==22.2.0
     # via
     #   -r requirements/base.txt
     #   jsonschema
-    #   pytest
 backcall==0.2.0
     # via ipython
 backoff==2.2.1
     # via
     #   -r requirements/base.txt
     #   argilla
-beautifulsoup4==4.12.0
+beautifulsoup4==4.12.2
     # via
     #   -r requirements/base.txt
     #   nbconvert
-black==23.1.0
+black==23.3.0
     # via -r requirements/test.in
 bleach==6.0.0
     # via
@@ -98,7 +97,7 @@ contourpy==1.0.7
     # via
     #   -r requirements/base.txt
     #   matplotlib
-coverage[toml]==7.2.2
+coverage[toml]==7.2.3
     # via pytest-cov
 cryptography==40.0.1
     # via
@@ -108,7 +107,7 @@ cycler==0.11.0
     # via
     #   -r requirements/base.txt
     #   matplotlib
-debugpy==1.6.6
+debugpy==1.6.7
     # via ipykernel
 decorator==5.1.1
     # via ipython
@@ -139,7 +138,7 @@ fastapi==0.95.0
     #   -r requirements/base.txt
     #   unstructured-api-tools
     #   unstructured-inference
-fastcore==1.5.28
+fastcore==1.5.29
     # via
     #   execnb
     #   ghapi
@@ -148,7 +147,7 @@ fastjsonschema==2.16.3
     # via
     #   -r requirements/base.txt
     #   nbformat
-filelock==3.10.7
+filelock==3.11.0
     # via
     #   -r requirements/base.txt
     #   huggingface-hub
@@ -160,7 +159,7 @@ flatbuffers==23.3.3
     # via
     #   -r requirements/base.txt
     #   onnxruntime
-fonttools==4.39.2
+fonttools==4.39.3
     # via
     #   -r requirements/base.txt
     #   matplotlib
@@ -185,7 +184,7 @@ httpx==0.23.3
     # via
     #   -r requirements/base.txt
     #   argilla
-huggingface-hub==0.13.3
+huggingface-hub==0.13.4
     # via
     #   -r requirements/base.txt
     #   timm
@@ -202,7 +201,7 @@ idna==3.4
     #   jsonschema
     #   requests
     #   rfc3986
-importlib-metadata==6.1.0
+importlib-metadata==6.3.0
     # via
     #   -r requirements/base.txt
     #   jupyter-client
@@ -221,12 +220,13 @@ iopath==0.1.10
     #   layoutparser
 ipykernel==6.22.0
     # via
+    #   ipywidgets
     #   jupyter
     #   jupyter-console
     #   nbclassic
     #   notebook
     #   qtconsole
-ipython==8.11.0
+ipython==8.12.0
     # via
     #   execnb
     #   ipykernel
@@ -237,7 +237,7 @@ ipython-genutils==0.2.0
     #   nbclassic
     #   notebook
     #   qtconsole
-ipywidgets==8.0.5
+ipywidgets==8.0.6
     # via jupyter
 isoduration==20.11.0
     # via jsonschema
@@ -302,7 +302,7 @@ jupyterlab-pygments==0.2.2
     # via
     #   -r requirements/base.txt
     #   nbconvert
-jupyterlab-widgets==3.0.6
+jupyterlab-widgets==3.0.7
     # via ipywidgets
 kiwisolver==1.4.4
     # via
@@ -349,7 +349,11 @@ mpmath==1.3.0
     # via
     #   -r requirements/base.txt
     #   sympy
-mypy==1.1.1
+msg-parser==1.2.0
+    # via
+    #   -r requirements/base.txt
+    #   unstructured
+mypy==1.2.0
     # via
     #   -r requirements/base.txt
     #   -r requirements/test.in
@@ -359,13 +363,13 @@ mypy-extensions==1.0.0
     #   -r requirements/base.txt
     #   black
     #   mypy
-nbclassic==0.5.3
+nbclassic==0.5.5
     # via notebook
-nbclient==0.7.2
+nbclient==0.7.3
     # via
     #   -r requirements/base.txt
     #   nbconvert
-nbconvert==7.2.10
+nbconvert==7.3.1
     # via
     #   -r requirements/base.txt
     #   jupyter
@@ -388,7 +392,7 @@ nest-asyncio==1.5.6
     #   ipykernel
     #   nbclassic
     #   notebook
-networkx==3.0
+networkx==3.1
     # via
     #   -r requirements/base.txt
     #   torch
@@ -396,7 +400,7 @@ nltk==3.8.1
     # via
     #   -r requirements/base.txt
     #   unstructured
-notebook==6.5.3
+notebook==6.5.4
     # via jupyter
 notebook-shim==0.2.2
     # via nbclassic
@@ -414,6 +418,10 @@ numpy==1.23.5
     #   scipy
     #   torchvision
     #   transformers
+olefile==0.46
+    # via
+    #   -r requirements/base.txt
+    #   msg-parser
 omegaconf==2.3.0
     # via
     #   -r requirements/base.txt
@@ -471,7 +479,7 @@ pdfminer-six==20221105
     # via
     #   -r requirements/base.txt
     #   pdfplumber
-pdfplumber==0.8.0
+pdfplumber==0.8.1
     # via
     #   -r requirements/base.txt
     #   layoutparser
@@ -479,7 +487,7 @@ pexpect==4.8.0
     # via ipython
 pickleshare==0.7.5
     # via ipython
-pillow==9.4.0
+pillow==9.5.0
     # via
     #   -r requirements/base.txt
     #   layoutparser
@@ -543,7 +551,7 @@ pydantic==1.10.7
     #   fastapi
 pyflakes==3.0.1
     # via flake8
-pygments==2.14.0
+pygments==2.15.0
     # via
     #   -r requirements/base.txt
     #   ipython
@@ -567,7 +575,7 @@ pytesseract==0.3.10
     # via
     #   -r requirements/base.txt
     #   layoutparser
-pytest==7.2.2
+pytest==7.3.0
     # via pytest-cov
 pytest-cov==4.0.0
     # via -r requirements/test.in
@@ -600,7 +608,7 @@ python-pptx==0.6.21
     # via
     #   -r requirements/base.txt
     #   unstructured
-pytz==2023.2
+pytz==2023.3
     # via
     #   -r requirements/base.txt
     #   pandas
@@ -625,9 +633,9 @@ pyzmq==25.0.2
     #   nbclassic
     #   notebook
     #   qtconsole
-qtconsole==5.4.1
+qtconsole==5.4.2
     # via jupyter
-qtpy==2.3.0
+qtpy==2.3.1
     # via qtconsole
 ratelimit==2.2.1
     # via -r requirements/base.txt
@@ -711,7 +719,7 @@ tinycss2==1.2.1
     # via
     #   -r requirements/base.txt
     #   nbconvert
-tokenizers==0.13.2
+tokenizers==0.13.3
     # via
     #   -r requirements/base.txt
     #   transformers
@@ -771,11 +779,11 @@ traitlets==5.9.0
     #   nbformat
     #   notebook
     #   qtconsole
-transformers==4.27.3
+transformers==4.27.4
     # via
     #   -r requirements/base.txt
     #   unstructured-inference
-types-requests==2.28.11.16
+types-requests==2.28.11.17
     # via
     #   -r requirements/base.txt
     #   unstructured-api-tools
@@ -783,7 +791,7 @@ types-ujson==5.7.0.1
     # via
     #   -r requirements/base.txt
     #   unstructured-api-tools
-types-urllib3==1.26.25.9
+types-urllib3==1.26.25.10
     # via
     #   -r requirements/base.txt
     #   types-requests
@@ -793,16 +801,17 @@ typing-extensions==4.5.0
     #   black
     #   huggingface-hub
     #   iopath
+    #   ipython
     #   mypy
     #   pydantic
     #   rich
     #   starlette
     #   torch
-unstructured[local-inference]==0.5.7
+unstructured[local-inference]==0.5.11
     # via -r requirements/base.txt
-unstructured-api-tools==0.8.1
+unstructured-api-tools==0.9.3
     # via -r requirements/base.txt
-unstructured-inference==0.2.11
+unstructured-inference==0.3.2
     # via
     #   -r requirements/base.txt
     #   unstructured
@@ -842,13 +851,13 @@ webencodings==0.5.1
     #   tinycss2
 websocket-client==1.5.1
     # via jupyter-server
-websockets==10.4
+websockets==11.0.1
     # via
     #   -r requirements/base.txt
     #   uvicorn
 wheel==0.40.0
     # via astunparse
-widgetsnbextension==4.0.6
+widgetsnbextension==4.0.7
     # via ipywidgets
 wrapt==1.14.1
     # via

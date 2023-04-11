@@ -79,7 +79,7 @@ jobs:
     - name: Test AMD image
       run: |
         source .venv/bin/activate
-        IMAGE_NAME="$DOCKER_BUILD_REPOSITORY:amd-$SHORT_SHA" make docker-test 
+        DOCKER_IMAGE="$DOCKER_BUILD_REPOSITORY:amd-$SHORT_SHA" make docker-test 
     - name: Push AMD image
       run: |
         # write to the build repository to cache for the publish-images job
@@ -123,7 +123,7 @@ jobs:
       run: |
         source .venv/bin/activate
         # skip the inference tests because they will hang on emulated architecture
-        SKIP_INFERENCE_TESTS=true IMAGE_NAME="$DOCKER_BUILD_REPOSITORY:arm-$SHORT_SHA" make docker-test 
+        SKIP_INFERENCE_TESTS=true DOCKER_IMAGE="$DOCKER_BUILD_REPOSITORY:arm-$SHORT_SHA" make docker-test 
     - name: Push ARM image
       run: |
         # write to the build repository to cache for the publish-images job
