@@ -189,7 +189,7 @@ opencv-python==4.6.0.66
     #   unstructured-inference
 openpyxl==3.1.2
     # via unstructured
-packaging==23.0
+packaging==23.1
     # via
     #   argilla
     #   huggingface-hub
@@ -209,7 +209,7 @@ pdf2image==1.16.3
     # via layoutparser
 pdfminer-six==20221105
     # via pdfplumber
-pdfplumber==0.8.1
+pdfplumber==0.9.0
     # via layoutparser
 pillow==9.5.0
     # via
@@ -227,7 +227,7 @@ platformdirs==3.2.0
     # via jupyter-core
 portalocker==2.7.0
     # via iopath
-protobuf==4.22.1
+protobuf==4.22.3
     # via onnxruntime
 pycocotools==2.0.6
     # via effdet
@@ -349,11 +349,11 @@ traitlets==5.9.0
     #   nbclient
     #   nbconvert
     #   nbformat
-transformers==4.27.4
+transformers==4.28.0
     # via unstructured-inference
 types-requests==2.28.11.17
     # via unstructured-api-tools
-types-ujson==5.7.0.1
+types-ujson==5.7.0.3
     # via unstructured-api-tools
 types-urllib3==1.26.25.10
     # via types-requests
@@ -366,9 +366,9 @@ typing-extensions==4.5.0
     #   rich
     #   starlette
     #   torch
-unstructured[local-inference]==0.5.11
+unstructured[local-inference]==0.5.12
     # via -r requirements/base.in
-unstructured-api-tools==0.9.3
+unstructured-api-tools==0.9.4
     # via -r requirements/base.in
 unstructured-inference==0.3.2
     # via unstructured
@@ -394,7 +394,7 @@ wrapt==1.14.1
     # via
     #   argilla
     #   deprecated
-xlsxwriter==3.0.9
+xlsxwriter==3.1.0
     # via python-pptx
 zipp==3.15.0
     # via
