@@ -140,5 +140,5 @@ def test_general_api_returns_500_bad_pdf():
         MAIN_API_ROUTE, files=[("files", (str(tmp.name), open(tmp.name, "rb"), "application/pdf"))]
     )
     assert response.json() == {"detail": f"{tmp.name} does not appear to be a valid PDF"}
-    assert response.status_code == 500
+    assert response.status_code == 400
     tmp.close()

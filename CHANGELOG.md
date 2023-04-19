@@ -1,6 +1,6 @@
 ## 0.0.13
 
-* Posting a bad .pdf results in a 500
+* Posting a bad .pdf results in a 400
 
 ## 0.0.12
 
