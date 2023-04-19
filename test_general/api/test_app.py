@@ -134,7 +134,7 @@ def test_general_api_returns_400_unsupported_file(example_filename):
 
 def test_general_api_returns_500_bad_pdf():
     tmp = tempfile.NamedTemporaryFile(suffix=".pdf")
-    tmp.write(b'This is not a valid PDF')
+    tmp.write(b"This is not a valid PDF")
     client = TestClient(app)
     response = client.post(
         MAIN_API_ROUTE, files=[("files", (str(tmp.name), open(tmp.name, "rb"), "application/pdf"))]
