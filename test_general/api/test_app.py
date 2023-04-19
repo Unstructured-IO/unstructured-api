@@ -132,7 +132,7 @@ def test_general_api_returns_400_unsupported_file(example_filename):
     assert response.status_code == 400
 
 
-def test_general_api_returns_500_bad_pdf(example_filename):
+def test_general_api_returns_500_bad_pdf():
     tmp = tempfile.NamedTemporaryFile(suffix=".pdf")
     tmp.write("This is not a valid PDF")
     client = TestClient(app)
