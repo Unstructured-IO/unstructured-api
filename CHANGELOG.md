@@ -1,3 +1,7 @@
+## 0.0.13
+
+* Posting a bad .pdf results in a 500
+
 ## 0.0.12
 
 * Remove coordinates field from response elements by default
