@@ -29,6 +29,7 @@ import secrets
 from unstructured.partition.auto import partition
 from unstructured.staging.base import convert_to_isd
 import tempfile
+import pdfminer
 
 
 app = FastAPI()
@@ -108,6 +109,10 @@ def pipeline_api(
                     detail=f"{file_content_type} not currently supported",
                 )
             raise e
+        except pdfminer.pdfparser.PDFSyntaxError:
+            raise HTTPException(
+                status_code=400, detail=f"{filename} does not appear to be a valid PDF"
+            )
 
     # Due to the above, elements have an ugly temp filename in their metadata
     # For now, replace this with the basename
@@ -221,7 +226,7 @@ def ungz_file(file: UploadFile) -> UploadFile:
 
 
 @router.post("/general/v0/general")
-@router.post("/general/v0.0.12/general")
+@router.post("/general/v0.0.13/general")
 def pipeline_1(
     request: Request,
     files: Union[List[UploadFile], None] = File(default=None),

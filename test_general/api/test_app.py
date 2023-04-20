@@ -5,6 +5,7 @@ from fastapi.testclient import TestClient
 from unstructured_api_tools.pipelines.api_conventions import get_pipeline_path
 
 from prepline_general.api.app import app
+import tempfile
 
 MAIN_API_ROUTE = get_pipeline_path("general")
 
@@ -129,3 +130,15 @@ def test_general_api_returns_400_unsupported_file(example_filename):
         "detail": f"Unable to process {str(test_file)}: " f"File type {filetype} is not supported."
     }
     assert response.status_code == 400
+
+
+def test_general_api_returns_500_bad_pdf():
+    tmp = tempfile.NamedTemporaryFile(suffix=".pdf")
+    tmp.write(b"This is not a valid PDF")
+    client = TestClient(app)
+    response = client.post(
+        MAIN_API_ROUTE, files=[("files", (str(tmp.name), open(tmp.name, "rb"), "application/pdf"))]
+    )
+    assert response.json() == {"detail": f"{tmp.name} does not appear to be a valid PDF"}
+    assert response.status_code == 400
+    tmp.close()
