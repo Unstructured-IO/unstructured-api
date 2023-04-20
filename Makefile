@@ -179,4 +179,4 @@ tidy-notebooks:
 version-sync:
 	scripts/version-sync.sh \
 		-s CHANGELOG.md \
-		-f preprocessing-pipeline-family.yaml release \
+		-f preprocessing-pipeline-family.yaml release
