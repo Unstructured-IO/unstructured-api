@@ -223,14 +223,23 @@ class MultipartMixedResponse(StreamingResponse):
         await send({"type": "http.response.body", "body": b"", "more_body": False})
 
 
-def ungz_file(file: UploadFile) -> UploadFile:
+def ungz_file(file: UploadFile, gz_uncompressed_content_type=None) -> UploadFile:
+    def return_content_type(filename):
+        if gz_uncompressed_content_type:
+            return gz_uncompressed_content_type
+        else:
+            return str(mimetypes.guess_type(filename)[0])
+
     filename = str(file.filename) if file.filename else ""
-    gzip_file = gzip.open(file.file)
+    if filename.endswith(".gz"):
+        filename = filename[:-3]
+
+    gzip_file = gzip.open(file.file).read()
     return UploadFile(
-        file=io.BytesIO(gzip_file.read()),
-        size=len(gzip_file.read()),
-        filename=filename[:-3] if len(filename) > 3 else "",
-        headers=Headers({"content-type": str(mimetypes.guess_type(filename)[0])}),
+        file=io.BytesIO(gzip_file),
+        size=len(gzip_file),
+        filename=filename,
+        headers=Headers({"content-type": return_content_type(filename)}),
     )
 
 
@@ -238,6 +247,7 @@ def ungz_file(file: UploadFile) -> UploadFile:
 @router.post("/general/v0.0.14/general")
 def pipeline_1(
     request: Request,
+    gz_uncompressed_content_type: Optional[str] = Form(default=None),
     files: Union[List[UploadFile], None] = File(default=None),
     output_format: Union[str, None] = Form(default=None),
     strategy: List[str] = Form(default=[]),
@@ -247,7 +257,9 @@ def pipeline_1(
     if files:
         for file_index in range(len(files)):
             if files[file_index].content_type == "application/gzip":
-                files[file_index] = ungz_file(files[file_index])
+                files[file_index] = ungz_file(
+                    files[file_index], gz_uncompressed_content_type
+                )
 
     content_type = request.headers.get("Accept")
 
