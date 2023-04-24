@@ -107,7 +107,7 @@ def pipeline_api(
                 file_filename=filename,
                 content_type=file_content_type,
                 strategy=strategy,
-                m_pdf_infer_table_structure=pdf_infer_table_structure
+                pdf_infer_table_structure=pdf_infer_table_structure
                 if strategy == "hi_res"
                 else False,
             )
