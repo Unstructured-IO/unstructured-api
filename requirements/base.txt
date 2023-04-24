@@ -71,6 +71,8 @@ flatbuffers==23.3.3
     # via onnxruntime
 fonttools==4.39.3
     # via matplotlib
+fsspec==2023.4.0
+    # via huggingface-hub
 h11==0.14.0
     # via
     #   httpcore
@@ -81,7 +83,7 @@ httptools==0.5.0
     # via uvicorn
 httpx==0.23.3
     # via argilla
-huggingface-hub==0.13.4
+huggingface-hub==0.14.0
     # via
     #   timm
     #   transformers
@@ -93,7 +95,7 @@ idna==3.4
     #   anyio
     #   requests
     #   rfc3986
-importlib-metadata==6.5.0
+importlib-metadata==6.6.0
     # via
     #   jupyter-client
     #   markdown
@@ -183,7 +185,7 @@ omegaconf==2.3.0
     # via effdet
 onnxruntime==1.14.1
     # via unstructured-inference
-opencv-python==4.6.0.66
+opencv-python==4.7.0.72
     # via
     #   layoutparser
     #   unstructured-inference
@@ -333,7 +335,7 @@ torchvision==0.15.1
     #   effdet
     #   layoutparser
     #   timm
-tornado==6.3
+tornado==6.3.1
     # via jupyter-client
 tqdm==4.65.0
     # via
@@ -366,11 +368,11 @@ typing-extensions==4.5.0
     #   rich
     #   starlette
     #   torch
-unstructured[local-inference]==0.5.13
+unstructured[local-inference]==0.6.1
     # via -r requirements/base.in
-unstructured-api-tools==0.9.4
+unstructured-api-tools==0.10.0
     # via -r requirements/base.in
-unstructured-inference==0.3.2
+unstructured-inference==0.4.2
     # via unstructured
 urllib3==1.26.15
     # via requests
