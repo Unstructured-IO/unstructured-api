@@ -68,6 +68,7 @@ def pipeline_api(
     filename="",
     m_strategy=[],
     m_coordinates=[],
+    m_pdf_infer_table_structure=[],
     file_content_type=None,
     response_type="application/json",
 ):
@@ -95,12 +96,20 @@ def pipeline_api(
                 f.write(file.read())
             elements = partition(filename=_filename, strategy=strategy)
     else:
+        pdf_infer_table_structure = (
+            bool(m_pdf_infer_table_structure[0])
+            if len(m_pdf_infer_table_structure)
+            else True
+        )
         try:
             elements = partition(
                 file=file,
                 file_filename=filename,
                 content_type=file_content_type,
                 strategy=strategy,
+                m_pdf_infer_table_structure=pdf_infer_table_structure
+                if strategy == "hi_res"
+                else False,
             )
         except ValueError as e:
             if "Invalid file" in e.args[0]:
@@ -233,6 +242,7 @@ def pipeline_1(
     output_format: Union[str, None] = Form(default=None),
     strategy: List[str] = Form(default=[]),
     coordinates: List[str] = Form(default=[]),
+    pdf_infer_table_structure: List[str] = Form(default=[]),
 ):
     if files:
         for file_index in range(len(files)):
@@ -272,6 +282,7 @@ def pipeline_1(
                         _file,
                         m_strategy=strategy,
                         m_coordinates=coordinates,
+                        m_pdf_infer_table_structure=pdf_infer_table_structure,
                         response_type=media_type,
                         filename=file.filename,
                         file_content_type=file_content_type,
@@ -297,6 +308,7 @@ def pipeline_1(
                 _file,
                 m_strategy=strategy,
                 m_coordinates=coordinates,
+                m_pdf_infer_table_structure=pdf_infer_table_structure,
                 response_type=media_type,
                 filename=file.filename,
                 file_content_type=file_content_type,
