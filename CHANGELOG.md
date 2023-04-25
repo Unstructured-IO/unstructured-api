@@ -1,7 +1,6 @@
 ## 0.0.14
 
-* Bump unstructured to the latest version (table support)
-* Add a new parameter `m_pdf_infer_table_structure` to `pipeline_api`
+* Bump unstructured to the latest version
 
 ## 0.0.13
 
