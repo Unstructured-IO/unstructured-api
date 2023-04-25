@@ -1,3 +1,7 @@
+## 0.0.14
+
+* Bump unstructured to the latest version
+
 ## 0.0.13
 
 * Posting a bad .pdf results in a 400
