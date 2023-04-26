@@ -368,7 +368,7 @@ typing-extensions==4.5.0
     #   rich
     #   starlette
     #   torch
-unstructured[local-inference]==0.6.1
+unstructured[local-inference]==0.6.2
     # via -r requirements/base.in
 unstructured-api-tools==0.10.1
     # via -r requirements/base.in
