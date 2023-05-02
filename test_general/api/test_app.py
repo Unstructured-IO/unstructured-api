@@ -20,6 +20,7 @@ def test_general_api_health_check():
 @pytest.mark.parametrize(
     "example_filename, content_type",
     [
+        ("fake-email.msg", None),
         ("alert.eml", None),
         ("announcement.eml", None),
         ("fake-email-attachment.eml", None),
