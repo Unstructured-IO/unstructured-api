@@ -21,6 +21,7 @@ def test_general_api_health_check():
     "example_filename, content_type",
     [
         ("fake-email.msg", None),
+        ("spring-weather.html.json", None),
         ("alert.eml", None),
         ("announcement.eml", None),
         ("fake-email-attachment.eml", None),

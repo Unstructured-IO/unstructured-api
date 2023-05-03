@@ -8,16 +8,7 @@ import os
 import gzip
 import mimetypes
 from typing import List, Union
-from fastapi import (
-    status,
-    FastAPI,
-    File,
-    Form,
-    Request,
-    UploadFile,
-    APIRouter,
-    HTTPException,
-)
+from fastapi import status, FastAPI, File, Form, Request, UploadFile, APIRouter, HTTPException
 from fastapi.responses import PlainTextResponse
 import json
 from fastapi.responses import StreamingResponse
@@ -55,7 +46,8 @@ DEFAULT_MIMETYPES = (
     "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,"
     "application/vnd.ms-excel,application/vnd.openxmlformats-officedocument."
     "presentationml.presentation,"
-    "application/vnd.ms-powerpoint,application/xml"
+    "application/json,"
+    "application/vnd.ms-powerpoint,"
     "text/html,message/rfc822,text/plain,image/png,"
 )
 
@@ -97,16 +89,12 @@ def pipeline_api(
     else:
         try:
             elements = partition(
-                file=file,
-                file_filename=filename,
-                content_type=file_content_type,
-                strategy=strategy,
+                file=file, file_filename=filename, content_type=file_content_type, strategy=strategy
             )
         except ValueError as e:
             if "Invalid file" in e.args[0]:
                 raise HTTPException(
-                    status_code=400,
-                    detail=f"{file_content_type} not currently supported",
+                    status_code=400, detail=f"{file_content_type} not currently supported"
                 )
             raise e
         except pdfminer.pdfparser.PDFSyntaxError:
@@ -136,9 +124,12 @@ def get_validated_mimetype(file):
     if not content_type or content_type == "application/octet-stream":
         content_type = mimetypes.guess_type(str(file.filename))[0]
 
-        # Markdown mimetype is too new for the library - just hardcode that one in for now
-        if not content_type and ".md" in file.filename:
-            content_type = "text/markdown"
+        # Some filetypes missing for this library, just hardcode them for now
+        if not content_type:
+            if file.filename.endswith(".md"):
+                content_type = "text/markdown"
+            elif file.filename.endswith(".msg"):
+                content_type = "message/rfc822"
 
     allowed_mimetypes_str = os.environ.get("UNSTRUCTURED_ALLOWED_MIMETYPES")
     if allowed_mimetypes_str is not None:
@@ -181,10 +172,7 @@ class MultipartMixedResponse(StreamingResponse):
 
     def build_part(self, chunk: bytes) -> bytes:
         part = self.boundary + self.CRLF
-        part_headers = {
-            "Content-Length": len(chunk),
-            "Content-Transfer-Encoding": "base64",
-        }
+        part_headers = {"Content-Length": len(chunk), "Content-Transfer-Encoding": "base64"}
         if self.content_type is not None:
             part_headers["Content-Type"] = self.content_type
         part += self._build_part_headers(part_headers)
@@ -204,11 +192,7 @@ class MultipartMixedResponse(StreamingResponse):
                 chunk = chunk.encode(self.charset)
                 chunk = b64encode(chunk)
             await send(
-                {
-                    "type": "http.response.body",
-                    "body": self.build_part(chunk),
-                    "more_body": True,
-                }
+                {"type": "http.response.body", "body": self.build_part(chunk), "more_body": True}
             )
 
         await send({"type": "http.response.body", "body": b"", "more_body": False})
@@ -235,7 +219,7 @@ def ungz_file(file: UploadFile, gz_uncompressed_content_type=None) -> UploadFile
 
 
 @router.post("/general/v0/general")
-@router.post("/general/v0.0.14/general")
+@router.post("/general/v0.0.15/general")
 def pipeline_1(
     request: Request,
     gz_uncompressed_content_type: Optional[str] = Form(default=None),
@@ -247,9 +231,7 @@ def pipeline_1(
     if files:
         for file_index in range(len(files)):
             if files[file_index].content_type == "application/gzip":
-                files[file_index] = ungz_file(
-                    files[file_index], gz_uncompressed_content_type
-                )
+                files[file_index] = ungz_file(files[file_index], gz_uncompressed_content_type)
 
     content_type = request.headers.get("Accept")
 
@@ -261,11 +243,7 @@ def pipeline_1(
 
     if isinstance(files, list) and len(files):
         if len(files) > 1:
-            if content_type and content_type not in [
-                "*/*",
-                "multipart/mixed",
-                "application/json",
-            ]:
+            if content_type and content_type not in ["*/*", "multipart/mixed", "application/json"]:
                 raise HTTPException(
                     detail=(
                         f"Conflict in media type {content_type}"
@@ -298,12 +276,7 @@ def pipeline_1(
                         status_code=status.HTTP_406_NOT_ACCEPTABLE,
                     )
 
-                valid_response_types = [
-                    "application/json",
-                    "text/csv",
-                    "*/*",
-                    "multipart/mixed",
-                ]
+                valid_response_types = ["application/json", "text/csv", "*/*", "multipart/mixed"]
                 if media_type in valid_response_types:
                     if is_multipart:
                         if type(response) not in [str, bytes]:
