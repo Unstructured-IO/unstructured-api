@@ -125,3 +125,12 @@ jobs:
         source .venv/bin/activate
         make docker-build
         make docker-test
+    - name: Run Trivy vulnerability scanner
+      uses: aquasecurity/trivy-action@master
+      with:
+        image-ref: 'pipeline-family-general-dev:latest'
+        format: 'table'
+        exit-code: '1'
+        ignore-unfixed: true
+        vuln-type: 'os,library'
+        severity: 'CRITICAL,HIGH'
