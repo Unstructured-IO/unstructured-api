@@ -225,7 +225,7 @@ pillow==9.5.0
     #   unstructured
 pkgutil-resolve-name==1.3.10
     # via jsonschema
-platformdirs==3.3.0
+platformdirs==3.5.0
     # via jupyter-core
 portalocker==2.7.0
     # via iopath
@@ -282,11 +282,11 @@ pyzmq==25.0.2
     # via jupyter-client
 ratelimit==2.2.1
     # via -r requirements/base.in
-regex==2023.3.23
+regex==2023.5.4
     # via
     #   nltk
     #   transformers
-requests==2.28.2
+requests==2.29.0
     # via
     #   -r requirements/base.in
     #   huggingface-hub
@@ -353,11 +353,11 @@ traitlets==5.9.0
     #   nbformat
 transformers==4.28.1
     # via unstructured-inference
-types-requests==2.28.11.17
+types-requests==2.29.0.0
     # via unstructured-api-tools
-types-ujson==5.7.0.4
+types-ujson==5.7.0.5
     # via unstructured-api-tools
-types-urllib3==1.26.25.10
+types-urllib3==1.26.25.12
     # via types-requests
 typing-extensions==4.5.0
     # via
@@ -370,13 +370,13 @@ typing-extensions==4.5.0
     #   torch
 unstructured[local-inference]==0.6.2
     # via -r requirements/base.in
-unstructured-api-tools==0.10.1
+unstructured-api-tools==0.10.3
     # via -r requirements/base.in
 unstructured-inference==0.4.2
     # via unstructured
 urllib3==1.26.15
     # via requests
-uvicorn[standard]==0.21.1
+uvicorn[standard]==0.22.0
     # via
     #   unstructured-api-tools
     #   unstructured-inference

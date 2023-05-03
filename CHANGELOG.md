@@ -1,3 +1,7 @@
+## 0.0.15
+
+* Add msg and json types to supported 
+
 ## 0.0.14
 
 * Bump unstructured to the latest version
