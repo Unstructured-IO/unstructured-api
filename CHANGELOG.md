@@ -1,6 +1,6 @@
 ## 0.0.15
 
-* Add msg types to supported 
+* Add msg and json types to supported 
 
 ## 0.0.14
 
