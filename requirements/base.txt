@@ -210,7 +210,9 @@ pandocfilters==1.5.0
 pdf2image==1.16.3
     # via layoutparser
 pdfminer-six==20221105
-    # via pdfplumber
+    # via
+    #   pdfplumber
+    #   unstructured
 pdfplumber==0.9.0
     # via layoutparser
 pillow==9.5.0
@@ -229,7 +231,7 @@ platformdirs==3.5.0
     # via jupyter-core
 portalocker==2.7.0
     # via iopath
-protobuf==4.22.3
+protobuf==4.22.4
     # via onnxruntime
 pycocotools==2.0.6
     # via effdet
@@ -282,11 +284,11 @@ pyzmq==25.0.2
     # via jupyter-client
 ratelimit==2.2.1
     # via -r requirements/base.in
-regex==2023.5.4
+regex==2023.5.5
     # via
     #   nltk
     #   transformers
-requests==2.29.0
+requests==2.30.0
     # via
     #   -r requirements/base.in
     #   huggingface-hub
@@ -368,13 +370,13 @@ typing-extensions==4.5.0
     #   rich
     #   starlette
     #   torch
-unstructured[local-inference]==0.6.2
+unstructured[local-inference]==0.6.3
     # via -r requirements/base.in
 unstructured-api-tools==0.10.3
     # via -r requirements/base.in
-unstructured-inference==0.4.2
+unstructured-inference==0.4.3
     # via unstructured
-urllib3==1.26.15
+urllib3==2.0.2
     # via requests
 uvicorn[standard]==0.22.0
     # via
