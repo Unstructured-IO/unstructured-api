@@ -79,7 +79,7 @@ generate-api:
 DOCKER_IMAGE ?= pipeline-family-${PIPELINE_FAMILY}-dev:latest
 
 .PHONY: docker-build
-docker-build:
+docker-build: ecr-login
 	PIP_VERSION=${PIP_VERSION} PIPELINE_FAMILY=${PIPELINE_FAMILY} PIPELINE_PACKAGE=${PIPELINE_PACKAGE} ./scripts/docker-build.sh
 
 .PHONY: docker-start-api
