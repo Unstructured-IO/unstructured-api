@@ -71,6 +71,10 @@ When elements are extracted from PDFs or images, it may be useful to get their b
 	`pyenv  virtualenv 3.8.15 document-processing` <br />
 	`pyenv activate document-processing`
 
+  - If you are parsing PDFs, run the following to install the `detectron2` model, which
+  `unstructured` uses for layout detection:
+    - make install-detectron2
+
 See the [Unstructured Quick Start](https://github.com/Unstructured-IO/unstructured#eight_pointed_black_star-quick-start) for the many OS dependencies that are required, if the ability to process all file types is desired.
 
 * Run `make install`

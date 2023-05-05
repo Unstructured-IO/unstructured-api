@@ -20,9 +20,14 @@ install-base: install-base-pip-packages install-nltk-models install-detectron
 .PHONY: install 
 install:install-base install-test
 
+.PHONY: install-tensorboard
+install-tensorboard:
+	@if [ ${OS} = "Darwin" ]; then\
+		python3 -m pip install tensorboard;\
+	fi
 
-.PHONY: install-detectron
-install-detectron:
+.PHONY: install-detectron2
+install-detectron2: install-tensorboard
 	python3 -m pip install "detectron2@git+https://github.com/facebookresearch/detectron2.git@e2ce8dc#egg=detectron2"
 
 .PHONY: install-base-pip-packages
