@@ -79,7 +79,8 @@ RUN python3.8 -m pip install pip==${PIP_VERSION} \
   && pip3.8 install  --no-cache  -r requirements-base.txt \
   && pip3.8 install --no-cache "detectron2@git+https://github.com/facebookresearch/detectron2.git@e2ce8dc#egg=detectron2"
 
-RUN python3.8 -c "import nltk; nltk.download('punkt')" && \
+RUN pip3.8 install urllib3==1.25.11 && \
+  python3.8 -c "import nltk; nltk.download('punkt')" && \
   python3.8 -c "import nltk; nltk.download('averaged_perceptron_tagger')" && \
   python3.8 -c "from unstructured.ingest.doc_processor.generalized import initialize; initialize()"
 
