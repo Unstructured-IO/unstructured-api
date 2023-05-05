@@ -55,9 +55,10 @@ RUN yum -y install openssl-devel bzip2-devel libffi-devel make git sqlite-devel 
   cd Python-3.8.15/ && ./configure --enable-optimizations && make altinstall && \
   cd .. && rm -rf Python-3.8.15* && \
   ln -s /usr/local/bin/python3.8 /usr/local/bin/python3 && \
-  $sudo yum -y remove openssl-devel bzip2-devel libffi-devel make sqlite-devel && \
+  $sudo yum -y remove bzip2-devel libffi-devel make sqlite-devel && \
   $sudo rm -rf /var/cache/yum/* && \
   yum clean all
+# note don't remove openssl-devel, it's needed for an openssl issue we'll encounter during pip installs
 
 # Set up environment
 ENV USER ${NB_USER}
@@ -81,9 +82,7 @@ RUN python3.8 -m pip install pip==${PIP_VERSION} \
   && pip3.8 install --no-cache tensorboard>=2.12.2 \
   && pip3.8 install --no-cache "detectron2@git+https://github.com/facebookresearch/detectron2.git@e2ce8dc#egg=detectron2"
 
-# note openssl needed for model download below
-RUN $sudo yum update openssl && \ 
-  python3.8 -c "import nltk; nltk.download('punkt')" && \
+RUN python3.8 -c "import nltk; nltk.download('punkt')" && \
   python3.8 -c "import nltk; nltk.download('averaged_perceptron_tagger')" && \
   python3.8 -c "from unstructured.ingest.doc_processor.generalized import initialize; initialize()"
 
