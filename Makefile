@@ -20,10 +20,11 @@ install-base: install-base-pip-packages install-nltk-models install-detectron
 .PHONY: install 
 install:install-base install-test
 
+# Need for Apple Silicon based Macs
 .PHONY: install-tensorboard
 install-tensorboard:
 	@if [ ${OS} = "Darwin" ]; then\
-		python3 -m pip install tensorboard;\
+		python3 -m pip install tensorboard>=2.12.2;\
 	fi
 
 .PHONY: install-detectron2
