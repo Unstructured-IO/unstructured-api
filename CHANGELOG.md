@@ -1,3 +1,7 @@
+## 0.0.19
+
+* Add returning text/csv to pipeline_api
+
 ## 0.0.18
 
 * Add optional CORS to api if os env var `ALLOWED_ORIGINS` is set
