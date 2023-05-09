@@ -34,6 +34,11 @@ loggers:
     handlers:
       - standard_handler
     propagate: no
+  unstructured.trace:
+    level: CRITICAL
+    handlers:
+      - standard_handler
+    propagate: no
   unstructured_inference:
     level: DEBUG
     handlers:
