@@ -21,7 +21,7 @@ beautifulsoup4==4.12.2
     # via nbconvert
 bleach==6.0.0
     # via nbconvert
-certifi==2022.12.7
+certifi==2023.5.7
     # via
     #   httpcore
     #   httpx
@@ -67,11 +67,11 @@ filelock==3.12.0
     #   huggingface-hub
     #   torch
     #   transformers
-flatbuffers==23.3.3
+flatbuffers==23.5.8
     # via onnxruntime
 fonttools==4.39.3
     # via matplotlib
-fsspec==2023.4.0
+fsspec==2023.5.0
     # via huggingface-hub
 h11==0.14.0
     # via
@@ -156,7 +156,7 @@ mypy-extensions==1.0.0
     # via mypy
 nbclient==0.7.4
     # via nbconvert
-nbconvert==7.3.1
+nbconvert==7.4.0
     # via unstructured-api-tools
 nbformat==5.8.0
     # via
@@ -231,7 +231,7 @@ platformdirs==3.5.0
     # via jupyter-core
 portalocker==2.7.0
     # via iopath
-protobuf==4.22.4
+protobuf==4.23.0
     # via onnxruntime
 pycocotools==2.0.6
     # via effdet
@@ -326,13 +326,13 @@ tokenizers==0.13.3
     # via transformers
 tomli==2.0.1
     # via mypy
-torch==2.0.0
+torch==2.0.1
     # via
     #   effdet
     #   layoutparser
     #   timm
     #   torchvision
-torchvision==0.15.1
+torchvision==0.15.2
     # via
     #   effdet
     #   layoutparser
@@ -355,7 +355,7 @@ traitlets==5.9.0
     #   nbformat
 transformers==4.28.1
     # via unstructured-inference
-types-requests==2.29.0.0
+types-requests==2.30.0.0
     # via unstructured-api-tools
 types-ujson==5.7.0.5
     # via unstructured-api-tools
@@ -370,11 +370,11 @@ typing-extensions==4.5.0
     #   rich
     #   starlette
     #   torch
-unstructured[local-inference]==0.6.3
+unstructured[local-inference]==0.6.4
     # via -r requirements/base.in
-unstructured-api-tools==0.10.3
+unstructured-api-tools==0.10.4
     # via -r requirements/base.in
-unstructured-inference==0.4.3
+unstructured-inference==0.4.4
     # via unstructured
 urllib3==2.0.2
     # via requests
@@ -392,7 +392,7 @@ webencodings==0.5.1
     # via
     #   bleach
     #   tinycss2
-websockets==11.0.2
+websockets==11.0.3
     # via uvicorn
 wrapt==1.14.1
     # via
