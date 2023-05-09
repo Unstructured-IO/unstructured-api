@@ -79,7 +79,7 @@ generate-api:
 DOCKER_IMAGE ?= pipeline-family-${PIPELINE_FAMILY}-dev:latest
 
 .PHONY: docker-build
-docker-build: ecr-login
+docker-build:
 	PIP_VERSION=${PIP_VERSION} PIPELINE_FAMILY=${PIPELINE_FAMILY} PIPELINE_PACKAGE=${PIPELINE_PACKAGE} ./scripts/docker-build.sh
 
 .PHONY: docker-start-api
@@ -95,10 +95,6 @@ docker-start-jupyter:
 .PHONY: docker-test
 docker-test:
 	DOCKER_IMAGE=${DOCKER_IMAGE} ./scripts/docker-smoke-test.sh
-
-.PHONY: ecr-login
-ecr-login:
-	aws ecr get-login-password --region us-east-2 | docker login --username AWS --password-stdin 663951896560.dkr.ecr.us-east-2.amazonaws.com:
 
 #########
 # Local #
