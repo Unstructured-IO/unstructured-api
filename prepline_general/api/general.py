@@ -73,34 +73,18 @@ def pipeline_api(
     show_coordinates_str = (m_coordinates[0] if len(m_coordinates) else "false").lower()
     show_coordinates = show_coordinates_str == "true"
 
-    if filename.endswith((".docx", ".pptx")):
-        # NOTE(robinson) - This is a hacky solution due to
-        # limitations in the SpooledTemporaryFile wrapper.
-        # Specifically, it doesn't have a `seekable` attribute,
-        # which is required for .pptx and .docx. See below
-        # the link below
-        # ref: https://stackoverflow.com/questions/47160211
-        # /why-doesnt-tempfile-spooledtemporaryfile-implement-readable-writable-seekable
-        with tempfile.TemporaryDirectory() as tmpdir:
-            _filename = os.path.join(tmpdir, filename.split("/")[-1])
-            with open(_filename, "wb") as f:
-                f.write(file.read())
-            elements = partition(filename=_filename, strategy=strategy)
-    else:
-        try:
-            elements = partition(
-                file=file, file_filename=filename, content_type=file_content_type, strategy=strategy
-            )
-        except ValueError as e:
-            if "Invalid file" in e.args[0]:
-                raise HTTPException(
-                    status_code=400, detail=f"{file_content_type} not currently supported"
-                )
-            raise e
-        except pdfminer.pdfparser.PDFSyntaxError:
+    try:
+        elements = partition(
+            file=file, file_filename=filename, content_type=file_content_type, strategy=strategy
+        )
+    except ValueError as e:
+        if "Invalid file" in e.args[0]:
             raise HTTPException(
-                status_code=400, detail=f"{filename} does not appear to be a valid PDF"
+                status_code=400, detail=f"{file_content_type} not currently supported"
             )
+        raise e
+    except pdfminer.pdfparser.PDFSyntaxError:
+        raise HTTPException(status_code=400, detail=f"{filename} does not appear to be a valid PDF")
 
     # Due to the above, elements have an ugly temp filename in their metadata
     # For now, replace this with the basename
