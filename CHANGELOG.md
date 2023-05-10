@@ -1,3 +1,7 @@
+## 0.0.16
+
+* Add config for unstructured.trace logger
+
 ## 0.0.15
 
 * Add msg and json types to supported 
