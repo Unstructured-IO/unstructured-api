@@ -1,3 +1,9 @@
+## 0.0.16
+
+* Fix image build steps to support detectron2 install from Mac M1/M2
+* Upgrade to openssl 1.1.1 to accomodate the latest urllib3 
+* Bump unstructured for SpooledTemporaryFile fix
+
 ## 0.0.15
 
 * Add msg and json types to supported 
