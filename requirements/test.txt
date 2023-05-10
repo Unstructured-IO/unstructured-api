@@ -58,7 +58,7 @@ bleach==6.0.0
     # via
     #   -r requirements/base.txt
     #   nbconvert
-certifi==2022.12.7
+certifi==2023.5.7
     # via
     #   -r requirements/base.txt
     #   httpcore
@@ -155,7 +155,7 @@ filelock==3.12.0
     #   transformers
 flake8==6.0.0
     # via -r requirements/test.in
-flatbuffers==23.3.3
+flatbuffers==23.5.8
     # via
     #   -r requirements/base.txt
     #   onnxruntime
@@ -165,7 +165,7 @@ fonttools==4.39.3
     #   matplotlib
 fqdn==1.5.1
     # via jsonschema
-fsspec==2023.4.0
+fsspec==2023.5.0
     # via
     #   -r requirements/base.txt
     #   huggingface-hub
@@ -222,7 +222,7 @@ iopath==0.1.10
     # via
     #   -r requirements/base.txt
     #   layoutparser
-ipykernel==6.22.0
+ipykernel==6.23.0
     # via
     #   ipywidgets
     #   jupyter
@@ -230,7 +230,7 @@ ipykernel==6.22.0
     #   nbclassic
     #   notebook
     #   qtconsole
-ipython==8.12.1
+ipython==8.12.2
     # via
     #   execnb
     #   ipykernel
@@ -367,13 +367,13 @@ mypy-extensions==1.0.0
     #   -r requirements/base.txt
     #   black
     #   mypy
-nbclassic==0.5.6
+nbclassic==1.0.0
     # via notebook
 nbclient==0.7.4
     # via
     #   -r requirements/base.txt
     #   nbconvert
-nbconvert==7.3.1
+nbconvert==7.4.0
     # via
     #   -r requirements/base.txt
     #   jupyter
@@ -483,6 +483,7 @@ pdfminer-six==20221105
     # via
     #   -r requirements/base.txt
     #   pdfplumber
+    #   unstructured
 pdfplumber==0.9.0
     # via
     #   -r requirements/base.txt
@@ -526,7 +527,7 @@ prompt-toolkit==3.0.38
     # via
     #   ipython
     #   jupyter-console
-protobuf==4.22.3
+protobuf==4.23.0
     # via
     #   -r requirements/base.txt
     #   onnxruntime
@@ -637,18 +638,18 @@ pyzmq==25.0.2
     #   nbclassic
     #   notebook
     #   qtconsole
-qtconsole==5.4.2
+qtconsole==5.4.3
     # via jupyter
 qtpy==2.3.1
     # via qtconsole
 ratelimit==2.2.1
     # via -r requirements/base.txt
-regex==2023.5.4
+regex==2023.5.5
     # via
     #   -r requirements/base.txt
     #   nltk
     #   transformers
-requests==2.29.0
+requests==2.30.0
     # via
     #   -r requirements/base.txt
     #   huggingface-hub
@@ -734,14 +735,14 @@ tomli==2.0.1
     #   coverage
     #   mypy
     #   pytest
-torch==2.0.0
+torch==2.0.1
     # via
     #   -r requirements/base.txt
     #   effdet
     #   layoutparser
     #   timm
     #   torchvision
-torchvision==0.15.1
+torchvision==0.15.2
     # via
     #   -r requirements/base.txt
     #   effdet
@@ -787,7 +788,7 @@ transformers==4.28.1
     # via
     #   -r requirements/base.txt
     #   unstructured-inference
-types-requests==2.29.0.0
+types-requests==2.30.0.0
     # via
     #   -r requirements/base.txt
     #   unstructured-api-tools
@@ -811,17 +812,17 @@ typing-extensions==4.5.0
     #   rich
     #   starlette
     #   torch
-unstructured[local-inference]==0.6.2
+unstructured[local-inference]==0.6.5
     # via -r requirements/base.txt
-unstructured-api-tools==0.10.3
+unstructured-api-tools==0.10.4
     # via -r requirements/base.txt
-unstructured-inference==0.4.2
+unstructured-inference==0.4.4
     # via
     #   -r requirements/base.txt
     #   unstructured
 uri-template==1.2.0
     # via jsonschema
-urllib3==1.26.15
+urllib3==2.0.2
     # via
     #   -r requirements/base.txt
     #   requests
@@ -855,7 +856,7 @@ webencodings==0.5.1
     #   tinycss2
 websocket-client==1.5.1
     # via jupyter-server
-websockets==11.0.2
+websockets==11.0.3
     # via
     #   -r requirements/base.txt
     #   uvicorn
