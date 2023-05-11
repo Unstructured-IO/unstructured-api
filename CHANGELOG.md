@@ -1,3 +1,7 @@
+## 0.0.17
+
+* Add config for unstructured.trace logger
+
 ## 0.0.16
 
 * Fix image build steps to support detectron2 install from Mac M1/M2
