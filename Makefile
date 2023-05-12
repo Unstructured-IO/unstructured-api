@@ -27,8 +27,9 @@ install-tensorboard:
 		python3 -m pip install tensorboard>=2.12.2;\
 	fi
 
-.PHONY: install-detectron2
-install-detectron2: install-tensorboard
+# Installs detectron2 if high resolution is needed
+.PHONY: install-high
+install-high: install-tensorboard
 	python3 -m pip install "detectron2@git+https://github.com/facebookresearch/detectron2.git@e2ce8dc#egg=detectron2"
 
 .PHONY: install-base-pip-packages
@@ -53,7 +54,7 @@ install-nltk-models:
 pip-compile:
 	pip-compile --upgrade requirements/base.in
 	pip-compile --upgrade -o requirements/test.txt requirements/base.txt requirements/test.in
- 
+
 #########
 # Build #
 #########
@@ -108,7 +109,7 @@ run-jupyter:
 ## run-web-app:                 runs the FastAPI api with hot reloading
 .PHONY: run-web-app
 run-web-app:
-	 PYTHONPATH=$(realpath .) uvicorn ${PACKAGE_NAME}.api.app:app --reload --log-config logger_config.yaml
+	PYTHONPATH=$(realpath .) uvicorn ${PACKAGE_NAME}.api.app:app --reload --log-config logger_config.yaml
 
 #################
 # Test and Lint #
