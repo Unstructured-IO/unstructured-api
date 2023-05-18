@@ -11,7 +11,7 @@ anyio==3.6.2
     #   httpcore
     #   starlette
     #   watchfiles
-argilla==1.6.0
+argilla==1.7.0
     # via unstructured
 attrs==23.1.0
     # via jsonschema
@@ -36,6 +36,7 @@ charset-normalizer==3.1.0
 click==8.1.3
     # via
     #   nltk
+    #   typer
     #   unstructured-api-tools
     #   uvicorn
 coloredlogs==15.0.1
@@ -56,7 +57,7 @@ effdet==0.3.0
     # via layoutparser
 et-xmlfile==1.1.0
     # via openpyxl
-fastapi==0.95.1
+fastapi==0.95.2
     # via
     #   unstructured-api-tools
     #   unstructured-inference
@@ -67,9 +68,9 @@ filelock==3.12.0
     #   huggingface-hub
     #   torch
     #   transformers
-flatbuffers==23.5.8
+flatbuffers==23.5.9
     # via onnxruntime
-fonttools==4.39.3
+fonttools==4.39.4
     # via matplotlib
 fsspec==2023.5.0
     # via huggingface-hub
@@ -150,7 +151,7 @@ mpmath==1.3.0
     # via sympy
 msg-parser==1.2.0
     # via unstructured
-mypy==1.2.0
+mypy==1.3.0
     # via unstructured-api-tools
 mypy-extensions==1.0.0
     # via mypy
@@ -227,11 +228,11 @@ pillow==9.5.0
     #   unstructured
 pkgutil-resolve-name==1.3.10
     # via jsonschema
-platformdirs==3.5.0
+platformdirs==3.5.1
     # via jupyter-core
 portalocker==2.7.0
     # via iopath
-protobuf==4.23.0
+protobuf==4.23.1
     # via onnxruntime
 pycocotools==2.0.6
     # via effdet
@@ -299,6 +300,8 @@ rfc3986[idna2008]==1.5.0
     # via httpx
 rich==13.0.1
     # via argilla
+safetensors==0.3.1
+    # via timm
 scipy==1.10.1
     # via layoutparser
 six==1.16.0
@@ -312,13 +315,13 @@ sniffio==1.3.0
     #   httpx
 soupsieve==2.4.1
     # via beautifulsoup4
-starlette==0.26.1
+starlette==0.27.0
     # via fastapi
-sympy==1.11.1
+sympy==1.12
     # via
     #   onnxruntime
     #   torch
-timm==0.6.13
+timm==0.9.2
     # via effdet
 tinycss2==1.2.1
     # via nbconvert
@@ -337,7 +340,7 @@ torchvision==0.15.2
     #   effdet
     #   layoutparser
     #   timm
-tornado==6.3.1
+tornado==6.3.2
     # via jupyter-client
 tqdm==4.65.0
     # via
@@ -353,13 +356,15 @@ traitlets==5.9.0
     #   nbclient
     #   nbconvert
     #   nbformat
-transformers==4.28.1
+transformers==4.29.2
     # via unstructured-inference
+typer==0.9.0
+    # via argilla
 types-requests==2.30.0.0
     # via unstructured-api-tools
 types-ujson==5.7.0.5
     # via unstructured-api-tools
-types-urllib3==1.26.25.12
+types-urllib3==1.26.25.13
     # via types-requests
 typing-extensions==4.5.0
     # via
@@ -370,9 +375,10 @@ typing-extensions==4.5.0
     #   rich
     #   starlette
     #   torch
-unstructured[local-inference]==0.6.5
+    #   typer
+unstructured[local-inference]==0.6.6
     # via -r requirements/base.in
-unstructured-api-tools==0.10.4
+unstructured-api-tools==0.10.5
     # via -r requirements/base.in
 unstructured-inference==0.4.4
     # via unstructured

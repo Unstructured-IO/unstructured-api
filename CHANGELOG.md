@@ -1,3 +1,7 @@
+## 0.0.18
+
+* Add optional CORS to api if os env var `ALLOWED_ORIGINS` is set
+
 ## 0.0.17
 
 * Add config for unstructured.trace logger
