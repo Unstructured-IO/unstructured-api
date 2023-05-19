@@ -1,3 +1,7 @@
+## 0.0.20
+
+* Add supporting gzipped files
+
 ## 0.0.19
 
 * Add returning text/csv to pipeline_api

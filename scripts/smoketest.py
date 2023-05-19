@@ -14,7 +14,10 @@ skip_inference_tests = os.getenv("SKIP_INFERENCE_TESTS", "").lower() in {"true",
 
 
 def send_document(filename, content_type, strategy="fast", output_format="application/json"):
-    files = {"files": (str(filename), open(filename, "rb"))}
+    if str(filename).endswith(".gz"):
+        files = {"files": (str(filename), open(filename, "rb"), "application/gzip")}
+    else:
+        files = {"files": (str(filename), open(filename, "rb"))}        
     return requests.post(API_URL, files=files, data={"strategy": strategy, "output_format": output_format})
 
 
@@ -66,10 +69,44 @@ def remove_path(text: str) -> str:
         ("fake.docx", "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "text/csv", "fast"),
         ("family-day.eml", "message/rfc822", "text/csv", "fast"),
         pytest.param("fake-excel.xlsx", None, "text/csv", "fast", marks=pytest.mark.xfail(reason="not supported yet")),
-        pytest.param("layout-parser-paper.pdf", "application/pdf", "text/csv", "hi_res", marks=pytest.mark.skipif(
+        pytest.param("layout-parser-paper.pdf", "application/pdf", "text/csv", "fast", marks=pytest.mark.skipif(
             skip_inference_tests, reason="emulated architecture")
         ),
-        pytest.param("layout-parser-paper-fast.jpg", "image/jpeg", "text/csv", "hi_res", marks=pytest.mark.skipif(
+        pytest.param("layout-parser-paper-fast.jpg", "image/jpeg", "text/csv", "fast", marks=pytest.mark.skipif(
+            skip_inference_tests, reason="emulated architecture")
+        ),
+        ("fake-text.txt.gz", "text/plain", "application/json", "fast"),
+        ("announcement.eml.gz", "message/rfc822", "application/json", "fast"),
+        ("fake-email-attachment.eml.gz", "message/rfc822", "application/json", "fast"),
+        ("fake-email-image-embedded.eml.gz", "message/rfc822", "application/json", "fast"),
+        ("fake-email.eml.gz", "message/rfc822", "application/json", "fast"),
+        ("fake-html.html.gz", "text/html", "application/json", "fast"),
+        ("fake-power-point.ppt.gz", "application/vnd.openxmlformats-officedocument.presentationml.presentation", "application/json", "fast"),
+        ("fake.doc.gz", "application/msword", "application/json", "fast"),
+        ("fake.docx.gz", "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "application/json", "fast"),
+        ("family-day.eml.gz", "message/rfc822", "application/json", "fast"),
+        pytest.param("fake-excel.xlsx.gz", None, "application/json", "fast", marks=pytest.mark.xfail(reason="not supported yet")),
+        pytest.param("layout-parser-paper.pdf.gz", "application/pdf", "application/json", "fast", marks=pytest.mark.skipif(
+            skip_inference_tests, reason="emulated architecture")
+        ),
+        pytest.param("layout-parser-paper-fast.jpg.gz", "image/jpeg", "text/csv", "fast", marks=pytest.mark.skipif(
+            skip_inference_tests, reason="emulated architecture")
+        ),
+        ("fake-text.txt.gz", "text/plain", "text/csv", "fast"),
+        ("announcement.eml.gz", "message/rfc822", "text/csv", "fast"),
+        ("fake-email-attachment.eml.gz", "message/rfc822", "text/csv", "fast"),
+        ("fake-email-image-embedded.eml.gz", "message/rfc822", "text/csv", "fast"),
+        ("fake-email.eml.gz", "message/rfc822", "text/csv", "fast"),
+        ("fake-html.html.gz", "text/html", "text/csv", "fast"),
+        ("fake-power-point.ppt.gz", "application/vnd.openxmlformats-officedocument.presentationml.presentation", "text/csv", "fast"),
+        ("fake.doc.gz", "application/msword", "text/csv", "fast"),
+        ("fake.docx.gz", "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "text/csv", "fast"),
+        ("family-day.eml.gz", "message/rfc822", "text/csv", "fast"),
+        pytest.param("fake-excel.xlsx.gz", None, "text/csv", "fast", marks=pytest.mark.xfail(reason="not supported yet")),
+        pytest.param("layout-parser-paper.pdf.gz", "application/pdf", "text/csv", "fast", marks=pytest.mark.skipif(
+            skip_inference_tests, reason="emulated architecture")
+        ),
+        pytest.param("layout-parser-paper-fast.jpg.gz", "image/jpeg", "text/csv", "fast", marks=pytest.mark.skipif(
             skip_inference_tests, reason="emulated architecture")
         ),
     ]
@@ -89,12 +126,19 @@ def test_happy_path(example_filename, content_type, output_format, strategy):
 
     assert(response.status_code == 200)
     assert len(response.json()) > 0
-    # NOTE(kravetsmic): looks like a bug on macOS (m1), incorrectly scanned text from images and pdf files
     if output_format == "text/csv":
-        if example_filename not in ["layout-parser-paper.pdf", "layout-parser-paper-fast.jpg"]:
+        # NOTE(kravetsmic): looks like a bug on macOS (m1), incorrectly scanned text from images and pdf files
+        if example_filename not in [
+                "layout-parser-paper.pdf",
+                "layout-parser-paper-fast.jpg",
+                "layout-parser-paper.pdf.gz",
+                "layout-parser-paper-fast.jpg.gz"
+            ]:
+            if str(test_file).endswith(".gz"):
+                test_file = Path("sample-docs") / example_filename[:-3]
             with open(test_file, "rb") as file:
                 # NOTE(kravetsmic): passing file as parameter raised zipfile.BadZipFile: File is not a zip file
-                if example_filename.endswith(".ppt"):
+                if str(test_file).endswith(".ppt"):
                     elements = partition(str(test_file), strategy=strategy)
                 else:
                     elements = partition(

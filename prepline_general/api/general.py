@@ -204,7 +204,7 @@ def ungz_file(file: UploadFile, gz_uncompressed_content_type=None) -> UploadFile
 
 
 @router.post("/general/v0/general")
-@router.post("/general/v0.0.19/general")
+@router.post("/general/v0.0.20/general")
 def pipeline_1(
     request: Request,
     gz_uncompressed_content_type: Optional[str] = Form(default=None),
@@ -250,7 +250,7 @@ def pipeline_1(
                     response_type=media_type,
                     filename=file.filename,
                     file_content_type=file_content_type,
-                )                
+                )
 
                 if is_expected_response_type(media_type, type(response)):
                     raise HTTPException(
