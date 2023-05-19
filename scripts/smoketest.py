@@ -6,7 +6,7 @@ from pathlib import Path
 import pytest
 import requests
 from unstructured.partition.auto import partition
-from unstructured.staging.base import convert_to_csv
+from unstructured.staging.base import convert_to_csv, convert_to_isd
 
 API_URL = "http://localhost:8000/general/v0/general"
 # NOTE(rniko): Skip inference tests if we're running on an emulated architecture
@@ -56,15 +56,15 @@ def remove_path(text: str) -> str:
             skip_inference_tests, reason="emulated architecture")
         ),
         ("fake-text.txt", "text/plain", "text/csv", "fast"),
-        ("announcement.eml", "text/plain", "text/csv", "fast"),
-        ("fake-email-attachment.eml", "text/plain", "text/csv", "fast"),
-        ("fake-email-image-embedded.eml", "text/plain", "text/csv", "fast"),
-        ("fake-email.eml", "text/plain", "text/csv", "fast"),
-        ("fake-html.html", "text/plain", "text/csv", "fast"),
-        ("fake-power-point.ppt", "text/plain", "text/csv", "fast"),
-        ("fake.doc", "text/plain", "text/csv", "fast"),
-        ("fake.docx", "text/plain", "text/csv", "fast"),
-        ("family-day.eml", "text/plain", "text/csv", "fast"),
+        ("announcement.eml", "message/rfc822", "text/csv", "fast"),
+        ("fake-email-attachment.eml", "message/rfc822", "text/csv", "fast"),
+        ("fake-email-image-embedded.eml", "message/rfc822", "text/csv", "fast"),
+        ("fake-email.eml", "message/rfc822", "text/csv", "fast"),
+        ("fake-html.html", "text/html", "text/csv", "fast"),
+        ("fake-power-point.ppt", "application/vnd.openxmlformats-officedocument.presentationml.presentation", "text/csv", "fast"),
+        ("fake.doc", "application/msword", "text/csv", "fast"),
+        ("fake.docx", "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "text/csv", "fast"),
+        ("family-day.eml", "message/rfc822", "text/csv", "fast"),
         pytest.param("fake-excel.xlsx", None, "text/csv", "fast", marks=pytest.mark.xfail(reason="not supported yet")),
         pytest.param("layout-parser-paper.pdf", "application/pdf", "text/csv", "hi_res", marks=pytest.mark.skipif(
             skip_inference_tests, reason="emulated architecture")
@@ -90,23 +90,24 @@ def test_happy_path(example_filename, content_type, output_format, strategy):
     assert(response.status_code == 200)
     assert len(response.json()) > 0
     # NOTE(kravetsmic): looks like a bug on macOS (m1), incorrectly scanned text from images and pdf files
-    if output_format == "text/csv" and example_filename not in ["layout-parser-paper.pdf", "layout-parser-paper-fast.jpg"]:
-        if isinstance(test_file, str) and test_file.endswith((".docx", ".pptx")):
-            with tempfile.TemporaryDirectory() as tmpdir:
-                _filename = os.path.join(tmpdir, test_file.split('/')[-1])
-                with open(_filename, "wb") as f:
-                    with open(test_file, "rb") as test_f:
-                        f.write(test_f.read())
-            elements = partition(filename=_filename, strategy=strategy)
-        else:
+    if output_format == "text/csv":
+        if example_filename not in ["layout-parser-paper.pdf", "layout-parser-paper-fast.jpg"]:
             with open(test_file, "rb") as file:
-                elements = partition(
-                    file=file,
-                    file_filename=str(test_file),
-                    content_type=content_type,
-                    strategy=strategy
-                )
-        assert remove_path(response.json()) == remove_path(convert_to_csv(elements))
+                # NOTE(kravetsmic): passing file as parameter raised zipfile.BadZipFile: File is not a zip file
+                if example_filename.endswith(".ppt"):
+                    elements = partition(str(test_file), strategy=strategy)
+                else:
+                    elements = partition(
+                        file=file,
+                        file_filename=str(test_file),
+                        content_type=content_type,
+                        strategy=strategy
+                    )
+            result = convert_to_isd(elements)
+            for element in result:
+                element['metadata']['filename'] = os.path.basename(str(test_file))
+                del element['coordinates']
+            assert remove_path(response.json()) == remove_path(convert_to_csv(elements))
     else:
         assert len("".join(elem["text"] for elem in response.json())) > 20
 
