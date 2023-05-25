@@ -64,12 +64,15 @@ certifi==2023.5.7
     #   httpcore
     #   httpx
     #   requests
-    #   unstructured
 cffi==1.15.1
     # via
     #   -r requirements/base.txt
     #   argon2-cffi-bindings
     #   cryptography
+chardet==5.1.0
+    # via
+    #   -r requirements/base.txt
+    #   unstructured
 charset-normalizer==3.1.0
     # via
     #   -r requirements/base.txt
@@ -98,7 +101,7 @@ contourpy==1.0.7
     # via
     #   -r requirements/base.txt
     #   matplotlib
-coverage[toml]==7.2.5
+coverage[toml]==7.2.6
     # via pytest-cov
 cryptography==40.0.2
     # via
@@ -120,7 +123,7 @@ deprecated==1.2.13
     # via
     #   -r requirements/base.txt
     #   argilla
-effdet==0.3.0
+effdet==0.4.1
     # via
     #   -r requirements/base.txt
     #   layoutparser
@@ -144,7 +147,7 @@ fastcore==1.5.29
     #   execnb
     #   ghapi
     #   nbdev
-fastjsonschema==2.16.3
+fastjsonschema==2.17.1
     # via
     #   -r requirements/base.txt
     #   nbformat
@@ -297,7 +300,7 @@ jupyter-core==5.3.0
     #   qtconsole
 jupyter-events==0.6.3
     # via jupyter-server
-jupyter-server==2.5.0
+jupyter-server==2.6.0
     # via
     #   nbclassic
     #   notebook-shim
@@ -370,7 +373,7 @@ mypy-extensions==1.0.0
     #   mypy
 nbclassic==1.0.0
     # via notebook
-nbclient==0.7.4
+nbclient==0.8.0
     # via
     #   -r requirements/base.txt
     #   nbconvert
@@ -431,7 +434,7 @@ omegaconf==2.3.0
     # via
     #   -r requirements/base.txt
     #   effdet
-onnxruntime==1.14.1
+onnxruntime==1.15.0
     # via
     #   -r requirements/base.txt
     #   unstructured-inference
@@ -444,6 +447,8 @@ openpyxl==3.1.2
     # via
     #   -r requirements/base.txt
     #   unstructured
+overrides==7.3.1
+    # via jupyter-server
 packaging==23.1
     # via
     #   -r requirements/base.txt
@@ -519,7 +524,7 @@ portalocker==2.7.0
     # via
     #   -r requirements/base.txt
     #   iopath
-prometheus-client==0.16.0
+prometheus-client==0.17.0
     # via
     #   jupyter-server
     #   nbclassic
@@ -550,7 +555,7 @@ pycparser==2.21
     # via
     #   -r requirements/base.txt
     #   cffi
-pydantic==1.10.7
+pydantic==1.10.8
     # via
     #   -r requirements/base.txt
     #   argilla
@@ -583,7 +588,7 @@ pytesseract==0.3.10
     #   layoutparser
 pytest==7.3.1
     # via pytest-cov
-pytest-cov==4.0.0
+pytest-cov==4.1.0
     # via -r requirements/test.in
 python-dateutil==2.8.2
     # via
@@ -650,7 +655,7 @@ regex==2023.5.5
     #   -r requirements/base.txt
     #   nltk
     #   transformers
-requests==2.30.0
+requests==2.31.0
     # via
     #   -r requirements/base.txt
     #   huggingface-hub
@@ -797,7 +802,7 @@ typer==0.9.0
     # via
     #   -r requirements/base.txt
     #   argilla
-types-requests==2.30.0.0
+types-requests==2.31.0.0
     # via
     #   -r requirements/base.txt
     #   unstructured-api-tools
@@ -809,7 +814,7 @@ types-urllib3==1.26.25.13
     # via
     #   -r requirements/base.txt
     #   types-requests
-typing-extensions==4.5.0
+typing-extensions==4.6.2
     # via
     #   -r requirements/base.txt
     #   black
@@ -822,7 +827,7 @@ typing-extensions==4.5.0
     #   starlette
     #   torch
     #   typer
-unstructured[local-inference]==0.6.6
+unstructured[local-inference]==0.6.9
     # via -r requirements/base.txt
 unstructured-api-tools==0.10.5
     # via -r requirements/base.txt
@@ -864,7 +869,7 @@ webencodings==0.5.1
     #   -r requirements/base.txt
     #   bleach
     #   tinycss2
-websocket-client==1.5.1
+websocket-client==1.5.2
     # via jupyter-server
 websockets==11.0.3
     # via
@@ -879,7 +884,7 @@ wrapt==1.14.1
     #   -r requirements/base.txt
     #   argilla
     #   deprecated
-xlsxwriter==3.1.0
+xlsxwriter==3.1.1
     # via
     #   -r requirements/base.txt
     #   python-pptx
