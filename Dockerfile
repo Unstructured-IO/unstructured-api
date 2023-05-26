@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:experimental
 
-FROM quay.io/unstructured-io/base-images:centos7.9
+FROM quay.io/unstructured-io/base-images:centos7.9-1
 
 # NOTE(crag): NB_USER ARG for mybinder.org compat:
 #             https://mybinder.readthedocs.io/en/latest/tutorials/dockerfile.html
