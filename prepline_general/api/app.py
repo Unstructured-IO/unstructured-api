@@ -6,6 +6,7 @@
 
 from fastapi import FastAPI, Request, status
 import logging
+import os
 
 from .general import router as general_router
 
@@ -17,6 +18,17 @@ app = FastAPI(
     docs_url="/general/docs",
     openapi_url="/general/openapi.json",
 )
+
+allowed_origins = os.environ.get("ALLOWED_ORIGINS", None)
+if allowed_origins:
+    from fastapi.middleware.cors import CORSMiddleware
+
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=allowed_origins,
+        allow_methods=["OPTIONS", "POST"],
+        allow_headers=["Content-Type"],
+    )
 
 app.include_router(general_router)
 
