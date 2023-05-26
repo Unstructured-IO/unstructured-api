@@ -49,6 +49,9 @@ DEFAULT_MIMETYPES = (
     "application/json,"
     "application/vnd.ms-powerpoint,"
     "text/html,message/rfc822,text/plain,image/png,"
+    "application/epub,application/epub+zip,"
+    "application/rtf,text/rtf,"
+    "application/vnd.oasis.opendocument.text,"
 )
 
 if not os.environ.get("UNSTRUCTURED_ALLOWED_MIMETYPES", None):
