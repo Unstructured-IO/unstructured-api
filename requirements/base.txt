@@ -69,7 +69,7 @@ filelock==3.12.0
     #   huggingface-hub
     #   torch
     #   transformers
-flatbuffers==23.5.9
+flatbuffers==23.5.26
     # via onnxruntime
 fonttools==4.39.4
     # via matplotlib
@@ -233,7 +233,7 @@ platformdirs==3.5.1
     # via jupyter-core
 portalocker==2.7.0
     # via iopath
-protobuf==4.23.1
+protobuf==4.23.2
     # via onnxruntime
 pycocotools==2.0.6
     # via effdet
@@ -282,7 +282,7 @@ pyyaml==6.0
     #   timm
     #   transformers
     #   uvicorn
-pyzmq==25.0.2
+pyzmq==25.1.0
     # via jupyter-client
 ratelimit==2.2.1
     # via -r requirements/base.in
@@ -377,7 +377,7 @@ typing-extensions==4.6.2
     #   starlette
     #   torch
     #   typer
-unstructured[local-inference]==0.6.9
+unstructured[local-inference]==0.6.10
     # via -r requirements/base.in
 unstructured-api-tools==0.10.6
     # via -r requirements/base.in
@@ -405,6 +405,8 @@ wrapt==1.14.1
     # via
     #   argilla
     #   deprecated
+xlrd==2.0.1
+    # via unstructured
 xlsxwriter==3.1.1
     # via python-pptx
 zipp==3.15.0
