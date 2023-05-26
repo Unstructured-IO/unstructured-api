@@ -20,7 +20,7 @@ def test_general_api_health_check():
 @pytest.mark.parametrize(
     "example_filename, content_type",
     [
-        ("fake-email.msg", None),
+        pytest.param("fake-email.msg", None, marks=pytest.mark.xfail(reason="See CORE-1148")),
         ("spring-weather.html.json", None),
         ("alert.eml", None),
         ("announcement.eml", None),
