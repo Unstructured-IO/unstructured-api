@@ -250,7 +250,7 @@ def pipeline_1(
                     response_type=media_type,
                     filename=file.filename,
                     file_content_type=file_content_type,
-                )                
+                )
 
                 if is_expected_response_type(media_type, type(response)):
                     raise HTTPException(
