@@ -21,6 +21,8 @@ RUN mkdir ${HOME}/.ssh && chmod go-rwx ${HOME}/.ssh \
 ENV PYTHONPATH="${PYTHONPATH}:${HOME}"
 ENV PATH="/home/${NB_USER}/.local/bin:${PATH}"
 
+RUN dnf install -y libreoffice-writer libreoffice-impress libreoffice-draw libreoffice-math libreoffice-core
+
 # COPY requirements/dev.txt requirements-dev.txt
 COPY requirements/base.txt requirements-base.txt
 RUN python3.8 -m pip install pip==${PIP_VERSION} \
