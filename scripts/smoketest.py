@@ -21,20 +21,6 @@ def send_document(filename, content_type, strategy="fast", output_format="applic
     return requests.post(API_URL, files=files, data={"strategy": strategy, "output_format": output_format})
 
 
-# NOTE(kravetsmic): This function was added for removing path from text/csv response because the backend has a different
-# temporary path than the temporary path in tests
-def remove_path(text: str) -> str:
-    try:
-        rows = text.split("\r\n")
-        filename_index = rows[0].split(",").index("filename")
-    except ValueError:
-        return text
-    for row_index in range(len(rows[1:])):
-        row_strings_arr = rows[row_index].split(",")
-        row_strings_arr[filename_index] = ""
-        rows[row_index] = ",".join(row_strings_arr)
-    return "\r\n".join(rows)
-
 @pytest.mark.parametrize(
     "example_filename, content_type, output_format, strategy",
     [
@@ -151,7 +137,7 @@ def test_happy_path(example_filename, content_type, output_format, strategy):
             for element in result:
                 element['metadata']['filename'] = os.path.basename(str(test_file))
                 del element['coordinates']
-            assert remove_path(response.json()) == remove_path(convert_to_csv(elements))
+            assert response.json() == convert_to_csv(elements)
     else:
         assert len("".join(elem["text"] for elem in response.json())) > 20
 

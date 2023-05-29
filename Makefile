@@ -14,7 +14,7 @@ help: Makefile
 
 ## install-base:                installs minimum requirements to run the API
 .PHONY: install-base
-install-base: install-base-pip-packages install-nltk-models install-detectron
+install-base: install-base-pip-packages install-nltk-models install-high
 
 ## install:                     installs all test and dev requirements
 .PHONY: install
