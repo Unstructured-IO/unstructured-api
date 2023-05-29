@@ -1,6 +1,6 @@
 ## 0.0.19
 
-* Add returning text/csv to pipeline_api
+* Updating data type of optional os env var `ALLOWED_ORIGINS`
 
 ## 0.0.18
 
