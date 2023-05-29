@@ -21,8 +21,6 @@ RUN mkdir ${HOME}/.ssh && chmod go-rwx ${HOME}/.ssh \
 ENV PYTHONPATH="${PYTHONPATH}:${HOME}"
 ENV PATH="/home/${NB_USER}/.local/bin:${PATH}"
 
-RUN dnf install -y libreoffice-writer libreoffice-impress libreoffice-draw libreoffice-math libreoffice-core
-
 # COPY requirements/dev.txt requirements-dev.txt
 COPY requirements/base.txt requirements-base.txt
 RUN python3.8 -m pip install pip==${PIP_VERSION} \
@@ -39,8 +37,6 @@ USER ${NB_USER}
 RUN python3.8 -c "import nltk; nltk.download('punkt')" && \
   python3.8 -c "import nltk; nltk.download('averaged_perceptron_tagger')" && \
   python3.8 -c "from unstructured.ingest.doc_processor.generalized import initialize; initialize()"
-
-USER ${NB_USER}
 
 COPY --chown=${NB_USER}:${NB_USER} CHANGELOG.md CHANGELOG.md
 COPY --chown=${NB_USER}:${NB_USER} logger_config.yaml logger_config.yaml
