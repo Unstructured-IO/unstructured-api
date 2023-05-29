@@ -25,7 +25,7 @@ if allowed_origins:
 
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=allowed_origins.split(","),
+        allow_origins=allowed_origins,
         allow_methods=["OPTIONS", "POST"],
         allow_headers=["Content-Type"],
     )
