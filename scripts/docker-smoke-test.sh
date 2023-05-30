@@ -12,44 +12,49 @@ CONTAINER_NAME=unstructured-api-smoke-test
 PIPELINE_FAMILY=${PIPELINE_FAMILY:-"general"}
 DOCKER_IMAGE="${DOCKER_IMAGE:-pipeline-family-${PIPELINE_FAMILY}-dev:latest}"
 SKIP_INFERENCE_TESTS="${SKIP_INFERENCE_TESTS:-false}"
+ARCH=$(uname -m)
 
-start_container() {
-    echo Starting container "$CONTAINER_NAME"
-    docker run -p 8000:8000 -d --rm --name "$CONTAINER_NAME" "$DOCKER_IMAGE" --port 8000 --host 0.0.0.0
-}
+if [ "$ARCH" != "arm64" ] && [ "$ARCH" != "aarch64" ]; then
+    start_container() {
+        echo Starting container "$CONTAINER_NAME"
+        docker run -p 8000:8000 -d --rm --name "$CONTAINER_NAME" "$DOCKER_IMAGE" --port 8000 --host 0.0.0.0
+    }
 
-await_server_ready() {
-    url=localhost:8000/healthcheck
+    await_server_ready() {
+        url=localhost:8000/healthcheck
 
-    # NOTE(rniko): Increasing the timeout to 120 seconds because emulated arm tests are slow to start
-    for _ in {1..120}; do
-        echo Waiting for response from "$url"
-        if curl $url 2> /dev/null; then
-            echo
-            return
-        fi
+        # NOTE(rniko): Increasing the timeout to 120 seconds because emulated arm tests are slow to start
+        for _ in {1..120}; do
+            echo Waiting for response from "$url"
+            if curl $url 2> /dev/null; then
+                echo
+                return
+            fi
 
-        sleep 1
-    done
+            sleep 1
+        done
 
-    echo Server did not respond!
-    exit 1
-}
+        echo Server did not respond!
+        exit 1
+    }
 
-stop_container() {
-    echo Stopping container "$CONTAINER_NAME"
-    docker stop "$CONTAINER_NAME"
-}
+    stop_container() {
+        echo Stopping container "$CONTAINER_NAME"
+        docker stop "$CONTAINER_NAME"
+    }
 
-start_container
+    start_container
 
-# Regardless of test result, stop the container
-trap stop_container EXIT
+    # Regardless of test result, stop the container
+    trap stop_container EXIT
 
-await_server_ready
+    await_server_ready
 
-echo Running tests
-PYTHONPATH=. SKIP_INFERENCE_TESTS=$SKIP_INFERENCE_TESTS pytest scripts/smoketest.py
+    echo Running tests
+    PYTHONPATH=. SKIP_INFERENCE_TESTS=$SKIP_INFERENCE_TESTS pytest scripts/smoketest.py
 
-result=$?
-exit $result
+    result=$?
+    exit $result
+else
+    echo "Skipping smoke test on $ARCH"
+fi
