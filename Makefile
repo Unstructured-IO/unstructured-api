@@ -2,6 +2,7 @@ PIPELINE_FAMILY := general
 PIPELINE_PACKAGE := general
 PACKAGE_NAME := prepline_${PIPELINE_PACKAGE}
 PIP_VERSION := 23.1.2
+ARCH := $(shell uname -m)
 
 .PHONY: help
 help: Makefile
@@ -23,7 +24,7 @@ install:install-base install-test
 # Need for Apple Silicon based Macs
 .PHONY: install-tensorboard
 install-tensorboard:
-	@if [ ${OS} = "Darwin" ]; then\
+	@if [ ${ARCH} = "arm64" ] || [ ${ARCH} = "aarch64" ]; then\
 		python3 -m pip install tensorboard>=2.12.2;\
 	fi
 

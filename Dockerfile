@@ -13,13 +13,14 @@ ENV USER ${NB_USER}
 ENV HOME /home/${NB_USER}
 
 RUN groupadd --gid ${NB_UID} ${NB_USER}
-RUN useradd --uid ${NB_UID}  --gid ${NB_UID} ${NB_USER}
+RUN useradd --uid ${NB_UID} --gid ${NB_UID} ${NB_USER}
 WORKDIR ${HOME}
 RUN mkdir ${HOME}/.ssh && chmod go-rwx ${HOME}/.ssh \
   &&  ssh-keyscan -t rsa github.com >> /home/${NB_USER}/.ssh/known_hosts
 
 ENV PYTHONPATH="${PYTHONPATH}:${HOME}"
 ENV PATH="/home/${NB_USER}/.local/bin:${PATH}"
+
 
 # COPY requirements/dev.txt requirements-dev.txt
 COPY requirements/base.txt requirements-base.txt
@@ -30,6 +31,7 @@ RUN python3.8 -m pip install pip==${PIP_VERSION} \
   && su -l ${NB_USER} -c  'pip3.8 install --no-cache tensorboard>=2.12.2' \
   && su -l ${NB_USER} -c 'pip3.8 install --no-cache "detectron2@git+https://github.com/facebookresearch/detectron2.git@e2ce8dc#egg=detectron2"' \
   && dnf -y groupremove "Development Tools" \
+  && dnf clean all \
   && ln -s /home/notebook-user/.local/bin/pip /usr/local/bin/pip || true
 
 USER ${NB_USER}
