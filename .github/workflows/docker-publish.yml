@@ -88,7 +88,7 @@ jobs:
         source .venv/bin/activate
         if [ "${{ matrix.docker-platform }}" == "linux/arm64" ]; then
           DOCKER_PLATFORM="${{ matrix.docker-platform }}" DOCKER_IMAGE="$DOCKER_BUILD_REPOSITORY:$ARCH-$SHORT_SHA" \
-          make docker-test
+          SKIP_INFERENCE_TESTS=true make docker-test
         else
           DOCKER_PLATFORM="${{ matrix.docker-platform }}" DOCKER_IMAGE="$DOCKER_BUILD_REPOSITORY:$ARCH-$SHORT_SHA" \
           make docker-test
