@@ -120,4 +120,6 @@ COPY --chown=${NB_USER}:${NB_USER} pipeline-notebooks pipeline-notebooks
 ENTRYPOINT ["uvicorn", "prepline_general.api.app:app", \
   "--log-config", "logger_config.yaml", \
   "--host", "0.0.0.0"]
+# Expose a default port of 8000. Note: The EXPOSE instruction does not actually publish the port, 
+# but some tooling will inspect containers and perform work contingent on networking support declared. 
 EXPOSE 8000
