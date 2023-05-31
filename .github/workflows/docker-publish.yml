@@ -1,9 +1,7 @@
 name: Build And Push Docker Image
 
 on:
-  push:
-    branches:
-      - main
+  push
 
 env:
   DOCKER_REPOSITORY: quay.io/unstructured-io/unstructured-api
@@ -85,53 +83,53 @@ jobs:
       run: |
         ARCH=$(cut -d "/" -f2 <<< ${{ matrix.docker-platform }})
         source .venv/bin/activate
+        export DOCKER_PLATFORM="${{ matrix.docker-platform }}"
+        exort DOCKER_IMAGE="$DOCKER_BUILD_REPOSITORY:$ARCH-$SHORT_SHA"
         if [ "${{ matrix.docker-platform }}" == "linux/arm64" ]; then
-          DOCKER_PLATFORM="${{ matrix.docker-platform }}" DOCKER_IMAGE="$DOCKER_BUILD_REPOSITORY:$ARCH-$SHORT_SHA" \
           SKIP_INFERENCE_TESTS=true make docker-test
         else
-          DOCKER_PLATFORM="${{ matrix.docker-platform }}" DOCKER_IMAGE="$DOCKER_BUILD_REPOSITORY:$ARCH-$SHORT_SHA" \
           make docker-test
         fi
-    - name: Push image
-      run: |
-        # write to the build repository to cache for the publish-images job
-        ARCH=$(cut -d "/" -f2 <<< ${{ matrix.docker-platform }})
-        docker push $DOCKER_BUILD_REPOSITORY:$ARCH-$SHORT_SHA
-  publish-images:
-    runs-on: ubuntu-latest
-    needs: [setup, set-short-sha, build-images]
-    env:
-      SHORT_SHA: ${{ needs.set-short-sha.outputs.short_sha }}
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
-    - name: Set SHORT_SHA
-      run: echo "SHORT_SHA=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
-    - name: Login to Quay.io
-      uses: docker/login-action@v2
-      with:
-        registry: quay.io
-        username: ${{ secrets.QUAY_IO_ROBOT_USERNAME }}
-        password: ${{ secrets.QUAY_IO_ROBOT_TOKEN }}
-    - name: Pull AMD image
-      run: |
-        docker pull $DOCKER_BUILD_REPOSITORY:amd64-$SHORT_SHA
-    - name: Pull ARM image
-      run: |
-        docker pull $DOCKER_BUILD_REPOSITORY:arm64-$SHORT_SHA
-    - name: Push AMD and ARM tags
-      run: |
-        # these are used to construct the final manifest but also cache-from in subsequent runs
-        docker tag $DOCKER_BUILD_REPOSITORY:amd64-$SHORT_SHA $DOCKER_BUILD_REPOSITORY:amd64
-        docker push $DOCKER_BUILD_REPOSITORY:amd64
-        docker tag $DOCKER_BUILD_REPOSITORY:arm64-$SHORT_SHA $DOCKER_BUILD_REPOSITORY:arm64
-        docker push $DOCKER_BUILD_REPOSITORY:arm64
-    - name: Push multiarch manifest
-      run: |
-        docker manifest create ${DOCKER_REPOSITORY}:latest $DOCKER_BUILD_REPOSITORY:amd64 $DOCKER_BUILD_REPOSITORY:arm64
-        docker manifest push $DOCKER_REPOSITORY:latest
-        docker manifest create ${DOCKER_REPOSITORY}:$SHORT_SHA $DOCKER_BUILD_REPOSITORY:amd64 $DOCKER_BUILD_REPOSITORY:arm64
-        docker manifest push $DOCKER_REPOSITORY:$SHORT_SHA
-        VERSION=$(grep -m1 version preprocessing-pipeline-family.yaml | cut -d ' ' -f2)
-        docker manifest create ${DOCKER_REPOSITORY}:$VERSION $DOCKER_BUILD_REPOSITORY:amd64 $DOCKER_BUILD_REPOSITORY:arm64
-        docker manifest push ${DOCKER_REPOSITORY}:$VERSION
+    # - name: Push image
+    #   run: |
+    #     # write to the build repository to cache for the publish-images job
+    #     ARCH=$(cut -d "/" -f2 <<< ${{ matrix.docker-platform }})
+    #     docker push $DOCKER_BUILD_REPOSITORY:$ARCH-$SHORT_SHA
+  # publish-images:
+  #   runs-on: ubuntu-latest
+  #   needs: [setup, set-short-sha, build-images]
+  #   env:
+  #     SHORT_SHA: ${{ needs.set-short-sha.outputs.short_sha }}
+  #   steps:
+  #   - name: Checkout code
+  #     uses: actions/checkout@v3
+  #   - name: Set SHORT_SHA
+  #     run: echo "SHORT_SHA=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+  #   - name: Login to Quay.io
+  #     uses: docker/login-action@v2
+  #     with:
+  #       registry: quay.io
+  #       username: ${{ secrets.QUAY_IO_ROBOT_USERNAME }}
+  #       password: ${{ secrets.QUAY_IO_ROBOT_TOKEN }}
+  #   - name: Pull AMD image
+  #     run: |
+  #       docker pull $DOCKER_BUILD_REPOSITORY:amd64-$SHORT_SHA
+  #   - name: Pull ARM image
+  #     run: |
+  #       docker pull $DOCKER_BUILD_REPOSITORY:arm64-$SHORT_SHA
+  #   - name: Push AMD and ARM tags
+  #     run: |
+  #       # these are used to construct the final manifest but also cache-from in subsequent runs
+  #       docker tag $DOCKER_BUILD_REPOSITORY:amd64-$SHORT_SHA $DOCKER_BUILD_REPOSITORY:amd64
+  #       docker push $DOCKER_BUILD_REPOSITORY:amd64
+  #       docker tag $DOCKER_BUILD_REPOSITORY:arm64-$SHORT_SHA $DOCKER_BUILD_REPOSITORY:arm64
+  #       docker push $DOCKER_BUILD_REPOSITORY:arm64
+  #   - name: Push multiarch manifest
+  #     run: |
+  #       docker manifest create ${DOCKER_REPOSITORY}:latest $DOCKER_BUILD_REPOSITORY:amd64 $DOCKER_BUILD_REPOSITORY:arm64
+  #       docker manifest push $DOCKER_REPOSITORY:latest
+  #       docker manifest create ${DOCKER_REPOSITORY}:$SHORT_SHA $DOCKER_BUILD_REPOSITORY:amd64 $DOCKER_BUILD_REPOSITORY:arm64
+  #       docker manifest push $DOCKER_REPOSITORY:$SHORT_SHA
+  #       VERSION=$(grep -m1 version preprocessing-pipeline-family.yaml | cut -d ' ' -f2)
+  #       docker manifest create ${DOCKER_REPOSITORY}:$VERSION $DOCKER_BUILD_REPOSITORY:amd64 $DOCKER_BUILD_REPOSITORY:arm64
+  #       docker manifest push ${DOCKER_REPOSITORY}:$VERSION
