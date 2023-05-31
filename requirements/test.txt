@@ -8,7 +8,7 @@ antlr4-python3-runtime==4.9.3
     # via
     #   -r requirements/base.txt
     #   omegaconf
-anyio==3.6.2
+anyio==3.7.0
     # via
     #   -r requirements/base.txt
     #   httpcore
@@ -101,7 +101,7 @@ contourpy==1.0.7
     # via
     #   -r requirements/base.txt
     #   matplotlib
-coverage[toml]==7.2.6
+coverage[toml]==7.2.7
     # via pytest-cov
 cryptography==40.0.2
     # via
@@ -119,7 +119,7 @@ defusedxml==0.7.1
     # via
     #   -r requirements/base.txt
     #   nbconvert
-deprecated==1.2.13
+deprecated==1.2.14
     # via
     #   -r requirements/base.txt
     #   argilla
@@ -132,7 +132,10 @@ et-xmlfile==1.1.0
     #   -r requirements/base.txt
     #   openpyxl
 exceptiongroup==1.1.1
-    # via pytest
+    # via
+    #   -r requirements/base.txt
+    #   anyio
+    #   pytest
 execnb==0.1.5
     # via nbdev
 executing==1.2.0
@@ -802,7 +805,7 @@ typer==0.9.0
     # via
     #   -r requirements/base.txt
     #   argilla
-types-requests==2.31.0.0
+types-requests==2.31.0.1
     # via
     #   -r requirements/base.txt
     #   unstructured-api-tools
@@ -827,7 +830,7 @@ typing-extensions==4.6.2
     #   starlette
     #   torch
     #   typer
-unstructured[local-inference]==0.6.10
+unstructured[local-inference]==0.6.11
     # via -r requirements/base.txt
 unstructured-api-tools==0.10.6
     # via -r requirements/base.txt
@@ -888,7 +891,7 @@ xlrd==2.0.1
     # via
     #   -r requirements/base.txt
     #   unstructured
-xlsxwriter==3.1.1
+xlsxwriter==3.1.2
     # via
     #   -r requirements/base.txt
     #   python-pptx
