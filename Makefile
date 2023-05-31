@@ -96,7 +96,11 @@ docker-start-jupyter:
 
 .PHONY: docker-test
 docker-test:
-	DOCKER_IMAGE=${DOCKER_IMAGE} ./scripts/docker-smoke-test.sh
+	@if [ ${ARCH} = "arm64" ] || [ ${ARCH} = "aarch64" ]; then\
+		DOCKER_IMAGE=${DOCKER_IMAGE} SKIP_INFERENCE_TESTS=true ./scripts/docker-smoke-test.sh\
+	else\
+		DOCKER_IMAGE=${DOCKER_IMAGE} ./scripts/docker-test.sh;\
+	fi
 
 #########
 # Local #
