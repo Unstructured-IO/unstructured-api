@@ -2,6 +2,7 @@ PIPELINE_FAMILY := general
 PIPELINE_PACKAGE := general
 PACKAGE_NAME := prepline_${PIPELINE_PACKAGE}
 PIP_VERSION := 23.1.2
+ARCH := $(shell uname -m)
 
 .PHONY: help
 help: Makefile
@@ -14,15 +15,22 @@ help: Makefile
 
 ## install-base:                installs minimum requirements to run the API
 .PHONY: install-base
-install-base: install-base-pip-packages install-nltk-models install-detectron
+install-base: install-base-pip-packages install-nltk-models install-high
 
 ## install:                     installs all test and dev requirements
-.PHONY: install 
+.PHONY: install
 install:install-base install-test
 
+# Need for Apple Silicon based Macs
+.PHONY: install-tensorboard
+install-tensorboard:
+	@if [ ${ARCH} = "arm64" ] || [ ${ARCH} = "aarch64" ]; then\
+		python3 -m pip install tensorboard>=2.12.2;\
+	fi
 
-.PHONY: install-detectron
-install-detectron:
+# Installs detectron2 if high resolution is needed
+.PHONY: install-high
+install-high: install-tensorboard
 	python3 -m pip install "detectron2@git+https://github.com/facebookresearch/detectron2.git@e2ce8dc#egg=detectron2"
 
 .PHONY: install-base-pip-packages
@@ -47,7 +55,7 @@ install-nltk-models:
 pip-compile:
 	pip-compile --upgrade requirements/base.in
 	pip-compile --upgrade -o requirements/test.txt requirements/base.txt requirements/test.in
- 
+
 #########
 # Build #
 #########
@@ -102,7 +110,7 @@ run-jupyter:
 ## run-web-app:                 runs the FastAPI api with hot reloading
 .PHONY: run-web-app
 run-web-app:
-	 PYTHONPATH=$(realpath .) uvicorn ${PACKAGE_NAME}.api.app:app --reload --log-config logger_config.yaml
+	PYTHONPATH=$(realpath .) uvicorn ${PACKAGE_NAME}.api.app:app --reload --log-config logger_config.yaml
 
 #################
 # Test and Lint #

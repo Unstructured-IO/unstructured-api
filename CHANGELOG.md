@@ -1,3 +1,11 @@
+## 0.0.20
+
+* Supports additional filetypes: epub, odt, rft
+
+## 0.0.19
+
+* Updating data type of optional os env var `ALLOWED_ORIGINS`
+
 ## 0.0.18
 
 * Add optional CORS to api if os env var `ALLOWED_ORIGINS` is set

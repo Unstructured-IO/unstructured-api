@@ -49,6 +49,9 @@ DEFAULT_MIMETYPES = (
     "application/json,"
     "application/vnd.ms-powerpoint,"
     "text/html,message/rfc822,text/plain,image/png,"
+    "application/epub,application/epub+zip,"
+    "application/rtf,text/rtf,"
+    "application/vnd.oasis.opendocument.text,"
 )
 
 if not os.environ.get("UNSTRUCTURED_ALLOWED_MIMETYPES", None):
@@ -203,7 +206,7 @@ def ungz_file(file: UploadFile, gz_uncompressed_content_type=None) -> UploadFile
 
 
 @router.post("/general/v0/general")
-@router.post("/general/v0.0.18/general")
+@router.post("/general/v0.0.20/general")
 def pipeline_1(
     request: Request,
     gz_uncompressed_content_type: Optional[str] = Form(default=None),

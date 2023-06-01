@@ -8,9 +8,9 @@
 
 This repo implements a pre-processing pipeline for the following documents. Currently, the pipeline is capable of recognizing the file type and choosing the relevant partition function to process the file.
 
-* Plaintext: `.txt`, `.eml`, `.html`, `.md`, `.json`
+* Plaintext: `.txt`, `.eml`, `.html`, `.md`, `.json`, `.rtf`
 * Images: `.jpeg`, `.png`
-* Documents: `.doc`, `.docx`, `.ppt`, `.pptx`, `.pdf`
+* Documents: `.doc`, `.docx`, `.ppt`, `.pptx`, `.pdf`, `.odt`, `.epub`
 
 ## :rocket: Unstructured API
 
@@ -74,6 +74,7 @@ When elements are extracted from PDFs or images, it may be useful to get their b
 See the [Unstructured Quick Start](https://github.com/Unstructured-IO/unstructured#eight_pointed_black_star-quick-start) for the many OS dependencies that are required, if the ability to process all file types is desired.
 
 * Run `make install`
+* If image and high resolution pdf extraction is required, also run `make install-high`
 * Start a local jupyter notebook server with `make run-jupyter` <br />
 	**OR** <br />
 	just start the fast-API locally with `make run-web-app`
