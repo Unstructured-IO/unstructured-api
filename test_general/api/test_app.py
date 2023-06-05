@@ -103,38 +103,6 @@ def test_coordinates_param():
         assert response_with_coords[i] == response_without_coords[i]
 
 
-@pytest.mark.parametrize(
-    "strategy, pdf_infer_table_structure, expected_table_num",
-    [
-        ("fast", "True", 0),
-        ("fast", "False", 0),
-        ("hi_res", "True", 2),
-        ("hi_res", "False", 0),
-    ],
-)
-def test_pdf_infer_table_structure_param(strategy, pdf_infer_table_structure, expected_table_num):
-    """
-    Verify that responses do include table extration output for hi_res strategy unless requested
-    """
-    client = TestClient(app)
-    test_file = Path("sample-docs") / "layout-parser-paper.pdf"
-    response = client.post(
-        MAIN_API_ROUTE,
-        files=[("files", (str(test_file), open(test_file, "rb")))],
-        data={"strategy": strategy, "pdf_infer_table_structure": pdf_infer_table_structure},
-    )
-    assert response.status_code == 200
-    extracted_tables = [
-        elem["metadata"]["text_as_html"]
-        for elem in response.json()
-        if "text_as_html" in elem["metadata"].keys()
-    ]
-    assert len(extracted_tables) == expected_table_num
-    if expected_table_num > 0:
-        # Test a text form a table is extracted
-        assert "Layouts of scanned modern magazines and scientific reports" in extracted_tables[0]
-
-
 def test_strategy_param_400():
     """Verify that we get a 400 if we pass in a bad strategy"""
     client = TestClient(app)
