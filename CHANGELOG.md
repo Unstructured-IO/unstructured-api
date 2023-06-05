@@ -1,3 +1,7 @@
+## 0.0.21
+
+* Bump to unstructured==0.7.1 for various bug fixes.
+
 ## 0.0.20
 
 * Supports additional filetypes: epub, odt, rft
