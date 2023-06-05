@@ -1,3 +1,7 @@
+## 0.0.22
+
+* Add parallel processing mode for pages within a pdf
+
 ## 0.0.20
 
 * Supports additional filetypes: epub, odt, rft
