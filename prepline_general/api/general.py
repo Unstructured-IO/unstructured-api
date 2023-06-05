@@ -61,7 +61,7 @@ if not os.environ.get("UNSTRUCTURED_ALLOWED_MIMETYPES", None):
 
 def get_pdf_splits(pdf, split_size=1):
     """
-    Given a pdf (PdfReader) with n pages, split it into pdfs each with (n / split_size) pages
+    Given a pdf (PdfReader) with n pages, split it into pdfs each with split_size # of pages
     Return the files as a list of BytesIO
     """
     split_pdfs = []
@@ -94,14 +94,12 @@ def partition_file_via_api(file, **kwargs):
     # using the request.url. We'll need to pass the Request into pipeline_api().
     # Same goes for any request context to pass on, i.e. the token
     request_url = "https://api.unstructured.io/general/v0/general"
-    # request_url = "http://localhost:9000/general/v0/general"
 
     try:
         # Note (austin) - consider using partition_multiple_via_api to cut down on traffic
         # This would serialize the work that we just tried to split up,
         # so we first need to parallelize multi file input
         elements = partition_via_api(file=file, api_url=request_url, **kwargs)
-        raise ValueError("this is bad")
     except ValueError as e:
         # TODO (austin) - the status code comes back in an error message
         # Need to pull that back out and set it here
@@ -179,8 +177,6 @@ def pipeline_api(
     except pdfminer.pdfparser.PDFSyntaxError:
         raise HTTPException(status_code=400, detail=f"{filename} does not appear to be a valid PDF")
 
-    # Due to the above, elements have an ugly temp filename in their metadata
-    # For now, replace this with the basename
     result = convert_to_isd(elements)
     for element in result:
         element["metadata"]["filename"] = os.path.basename(filename)
