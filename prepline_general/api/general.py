@@ -17,6 +17,10 @@ from starlette.types import Send
 from base64 import b64encode
 from typing import Optional, Mapping, Iterator, Tuple
 import secrets
+from concurrent.futures import ThreadPoolExecutor
+from functools import partial
+from PyPDF2 import PdfReader, PdfWriter
+from unstructured.partition.api import partition_via_api
 from unstructured.partition.auto import partition
 from unstructured.staging.base import convert_to_isd
 import tempfile
@@ -34,9 +38,6 @@ def is_expected_response_type(media_type, response_type):
         return True
     else:
         return False
-
-
-# pipeline-api
 
 
 DEFAULT_MIMETYPES = (
@@ -58,28 +59,117 @@ if not os.environ.get("UNSTRUCTURED_ALLOWED_MIMETYPES", None):
     os.environ["UNSTRUCTURED_ALLOWED_MIMETYPES"] = DEFAULT_MIMETYPES
 
 
+def get_pdf_splits(pdf, split_size=1):
+    """
+    Given a pdf (PdfReader) with n pages, split it into pdfs each with (n / split_size) pages
+    Return the files as a list of BytesIO
+    """
+    split_pdfs = []
+
+    count = 0
+
+    while count < len(pdf.pages):
+        new_pdf = PdfWriter()
+        pdf_buffer = io.BytesIO()
+
+        end = count + split_size
+        for page in pdf.pages[count:end]:
+            new_pdf.add_page(page)
+
+        new_pdf.write(pdf_buffer)
+        pdf_buffer.seek(0)
+
+        split_pdfs.append(pdf_buffer)
+        count += split_size
+
+    return split_pdfs
+
+
+def partition_file_via_api(file, **kwargs):
+    """
+    Given a file-like, use partition_via_api to retrieve its elements.
+    Hardcode sending it to api.unstructured.io for now.
+    """
+    # Note (austin) - the correct thing is to call back to ourselves
+    # using the request.url. We'll need to pass the Request into pipeline_api().
+    # Same goes for any request context to pass on, i.e. the token
+    request_url = "https://api.unstructured.io/general/v0/general"
+    # request_url = "http://localhost:9000/general/v0/general"
+
+    try:
+        # Note (austin) - consider using partition_multiple_via_api to cut down on traffic
+        # This would serialize the work that we just tried to split up,
+        # so we first need to parallelize multi file input
+        elements = partition_via_api(file=file, api_url=request_url, **kwargs)
+        raise ValueError("this is bad")
+    except ValueError as e:
+        # TODO (austin) - the status code comes back in an error message
+        # Need to pull that back out and set it here
+        raise HTTPException(status_code=500, detail=f"{e}")
+
+    return elements
+
+
+def partition_pdf_splits(file, **kwargs):
+    """
+    Split up a pdf and process in parallel by sending back into the api
+    """
+    pages_per_pdf = 1
+    pdf = PdfReader(file)
+
+    # If it's small enough, just process locally
+    if len(pdf.pages) <= pages_per_pdf:
+        return partition(file=file, **kwargs)
+
+    results = []
+    pages = get_pdf_splits(pdf, split_size=pages_per_pdf)
+    partition_func = partial(partition_file_via_api, **kwargs)
+
+    with ThreadPoolExecutor() as executor:
+        for result in executor.map(partition_func, pages):
+            results.extend(result)
+
+    return results
+
+
 def pipeline_api(
     file,
     filename="",
     m_strategy=[],
     m_coordinates=[],
+    m_pdf_processing_mode=[],
     file_content_type=None,
     response_type="application/json",
 ):
     strategy = (m_strategy[0] if len(m_strategy) else "fast").lower()
-    if strategy not in ["fast", "hi_res"]:
+    strategies = ["fast", "hi_res", "auto"]
+    if strategy not in strategies:
+        raise HTTPException(
+            status_code=400, detail=f"Invalid strategy: {strategy}. Must be one of {strategies}"
+        )
+
+    pdf_processing_mode = (
+        m_pdf_processing_mode[0] if len(m_pdf_processing_mode) else "serial"
+    ).lower()
+    modes = ["parallel", "serial"]
+    if pdf_processing_mode not in modes:
         raise HTTPException(
             status_code=400,
-            detail=f"Invalid strategy: {strategy}. Must be one of ['fast', 'hi_res']",
+            detail=f"Invalid processing mode: {pdf_processing_mode}. Must be one of {modes}",
         )
 
     show_coordinates_str = (m_coordinates[0] if len(m_coordinates) else "false").lower()
     show_coordinates = show_coordinates_str == "true"
 
     try:
-        elements = partition(
-            file=file, file_filename=filename, content_type=file_content_type, strategy=strategy
-        )
+        if file_content_type == "application/pdf" and pdf_processing_mode == "parallel":
+            elements = partition_pdf_splits(
+                file=file, file_filename=filename, content_type=file_content_type, strategy=strategy
+            )
+        else:
+            elements = partition(
+                file=file, file_filename=filename, content_type=file_content_type, strategy=strategy
+            )
     except ValueError as e:
         if "Invalid file" in e.args[0]:
             raise HTTPException(
@@ -94,6 +184,11 @@ def pipeline_api(
     result = convert_to_isd(elements)
     for element in result:
         element["metadata"]["filename"] = os.path.basename(filename)
+
+        # TODO (austin) - partition_via_api always returns a filetype of json
+        # If we've run a pdf in parallel mode, just change the type back for now
+        if "pdf" in element["metadata"]["filename"] and "json" in element["metadata"]["filetype"]:
+            element["metadata"]["filetype"] = "application/pdf"
 
         if not show_coordinates:
             del element["coordinates"]
@@ -214,6 +309,7 @@ def pipeline_1(
     output_format: Union[str, None] = Form(default=None),
     strategy: List[str] = Form(default=[]),
     coordinates: List[str] = Form(default=[]),
+    pdf_processing_mode: List[str] = Form(default=[]),
 ):
     if files:
         for file_index in range(len(files)):
@@ -249,6 +345,7 @@ def pipeline_1(
                     _file,
                     m_strategy=strategy,
                     m_coordinates=coordinates,
+                    m_pdf_processing_mode=pdf_processing_mode,
                     response_type=media_type,
                     filename=file.filename,
                     file_content_type=file_content_type,
