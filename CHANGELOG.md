@@ -1,3 +1,7 @@
+## 0.0.22
+
+* Add table extraction support for hi_res strategy
+
 ## 0.0.21
 
 * Bump version of base image to use new stable version of tesseract
