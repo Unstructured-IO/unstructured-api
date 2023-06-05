@@ -80,10 +80,10 @@ def test_strategy_performance():
 
 @pytest.mark.skipif(skip_inference_tests, reason="emulated architecture")
 @pytest.mark.parametrize("strategy, pdf_infer_table_structure, expected_table_num", 
-                         [("fast", "true", 0),
-                          ("fast", "false", 0),
-                          ("hi_res", "true", 2),
-                          ("hi_res", "false", 0),
+                         [("fast", "True", 0),
+                          ("fast", "False", 0),
+                          ("hi_res", "True", 2),
+                          ("hi_res", "False", 0),
                           ]
 )
 def test_table_support(strategy, pdf_infer_table_structure, expected_table_num):

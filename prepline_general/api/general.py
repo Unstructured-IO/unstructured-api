@@ -71,14 +71,7 @@ def pipeline_api(
     pdf_infer_table_structure = (
         m_pdf_infer_table_structure[0] if len(m_pdf_infer_table_structure) else "true"
     ).lower()
-    if strategy == "hi_res" and pdf_infer_table_structure not in (
-        "n",
-        "no",
-        "f",
-        "false",
-        "off",
-        "0",
-    ):
+    if strategy == "hi_res" and pdf_infer_table_structure == "true":
         pdf_infer_table_structure = True
     else:
         pdf_infer_table_structure = False
