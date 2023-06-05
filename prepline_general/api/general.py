@@ -70,8 +70,17 @@ def pipeline_api(
     strategy = (m_strategy[0] if len(m_strategy) else "fast").lower()
     pdf_infer_table_structure = (
         m_pdf_infer_table_structure[0] if len(m_pdf_infer_table_structure) else "true"
-    ).lower() == "true"
-    if strategy != "hi_res":
+    ).lower()
+    if strategy == "hi_res" and pdf_infer_table_structure not in (
+        "n",
+        "no",
+        "f",
+        "false",
+        "off",
+        "0",
+    ):
+        pdf_infer_table_structure = True
+    else:
         pdf_infer_table_structure = False
     if strategy not in ["fast", "hi_res"]:
         raise HTTPException(
