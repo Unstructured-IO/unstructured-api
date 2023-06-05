@@ -1,5 +1,6 @@
 ## 0.0.21
 
+* Bump version of base image to use new stable version of tesseract
 * Bump to unstructured==0.7.1 for various bug fixes.
 
 ## 0.0.20
