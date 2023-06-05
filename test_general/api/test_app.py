@@ -149,18 +149,18 @@ def test_general_api_returns_500_bad_pdf():
 
 
 def test_parallel_mode_correct_result():
-    '''
+    """
     Validate that splitting up the pages and sending to the api
     returns the same result as usual
     Note that this test makes calls to prod for now
-    '''
+    """
     client = TestClient(app)
     test_file = Path("sample-docs") / "layout-parser-paper.pdf"
 
     response = client.post(
         MAIN_API_ROUTE,
         files=[("files", (str(test_file), open(test_file, "rb"), "application/pdf"))],
-        )
+    )
 
     assert response.status_code == 200
     result_serial = response.json()
@@ -169,7 +169,7 @@ def test_parallel_mode_correct_result():
         MAIN_API_ROUTE,
         files=[("files", (str(test_file), open(test_file, "rb"), "application/pdf"))],
         data={"pdf_processing_mode": "parallel"},
-       )
+    )
 
     assert response.status_code == 200
     result_parallel = response.json()
@@ -185,9 +185,9 @@ class MockResponse:
 
 
 def test_parallel_mode_returns_errors(monkeypatch):
-    '''
+    """
     If we get an error sending a page to the api, bubble it up
-    '''
+    """
     monkeypatch.setattr(
         requests,
         "post",
@@ -201,7 +201,7 @@ def test_parallel_mode_returns_errors(monkeypatch):
         MAIN_API_ROUTE,
         files=[("files", (str(test_file), open(test_file, "rb"), "application/pdf"))],
         data={"pdf_processing_mode": "parallel"},
-        )
+    )
 
     assert response.status_code == 500
 
@@ -221,9 +221,7 @@ def test_parallel_mode_returns_errors(monkeypatch):
         MAIN_API_ROUTE,
         files=[("files", (str(test_file), open(test_file, "rb"), "application/pdf"))],
         data={"pdf_processing_mode": "parallel"},
-        )
+    )
 
     assert response.status_code == 500
-    assert response.json() == {
-        "detail": "Received unexpected status code 400 from the API"
-    }
+    assert response.json() == {"detail": "Received unexpected status code 400 from the API"}
