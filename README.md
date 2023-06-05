@@ -29,9 +29,11 @@ Try our hosted API! It's freely available to use with any of the filetypes liste
 
 #### PDF Strategies
 
-Two strategies are available for processing PDF files: `hi_res` and `fast`. `fast` is the default `strategy` and works well for documents that do not have text embedded in images.
+Three strategies are available for processing PDF files: `hi_res`, `fast`, and `auto`. `fast` is the default `strategy` and works well for documents that do not have text embedded in images.
 
 On the other hand, `hi_res` is the better choice for PDF's that may have text within embedded images, or for achieving greater precision of [element types](https://unstructured-io.github.io/unstructured/getting_started.html#document-elements) in the response JSON. Please be aware that, as of writing, `hi_res` requests may take 20 times longer to process compared to the`fast` option. See the example below for making a `hi_res` request.
+
+For the best of both worlds, `auto` will determine when a page can be extracted using `fast` mode, otherwise it will fall back to `hi_res`.
 
 ```
  curl -X 'POST' \
@@ -42,6 +44,9 @@ On the other hand, `hi_res` is the better choice for PDF's that may have text wi
   -F 'strategy=hi_res' \
   | jq -C . | less -R
 ```
+
+#### PDF Processing Mode
+The `pdf_processing_mode` parameter can be `parallel` or `serial` (the default). In `serial` mode, a pdf will be processed one page at a time. In `parallel` mode, each page will be asynchronously sent to our hosted api. As we work to optimize the `hi_res` strategy, this is a quick way to get faster processing of pdfs. Note that this mode is currently hardcoded to send documents to api.unstructured.io.
 
 #### Coordinates
 
