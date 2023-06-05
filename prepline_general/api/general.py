@@ -63,10 +63,16 @@ def pipeline_api(
     filename="",
     m_strategy=[],
     m_coordinates=[],
+    m_pdf_infer_table_structure=[],
     file_content_type=None,
     response_type="application/json",
 ):
     strategy = (m_strategy[0] if len(m_strategy) else "fast").lower()
+    pdf_infer_table_structure = (
+        m_pdf_infer_table_structure[0] if len(m_pdf_infer_table_structure) else "true"
+    ).lower() == "true"
+    if strategy != "hi_res":
+        pdf_infer_table_structure = False
     if strategy not in ["fast", "hi_res"]:
         raise HTTPException(
             status_code=400,
@@ -78,7 +84,11 @@ def pipeline_api(
 
     try:
         elements = partition(
-            file=file, file_filename=filename, content_type=file_content_type, strategy=strategy
+            file=file,
+            file_filename=filename,
+            content_type=file_content_type,
+            strategy=strategy,
+            pdf_infer_table_structure=pdf_infer_table_structure,
         )
     except ValueError as e:
         if "Invalid file" in e.args[0]:
@@ -206,7 +216,7 @@ def ungz_file(file: UploadFile, gz_uncompressed_content_type=None) -> UploadFile
 
 
 @router.post("/general/v0/general")
-@router.post("/general/v0.0.21/general")
+@router.post("/general/v0.0.22/general")
 def pipeline_1(
     request: Request,
     gz_uncompressed_content_type: Optional[str] = Form(default=None),
@@ -214,6 +224,7 @@ def pipeline_1(
     output_format: Union[str, None] = Form(default=None),
     strategy: List[str] = Form(default=[]),
     coordinates: List[str] = Form(default=[]),
+    pdf_infer_table_structure: List[str] = Form(default=[]),
 ):
     if files:
         for file_index in range(len(files)):
@@ -249,6 +260,7 @@ def pipeline_1(
                     _file,
                     m_strategy=strategy,
                     m_coordinates=coordinates,
+                    m_pdf_infer_table_structure=pdf_infer_table_structure,
                     response_type=media_type,
                     filename=file.filename,
                     file_content_type=file_content_type,
