@@ -7,6 +7,8 @@ from fastapi.testclient import TestClient
 from unstructured_api_tools.pipelines.api_conventions import get_pipeline_path
 
 from prepline_general.api.app import app
+from prepline_general.api.general import partition_file_via_api
+from unstructured.partition.auto import partition
 import tempfile
 
 MAIN_API_ROUTE = get_pipeline_path("general")
@@ -148,11 +150,16 @@ def test_general_api_returns_500_bad_pdf():
     tmp.close()
 
 
-def test_parallel_mode_correct_result():
+# Quick helper to call partition
+# The kwargs aren't sent properly otherwise - it interprets file as the filename arg
+def partition_wrapper(file_buffer, **kwargs):
+    return partition(file=file_buffer, **kwargs)
+
+
+def test_parallel_mode_correct_result(monkeypatch):
     """
-    Validate that splitting up the pages and sending to the api
-    returns the same result as usual
-    Note that this test makes calls to prod for now
+    Validate that parallel processing mode merges the results
+    to look the same as normal mode
     """
     client = TestClient(app)
     test_file = Path("sample-docs") / "layout-parser-paper.pdf"
@@ -165,12 +172,16 @@ def test_parallel_mode_correct_result():
     assert response.status_code == 200
     result_serial = response.json()
 
+    monkeypatch.setenv("UNSTRUCTURED_PARALLEL_MODE_ENABLED", "true")
+    # Replace our callout with regular old partition
+    monkeypatch.setattr("prepline_general.api.general.partition_file_via_api", partition_wrapper)
+
     response = client.post(
         MAIN_API_ROUTE,
         files=[("files", (str(test_file), open(test_file, "rb"), "application/pdf"))],
-        data={"pdf_processing_mode": "parallel"},
     )
 
+    print(response.text)
     assert response.status_code == 200
     result_parallel = response.json()
 
@@ -188,6 +199,8 @@ def test_parallel_mode_returns_errors(monkeypatch):
     """
     If we get an error sending a page to the api, bubble it up
     """
+    monkeypatch.setenv("UNSTRUCTURED_PARALLEL_MODE_ENABLED", "true")
+    monkeypatch.setenv("UNSTRUCTURED_PARALLEL_MODE_URL", "unused")
     monkeypatch.setattr(
         requests,
         "post",
@@ -224,4 +237,4 @@ def test_parallel_mode_returns_errors(monkeypatch):
     )
 
     assert response.status_code == 500
-    assert response.json() == {"detail": "Received unexpected status code 400 from the API"}
+    assert response.json() == {"detail": "Receive unexpected status code 400 from the API."}

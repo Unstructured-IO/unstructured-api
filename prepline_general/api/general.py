@@ -88,12 +88,13 @@ def get_pdf_splits(pdf, split_size=1):
 def partition_file_via_api(file, **kwargs):
     """
     Given a file-like, use partition_via_api to retrieve its elements.
-    Hardcode sending it to api.unstructured.io for now.
     """
-    # Note (austin) - the correct thing is to call back to ourselves
-    # using the request.url. We'll need to pass the Request into pipeline_api().
-    # Same goes for any request context to pass on, i.e. the token
-    request_url = "https://api.unstructured.io/general/v0/general"
+    # Note (austin) - we'll need to have the Request object here to forward
+    # any important context, e.g. api keys
+    request_url = os.environ.get("UNSTRUCTURED_PARALLEL_MODE_URL")
+
+    if not request_url:
+        raise HTTPException(status_code=500, detail="Parallel mode enabled but no url set!")
 
     try:
         # Note (austin) - consider using partition_multiple_via_api to cut down on traffic
@@ -135,7 +136,6 @@ def pipeline_api(
     filename="",
     m_strategy=[],
     m_coordinates=[],
-    m_pdf_processing_mode=[],
     file_content_type=None,
     response_type="application/json",
 ):
@@ -146,21 +146,15 @@ def pipeline_api(
             status_code=400, detail=f"Invalid strategy: {strategy}. Must be one of {strategies}"
         )
 
-    pdf_processing_mode = (
-        m_pdf_processing_mode[0] if len(m_pdf_processing_mode) else "serial"
-    ).lower()
-    modes = ["parallel", "serial"]
-    if pdf_processing_mode not in modes:
-        raise HTTPException(
-            status_code=400,
-            detail=f"Invalid processing mode: {pdf_processing_mode}. Must be one of {modes}",
-        )
-
     show_coordinates_str = (m_coordinates[0] if len(m_coordinates) else "false").lower()
     show_coordinates = show_coordinates_str == "true"
 
+    pdf_parallel_mode_enabled = (
+        os.environ.get("UNSTRUCTURED_PARALLEL_MODE_ENABLED", "false") == "true"
+    )
+
     try:
-        if file_content_type == "application/pdf" and pdf_processing_mode == "parallel":
+        if file_content_type == "application/pdf" and pdf_parallel_mode_enabled:
             elements = partition_pdf_splits(
                 file=file, file_filename=filename, content_type=file_content_type, strategy=strategy
             )
@@ -305,7 +299,6 @@ def pipeline_1(
     output_format: Union[str, None] = Form(default=None),
     strategy: List[str] = Form(default=[]),
     coordinates: List[str] = Form(default=[]),
-    pdf_processing_mode: List[str] = Form(default=[]),
 ):
     if files:
         for file_index in range(len(files)):
@@ -341,7 +334,6 @@ def pipeline_1(
                     _file,
                     m_strategy=strategy,
                     m_coordinates=coordinates,
-                    m_pdf_processing_mode=pdf_processing_mode,
                     response_type=media_type,
                     filename=file.filename,
                     file_content_type=file_content_type,

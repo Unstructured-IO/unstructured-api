@@ -45,9 +45,6 @@ For the best of both worlds, `auto` will determine when a page can be extracted 
   | jq -C . | less -R
 ```
 
-#### PDF Processing Mode
-The `pdf_processing_mode` parameter can be `parallel` or `serial` (the default). In `serial` mode, a pdf will be processed one page at a time. In `parallel` mode, each page will be asynchronously sent to our hosted api. As we work to optimize the `hi_res` strategy, this is a quick way to get faster processing of pdfs. Note that this mode is currently hardcoded to send documents to api.unstructured.io.
-
 #### Coordinates
 
 When elements are extracted from PDFs or images, it may be useful to get their bounding boxes as well. Set the `coordinates` parameter to `true` to add this field to the elements in the response.
@@ -122,6 +119,11 @@ The response will be a list of the extracted elements:
 ...
 ```
 
+#### Parallel Mode for PDFs
+As mentioned above, processing a pdf using `hi_res` is currently a slow operation. One workaround is to split the pdf into smaller files, process these asynchronously, and merge the results. You can enable parallel processing mode with the following env variables:
+
+* `UNSTRUCTURED_PARALLEL_MODE_ENABLED` - set to `true` to process individual pdf pages remotely 
+* `UNSTRUCTURED_PARALLEL_MODE_URL` - the location to send pdf page asynchronously
 
 ### Generating Python files from the pipeline notebooks
 
