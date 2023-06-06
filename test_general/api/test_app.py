@@ -7,7 +7,6 @@ from fastapi.testclient import TestClient
 from unstructured_api_tools.pipelines.api_conventions import get_pipeline_path
 
 from prepline_general.api.app import app
-from prepline_general.api.general import partition_file_via_api
 from unstructured.partition.auto import partition
 import tempfile
 
