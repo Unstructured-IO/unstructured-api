@@ -166,10 +166,10 @@ def test_parallel_mode_correct_result(monkeypatch):
     result_serial = response.json()
 
     monkeypatch.setenv("UNSTRUCTURED_PARALLEL_MODE_ENABLED", "true")
+    monkeypatch.setenv("UNSTRUCTURED_PARALLEL_MODE_URL", "unused")
     # Replace our callout with regular old partition
-    # monkeypatch.setattr("prepline_general.api.general.partition_file_via_api", partition_wrapper)
-    monkeypatch.setattr("prepline_general.api.general.partition_file_via_api",
-                        lambda file, **kwargs: partition(file=file, **kwargs))
+    monkeypatch.setattr("prepline_general.api.general.partition_via_api",
+                        lambda file, api_url, **kwargs: partition(file=file, **kwargs))
 
     response = client.post(
         MAIN_API_ROUTE,

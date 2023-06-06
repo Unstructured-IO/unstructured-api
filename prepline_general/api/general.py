@@ -62,30 +62,30 @@ if not os.environ.get("UNSTRUCTURED_ALLOWED_MIMETYPES", None):
 def get_pdf_splits(pdf, split_size=1):
     """
     Given a pdf (PdfReader) with n pages, split it into pdfs each with split_size # of pages
-    Return the files as a list of BytesIO
+    Return the files with their page offset in the form [( BytesIO, int)]
     """
     split_pdfs = []
 
-    count = 0
+    offset = 0
 
-    while count < len(pdf.pages):
+    while offset < len(pdf.pages):
         new_pdf = PdfWriter()
         pdf_buffer = io.BytesIO()
 
-        end = count + split_size
-        for page in pdf.pages[count:end]:
+        end = offset + split_size
+        for page in pdf.pages[offset:end]:
             new_pdf.add_page(page)
 
         new_pdf.write(pdf_buffer)
         pdf_buffer.seek(0)
 
-        split_pdfs.append(pdf_buffer)
-        count += split_size
+        split_pdfs.append((pdf_buffer, offset))
+        offset += split_size
 
     return split_pdfs
 
 
-def partition_file_via_api(file, **kwargs):
+def partition_file_via_api(file_tuple, **kwargs):
     """
     Given a file-like, use partition_via_api to retrieve its elements.
     """
@@ -96,6 +96,8 @@ def partition_file_via_api(file, **kwargs):
     if not request_url:
         raise HTTPException(status_code=500, detail="Parallel mode enabled but no url set!")
 
+    file, page_offset = file_tuple
+
     try:
         # Note (austin) - consider using partition_multiple_via_api to cut down on traffic
         # This would serialize the work that we just tried to split up,
@@ -105,6 +107,10 @@ def partition_file_via_api(file, **kwargs):
         # TODO (austin) - the status code comes back in an error message
         # Need to pull that back out and set it here
         raise HTTPException(status_code=500, detail=f"{e}")
+
+    # We need to account for the original page numbers
+    for element in elements:
+        element.metadata.page_number += page_offset
 
     return elements
 
