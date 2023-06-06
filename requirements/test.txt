@@ -580,6 +580,8 @@ pyparsing==3.0.9
     # via
     #   -r requirements/base.txt
     #   matplotlib
+pypdf2==3.0.1
+    # via -r requirements/base.txt
 pyrsistent==0.19.3
     # via
     #   -r requirements/base.txt
@@ -825,6 +827,7 @@ typing-extensions==4.6.3
     #   ipython
     #   mypy
     #   pydantic
+    #   pypdf2
     #   rich
     #   starlette
     #   torch
