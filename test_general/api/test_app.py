@@ -149,12 +149,6 @@ def test_general_api_returns_500_bad_pdf():
     tmp.close()
 
 
-# Quick helper to call partition
-# The kwargs aren't sent properly otherwise - it interprets file as the filename arg
-def partition_wrapper(file_buffer, **kwargs):
-    return partition(file=file_buffer, **kwargs)
-
-
 def test_parallel_mode_correct_result(monkeypatch):
     """
     Validate that parallel processing mode merges the results
@@ -173,7 +167,9 @@ def test_parallel_mode_correct_result(monkeypatch):
 
     monkeypatch.setenv("UNSTRUCTURED_PARALLEL_MODE_ENABLED", "true")
     # Replace our callout with regular old partition
-    monkeypatch.setattr("prepline_general.api.general.partition_file_via_api", partition_wrapper)
+    # monkeypatch.setattr("prepline_general.api.general.partition_file_via_api", partition_wrapper)
+    monkeypatch.setattr("prepline_general.api.general.partition_file_via_api",
+                        lambda file, **kwargs: partition(file=file, **kwargs))
 
     response = client.post(
         MAIN_API_ROUTE,
