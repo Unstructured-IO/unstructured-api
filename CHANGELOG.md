@@ -1,3 +1,7 @@
+## 0.0.23
+
+* Add support for csv files
+
 ## 0.0.22
 
 * Add parallel processing mode for pages within a pdf
