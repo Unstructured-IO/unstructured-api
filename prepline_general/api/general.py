@@ -56,6 +56,8 @@ DEFAULT_MIMETYPES = (
     "application/epub,application/epub+zip,"
     "application/rtf,text/rtf,"
     "application/vnd.oasis.opendocument.text,"
+    "text/csv,text/x-csv,application/csv,application/x-csv,"
+    "text/comma-separated-values,text/x-comma-separated-values,"
 )
 
 if not os.environ.get("UNSTRUCTURED_ALLOWED_MIMETYPES", None):
@@ -300,7 +302,7 @@ def ungz_file(file: UploadFile, gz_uncompressed_content_type=None) -> UploadFile
 
 
 @router.post("/general/v0/general")
-@router.post("/general/v0.0.22/general")
+@router.post("/general/v0.0.23/general")
 def pipeline_1(
     request: Request,
     gz_uncompressed_content_type: Optional[str] = Form(default=None),
