@@ -17,6 +17,10 @@ from starlette.types import Send
 from base64 import b64encode
 from typing import Optional, Mapping, Iterator, Tuple
 import secrets
+from concurrent.futures import ThreadPoolExecutor
+from functools import partial
+from PyPDF2 import PdfReader, PdfWriter
+from unstructured.partition.api import partition_via_api
 from unstructured.partition.auto import partition
 from unstructured.staging.base import convert_to_isd
 import tempfile
@@ -58,6 +62,84 @@ if not os.environ.get("UNSTRUCTURED_ALLOWED_MIMETYPES", None):
     os.environ["UNSTRUCTURED_ALLOWED_MIMETYPES"] = DEFAULT_MIMETYPES
 
 
+def get_pdf_splits(pdf, split_size=1):
+    """
+    Given a pdf (PdfReader) with n pages, split it into pdfs each with split_size # of pages
+    Return the files with their page offset in the form [( BytesIO, int)]
+    """
+    split_pdfs = []
+
+    offset = 0
+
+    while offset < len(pdf.pages):
+        new_pdf = PdfWriter()
+        pdf_buffer = io.BytesIO()
+
+        end = offset + split_size
+        for page in pdf.pages[offset:end]:
+            new_pdf.add_page(page)
+
+        new_pdf.write(pdf_buffer)
+        pdf_buffer.seek(0)
+
+        split_pdfs.append((pdf_buffer, offset))
+        offset += split_size
+
+    return split_pdfs
+
+
+def partition_file_via_api(file_tuple, **kwargs):
+    """
+    Given a file-like, use partition_via_api to retrieve its elements.
+    """
+    # Note (austin) - we'll need to have the Request object here to forward
+    # any important context, e.g. api keys
+    request_url = os.environ.get("UNSTRUCTURED_PARALLEL_MODE_URL")
+
+    if not request_url:
+        raise HTTPException(status_code=500, detail="Parallel mode enabled but no url set!")
+
+    file, page_offset = file_tuple
+
+    try:
+        # Note (austin) - consider using partition_multiple_via_api to cut down on traffic
+        # This would serialize the work that we just tried to split up,
+        # so we first need to parallelize multi file input
+        elements = partition_via_api(file=file, api_url=request_url, **kwargs)
+    except ValueError as e:
+        # TODO (austin) - the status code comes back in an error message
+        # Need to pull that back out and set it here
+        raise HTTPException(status_code=500, detail=f"{e}")
+
+    # We need to account for the original page numbers
+    for element in elements:
+        element.metadata.page_number += page_offset
+
+    return elements
+
+
+def partition_pdf_splits(file, **kwargs):
+    """
+    Split up a pdf and process in parallel by sending back into the api
+    """
+    pages_per_pdf = 1
+    pdf = PdfReader(file)
+
+    # If it's small enough, just process locally
+    if len(pdf.pages) <= pages_per_pdf:
+        return partition(file=file, **kwargs)
+
+    results = []
+    pages = get_pdf_splits(pdf, split_size=pages_per_pdf)
+    partition_func = partial(partition_file_via_api, **kwargs)
+
+    with ThreadPoolExecutor() as executor:
+        for result in executor.map(partition_func, pages):
+            results.extend(result)
+
+    return results
+
+
 def pipeline_api(
     file,
     filename="",
@@ -67,19 +149,28 @@ def pipeline_api(
     response_type="application/json",
 ):
     strategy = (m_strategy[0] if len(m_strategy) else "fast").lower()
-    if strategy not in ["fast", "hi_res"]:
+    strategies = ["fast", "hi_res", "auto"]
+    if strategy not in strategies:
         raise HTTPException(
-            status_code=400,
-            detail=f"Invalid strategy: {strategy}. Must be one of ['fast', 'hi_res']",
+            status_code=400, detail=f"Invalid strategy: {strategy}. Must be one of {strategies}"
         )
 
     show_coordinates_str = (m_coordinates[0] if len(m_coordinates) else "false").lower()
     show_coordinates = show_coordinates_str == "true"
 
+    pdf_parallel_mode_enabled = (
+        os.environ.get("UNSTRUCTURED_PARALLEL_MODE_ENABLED", "false") == "true"
+    )
+
     try:
-        elements = partition(
-            file=file, file_filename=filename, content_type=file_content_type, strategy=strategy
-        )
+        if file_content_type == "application/pdf" and pdf_parallel_mode_enabled:
+            elements = partition_pdf_splits(
+                file=file, file_filename=filename, content_type=file_content_type, strategy=strategy
+            )
+        else:
+            elements = partition(
+                file=file, file_filename=filename, content_type=file_content_type, strategy=strategy
+            )
     except ValueError as e:
         if "Invalid file" in e.args[0]:
             raise HTTPException(
@@ -89,11 +180,14 @@ def pipeline_api(
     except pdfminer.pdfparser.PDFSyntaxError:
         raise HTTPException(status_code=400, detail=f"{filename} does not appear to be a valid PDF")
 
-    # Due to the above, elements have an ugly temp filename in their metadata
-    # For now, replace this with the basename
     result = convert_to_isd(elements)
     for element in result:
         element["metadata"]["filename"] = os.path.basename(filename)
+
+        # TODO (austin) - partition_via_api always returns a filetype of json
+        # If we've run a pdf in parallel mode, just change the type back for now
+        if "pdf" in element["metadata"]["filename"] and "json" in element["metadata"]["filetype"]:
+            element["metadata"]["filetype"] = "application/pdf"
 
         if not show_coordinates:
             del element["coordinates"]
@@ -206,7 +300,7 @@ def ungz_file(file: UploadFile, gz_uncompressed_content_type=None) -> UploadFile
 
 
 @router.post("/general/v0/general")
-@router.post("/general/v0.0.21/general")
+@router.post("/general/v0.0.22/general")
 def pipeline_1(
     request: Request,
     gz_uncompressed_content_type: Optional[str] = Form(default=None),

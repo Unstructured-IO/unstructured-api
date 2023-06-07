@@ -251,6 +251,8 @@ pypandoc==1.11
     # via unstructured
 pyparsing==3.0.9
     # via matplotlib
+pypdf2==3.0.1
+    # via -r requirements/base.in
 pyrsistent==0.19.3
     # via jsonschema
 pytesseract==0.3.10
@@ -373,6 +375,7 @@ typing-extensions==4.6.3
     #   iopath
     #   mypy
     #   pydantic
+    #   pypdf2
     #   rich
     #   starlette
     #   torch

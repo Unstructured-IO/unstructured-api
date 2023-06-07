@@ -29,9 +29,11 @@ Try our hosted API! It's freely available to use with any of the filetypes liste
 
 #### PDF Strategies
 
-Two strategies are available for processing PDF files: `hi_res` and `fast`. `fast` is the default `strategy` and works well for documents that do not have text embedded in images.
+Three strategies are available for processing PDF files: `hi_res`, `fast`, and `auto`. `fast` is the default `strategy` and works well for documents that do not have text embedded in images.
 
 On the other hand, `hi_res` is the better choice for PDF's that may have text within embedded images, or for achieving greater precision of [element types](https://unstructured-io.github.io/unstructured/getting_started.html#document-elements) in the response JSON. Please be aware that, as of writing, `hi_res` requests may take 20 times longer to process compared to the`fast` option. See the example below for making a `hi_res` request.
+
+For the best of both worlds, `auto` will determine when a page can be extracted using `fast` mode, otherwise it will fall back to `hi_res`.
 
 ```
  curl -X 'POST' \
@@ -117,6 +119,11 @@ The response will be a list of the extracted elements:
 ...
 ```
 
+#### Parallel Mode for PDFs
+As mentioned above, processing a pdf using `hi_res` is currently a slow operation. One workaround is to split the pdf into smaller files, process these asynchronously, and merge the results. You can enable parallel processing mode with the following env variables:
+
+* `UNSTRUCTURED_PARALLEL_MODE_ENABLED` - set to `true` to process individual pdf pages remotely 
+* `UNSTRUCTURED_PARALLEL_MODE_URL` - the location to send pdf page asynchronously
 
 ### Generating Python files from the pipeline notebooks
 

@@ -1,10 +1,13 @@
 from pathlib import Path
 
+import json
 import pytest
+import requests
 from fastapi.testclient import TestClient
 from unstructured_api_tools.pipelines.api_conventions import get_pipeline_path
 
 from prepline_general.api.app import app
+from unstructured.partition.auto import partition
 import tempfile
 
 MAIN_API_ROUTE = get_pipeline_path("general")
@@ -144,3 +147,91 @@ def test_general_api_returns_500_bad_pdf():
     assert response.json() == {"detail": f"{tmp.name} does not appear to be a valid PDF"}
     assert response.status_code == 400
     tmp.close()
+
+
+def test_parallel_mode_correct_result(monkeypatch):
+    """
+    Validate that parallel processing mode merges the results
+    to look the same as normal mode
+    """
+    client = TestClient(app)
+    test_file = Path("sample-docs") / "layout-parser-paper.pdf"
+
+    response = client.post(
+        MAIN_API_ROUTE,
+        files=[("files", (str(test_file), open(test_file, "rb"), "application/pdf"))],
+    )
+
+    assert response.status_code == 200
+    result_serial = response.json()
+
+    monkeypatch.setenv("UNSTRUCTURED_PARALLEL_MODE_ENABLED", "true")
+    monkeypatch.setenv("UNSTRUCTURED_PARALLEL_MODE_URL", "unused")
+    # Replace our callout with regular old partition
+    monkeypatch.setattr(
+        "prepline_general.api.general.partition_via_api",
+        lambda file, api_url, **kwargs: partition(file=file, **kwargs),
+    )
+
+    response = client.post(
+        MAIN_API_ROUTE,
+        files=[("files", (str(test_file), open(test_file, "rb"), "application/pdf"))],
+    )
+
+    print(response.text)
+    assert response.status_code == 200
+    result_parallel = response.json()
+
+    for pair in zip(result_serial, result_parallel):
+        print(json.dumps(pair, indent=2))
+        assert pair[0] == pair[1]
+
+
+class MockResponse:
+    def __init__(self, status_code):
+        self.status_code = status_code
+
+
+def test_parallel_mode_returns_errors(monkeypatch):
+    """
+    If we get an error sending a page to the api, bubble it up
+    """
+    monkeypatch.setenv("UNSTRUCTURED_PARALLEL_MODE_ENABLED", "true")
+    monkeypatch.setenv("UNSTRUCTURED_PARALLEL_MODE_URL", "unused")
+    monkeypatch.setattr(
+        requests,
+        "post",
+        lambda *args, **kwargs: MockResponse(status_code=500),
+    )
+
+    client = TestClient(app)
+    test_file = Path("sample-docs") / "layout-parser-paper.pdf"
+
+    response = client.post(
+        MAIN_API_ROUTE,
+        files=[("files", (str(test_file), open(test_file, "rb"), "application/pdf"))],
+        data={"pdf_processing_mode": "parallel"},
+    )
+
+    assert response.status_code == 500
+
+    # TODO (austin) - Right now any non 200 is going to turn into a 500
+    # because of how partition_via_api_works
+    # At the very least we can return a message with a bit more info
+    monkeypatch.setattr(
+        requests,
+        "post",
+        lambda *args, **kwargs: MockResponse(status_code=400),
+    )
+
+    client = TestClient(app)
+    test_file = Path("sample-docs") / "layout-parser-paper.pdf"
+
+    response = client.post(
+        MAIN_API_ROUTE,
+        files=[("files", (str(test_file), open(test_file, "rb"), "application/pdf"))],
+        data={"pdf_processing_mode": "parallel"},
+    )
+
+    assert response.status_code == 500
+    assert response.json() == {"detail": "Receive unexpected status code 400 from the API."}
