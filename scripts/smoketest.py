@@ -32,6 +32,7 @@ def send_document(filename, content_type, strategy="fast"):
         ("winter-sports.epub", "application/epub"),
         ("fake-doc.rtf", "application/rtf"),
         ("fake.odt", "application/vnd.oasis.opendocument.text"),
+        ("stanley-cups.csv", "application/csv"),
         pytest.param("fake-excel.xlsx", None, marks=pytest.mark.xfail(reason="not supported yet")),
         # Note(austin) The two inference calls will hang on mac with unsupported hardware error
         # Skip these with SKIP_INFERENCE_TESTS=true make docker-test
