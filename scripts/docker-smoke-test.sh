@@ -70,13 +70,13 @@ PYTHONPATH=. SKIP_INFERENCE_TESTS=$SKIP_INFERENCE_TESTS pytest scripts/smoketest
 #######################
 echo Running parallel mode test
 
-curl http://localhost:$API_PORT/general/v0/general --form 'files=@sample-docs/layout-parser-paper.pdf' --form 'strategy=fast' | jq -S > single-mode.json
+curl http://localhost:$API_PORT/general/v0/general --form 'files=@sample-docs/layout-parser-paper.pdf' --form 'coordinate=true' --form 'strategy=fast' | jq -S > single-mode.json
 
 stop_container
 start_container "true"
 await_server_ready
 
-curl http://localhost:$API_PORT/general/v0/general --form 'files=@sample-docs/layout-parser-paper.pdf' --form 'strategy=fast' | jq -S > parallel-mode.json
+curl http://localhost:$API_PORT/general/v0/general --form 'files=@sample-docs/layout-parser-paper.pdf' --form 'coordinates=true'--form 'strategy=fast' | jq -S > parallel-mode.json
 
 if ! diff -u single-mode.json parallel-mode.json ; then
     echo Parallel mode received a different output!
