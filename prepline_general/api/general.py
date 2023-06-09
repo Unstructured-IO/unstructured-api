@@ -155,7 +155,7 @@ def partition_pdf_splits(request, file, file_filename, content_type, coordinates
 
 def pipeline_api(
     file,
-    request,
+    request=None,
     filename="",
     m_strategy=[],
     m_coordinates=[],
@@ -168,6 +168,11 @@ def pipeline_api(
         raise HTTPException(
             status_code=400, detail=f"Invalid strategy: {strategy}. Must be one of {strategies}"
         )
+
+    # Note (austin) - there is no fast mode for images
+    # In this case we need to use hi_res
+    if file_content_type == "image/jpeg":
+        strategy = "hi_res"
 
     show_coordinates_str = (m_coordinates[0] if len(m_coordinates) else "false").lower()
     show_coordinates = show_coordinates_str == "true"
@@ -319,7 +324,7 @@ def ungz_file(file: UploadFile, gz_uncompressed_content_type=None) -> UploadFile
 
 
 @router.post("/general/v0/general")
-@router.post("/general/v0.0.23/general")
+@router.post("/general/v0.0.24/general")
 def pipeline_1(
     request: Request,
     gz_uncompressed_content_type: Optional[str] = Form(default=None),
