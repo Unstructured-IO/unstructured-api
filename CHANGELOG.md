@@ -1,3 +1,7 @@
+## 0.0.24-dev0
+
+* Add more testing to parallel mode
+
 ## 0.0.23
 
 * Add support for csv files
