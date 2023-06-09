@@ -149,10 +149,36 @@ def test_general_api_returns_500_bad_pdf():
     tmp.close()
 
 
+class MockResponse:
+    def __init__(self, status_code):
+        self.status_code = status_code
+        self.body = {}
+        self.text = ""
+
+    def json(self):
+        return self.body
+
+
+def mock_partition_file_via_api(url, **kwargs):
+    file = kwargs["files"]["files"][1]
+
+    partition_kwargs = kwargs["data"]
+
+    # Hack - the api takes `coordinates` but regular partition does not
+    del partition_kwargs["coordinates"]
+
+    elements = partition(file=file, **partition_kwargs)
+
+    response = MockResponse(200)
+    response.body = elements
+    return response
+
+
 def test_parallel_mode_correct_result(monkeypatch):
     """
     Validate that parallel processing mode merges the results
-    to look the same as normal mode
+    to look the same as normal mode. The api call is mocked to
+    use local partition, so this is just testing the merge logic.
     """
     client = TestClient(app)
     test_file = Path("sample-docs") / "layout-parser-paper.pdf"
@@ -169,8 +195,9 @@ def test_parallel_mode_correct_result(monkeypatch):
     monkeypatch.setenv("UNSTRUCTURED_PARALLEL_MODE_URL", "unused")
     # Replace our callout with regular old partition
     monkeypatch.setattr(
-        "prepline_general.api.general.partition_via_api",
-        lambda file, api_url, **kwargs: partition(file=file, **kwargs),
+        requests,
+        "post",
+        lambda *args, **kwargs: mock_partition_file_via_api(*args, **kwargs),
     )
 
     response = client.post(
@@ -184,11 +211,6 @@ def test_parallel_mode_correct_result(monkeypatch):
     for pair in zip(result_serial, result_parallel):
         print(json.dumps(pair, indent=2))
         assert pair[0] == pair[1]
-
-
-class MockResponse:
-    def __init__(self, status_code):
-        self.status_code = status_code
 
 
 def test_parallel_mode_returns_errors(monkeypatch):
@@ -214,9 +236,6 @@ def test_parallel_mode_returns_errors(monkeypatch):
 
     assert response.status_code == 500
 
-    # TODO (austin) - Right now any non 200 is going to turn into a 500
-    # because of how partition_via_api_works
-    # At the very least we can return a message with a bit more info
     monkeypatch.setattr(
         requests,
         "post",
@@ -232,5 +251,4 @@ def test_parallel_mode_returns_errors(monkeypatch):
         data={"pdf_processing_mode": "parallel"},
     )
 
-    assert response.status_code == 500
-    assert response.json() == {"detail": "Receive unexpected status code 400 from the API."}
+    assert response.status_code == 400

@@ -11,7 +11,7 @@ anyio==3.7.0
     #   httpcore
     #   starlette
     #   watchfiles
-argilla==1.8.0
+argilla==1.9.0
     # via unstructured
 attrs==23.1.0
     # via jsonschema
@@ -73,7 +73,7 @@ flatbuffers==23.5.26
     # via onnxruntime
 fonttools==4.39.4
     # via matplotlib
-fsspec==2023.5.0
+fsspec==2023.6.0
     # via huggingface-hub
 h11==0.14.0
     # via
@@ -363,7 +363,7 @@ traitlets==5.9.0
     #   nbclient
     #   nbconvert
     #   nbformat
-transformers==4.30.0
+transformers==4.30.1
     # via unstructured-inference
 typer==0.9.0
     # via argilla
@@ -384,9 +384,9 @@ typing-extensions==4.6.3
     #   starlette
     #   torch
     #   typer
-unstructured[local-inference]==0.7.2
+unstructured[local-inference]==0.7.3
     # via -r requirements/base.in
-unstructured-api-tools==0.10.6
+unstructured-api-tools==0.10.7
     # via -r requirements/base.in
 unstructured-inference==0.5.1
     # via unstructured

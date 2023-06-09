@@ -20,11 +20,12 @@ import secrets
 from concurrent.futures import ThreadPoolExecutor
 from functools import partial
 from PyPDF2 import PdfReader, PdfWriter
-from unstructured.partition.api import partition_via_api
 from unstructured.partition.auto import partition
+from unstructured.partition.json import partition_json
 from unstructured.staging.base import convert_to_isd
 import tempfile
 import pdfminer
+import requests
 
 
 app = FastAPI()
@@ -38,9 +39,6 @@ def is_expected_response_type(media_type, response_type):
         return True
     else:
         return False
-
-
-# pipeline-api
 
 
 DEFAULT_MIMETYPES = (
@@ -90,12 +88,10 @@ def get_pdf_splits(pdf, split_size=1):
     return split_pdfs
 
 
-def partition_file_via_api(file_tuple, **kwargs):
+def partition_file_via_api(file_tuple, request, filename, content_type, **request_kwargs):
     """
     Given a file-like, use partition_via_api to retrieve its elements.
     """
-    # Note (austin) - we'll need to have the Request object here to forward
-    # any important context, e.g. api keys
     request_url = os.environ.get("UNSTRUCTURED_PARALLEL_MODE_URL")
 
     if not request_url:
@@ -103,15 +99,20 @@ def partition_file_via_api(file_tuple, **kwargs):
 
     file, page_offset = file_tuple
 
-    try:
-        # Note (austin) - consider using partition_multiple_via_api to cut down on traffic
-        # This would serialize the work that we just tried to split up,
-        # so we first need to parallelize multi file input
-        elements = partition_via_api(file=file, api_url=request_url, **kwargs)
-    except ValueError as e:
-        # TODO (austin) - the status code comes back in an error message
-        # Need to pull that back out and set it here
-        raise HTTPException(status_code=500, detail=f"{e}")
+    headers = {"unstructured-api-key": request.headers.get("unstructured_api_key")}
+
+    response = requests.post(
+        request_url,
+        files={"files": (filename, file, content_type)},
+        data=request_kwargs,
+        headers=headers,
+    )
+
+    if response.status_code != 200:
+        detail = response.json().get("detail") or response.text
+        raise HTTPException(status_code=response.status_code, detail=detail)
+
+    elements = partition_json(text=response.text)
 
     # We need to account for the original page numbers
     for element in elements:
@@ -120,7 +121,7 @@ def partition_file_via_api(file_tuple, **kwargs):
     return elements
 
 
-def partition_pdf_splits(file, **kwargs):
+def partition_pdf_splits(request, file, file_filename, content_type, coordinates, **request_kwargs):
     """
     Split up a pdf and process in parallel by sending back into the api
     """
@@ -129,11 +130,21 @@ def partition_pdf_splits(file, **kwargs):
 
     # If it's small enough, just process locally
     if len(pdf.pages) <= pages_per_pdf:
-        return partition(file=file, **kwargs)
+        return partition(
+            file=file, file_filename=file_filename, content_type=content_type, **request_kwargs
+        )
 
     results = []
     pages = get_pdf_splits(pdf, split_size=pages_per_pdf)
-    partition_func = partial(partition_file_via_api, **kwargs)
+
+    partition_func = partial(
+        partition_file_via_api,
+        request=request,
+        filename=file_filename,
+        content_type=content_type,
+        coordinates=coordinates,
+        **request_kwargs,
+    )
 
     with ThreadPoolExecutor() as executor:
         for result in executor.map(partition_func, pages):
@@ -144,6 +155,7 @@ def partition_pdf_splits(file, **kwargs):
 
 def pipeline_api(
     file,
+    request,
     filename="",
     m_strategy=[],
     m_coordinates=[],
@@ -167,7 +179,12 @@ def pipeline_api(
     try:
         if file_content_type == "application/pdf" and pdf_parallel_mode_enabled:
             elements = partition_pdf_splits(
-                file=file, file_filename=filename, content_type=file_content_type, strategy=strategy
+                request,
+                file=file,
+                file_filename=filename,
+                content_type=file_content_type,
+                strategy=strategy,
+                coordinates=show_coordinates,
             )
         else:
             elements = partition(
@@ -343,6 +360,7 @@ def pipeline_1(
 
                 response = pipeline_api(
                     _file,
+                    request=request,
                     m_strategy=strategy,
                     m_coordinates=coordinates,
                     response_type=media_type,
