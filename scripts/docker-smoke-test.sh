@@ -11,15 +11,25 @@
 CONTAINER_NAME=unstructured-api-smoke-test
 PIPELINE_FAMILY=${PIPELINE_FAMILY:-"general"}
 DOCKER_IMAGE="${DOCKER_IMAGE:-pipeline-family-${PIPELINE_FAMILY}-dev:latest}"
+API_PORT=8000
 SKIP_INFERENCE_TESTS="${SKIP_INFERENCE_TESTS:-false}"
 
 start_container() {
     echo Starting container "$CONTAINER_NAME"
-    docker run -p 8000:8000 -d --rm --name "$CONTAINER_NAME" "$DOCKER_IMAGE" --port 8000 --host 0.0.0.0
+    use_parallel_mode=$1
+
+    docker run -p $API_PORT:$API_PORT \
+           -d \
+           --rm \
+           --name "$CONTAINER_NAME" \
+           --env "UNSTRUCTURED_PARALLEL_MODE_ENABLED=$use_parallel_mode" \
+           --env "UNSTRUCTURED_PARALLEL_MODE_URL=http://localhost:$API_PORT/general/v0/general" \
+           "$DOCKER_IMAGE" \
+           --port $API_PORT --host 0.0.0.0
 }
 
 await_server_ready() {
-    url=localhost:8000/healthcheck
+    url=localhost:$API_PORT/healthcheck
 
     # NOTE(rniko): Increasing the timeout to 120 seconds because emulated arm tests are slow to start
     for _ in {1..120}; do
@@ -38,18 +48,42 @@ await_server_ready() {
 
 stop_container() {
     echo Stopping container "$CONTAINER_NAME"
+    # Note (austin) - could be useful to dump the logs on an error
+    # docker logs $CONTAINER_NAME 2> docker_logs.txt
     docker stop "$CONTAINER_NAME"
 }
 
-start_container
-
-# Regardless of test result, stop the container
+# Always clean up the container
 trap stop_container EXIT
 
+start_container "false"
 await_server_ready
 
-echo Running tests
+#######################
+# Smoke Tests
+#######################
+echo Running smoke tests
 PYTHONPATH=. SKIP_INFERENCE_TESTS=$SKIP_INFERENCE_TESTS pytest scripts/smoketest.py
+
+#######################
+# Test parallel vs single mode
+#######################
+echo Running parallel mode test
+
+curl http://localhost:$API_PORT/general/v0/general --form 'files=@sample-docs/layout-parser-paper.pdf' --form 'strategy=fast' | jq -S > single-mode.json
+
+stop_container
+start_container "true"
+await_server_ready
+
+curl http://localhost:$API_PORT/general/v0/general --form 'files=@sample-docs/layout-parser-paper.pdf' --form 'strategy=fast' | jq -S > parallel-mode.json
+
+if ! diff -u single-mode.json parallel-mode.json ; then
+    echo Parallel mode received a different output!
+    exit 1
+fi
+
+rm single-mode.json parallel-mode.json
 
 result=$?
 exit $result

@@ -178,7 +178,6 @@ def test_parallel_mode_correct_result(monkeypatch):
         files=[("files", (str(test_file), open(test_file, "rb"), "application/pdf"))],
     )
 
-    print(response.text)
     assert response.status_code == 200
     result_parallel = response.json()
 
