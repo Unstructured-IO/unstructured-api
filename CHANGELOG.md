@@ -1,3 +1,7 @@
+## 0.0.24
+
+* Add support for `ocr_only` strategy and `ocr_languages` parameter
+
 ## 0.0.23
 
 * Add support for csv files
