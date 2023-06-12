@@ -159,9 +159,8 @@ def pipeline_api(
         )
 
     # Note (austin) - there is no fast mode for images
-    # In this case we need to use hi_res
-    if file_content_type in ["image/jpeg", "image/png"]:
-        strategy = "hi_res"
+    if file_content_type in ["image/jpeg", "image/png"] and strategy == "fast":
+        strategy = "auto"
 
     show_coordinates_str = (m_coordinates[0] if len(m_coordinates) else "false").lower()
     show_coordinates = show_coordinates_str == "true"
