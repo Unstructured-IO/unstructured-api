@@ -1,6 +1,7 @@
 ## 0.0.24
 
 * Add support for `ocr_only` strategy and `ocr_languages` parameter
+* Remove building `detectron2` from source in Dockerfile
 
 ## 0.0.23
 
