@@ -140,7 +140,7 @@ execnb==0.1.5
     # via nbdev
 executing==1.2.0
     # via stack-data
-fastapi==0.96.0
+fastapi==0.97.0
     # via
     #   -r requirements/base.txt
     #   unstructured-api-tools
@@ -153,19 +153,23 @@ fastjsonschema==2.17.1
     # via
     #   -r requirements/base.txt
     #   nbformat
-filelock==3.12.0
+filelock==3.12.1
     # via
     #   -r requirements/base.txt
     #   huggingface-hub
     #   torch
     #   transformers
+filetype==1.2.0
+    # via
+    #   -r requirements/base.txt
+    #   unstructured
 flake8==6.0.0
     # via -r requirements/test.in
 flatbuffers==23.5.26
     # via
     #   -r requirements/base.txt
     #   onnxruntime
-fonttools==4.39.4
+fonttools==4.40.0
     # via
     #   -r requirements/base.txt
     #   matplotlib
@@ -515,7 +519,7 @@ pkgutil-resolve-name==1.3.10
     # via
     #   -r requirements/base.txt
     #   jsonschema
-platformdirs==3.5.1
+platformdirs==3.5.3
     # via
     #   -r requirements/base.txt
     #   black
@@ -590,7 +594,7 @@ pytesseract==0.3.10
     # via
     #   -r requirements/base.txt
     #   layoutparser
-pytest==7.3.1
+pytest==7.3.2
     # via pytest-cov
 pytest-cov==4.1.0
     # via -r requirements/test.in
@@ -815,7 +819,7 @@ types-requests==2.31.0.1
     # via
     #   -r requirements/base.txt
     #   unstructured-api-tools
-types-ujson==5.7.0.5
+types-ujson==5.8.0.0
     # via
     #   -r requirements/base.txt
     #   unstructured-api-tools
@@ -837,9 +841,9 @@ typing-extensions==4.6.3
     #   starlette
     #   torch
     #   typer
-unstructured[local-inference]==0.7.3
+unstructured[local-inference]==0.7.4
     # via -r requirements/base.txt
-unstructured-api-tools==0.10.6
+unstructured-api-tools==0.10.7
     # via -r requirements/base.txt
 unstructured-inference==0.5.1
     # via

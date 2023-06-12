@@ -60,18 +60,20 @@ et-xmlfile==1.1.0
     # via openpyxl
 exceptiongroup==1.1.1
     # via anyio
-fastapi==0.96.0
+fastapi==0.97.0
     # via unstructured-api-tools
 fastjsonschema==2.17.1
     # via nbformat
-filelock==3.12.0
+filelock==3.12.1
     # via
     #   huggingface-hub
     #   torch
     #   transformers
+filetype==1.2.0
+    # via unstructured
 flatbuffers==23.5.26
     # via onnxruntime
-fonttools==4.39.4
+fonttools==4.40.0
     # via matplotlib
 fsspec==2023.6.0
     # via huggingface-hub
@@ -229,7 +231,7 @@ pillow==9.5.0
     #   unstructured
 pkgutil-resolve-name==1.3.10
     # via jsonschema
-platformdirs==3.5.1
+platformdirs==3.5.3
     # via jupyter-core
 portalocker==2.7.0
     # via iopath
@@ -369,7 +371,7 @@ typer==0.9.0
     # via argilla
 types-requests==2.31.0.1
     # via unstructured-api-tools
-types-ujson==5.7.0.5
+types-ujson==5.8.0.0
     # via unstructured-api-tools
 types-urllib3==1.26.25.13
     # via types-requests
@@ -384,9 +386,9 @@ typing-extensions==4.6.3
     #   starlette
     #   torch
     #   typer
-unstructured[local-inference]==0.7.3
+unstructured[local-inference]==0.7.4
     # via -r requirements/base.in
-unstructured-api-tools==0.10.6
+unstructured-api-tools==0.10.7
     # via -r requirements/base.in
 unstructured-inference==0.5.1
     # via unstructured
