@@ -2,6 +2,7 @@
 
 * Add support for `ocr_only` strategy and `ocr_languages` parameter
 * Remove building `detectron2` from source in Dockerfile
+* Convert strategy from fast to auto for images since there is no fast strategy for images
 
 ## 0.0.23
 
