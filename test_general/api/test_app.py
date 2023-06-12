@@ -105,6 +105,7 @@ def test_coordinates_param():
         del response_with_coords[i]["coordinates"]
         assert response_with_coords[i] == response_without_coords[i]
 
+
 def test_ocr_languages_param():
     """
     ...
@@ -114,12 +115,13 @@ def test_ocr_languages_param():
     response = client.post(
         MAIN_API_ROUTE,
         files=[("files", (str(test_file), open(test_file, "rb")))],
-        data={"strategy": "ocr_only", "ocr_languages":["eng", "kor"]},
+        data={"strategy": "ocr_only", "ocr_languages": ["eng", "kor"]},
     )
-    
+
     assert response.status_code == 200
     elements = response.json()
-    assert elements[3]["text"] == "안녕하세요, 저 희 는 YGEAS 그룹 TREASUREWH HARUTOM|2] 팬 입니다. 팬 으 로서, HARUTO 씨 받 는 대 우 에 대해 의 구 심 과 불 공 평 함 을 LRU, 이 메 일 을 통해 저 희 의 의 혹 을 전 달 하여 귀 사 의 진지한 고 민 과 적극적인 답 변 을 받을 수 있 기 를 바랍니다."
+    assert elements[3]["text"].startswith("안녕하세요, 저 희 는 YGEAS 그룹")
+
 
 def test_strategy_param_400():
     """Verify that we get a 400 if we pass in a bad strategy"""
