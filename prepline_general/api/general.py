@@ -184,7 +184,8 @@ def pipeline_api(
         df["filename"] = os.path.basename(filename)
         if not show_coordinates:
             df.drop(columns=["coordinates"], inplace=True)
-        return df.to_csv()
+
+        return df.to_csv(index=False)
 
     result = convert_to_isd(elements)
     for element in result:

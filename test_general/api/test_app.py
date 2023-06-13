@@ -1,8 +1,11 @@
 from pathlib import Path
 
 import json
+import io
 import pytest
 import requests
+import ast
+import pandas as pd
 from fastapi.testclient import TestClient
 from unstructured_api_tools.pipelines.api_conventions import get_pipeline_path
 
@@ -74,6 +77,49 @@ def test_general_api(example_filename, content_type):
     assert all(x["metadata"]["filename"] == example_filename for i in response.json() for x in i)
 
     assert len(response.json()) > 0
+
+
+@pytest.mark.parametrize(
+    "example_filename, content_type",
+    [
+        pytest.param("fake-email.msg", None, marks=pytest.mark.xfail(reason="See CORE-1148")),
+        ("spring-weather.html.json", None),
+        ("alert.eml", None),
+        ("announcement.eml", None),
+        ("fake-email-attachment.eml", None),
+        ("fake-email-image-embedded.eml", None),
+        ("fake-email.eml", None),
+        ("fake-html.html", "text/html"),
+        pytest.param(
+            "fake-power-point.ppt",
+            "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+            marks=pytest.mark.xfail(reason="See CORE-796"),
+        ),
+        ("fake-text.txt", "text/plain"),
+        pytest.param(
+            "fake.doc",
+            "application/msword",
+            marks=pytest.mark.xfail(reason="Encoding not supported yet"),
+        ),
+        ("fake.docx", "application/vnd.openxmlformats-officedocument.wordprocessingml.document"),
+        ("family-day.eml", None),
+        pytest.param("fake-excel.xlsx", None, marks=pytest.mark.xfail(reason="not supported yet")),
+        ("layout-parser-paper.pdf", "application/pdf"),
+        ("layout-parser-paper-fast.jpg", "image/jpeg"),
+    ],
+)
+def test_general_csv(example_filename, content_type):
+    client = TestClient(app)
+    test_file = Path("sample-docs") / example_filename
+    response = client.post(
+        MAIN_API_ROUTE,
+        files=[("files", (str(test_file), open(test_file, "rb"), content_type))],
+        data={"output_format": "text/csv"},
+    )
+    assert response.status_code == 200
+    df = pd.read_csv(io.StringIO(ast.literal_eval(response.text)))
+    assert len(df) > 0
+    assert len(df.columns) > 0
 
 
 def test_coordinates_param():
