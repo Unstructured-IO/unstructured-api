@@ -172,11 +172,6 @@ def pipeline_api(
             status_code=400, detail=f"Invalid strategy: {strategy}. Must be one of {strategies}"
         )
 
-    # Note (austin) - there is no fast mode for images
-    # In this case we need to use hi_res
-    if file_content_type == "image/jpeg":
-        strategy = "hi_res"
-
     show_coordinates_str = (m_coordinates[0] if len(m_coordinates) else "false").lower()
     show_coordinates = show_coordinates_str == "true"
 
