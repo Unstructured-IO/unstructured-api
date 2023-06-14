@@ -6,7 +6,7 @@ from pathlib import Path
 import pytest
 import requests
 from unstructured.partition.auto import partition
-from unstructured.staging.base import convert_to_csv, convert_to_isd
+from unstructured.staging.base import convert_to_csv, convert_to_isd, dict_to_elements
 
 API_URL = "http://localhost:8000/general/v0/general"
 # NOTE(rniko): Skip inference tests if we're running on an emulated architecture
@@ -126,6 +126,7 @@ def test_happy_path(example_filename, content_type, output_format, strategy):
             for element in result:
                 element['metadata']['filename'] = os.path.basename(str(test_file))
                 del element['coordinates']
+            elements = dict_to_elements(result)
             assert response.json() == convert_to_csv(elements)
     else:
         assert len("".join(elem["text"] for elem in response.json())) > 20
