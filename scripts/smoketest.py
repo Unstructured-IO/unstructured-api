@@ -53,53 +53,18 @@ def test_happy_path(example_filename, content_type):
     and some structured response
     """
     test_file = Path("sample-docs") / example_filename
-    response = send_document(test_file, content_type)
+    json_response = send_document(test_file, content_type)
 
-    assert(response.status_code == 200)
-    assert len(response.json()) > 0
-    assert len("".join(elem["text"] for elem in response.json())) > 20
+    assert(json_response.status_code == 200)
+    assert len(json_response.json()) > 0
+    assert len("".join(elem["text"] for elem in json_response.json())) > 20
 
 
-@pytest.mark.parametrize(
-    "example_filename, content_type",
-    [
-        ("alert.eml", "message/rfc822"),
-        ("announcement.eml", "message/rfc822"),
-        ("fake-email-attachment.eml", "message/rfc822"),
-        ("fake-email-image-embedded.eml", "message/rfc822"),
-        ("fake-email.eml", "message/rfc822"),
-        ("fake-html.html", "text/html"),
-        ("fake-power-point.ppt", "application/vnd.openxmlformats-officedocument.presentationml.presentation"),
-        ("fake-text.txt", "text/plain"),
-        ("fake.doc", "application/msword"),
-        ("fake.docx", "application/vnd.openxmlformats-officedocument.wordprocessingml.document"),
-        ("family-day.eml", "message/rfc822"),
-        ("winter-sports.epub", "application/epub"),
-        ("fake-doc.rtf", "application/rtf"),
-        ("fake.odt", "application/vnd.oasis.opendocument.text"),
-        ("stanley-cups.csv", "application/csv"),
-        pytest.param("fake-excel.xlsx", None, marks=pytest.mark.xfail(reason="not supported yet")),
-        # Note(austin) The two inference calls will hang on mac with unsupported hardware error
-        # Skip these with SKIP_INFERENCE_TESTS=true make docker-test
-        pytest.param("layout-parser-paper.pdf", "application/pdf", marks=pytest.mark.skipif(
-            skip_inference_tests, reason="emulated architecture")
-        ),
-        pytest.param("layout-parser-paper-fast.jpg", "image/jpeg", marks=pytest.mark.skipif(
-            skip_inference_tests, reason="emulated architecture")
-        )
-    ]
-)
-def test_csv_output(example_filename, content_type):
-    """
-    For the files in sample-docs, verify that we get a 200
-    and some structured response
-    """
-    test_file = Path("sample-docs") / example_filename
-    response = send_document(test_file, content_type, output_format="text/csv")
-
-    assert(response.status_code == 200)
-    df = pd.read_csv(io.StringIO(ast.literal_eval(response.text)))
-    assert len(df) > 0
+    csv_response = send_document(test_file, content_type, output_format="text/csv")
+    assert csv_response.status_code == 200
+    assert len(csv_response.text) > 0
+    df = pd.read_csv(io.StringIO(ast.literal_eval(csv_response.text)))
+    assert len(df) == len(json_response.json())
 
 
 

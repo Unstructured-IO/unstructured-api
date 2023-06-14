@@ -1,4 +1,5 @@
 from pathlib import Path
+from typing import List
 
 import json
 import io
@@ -14,6 +15,14 @@ from unstructured.partition.auto import partition
 import tempfile
 
 MAIN_API_ROUTE = get_pipeline_path("general")
+
+
+def multifile_response_to_dfs(resp: requests.Response) -> List[pd.DataFrame]:
+    s = resp.text.split(',"')
+    s[0] = s[0][1:]
+    s[-1] = s[-1][:-1]
+    s[1:] = [f'"{x}' for x in s[1:]]
+    return [pd.read_csv(io.StringIO(ast.literal_eval(i))) for i in s]
 
 
 def test_general_api_health_check():
@@ -78,48 +87,17 @@ def test_general_api(example_filename, content_type):
 
     assert len(response.json()) > 0
 
-
-@pytest.mark.parametrize(
-    "example_filename, content_type",
-    [
-        pytest.param("fake-email.msg", None, marks=pytest.mark.xfail(reason="See CORE-1148")),
-        ("spring-weather.html.json", None),
-        ("alert.eml", None),
-        ("announcement.eml", None),
-        ("fake-email-attachment.eml", None),
-        ("fake-email-image-embedded.eml", None),
-        ("fake-email.eml", None),
-        ("fake-html.html", "text/html"),
-        pytest.param(
-            "fake-power-point.ppt",
-            "application/vnd.openxmlformats-officedocument.presentationml.presentation",
-            marks=pytest.mark.xfail(reason="See CORE-796"),
-        ),
-        ("fake-text.txt", "text/plain"),
-        pytest.param(
-            "fake.doc",
-            "application/msword",
-            marks=pytest.mark.xfail(reason="Encoding not supported yet"),
-        ),
-        ("fake.docx", "application/vnd.openxmlformats-officedocument.wordprocessingml.document"),
-        ("family-day.eml", None),
-        pytest.param("fake-excel.xlsx", None, marks=pytest.mark.xfail(reason="not supported yet")),
-        ("layout-parser-paper.pdf", "application/pdf"),
-        ("layout-parser-paper-fast.jpg", "image/jpeg"),
-    ],
-)
-def test_general_csv(example_filename, content_type):
-    client = TestClient(app)
-    test_file = Path("sample-docs") / example_filename
-    response = client.post(
+    csv_response = client.post(
         MAIN_API_ROUTE,
-        files=[("files", (str(test_file), open(test_file, "rb"), content_type))],
+        files=[
+            ("files", (str(test_file), open(test_file, "rb"), content_type)),
+            ("files", (str(test_file), open(test_file, "rb"), content_type)),
+        ],
         data={"output_format": "text/csv"},
     )
-    assert response.status_code == 200
-    df = pd.read_csv(io.StringIO(ast.literal_eval(response.text)))
-    assert len(df) > 0
-    assert len(df.columns) > 0
+    assert csv_response.status_code == 200
+    dfs = multifile_response_to_dfs(csv_response)
+    assert len(response.json()) == len(dfs)
 
 
 def test_coordinates_param():
