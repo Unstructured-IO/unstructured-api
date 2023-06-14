@@ -19,13 +19,11 @@ SKIP_INFERENCE_TESTS="${SKIP_INFERENCE_TESTS:-false}"
 
 start_container() {
     echo Starting container "$CONTAINER_NAME"
-    use_parallel_mode=$1
 
     docker run -p $API_PORT:$API_PORT \
            -d \
            --rm \
            --name "$CONTAINER_NAME" \
-           --env "UNSTRUCTURED_PARALLEL_MODE_ENABLED=$use_parallel_mode" \
            --env "UNSTRUCTURED_PARALLEL_MODE_URL=http://localhost:$API_PORT/general/v0/general" \
            "$DOCKER_IMAGE" \
            --port $API_PORT --host 0.0.0.0
@@ -59,7 +57,7 @@ stop_container() {
 # Always clean up the container
 trap stop_container EXIT
 
-start_container "false"
+start_container
 await_server_ready
 
 #######################
