@@ -1,6 +1,10 @@
-## 0.0.24-dev0
+## 0.0.25
 
-* Add more testing to parallel mode
+* Add smoke test for parallel mode and refactor
+
+## 0.0.24
+
+* Add returning text/csv to pipeline_api
 
 ## 0.0.23
 

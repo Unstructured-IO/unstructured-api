@@ -22,7 +22,7 @@ from functools import partial
 from PyPDF2 import PdfReader, PdfWriter
 from unstructured.partition.auto import partition
 from unstructured.partition.json import partition_json
-from unstructured.staging.base import convert_to_isd
+from unstructured.staging.base import convert_to_isd, convert_to_dataframe
 import tempfile
 import pdfminer
 import requests
@@ -218,6 +218,14 @@ def pipeline_api(
         raise e
     except pdfminer.pdfparser.PDFSyntaxError:
         raise HTTPException(status_code=400, detail=f"{filename} does not appear to be a valid PDF")
+
+    if response_type == "text/csv":
+        df = convert_to_dataframe(elements)
+        df["filename"] = os.path.basename(filename)
+        if not show_coordinates:
+            df.drop(columns=["coordinates"], inplace=True)
+
+        return df.to_csv(index=False)
 
     result = convert_to_isd(elements)
     for element in result:
