@@ -79,6 +79,10 @@ def send_document(filename, content_type, strategy="fast", output_format="applic
         ("fake.doc.gz", "application/msword", "application/json", "fast"),
         ("fake.docx.gz", "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "application/json", "fast"),
         ("family-day.eml.gz", "message/rfc822", "application/json", "fast"),
+        ("winter-sports.epub.gz", "application/epub", "application/json", "fast"),
+        ("fake-doc.rtf.gz", "application/rtf", "application/json", "fast"),
+        ("fake.odt.gz", "application/vnd.oasis.opendocument.text", "application/json", "fast"),
+        ("stanley-cups.csv.gz", "application/csv", "application/json", "fast"),
         pytest.param("fake-excel.xlsx.gz", None, "application/json", "fast", marks=pytest.mark.xfail(reason="not supported yet")),
         pytest.param("layout-parser-paper.pdf.gz", "application/pdf", "application/json", "fast", marks=pytest.mark.skipif(
             skip_inference_tests, reason="emulated architecture")
@@ -96,6 +100,10 @@ def send_document(filename, content_type, strategy="fast", output_format="applic
         ("fake.doc.gz", "application/msword", "text/csv", "fast"),
         ("fake.docx.gz", "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "text/csv", "fast"),
         ("family-day.eml.gz", "message/rfc822", "text/csv", "fast"),
+        ("winter-sports.epub.gz", "application/epub", "text/csv", "fast"),
+        ("fake-doc.rtf.gz", "application/rtf", "text/csv", "fast"),
+        ("fake.odt.gz", "application/vnd.oasis.opendocument.text", "text/csv", "fast"),
+        ("stanley-cups.csv", "application/csv", "text/csv", "fast"),
         pytest.param("fake-excel.xlsx.gz", None, "text/csv", "fast", marks=pytest.mark.xfail(reason="not supported yet")),
         pytest.param("layout-parser-paper.pdf.gz", "application/pdf", "text/csv", "fast", marks=pytest.mark.skipif(
             skip_inference_tests, reason="emulated architecture")
