@@ -22,7 +22,7 @@ from functools import partial
 from PyPDF2 import PdfReader, PdfWriter
 from unstructured.partition.api import partition_via_api
 from unstructured.partition.auto import partition
-from unstructured.staging.base import convert_to_isd
+from unstructured.staging.base import convert_to_isd, convert_to_dataframe
 import tempfile
 import pdfminer
 
@@ -182,6 +182,14 @@ def pipeline_api(
     except pdfminer.pdfparser.PDFSyntaxError:
         raise HTTPException(status_code=400, detail=f"{filename} does not appear to be a valid PDF")
 
+    if response_type == "text/csv":
+        df = convert_to_dataframe(elements)
+        df["filename"] = os.path.basename(filename)
+        if not show_coordinates:
+            df.drop(columns=["coordinates"], inplace=True)
+
+        return df.to_csv(index=False)
+
     result = convert_to_isd(elements)
     for element in result:
         element["metadata"]["filename"] = os.path.basename(filename)
@@ -302,7 +310,7 @@ def ungz_file(file: UploadFile, gz_uncompressed_content_type=None) -> UploadFile
 
 
 @router.post("/general/v0/general")
-@router.post("/general/v0.0.23/general")
+@router.post("/general/v0.0.24/general")
 def pipeline_1(
     request: Request,
     gz_uncompressed_content_type: Optional[str] = Form(default=None),
