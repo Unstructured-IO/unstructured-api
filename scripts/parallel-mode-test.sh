@@ -1,4 +1,4 @@
-#/bin/bash
+#!/bin/bash
 
 # parallel-mode-test.sh
 # Iterate a list of curl commands, and run each one with parallel mode enabled/disabled.
@@ -30,7 +30,7 @@ trap "rm -f output.json parallel_output.json" EXIT
 for params in "${curl_params[@]}"
 do
    curl_command="curl $base_url/general/v0/general $params"
-   echo Testing: $curl_command
+   echo Testing: "$curl_command"
 
    # Run in single mode
    $curl_command 2> /dev/null | jq -S > output.json
@@ -48,7 +48,7 @@ do
 
    if ! diff -u output.json parallel_output.json ; then
        echo Parallel mode received a different output!
-       echo Params: $params
+       echo Params: "$params"
        exit 1
    fi
 

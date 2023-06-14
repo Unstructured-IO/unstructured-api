@@ -1,6 +1,5 @@
 #!/bin/bash
 
-set -e
 
 # docker-smoke-test.sh
 # Start the containerized api and run some end-to-end tests against it
@@ -9,6 +8,8 @@ set -e
 # Also note this can evolve into a generalized pipeline smoke test
 
 # shellcheck disable=SC2317  # Shellcheck complains that trap functions are unreachable...
+
+set -e
 
 CONTAINER_NAME=unstructured-api-smoke-test
 PIPELINE_FAMILY=${PIPELINE_FAMILY:-"general"}
