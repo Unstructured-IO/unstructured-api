@@ -18,7 +18,7 @@ from base64 import b64encode
 from typing import Optional, Mapping, Iterator, Tuple
 import secrets
 from unstructured.partition.auto import partition
-from unstructured.staging.base import convert_to_isd, convert_to_csv
+from unstructured.staging.base import convert_to_isd, convert_to_csv, dict_to_elements
 import tempfile
 import pdfminer
 
@@ -95,6 +95,7 @@ def pipeline_api(
         if not show_coordinates:
             del element["coordinates"]
     if response_type == "text/csv":
+        elements = dict_to_elements(result)
         result = convert_to_csv(elements)
     return result
 
