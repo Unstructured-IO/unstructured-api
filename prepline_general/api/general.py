@@ -41,9 +41,6 @@ def is_expected_response_type(media_type, response_type):
         return False
 
 
-# pipeline-api
-
-
 DEFAULT_MIMETYPES = (
     "application/pdf,application/msword,image/jpeg,image/png,text/markdown,"
     "text/x-markdown,text/html,"
@@ -91,9 +88,15 @@ def get_pdf_splits(pdf, split_size=1):
     return split_pdfs
 
 
-def partition_file_via_api(file_tuple, request, filename, content_type, **request_kwargs):
+def partition_file_via_api(file_tuple, request, filename, content_type, **partition_kwargs):
     """
-    Given a file-like, use partition_via_api to retrieve its elements.
+    Send the given file to be partitioned remotely, where the remote url is set by env var.
+
+    Args:
+    file_tuple is in the form (file, page_offest)
+    request is used to forward the api key header
+    filename and content_type are passed in the file form data
+    partition_kwargs holds any form parameters to be sent on
     """
     request_url = os.environ.get("UNSTRUCTURED_PARALLEL_MODE_URL")
 
@@ -107,7 +110,7 @@ def partition_file_via_api(file_tuple, request, filename, content_type, **reques
     response = requests.post(
         request_url,
         files={"files": (filename, file, content_type)},
-        data=request_kwargs,
+        data=partition_kwargs,
         headers=headers,
     )
 
@@ -124,9 +127,19 @@ def partition_file_via_api(file_tuple, request, filename, content_type, **reques
     return elements
 
 
-def partition_pdf_splits(request, file, file_filename, content_type, coordinates, **request_kwargs):
+def partition_pdf_splits(
+    request, file, file_filename, content_type, coordinates, **partition_kwargs
+):
     """
-    Split up a pdf and process in parallel by sending back into the api
+    Split a pdf into chunks and process in parallel with more api calls, or partition
+    locally if the chunk is small enough. As soon as any remote call fails, bubble up
+    the error.
+
+    Arguments:
+    request is used to forward relevant headers to the api calls
+    file, file_filename and content_type are passed on in the file argument to requests.post
+    coordinates is passed on to the api calls, but cannot be used in the local partition case
+    partition_kwargs holds any others parameters that will be forwarded, or passed to partition
     """
     pages_per_pdf = 1
     pdf = PdfReader(file)
@@ -134,11 +147,11 @@ def partition_pdf_splits(request, file, file_filename, content_type, coordinates
     # If it's small enough, just process locally
     if len(pdf.pages) <= pages_per_pdf:
         return partition(
-            file=file, file_filename=file_filename, content_type=content_type, **request_kwargs
+            file=file, file_filename=file_filename, content_type=content_type, **partition_kwargs
         )
 
     results = []
-    pages = get_pdf_splits(pdf, split_size=pages_per_pdf)
+    page_tuples = get_pdf_splits(pdf, split_size=pages_per_pdf)
 
     partition_func = partial(
         partition_file_via_api,
@@ -146,11 +159,11 @@ def partition_pdf_splits(request, file, file_filename, content_type, coordinates
         filename=file_filename,
         content_type=content_type,
         coordinates=coordinates,
-        **request_kwargs,
+        **partition_kwargs,
     )
 
     with ThreadPoolExecutor() as executor:
-        for result in executor.map(partition_func, pages):
+        for result in executor.map(partition_func, page_tuples):
             results.extend(result)
 
     return results
@@ -162,6 +175,7 @@ def pipeline_api(
     filename="",
     m_strategy=[],
     m_coordinates=[],
+    m_use_parallel_mode=[],
     file_content_type=None,
     response_type="application/json",
 ):
@@ -175,9 +189,12 @@ def pipeline_api(
     show_coordinates_str = (m_coordinates[0] if len(m_coordinates) else "false").lower()
     show_coordinates = show_coordinates_str == "true"
 
-    pdf_parallel_mode_enabled = (
-        os.environ.get("UNSTRUCTURED_PARALLEL_MODE_ENABLED", "false") == "true"
-    )
+    # Parallel mode is set by env variable, but can be overridden with a request parameter
+    enable_parallel_mode = os.environ.get("UNSTRUCTURED_PARALLEL_MODE_ENABLED", "false")
+    if len(m_use_parallel_mode):
+        enable_parallel_mode = m_use_parallel_mode[0].lower()
+
+    pdf_parallel_mode_enabled = enable_parallel_mode == "true"
 
     try:
         if file_content_type == "application/pdf" and pdf_parallel_mode_enabled:
@@ -330,6 +347,7 @@ def pipeline_1(
     output_format: Union[str, None] = Form(default=None),
     strategy: List[str] = Form(default=[]),
     coordinates: List[str] = Form(default=[]),
+    use_parallel_mode: List[str] = Form(default=[]),
 ):
     if files:
         for file_index in range(len(files)):
@@ -366,6 +384,7 @@ def pipeline_1(
                     request=request,
                     m_strategy=strategy,
                     m_coordinates=coordinates,
+                    m_use_parallel_mode=use_parallel_mode,
                     response_type=media_type,
                     filename=file.filename,
                     file_content_type=file_content_type,
