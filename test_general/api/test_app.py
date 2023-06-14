@@ -49,7 +49,9 @@ def test_general_api_health_check():
         pytest.param(
             "layout-parser-paper-fast.jpg",
             "image/jpeg",
-            marks=pytest.mark.xfail(reason="Images do not support the default strategy=fast (CORE-1294)"),
+            marks=pytest.mark.xfail(
+                reason="Images do not support the default strategy=fast (CORE-1294)"
+            ),
         ),
     ],
 )
@@ -98,8 +100,7 @@ def test_coordinates_param():
     response = client.post(
         MAIN_API_ROUTE,
         files=[("files", (str(test_file), open(test_file, "rb")))],
-        data={"coordinates": "true",
-              "strategy": "hi_res"},
+        data={"coordinates": "true", "strategy": "hi_res"},
     )
 
     assert response.status_code == 200
