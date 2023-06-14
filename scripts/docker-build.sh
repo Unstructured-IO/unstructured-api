@@ -6,6 +6,8 @@ PIPELINE_PACKAGE=${PIPELINE_PACKAGE:-"general"}
 PIPELINE_FAMILY=${PIPELINE_FAMILY:-"general"}
 PIP_VERSION="${PIP_VERSION:-22.2.1}"
 DOCKER_IMAGE="${DOCKER_IMAGE:-pipeline-family-${PIPELINE_FAMILY}-dev}"
+DOCKER_PLATFORM="${DOCKER_PLATFORM:-}"
+
 
 DOCKER_BUILD_CMD=(docker buildx build --load -f Dockerfile \
   --build-arg PIP_VERSION="$PIP_VERSION" \

@@ -32,7 +32,40 @@ def send_document(filename, content_type, strategy="fast", output_format="applic
         ("fake.doc", "application/msword", "application/json", "fast"),
         ("fake.docx", "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "application/json", "fast"),
         ("family-day.eml", "message/rfc822", "application/json", "fast"),
+        ("winter-sports.epub", "application/epub", "application/json", "fast"),
+        ("fake-doc.rtf", "application/rtf", "application/json", "fast"),
+        ("fake.odt", "application/vnd.oasis.opendocument.text", "application/json", "fast"),
+        ("stanley-cups.csv", "application/csv", "application/json", "fast"),
         pytest.param("fake-excel.xlsx", None, "application/json", "fast", marks=pytest.mark.xfail(reason="not supported yet")),
+        # Note(austin) The two inference calls will hang on mac with unsupported hardware error
+        # Skip these with SKIP_INFERENCE_TESTS=true make docker-test
+        pytest.param("layout-parser-paper.pdf", "application/pdf", "application/json", "fast", marks=pytest.mark.skipif(
+            skip_inference_tests, reason="emulated architecture")
+        ),
+        pytest.param("layout-parser-paper-fast.jpg", "image/jpeg", "application/json", "fast", marks=pytest.mark.skipif(
+            skip_inference_tests, reason="emulated architecture")
+        ),
+        ("fake-text.txt", "text/plain", "text/csv", "fast"),
+        ("announcement.eml", "message/rfc822", "text/csv", "fast"),
+        ("fake-email-attachment.eml", "message/rfc822", "text/csv", "fast"),
+        ("fake-email-image-embedded.eml", "message/rfc822", "text/csv", "fast"),
+        ("fake-email.eml", "message/rfc822", "text/csv", "fast"),
+        ("fake-html.html", "text/html", "text/csv", "fast"),
+        ("fake-power-point.ppt", "application/vnd.openxmlformats-officedocument.presentationml.presentation", "text/csv", "fast"),
+        ("fake.doc", "application/msword", "text/csv", "fast"),
+        ("fake.docx", "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "text/csv", "fast"),
+        ("family-day.eml", "message/rfc822", "text/csv", "fast"),
+        ("winter-sports.epub", "application/epub", "text/csv", "fast"),
+        ("fake-doc.rtf", "application/rtf", "text/csv", "fast"),
+        ("fake.odt", "application/vnd.oasis.opendocument.text", "text/csv", "fast"),
+        ("stanley-cups.csv", "application/csv", "text/csv", "fast"),
+        pytest.param("fake-excel.xlsx", None, "text/csv", "fast", marks=pytest.mark.xfail(reason="not supported yet")),
+        pytest.param("layout-parser-paper.pdf", "application/pdf", "text/csv", "fast", marks=pytest.mark.skipif(
+            skip_inference_tests, reason="emulated architecture")
+        ),
+        pytest.param("layout-parser-paper-fast.jpg", "image/jpeg", "text/csv", "fast", marks=pytest.mark.skipif(
+            skip_inference_tests, reason="emulated architecture")
+        ),
         # Note(austin) The two inference calls will hang on mac with unsupported hardware error
         # Skip these with SKIP_INFERENCE_TESTS=true make docker-test
         pytest.param("layout-parser-paper.pdf", "application/pdf", "application/json", "fast", marks=pytest.mark.skipif(

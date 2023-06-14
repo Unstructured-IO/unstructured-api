@@ -1,6 +1,20 @@
+## 0.0.23
+
+* Add support for csv files
+* Add returning text/csv to pipeline_api
+
+## 0.0.22
+
+* Add parallel processing mode for pages within a pdf
+
+## 0.0.21
+
+* Bump version of base image to use new stable version of tesseract
+* Bump to unstructured==0.7.1 for various bug fixes.
+
 ## 0.0.20
 
-* Add returning text/csv to pipeline_api
+* Supports additional filetypes: epub, odt, rft
 
 ## 0.0.19
 
