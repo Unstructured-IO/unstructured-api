@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 # docker-smoke-test.sh
 # Start the containerized api and run some end-to-end tests against it
 # There will be some overlap with just running a TestClient in the unit tests

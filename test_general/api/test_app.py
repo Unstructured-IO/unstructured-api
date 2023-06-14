@@ -46,7 +46,11 @@ def test_general_api_health_check():
         ("family-day.eml", None),
         pytest.param("fake-excel.xlsx", None, marks=pytest.mark.xfail(reason="not supported yet")),
         ("layout-parser-paper.pdf", "application/pdf"),
-        ("layout-parser-paper-fast.jpg", "image/jpeg"),
+        pytest.param(
+            "layout-parser-paper-fast.jpg",
+            "image/jpeg",
+            marks=pytest.mark.xfail(reason="Images do not support the default strategy=fast (CORE-1294)"),
+        ),
     ],
 )
 def test_general_api(example_filename, content_type):
@@ -85,6 +89,7 @@ def test_coordinates_param():
     response = client.post(
         MAIN_API_ROUTE,
         files=[("files", (str(test_file), open(test_file, "rb")))],
+        data={"strategy": "hi_res"},
     )
 
     assert response.status_code == 200
@@ -93,7 +98,8 @@ def test_coordinates_param():
     response = client.post(
         MAIN_API_ROUTE,
         files=[("files", (str(test_file), open(test_file, "rb")))],
-        data={"coordinates": "true"},
+        data={"coordinates": "true",
+              "strategy": "hi_res"},
     )
 
     assert response.status_code == 200
