@@ -158,10 +158,6 @@ def pipeline_api(
             status_code=400, detail=f"Invalid strategy: {strategy}. Must be one of {strategies}"
         )
 
-    # Note (austin) - there is no fast mode for images
-    if file_content_type in ["image/jpeg", "image/png"] and strategy == "fast":
-        strategy = "auto"
-
     show_coordinates_str = (m_coordinates[0] if len(m_coordinates) else "false").lower()
     show_coordinates = show_coordinates_str == "true"
 
@@ -325,7 +321,7 @@ def ungz_file(file: UploadFile, gz_uncompressed_content_type=None) -> UploadFile
 
 
 @router.post("/general/v0/general")
-@router.post("/general/v0.0.24/general")
+@router.post("/general/v0.0.25/general")
 def pipeline_1(
     request: Request,
     gz_uncompressed_content_type: Optional[str] = Form(default=None),
