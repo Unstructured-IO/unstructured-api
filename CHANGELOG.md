@@ -1,3 +1,7 @@
+## 0.0.25
+
+* Bump image to use python 3.8.17 instead of 3.8.15 
+
 ## 0.0.24
 
 * Add returning text/csv to pipeline_api
