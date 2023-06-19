@@ -181,7 +181,7 @@ def test_strategy_param_400():
 def test_general_api_returns_400_unsupported_file(example_filename):
     client = TestClient(app)
     test_file = Path("sample-docs") / example_filename
-    filetype = "not_valid/filetype"
+    filetype = "invalid/filetype"
     response = client.post(
         MAIN_API_ROUTE, files=[("files", (str(test_file), open(test_file, "rb"), filetype))]
     )
