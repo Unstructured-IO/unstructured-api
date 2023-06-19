@@ -53,7 +53,7 @@ def test_general_api_health_check():
         ("README.md", "text/markdown"),
         pytest.param(
             "fake-email.msg",
-            None,
+            "application/x-ole-storage",
             marks=pytest.mark.xfail(reason="See CORE-1148 & not supported yet"),
         ),
         ("fake.odt", "application/vnd.oasis.opendocument.text"),
