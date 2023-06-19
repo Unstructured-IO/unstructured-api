@@ -43,11 +43,7 @@ def test_general_api_health_check():
         ("fake-email-image-embedded.eml", None),
         ("fake-email.eml", None),
         ("fake-html.html", "text/html"),
-        pytest.param(
-            "fake-power-point.ppt",
-            "application/vnd.openxmlformats-officedocument.presentationml.presentation",
-            marks=pytest.mark.xfail(reason="See CORE-796"),
-        ),
+        ("fake-power-point.ppt", "application/vnd.ms-powerpoint"),
         ("fake-text.txt", "text/plain"),
         pytest.param(
             "fake.doc",

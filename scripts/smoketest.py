@@ -27,7 +27,7 @@ def send_document(filename, content_type, strategy="fast", output_format="applic
         ("fake-email-image-embedded.eml", "message/rfc822"),
         ("fake-email.eml", "message/rfc822"),
         ("fake-html.html", "text/html"),
-        ("fake-power-point.ppt", "application/vnd.openxmlformats-officedocument.presentationml.presentation"),
+        ("fake-power-point.ppt", "application/vnd.ms-powerpoint"),
         ("fake-text.txt", "text/plain"),
         ("fake.doc", "application/msword"),
         ("fake.docx", "application/vnd.openxmlformats-officedocument.wordprocessingml.document"),
