@@ -147,11 +147,12 @@ def pipeline_api(
     filename="",
     m_strategy=[],
     m_coordinates=[],
+    m_ocr_languages=[],
     file_content_type=None,
     response_type="application/json",
 ):
     strategy = (m_strategy[0] if len(m_strategy) else "fast").lower()
-    strategies = ["fast", "hi_res", "auto"]
+    strategies = ["fast", "hi_res", "auto", "ocr_only"]
     if strategy not in strategies:
         raise HTTPException(
             status_code=400, detail=f"Invalid strategy: {strategy}. Must be one of {strategies}"
@@ -164,14 +165,24 @@ def pipeline_api(
         os.environ.get("UNSTRUCTURED_PARALLEL_MODE_ENABLED", "false") == "true"
     )
 
+    ocr_languages = ("+".join(m_ocr_languages) if len(m_ocr_languages) else "eng").lower()
+
     try:
         if file_content_type == "application/pdf" and pdf_parallel_mode_enabled:
             elements = partition_pdf_splits(
-                file=file, file_filename=filename, content_type=file_content_type, strategy=strategy
+                file=file,
+                file_filename=filename,
+                content_type=file_content_type,
+                strategy=strategy,
+                ocr_languages=ocr_languages,
             )
         else:
             elements = partition(
-                file=file, file_filename=filename, content_type=file_content_type, strategy=strategy
+                file=file,
+                file_filename=filename,
+                content_type=file_content_type,
+                strategy=strategy,
+                ocr_languages=ocr_languages,
             )
     except ValueError as e:
         if "Invalid file" in e.args[0]:
@@ -310,7 +321,7 @@ def ungz_file(file: UploadFile, gz_uncompressed_content_type=None) -> UploadFile
 
 
 @router.post("/general/v0/general")
-@router.post("/general/v0.0.25/general")
+@router.post("/general/v0.0.26/general")
 def pipeline_1(
     request: Request,
     gz_uncompressed_content_type: Optional[str] = Form(default=None),
@@ -318,6 +329,7 @@ def pipeline_1(
     output_format: Union[str, None] = Form(default=None),
     strategy: List[str] = Form(default=[]),
     coordinates: List[str] = Form(default=[]),
+    ocr_languages: List[str] = Form(default=[]),
 ):
     if files:
         for file_index in range(len(files)):
@@ -353,6 +365,7 @@ def pipeline_1(
                     _file,
                     m_strategy=strategy,
                     m_coordinates=coordinates,
+                    m_ocr_languages=ocr_languages,
                     response_type=media_type,
                     filename=file.filename,
                     file_content_type=file_content_type,
