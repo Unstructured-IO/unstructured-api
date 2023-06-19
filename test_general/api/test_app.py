@@ -59,7 +59,7 @@ def test_general_api_health_check():
         pytest.param("fake-excel.xlsx", None, marks=pytest.mark.xfail(reason="not supported yet")),
         ("layout-parser-paper.pdf", "application/pdf"),
         ("layout-parser-paper-fast.jpg", "image/jpeg"),
-        ("README.md", None),
+        ("README.md", "text/markdown"),
     ],
 )
 def test_general_api(example_filename, content_type):
