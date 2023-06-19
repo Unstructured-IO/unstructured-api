@@ -69,11 +69,6 @@ def send_document(filename, content_type, strategy="fast", output_format="applic
         pytest.param(
             "stanley-cups.tsv", "text/tsv", marks=pytest.mark.xfail(reason="not supported yet")
         ),
-        pytest.param(
-            "fake-excel.xlsx",
-            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-            marks=pytest.mark.xfail(reason="error on empty xlsx"),
-        ),
         (
             "stanley-cups.xlsx",
             "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",

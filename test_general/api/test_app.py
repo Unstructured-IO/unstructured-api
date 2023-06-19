@@ -71,11 +71,6 @@ def test_general_api_health_check():
         pytest.param(
             "stanley-cups.tsv", "text/tsv", marks=pytest.mark.xfail(reason="not supported yet")
         ),
-        pytest.param(
-            "fake-excel.xlsx",
-            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-            marks=pytest.mark.xfail(reason="error on empty xlsx"),
-        ),
         (
             "stanley-cups.xlsx",
             "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
