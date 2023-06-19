@@ -20,7 +20,8 @@ def send_document(filename, content_type, strategy="fast", output_format="applic
 
 @pytest.mark.parametrize(
     "example_filename, content_type",
-    [
+    [   
+        ("stanley-cups.csv", "application/csv"),
         ("alert.eml", "message/rfc822"),
         ("announcement.eml", "message/rfc822"),
         ("fake-email-attachment.eml", "message/rfc822"),
@@ -35,7 +36,7 @@ def send_document(filename, content_type, strategy="fast", output_format="applic
         ("winter-sports.epub", "application/epub"),
         ("fake-doc.rtf", "application/rtf"),
         ("fake.odt", "application/vnd.oasis.opendocument.text"),
-        ("stanley-cups.csv", "application/csv"),
+        
         ("README.md", "text/markdown"),
         pytest.param("fake-excel.xlsx", None, marks=pytest.mark.xfail(reason="not supported yet")),
         # Note(austin) The two inference calls will hang on mac with unsupported hardware error

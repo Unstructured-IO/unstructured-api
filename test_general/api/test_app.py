@@ -35,16 +35,9 @@ def test_general_api_health_check():
 @pytest.mark.parametrize(
     "example_filename, content_type",
     [
-        pytest.param("fake-email.msg", None, marks=pytest.mark.xfail(reason="See CORE-1148")),
-        ("spring-weather.html.json", None),
-        ("alert.eml", None),
-        ("announcement.eml", None),
-        ("fake-email-attachment.eml", None),
-        ("fake-email-image-embedded.eml", None),
-        ("fake-email.eml", None),
-        ("fake-html.html", "text/html"),
-        ("fake-power-point.ppt", "application/vnd.ms-powerpoint"),
-        ("fake-text.txt", "text/plain"),
+        # Note(yuming): Sort filetypes alphabetically according to
+        # https://github.com/Unstructured-IO/unstructured/blob/main/unstructured/partition/auto.py#L14
+        ("stanley-cups.csv", "application/csv"),
         pytest.param(
             "fake.doc",
             "application/msword",
@@ -52,10 +45,40 @@ def test_general_api_health_check():
         ),
         ("fake.docx", "application/vnd.openxmlformats-officedocument.wordprocessingml.document"),
         ("family-day.eml", None),
-        pytest.param("fake-excel.xlsx", None, marks=pytest.mark.xfail(reason="not supported yet")),
-        ("layout-parser-paper.pdf", "application/pdf"),
+        ("alert.eml", None),
+        ("announcement.eml", None),
+        ("fake-email-attachment.eml", None),
+        ("fake-email-image-embedded.eml", None),
+        ("fake-email.eml", None),
+        ("winter-sports.epub", "application/epub"),
+        ("fake-html.html", "text/html"),
         ("layout-parser-paper-fast.jpg", "image/jpeg"),
+        ("spring-weather.html.json", None),
         ("README.md", "text/markdown"),
+        pytest.param("fake-email.msg", None, marks=pytest.mark.xfail(reason="See CORE-1148")),
+        ("fake.odt", "application/vnd.oasis.opendocument.text"),
+        ("layout-parser-paper.pdf", "application/pdf"),
+        ("fake-power-point.ppt", "application/vnd.ms-powerpoint"),
+        (
+            "fake-power-point.pptx",
+            "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+        ),
+        pytest.param(
+            "README.rst", "text/x-rst", marks=pytest.mark.xfail(reason="not supported yet")
+        ),
+        ("fake-doc.rtf", "application/rtf"),
+        ("fake-text.txt", "text/plain"),
+        pytest.param(
+            "stanley-cups.tsv", "text/tsv", marks=pytest.mark.xfail(reason="not supported yet")
+        ),
+        pytest.param(
+            "fake-excel.xlsx",
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            marks=pytest.mark.xfail(reason="not supported yet"),
+        ),
+        pytest.param(
+            "fake-xml.xml", "application/xml", marks=pytest.mark.xfail(reason="not supported yet")
+        ),
     ],
 )
 def test_general_api(example_filename, content_type):
