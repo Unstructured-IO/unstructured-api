@@ -38,11 +38,7 @@ def test_general_api_health_check():
         # Note(yuming): Please sort filetypes alphabetically according to
         # https://github.com/Unstructured-IO/unstructured/blob/main/unstructured/partition/auto.py#L14
         ("stanley-cups.csv", "application/csv"),
-        pytest.param(
-            "fake.doc",
-            "application/msword",
-            marks=pytest.mark.xfail(reason="Encoding not supported yet"),
-        ),
+        ("fake.doc", "application/msword"),
         ("fake.docx", "application/vnd.openxmlformats-officedocument.wordprocessingml.document"),
         ("family-day.eml", None),
         ("alert.eml", None),
@@ -74,7 +70,11 @@ def test_general_api_health_check():
         pytest.param(
             "fake-excel.xlsx",
             "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-            marks=pytest.mark.xfail(reason="not supported yet"),
+            marks=pytest.mark.xfail(reason="error on empty xlsx"),
+        ),
+        (
+            "stanley-cups.xlsx",
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
         ),
         pytest.param(
             "fake-xml.xml", "application/xml", marks=pytest.mark.xfail(reason="not supported yet")

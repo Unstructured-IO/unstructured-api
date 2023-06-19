@@ -40,7 +40,8 @@ def send_document(filename, content_type, strategy="fast", output_format="applic
             "layout-parser-paper-fast.jpg",
             "image/jpeg",
             marks=pytest.mark.skipif(skip_inference_tests, reason="emulated architecture"),
-        )("spring-weather.html.json", "application/json"),
+        ),
+        ("spring-weather.html.json", "application/json"),
         ("README.md", "text/markdown"),
         pytest.param("fake-email.msg", None, marks=pytest.mark.xfail(reason="See CORE-1148")),
         ("fake.odt", "application/vnd.oasis.opendocument.text"),
@@ -61,7 +62,15 @@ def send_document(filename, content_type, strategy="fast", output_format="applic
         ),
         ("fake-doc.rtf", "application/rtf"),
         ("fake-text.txt", "text/plain"),
-        pytest.param("fake-excel.xlsx", None, marks=pytest.mark.xfail(reason="not supported yet")),
+        pytest.param(
+            "fake-excel.xlsx",
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            marks=pytest.mark.xfail(reason="error on empty xlsx"),
+        ),
+        (
+            "stanley-cups.xlsx",
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        ),
         pytest.param(
             "fake-xml.xml", "application/xml", marks=pytest.mark.xfail(reason="not supported yet")
         ),
