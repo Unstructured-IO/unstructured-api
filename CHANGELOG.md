@@ -1,3 +1,7 @@
+## 0.0.27-dev0
+
+* Move PYPDF2 to pypdf since PYPDF2 is deprecated
+
 ## 0.0.26
 
 * Add support for `ocr_only` strategy and `ocr_languages` parameter

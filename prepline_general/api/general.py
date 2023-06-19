@@ -19,7 +19,7 @@ from typing import Optional, Mapping, Iterator, Tuple
 import secrets
 from concurrent.futures import ThreadPoolExecutor
 from functools import partial
-from PyPDF2 import PdfReader, PdfWriter
+from pypdf import PdfReader, PdfWriter
 from unstructured.partition.api import partition_via_api
 from unstructured.partition.auto import partition
 from unstructured.staging.base import convert_to_isd, convert_to_dataframe
@@ -321,7 +321,7 @@ def ungz_file(file: UploadFile, gz_uncompressed_content_type=None) -> UploadFile
 
 
 @router.post("/general/v0/general")
-@router.post("/general/v0.0.26/general")
+@router.post("/general/v0.0.27/general")
 def pipeline_1(
     request: Request,
     gz_uncompressed_content_type: Optional[str] = Form(default=None),
