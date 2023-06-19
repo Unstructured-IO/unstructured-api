@@ -15,39 +15,57 @@ skip_inference_tests = os.getenv("SKIP_INFERENCE_TESTS", "").lower() in {"true",
 
 def send_document(filename, content_type, strategy="fast", output_format="application/json"):
     files = {"files": (str(filename), open(filename, "rb"))}
-    return requests.post(API_URL, files=files, data={"strategy": strategy, "output_format": output_format})
+    return requests.post(
+        API_URL, files=files, data={"strategy": strategy, "output_format": output_format}
+    )
 
 
 @pytest.mark.parametrize(
     "example_filename, content_type",
-    [   
+    [
+        # Note(yuming): Please sort filetypes alphabetically according to
+        # https://github.com/Unstructured-IO/unstructured/blob/main/unstructured/partition/auto.py#L14
         ("stanley-cups.csv", "application/csv"),
+        ("fake.doc", "application/msword"),
+        ("fake.docx", "application/vnd.openxmlformats-officedocument.wordprocessingml.document"),
         ("alert.eml", "message/rfc822"),
         ("announcement.eml", "message/rfc822"),
         ("fake-email-attachment.eml", "message/rfc822"),
         ("fake-email-image-embedded.eml", "message/rfc822"),
         ("fake-email.eml", "message/rfc822"),
-        ("fake-html.html", "text/html"),
-        ("fake-power-point.ppt", "application/vnd.ms-powerpoint"),
-        ("fake-text.txt", "text/plain"),
-        ("fake.doc", "application/msword"),
-        ("fake.docx", "application/vnd.openxmlformats-officedocument.wordprocessingml.document"),
         ("family-day.eml", "message/rfc822"),
         ("winter-sports.epub", "application/epub"),
-        ("fake-doc.rtf", "application/rtf"),
-        ("fake.odt", "application/vnd.oasis.opendocument.text"),
-        
+        ("fake-html.html", "text/html"),
+        pytest.param(
+            "layout-parser-paper-fast.jpg",
+            "image/jpeg",
+            marks=pytest.mark.skipif(skip_inference_tests, reason="emulated architecture"),
+        )("spring-weather.html.json", "application/json"),
         ("README.md", "text/markdown"),
-        pytest.param("fake-excel.xlsx", None, marks=pytest.mark.xfail(reason="not supported yet")),
+        pytest.param("fake-email.msg", None, marks=pytest.mark.xfail(reason="See CORE-1148")),
+        ("fake.odt", "application/vnd.oasis.opendocument.text"),
         # Note(austin) The two inference calls will hang on mac with unsupported hardware error
         # Skip these with SKIP_INFERENCE_TESTS=true make docker-test
-        pytest.param("layout-parser-paper.pdf", "application/pdf", marks=pytest.mark.skipif(
-            skip_inference_tests, reason="emulated architecture")
+        pytest.param(
+            "layout-parser-paper.pdf",
+            "application/pdf",
+            marks=pytest.mark.skipif(skip_inference_tests, reason="emulated architecture"),
         ),
-        pytest.param("layout-parser-paper-fast.jpg", "image/jpeg", marks=pytest.mark.skipif(
-            skip_inference_tests, reason="emulated architecture")
-        )
-    ]
+        ("fake-power-point.ppt", "application/vnd.ms-powerpoint"),
+        (
+            "fake-power-point.pptx",
+            "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+        ),
+        pytest.param(
+            "README.rst", "text/x-rst", marks=pytest.mark.xfail(reason="not supported yet")
+        ),
+        ("fake-doc.rtf", "application/rtf"),
+        ("fake-text.txt", "text/plain"),
+        pytest.param("fake-excel.xlsx", None, marks=pytest.mark.xfail(reason="not supported yet")),
+        pytest.param(
+            "fake-xml.xml", "application/xml", marks=pytest.mark.xfail(reason="not supported yet")
+        ),
+    ],
 )
 def test_happy_path(example_filename, content_type):
     """
@@ -57,17 +75,15 @@ def test_happy_path(example_filename, content_type):
     test_file = Path("sample-docs") / example_filename
     json_response = send_document(test_file, content_type)
 
-    assert(json_response.status_code == 200)
+    assert json_response.status_code == 200
     assert len(json_response.json()) > 0
     assert len("".join(elem["text"] for elem in json_response.json())) > 20
-
 
     csv_response = send_document(test_file, content_type, output_format="text/csv")
     assert csv_response.status_code == 200
     assert len(csv_response.text) > 0
     df = pd.read_csv(io.StringIO(ast.literal_eval(csv_response.text)))
     assert len(df) == len(json_response.json())
-
 
 
 @pytest.mark.skipif(skip_inference_tests, reason="emulated architecture")
@@ -82,11 +98,11 @@ def test_strategy_performance():
     start_time = time.time()
     response = send_document(test_file, content_type="application/pdf", strategy="hi_res")
     hi_res_time = time.time() - start_time
-    assert(response.status_code == 200)
+    assert response.status_code == 200
 
     start_time = time.time()
     response = send_document(test_file, content_type="application/pdf", strategy="fast")
     fast_time = time.time() - start_time
-    assert(response.status_code == 200)
+    assert response.status_code == 200
 
     assert hi_res_time > performance_ratio * fast_time

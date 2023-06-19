@@ -35,7 +35,7 @@ def test_general_api_health_check():
 @pytest.mark.parametrize(
     "example_filename, content_type",
     [
-        # Note(yuming): Sort filetypes alphabetically according to
+        # Note(yuming): Please sort filetypes alphabetically according to
         # https://github.com/Unstructured-IO/unstructured/blob/main/unstructured/partition/auto.py#L14
         ("stanley-cups.csv", "application/csv"),
         pytest.param(
@@ -53,7 +53,7 @@ def test_general_api_health_check():
         ("winter-sports.epub", "application/epub"),
         ("fake-html.html", "text/html"),
         ("layout-parser-paper-fast.jpg", "image/jpeg"),
-        ("spring-weather.html.json", None),
+        ("spring-weather.html.json", "application/json"),
         ("README.md", "text/markdown"),
         pytest.param("fake-email.msg", None, marks=pytest.mark.xfail(reason="See CORE-1148")),
         ("fake.odt", "application/vnd.oasis.opendocument.text"),
@@ -188,7 +188,7 @@ def test_strategy_param_400():
 def test_general_api_returns_400_unsupported_file(example_filename):
     client = TestClient(app)
     test_file = Path("sample-docs") / example_filename
-    filetype = "application/xml"
+    filetype = "not_valid/filetype"
     response = client.post(
         MAIN_API_ROUTE, files=[("files", (str(test_file), open(test_file, "rb"), filetype))]
     )

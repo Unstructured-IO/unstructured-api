@@ -1,3 +1,7 @@
+## 0.0.27-dev0
+
+* Update documentation and tests for filetypes to sync with partition.auto
+
 ## 0.0.26
 
 * Add support for `ocr_only` strategy and `ocr_languages` parameter
