@@ -54,7 +54,7 @@ def test_general_api_health_check():
         pytest.param(
             "fake-email.msg",
             "application/x-ole-storage",
-            marks=pytest.mark.xfail(reason="See CORE-1148 & not supported yet"),
+            marks=pytest.mark.xfail(reason="See CORE-1148"),
         ),
         ("fake.odt", "application/vnd.oasis.opendocument.text"),
         ("layout-parser-paper.pdf", "application/pdf"),
@@ -63,21 +63,15 @@ def test_general_api_health_check():
             "fake-power-point.pptx",
             "application/vnd.openxmlformats-officedocument.presentationml.presentation",
         ),
-        pytest.param(
-            "README.rst", "text/x-rst", marks=pytest.mark.xfail(reason="not supported yet")
-        ),
+        ("README.rst", "text/x-rst"),
         ("fake-doc.rtf", "application/rtf"),
         ("fake-text.txt", "text/plain"),
-        pytest.param(
-            "stanley-cups.tsv", "text/tsv", marks=pytest.mark.xfail(reason="not supported yet")
-        ),
+        ("stanley-cups.tsv", "text/tsv"),
         (
             "stanley-cups.xlsx",
             "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
         ),
-        pytest.param(
-            "fake-xml.xml", "application/xml", marks=pytest.mark.xfail(reason="not supported yet")
-        ),
+        ("fake-xml.xml", "application/xml"),
     ],
 )
 def test_general_api(example_filename, content_type):

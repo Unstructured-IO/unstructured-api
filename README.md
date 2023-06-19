@@ -8,9 +8,9 @@
 
 This repo implements a pre-processing pipeline for the following documents. Currently, the pipeline is capable of recognizing the file type and choosing the relevant partition function to process the file.
 
-* Plaintext: `.txt`, `.eml`, `.html`, `.md`, `.json`, `.rtf`
+* Plaintext: `.txt`, `.eml`, `.xml`, `.html`, `.md`, `.rst`, `.json`, `.rtf`
 * Images: `.jpeg`, `.png`
-* Documents: `.doc`, `.docx`, `.ppt`, `.pptx`, `.pdf`, `.odt`, `.epub`, `.csv`, `.xlsx`
+* Documents: `.doc`, `.docx`, `.ppt`, `.pptx`, `.pdf`, `.odt`, `.epub`, `.csv`, `.tsv`, `.xlsx`
 
 ## :rocket: Unstructured API
 

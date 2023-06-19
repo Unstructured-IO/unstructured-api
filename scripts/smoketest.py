@@ -4,9 +4,10 @@ from pathlib import Path
 
 import pytest
 import requests
-import pandas as pd
-import io
-import ast
+# Note(yuming): disable dependencies as csv ouput is not suppoprted yet
+# import pandas as pd
+# import io
+# import ast
 
 API_URL = "http://localhost:8000/general/v0/general"
 # NOTE(rniko): Skip inference tests if we're running on an emulated architecture
@@ -46,7 +47,7 @@ def send_document(filename, content_type, strategy="fast", output_format="applic
         pytest.param(
             "fake-email.msg",
             "application/x-ole-storage",
-            marks=pytest.mark.xfail(reason="See CORE-1148 & not supported yet"),
+            marks=pytest.mark.xfail(reason="See CORE-1148"),
         ),
         ("fake.odt", "application/vnd.oasis.opendocument.text"),
         # Note(austin) The two inference calls will hang on mac with unsupported hardware error
@@ -61,21 +62,15 @@ def send_document(filename, content_type, strategy="fast", output_format="applic
             "fake-power-point.pptx",
             "application/vnd.openxmlformats-officedocument.presentationml.presentation",
         ),
-        pytest.param(
-            "README.rst", "text/x-rst", marks=pytest.mark.xfail(reason="not supported yet")
-        ),
+        ("README.rst", "text/prs.fallenstein.rst"),
         ("fake-doc.rtf", "application/rtf"),
         ("fake-text.txt", "text/plain"),
-        pytest.param(
-            "stanley-cups.tsv", "text/tsv", marks=pytest.mark.xfail(reason="not supported yet")
-        ),
+        ("stanley-cups.tsv", "text/tab-separated-values"),
         (
             "stanley-cups.xlsx",
             "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
         ),
-        pytest.param(
-            "fake-xml.xml", "application/xml", marks=pytest.mark.xfail(reason="not supported yet")
-        ),
+        ("fake-xml.xml", "text/xml"),
     ],
 )
 def test_happy_path(example_filename, content_type):
@@ -90,11 +85,12 @@ def test_happy_path(example_filename, content_type):
     assert len(json_response.json()) > 0
     assert len("".join(elem["text"] for elem in json_response.json())) > 20
 
-    csv_response = send_document(test_file, content_type, output_format="text/csv")
-    assert csv_response.status_code == 200
-    assert len(csv_response.text) > 0
-    df = pd.read_csv(io.StringIO(ast.literal_eval(csv_response.text)))
-    assert len(df) == len(json_response.json())
+    # NOTE(yuming): csv ouput is not suppoprted yet
+    # csv_response = send_document(test_file, content_type, output_format="text/csv")
+    # assert csv_response.status_code == 200
+    # assert len(csv_response.text) > 0
+    # df = pd.read_csv(io.StringIO(ast.literal_eval(csv_response.text)))
+    # assert len(df) == len(json_response.json())
 
 
 @pytest.mark.skipif(skip_inference_tests, reason="emulated architecture")

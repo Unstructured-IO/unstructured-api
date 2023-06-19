@@ -1,6 +1,7 @@
-## 0.0.27-dev0
+## 0.0.27
 
 * Update documentation and tests for filetypes to sync with partition.auto
+* Add support for .rst, .tsv, .xml
 
 ## 0.0.26
 
