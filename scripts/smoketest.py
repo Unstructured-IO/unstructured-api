@@ -5,10 +5,9 @@ from pathlib import Path
 import pytest
 import requests
 
-# Note(yuming): disable dependencies as csv ouput is not suppoprted yet
-# import pandas as pd
-# import io
-# import ast
+import pandas as pd
+import io
+import ast
 
 API_URL = "http://localhost:8000/general/v0/general"
 # NOTE(rniko): Skip inference tests if we're running on an emulated architecture
@@ -86,12 +85,11 @@ def test_happy_path(example_filename, content_type):
     assert len(json_response.json()) > 0
     assert len("".join(elem["text"] for elem in json_response.json())) > 20
 
-    # NOTE(yuming): csv ouput is not suppoprted yet
-    # csv_response = send_document(test_file, content_type, output_format="text/csv")
-    # assert csv_response.status_code == 200
-    # assert len(csv_response.text) > 0
-    # df = pd.read_csv(io.StringIO(ast.literal_eval(csv_response.text)))
-    # assert len(df) == len(json_response.json())
+    csv_response = send_document(test_file, content_type, output_format="text/csv")
+    assert csv_response.status_code == 200
+    assert len(csv_response.text) > 0
+    df = pd.read_csv(io.StringIO(ast.literal_eval(csv_response.text)))
+    assert len(df) == len(json_response.json())
 
 
 @pytest.mark.skipif(skip_inference_tests, reason="emulated architecture")
