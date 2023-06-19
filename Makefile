@@ -44,6 +44,10 @@ pip-compile:
 	pip-compile --upgrade requirements/base.in
 	pip-compile --upgrade -o requirements/test.txt requirements/base.txt requirements/test.in
 
+.PHONY: install-pandoc
+install-pandoc:
+	ARCH=${ARCH} ./scripts/install-pandoc.sh
+
 #########
 # Build #
 #########
