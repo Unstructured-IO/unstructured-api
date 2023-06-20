@@ -147,8 +147,6 @@ As mentioned above, processing a pdf using `hi_res` is currently a slow operatio
 * `UNSTRUCTURED_PARALLEL_MODE_ENABLED` - set to `true` to process individual pdf pages remotely 
 * `UNSTRUCTURED_PARALLEL_MODE_URL` - the location to send pdf page asynchronously
 
-You can override the default behavior by passing the `use_parallel_mode` parameter set to `true` or `false`.
-
 ### Generating Python files from the pipeline notebooks
 
 You can generate the FastAPI APIs from your pipeline notebooks by running `make generate-api`.

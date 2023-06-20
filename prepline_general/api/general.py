@@ -41,9 +41,6 @@ def is_expected_response_type(media_type, response_type):
         return False
 
 
-# pipeline-api
-
-
 DEFAULT_MIMETYPES = (
     "application/pdf,application/msword,image/jpeg,image/png,text/markdown,"
     "text/x-markdown,text/html,"
@@ -178,7 +175,6 @@ def pipeline_api(
     filename="",
     m_strategy=[],
     m_coordinates=[],
-    m_use_parallel_mode=[],
     file_content_type=None,
     response_type="application/json",
 ):
@@ -194,9 +190,6 @@ def pipeline_api(
 
     # Parallel mode is set by env variable, but can be overridden with a request parameter
     enable_parallel_mode = os.environ.get("UNSTRUCTURED_PARALLEL_MODE_ENABLED", "false")
-    if len(m_use_parallel_mode):
-        enable_parallel_mode = m_use_parallel_mode[0].lower()
-
     pdf_parallel_mode_enabled = enable_parallel_mode == "true"
 
     try:
@@ -358,7 +351,6 @@ def pipeline_1(
     output_format: Union[str, None] = Form(default=None),
     strategy: List[str] = Form(default=[]),
     coordinates: List[str] = Form(default=[]),
-    use_parallel_mode: List[str] = Form(default=[]),
 ):
     if files:
         for file_index in range(len(files)):
@@ -395,7 +387,6 @@ def pipeline_1(
                     request=request,
                     m_strategy=strategy,
                     m_coordinates=coordinates,
-                    m_use_parallel_mode=use_parallel_mode,
                     response_type=media_type,
                     filename=file.filename,
                     file_content_type=file_content_type,
