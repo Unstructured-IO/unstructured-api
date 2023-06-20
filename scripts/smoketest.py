@@ -42,10 +42,9 @@ def send_document(filename, content_type, strategy="fast", output_format="applic
         pytest.param("layout-parser-paper.pdf", "application/pdf", marks=pytest.mark.skipif(
             skip_inference_tests, reason="emulated architecture")
         ),
-        # Images do not support the default strategy=fast (fix this soon) (CORE-1294)
-        # pytest.param("layout-parser-paper-fast.jpg", "image/jpeg", marks=pytest.mark.skipif(
-        #     skip_inference_tests, reason="emulated architecture")
-        # )
+        pytest.param("layout-parser-paper-fast.jpg", "image/jpeg", marks=pytest.mark.skipif(
+            skip_inference_tests, reason="emulated architecture")
+        )
     ]
 )
 def test_happy_path(example_filename, content_type):

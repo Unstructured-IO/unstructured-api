@@ -58,13 +58,7 @@ def test_general_api_health_check():
         ("family-day.eml", None),
         pytest.param("fake-excel.xlsx", None, marks=pytest.mark.xfail(reason="not supported yet")),
         ("layout-parser-paper.pdf", "application/pdf"),
-        pytest.param(
-            "layout-parser-paper-fast.jpg",
-            "image/jpeg",
-            marks=pytest.mark.xfail(
-                reason="Images do not support the default strategy=fast (CORE-1294)"
-            ),
-        ),
+        ("layout-parser-paper-fast.jpg", "image/jpeg"),
     ],
 )
 def test_general_api(example_filename, content_type):
