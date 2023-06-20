@@ -41,6 +41,9 @@ def is_expected_response_type(media_type, response_type):
         return False
 
 
+# pipeline-api
+
+
 DEFAULT_MIMETYPES = (
     "application/pdf,application/msword,image/jpeg,image/png,text/markdown,"
     "text/x-markdown,text/html,"
