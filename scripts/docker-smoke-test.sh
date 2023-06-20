@@ -12,30 +12,41 @@
 set -e
 
 CONTAINER_NAME=unstructured-api-smoke-test
+CONTAINER_NAME_PARALLEL=unstructured-api-smoke-test-parallel
 PIPELINE_FAMILY=${PIPELINE_FAMILY:-"general"}
 DOCKER_IMAGE="${DOCKER_IMAGE:-pipeline-family-${PIPELINE_FAMILY}-dev:latest}"
-API_PORT=8000
 SKIP_INFERENCE_TESTS="${SKIP_INFERENCE_TESTS:-false}"
 
 start_container() {
-    echo Starting container "$CONTAINER_NAME"
 
-    docker run -p $API_PORT:$API_PORT \
+    port=$1
+    use_parallel_mode=$2
+
+    if [ "$use_parallel_mode" = "true" ]; then
+        name=$CONTAINER_NAME_PARALLEL
+    else
+        name=$CONTAINER_NAME
+    fi
+
+    echo Starting container "$name"
+    docker run -p "$port":"$port" \
            -d \
            --rm \
-           --name "$CONTAINER_NAME" \
-           --env "UNSTRUCTURED_PARALLEL_MODE_URL=http://localhost:$API_PORT/general/v0/general" \
+           --name "$name" \
+           --env "UNSTRUCTURED_PARALLEL_MODE_URL=http://localhost:$port/general/v0/general" \
+           --env "UNSTRUCTURED_PARALLEL_MODE_ENABLED=$use_parallel_mode" \
            "$DOCKER_IMAGE" \
-           --port $API_PORT --host 0.0.0.0
+           --port $port --host 0.0.0.0
 }
 
 await_server_ready() {
-    url=localhost:$API_PORT/healthcheck
+    port=$1
+    url=localhost:$port/healthcheck
 
     # NOTE(rniko): Increasing the timeout to 120 seconds because emulated arm tests are slow to start
     for _ in {1..120}; do
         echo Waiting for response from "$url"
-        if curl $url 2> /dev/null; then
+        if curl "$url" 2> /dev/null; then
             echo
             return
         fi
@@ -52,13 +63,16 @@ stop_container() {
     # Note (austin) - if you're getting an error from the api, try dumping the logs
     # docker logs $CONTAINER_NAME 2> docker_logs.txt
     docker stop "$CONTAINER_NAME"
+
+    echo Stopping container "$CONTAINER_NAME_PARALLEL"
+    docker stop "$CONTAINER_NAME_PARALLEL"
 }
 
 # Always clean up the container
 trap stop_container EXIT
 
-start_container
-await_server_ready
+start_container 8000 "false"
+await_server_ready 8000
 
 #######################
 # Smoke Tests
@@ -69,8 +83,11 @@ PYTHONPATH=. SKIP_INFERENCE_TESTS=$SKIP_INFERENCE_TESTS pytest scripts/smoketest
 #######################
 # Test parallel vs single mode
 #######################
+start_container 9000 true
+await_server_ready 9000
+
 echo Running parallel mode test
-./scripts/parallel-mode-test.sh
+./scripts/parallel-mode-test.sh localhost:8000 localhost:9000
 
 result=$?
 exit $result
