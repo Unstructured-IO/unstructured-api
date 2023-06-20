@@ -36,7 +36,7 @@ start_container() {
            --env "UNSTRUCTURED_PARALLEL_MODE_URL=http://localhost:$port/general/v0/general" \
            --env "UNSTRUCTURED_PARALLEL_MODE_ENABLED=$use_parallel_mode" \
            "$DOCKER_IMAGE" \
-           --port $port --host 0.0.0.0
+           --port "$port" --host 0.0.0.0
 }
 
 await_server_ready() {
