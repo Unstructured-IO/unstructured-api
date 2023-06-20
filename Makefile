@@ -15,23 +15,11 @@ help: Makefile
 
 ## install-base:                installs minimum requirements to run the API
 .PHONY: install-base
-install-base: install-base-pip-packages install-nltk-models install-high
+install-base: install-base-pip-packages install-nltk-models
 
 ## install:                     installs all test and dev requirements
 .PHONY: install
 install:install-base install-test
-
-# Need for Apple Silicon based Macs
-.PHONY: install-tensorboard
-install-tensorboard:
-	@if [ ${ARCH} = "arm64" ] || [ ${ARCH} = "aarch64" ]; then\
-		python3 -m pip install tensorboard>=2.12.2;\
-	fi
-
-# Installs detectron2 if high resolution is needed
-.PHONY: install-high
-install-high: install-tensorboard
-	python3 -m pip install "detectron2@git+https://github.com/facebookresearch/detectron2.git@e2ce8dc#egg=detectron2"
 
 .PHONY: install-base-pip-packages
 install-base-pip-packages:

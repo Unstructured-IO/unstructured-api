@@ -27,13 +27,11 @@ Try our hosted API! It's freely available to use with any of the filetypes liste
 
 ### Parameters
 
-#### PDF Strategies
+#### Strategies
 
-Three strategies are available for processing PDF files: `hi_res`, `fast`, and `auto`. `fast` is the default `strategy` and works well for documents that do not have text embedded in images.
+Four strategies are available for processing PDF/Images files: `hi_res`, `fast`, `ocr_only` and `auto`. `fast` is the default `strategy` and works well for documents that do not have text embedded in images.
 
-On the other hand, `hi_res` is the better choice for PDF's that may have text within embedded images, or for achieving greater precision of [element types](https://unstructured-io.github.io/unstructured/getting_started.html#document-elements) in the response JSON. Please be aware that, as of writing, `hi_res` requests may take 20 times longer to process compared to the`fast` option. See the example below for making a `hi_res` request.
-
-For the best of both worlds, `auto` will determine when a page can be extracted using `fast` mode, otherwise it will fall back to `hi_res`.
+On the other hand, `hi_res` is the better choice for PDFs that may have text within embedded images, or for achieving greater precision of [element types](https://unstructured-io.github.io/unstructured/getting_started.html#document-elements) in the response JSON. Please be aware that, as of writing, `hi_res` requests may take 20 times longer to process compared to the `fast` option. See the example below for making a `hi_res` request.
 
 ```
  curl -X 'POST' \
@@ -42,6 +40,26 @@ For the best of both worlds, `auto` will determine when a page can be extracted 
   -H 'Content-Type: multipart/form-data' \
   -F 'files=@sample-docs/layout-parser-paper.pdf' \
   -F 'strategy=hi_res' \
+  | jq -C . | less -R
+```
+
+The `ocr_only` strategy runs the document through Tesseract for OCR. Currently, `hi_res` has difficulty ordering elements for documents with multiple columns. If you have a document with multiple columns that do not have extractable text, we recommend using the `ocr_only` strategy. Please be aware that `ocr_only` will fall back to another strategy if Tesseract is not available.
+
+For the best of all worlds, `auto` will determine when a page can be extracted using `fast` or `ocr_only` mode, otherwise it will fall back to `hi_res`.
+
+#### OCR languages
+
+You can also specify what languages to use for OCR with the `ocr_languages` kwarg. See the [Tesseract documentation](https://github.com/tesseract-ocr/tessdata) for a full list of languages and install instructions. OCR is only applied if the text is not already available in the PDF document.
+
+```
+curl -X 'POST' \
+  'https://api.unstructured.io/general/v0/general' \
+  -H 'accept: application/json' \
+  -H 'Content-Type: multipart/form-data' \
+  -F 'files=@sample-docs/english-and-korean.png' \
+  -F 'strategy=ocr_only' \
+  -F 'ocr_languages=eng'  \
+  -F 'ocr_languages=kor'  \
   | jq -C . | less -R
 ```
 
@@ -65,12 +83,12 @@ When elements are extracted from PDFs or images, it may be useful to get their b
 * Using `pyenv` to manage virtualenv's is recommended
 	* Mac install instructions. See [here](https://github.com/Unstructured-IO/community#mac--homebrew) for more detailed instructions.
 		* `brew install pyenv-virtualenv`
-	  * `pyenv install 3.8.15`
+	  * `pyenv install 3.8.17`
   * Linux instructions are available [here](https://github.com/Unstructured-IO/community#linux).
 
   * Create a virtualenv to work in and activate it, e.g. for one named `document-processing`:
 
-	`pyenv  virtualenv 3.8.15 document-processing` <br />
+	`pyenv  virtualenv 3.8.17 document-processing` <br />
 	`pyenv activate document-processing`
 
 See the [Unstructured Quick Start](https://github.com/Unstructured-IO/unstructured#eight_pointed_black_star-quick-start) for the many OS dependencies that are required, if the ability to process all file types is desired.

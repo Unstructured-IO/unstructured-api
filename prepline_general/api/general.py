@@ -19,7 +19,7 @@ from typing import Optional, Mapping, Iterator, Tuple
 import secrets
 from concurrent.futures import ThreadPoolExecutor
 from functools import partial
-from PyPDF2 import PdfReader, PdfWriter
+from pypdf import PdfReader, PdfWriter
 from unstructured.partition.auto import partition
 from unstructured.partition.json import partition_json
 from unstructured.staging.base import convert_to_isd, convert_to_dataframe
@@ -175,11 +175,12 @@ def pipeline_api(
     filename="",
     m_strategy=[],
     m_coordinates=[],
+    m_ocr_languages=[],
     file_content_type=None,
     response_type="application/json",
 ):
     strategy = (m_strategy[0] if len(m_strategy) else "fast").lower()
-    strategies = ["fast", "hi_res", "auto"]
+    strategies = ["fast", "hi_res", "auto", "ocr_only"]
     if strategy not in strategies:
         raise HTTPException(
             status_code=400, detail=f"Invalid strategy: {strategy}. Must be one of {strategies}"
@@ -188,9 +189,11 @@ def pipeline_api(
     show_coordinates_str = (m_coordinates[0] if len(m_coordinates) else "false").lower()
     show_coordinates = show_coordinates_str == "true"
 
-    # Parallel mode is set by env variable, but can be overridden with a request parameter
+    # Parallel mode is set by env variable
     enable_parallel_mode = os.environ.get("UNSTRUCTURED_PARALLEL_MODE_ENABLED", "false")
     pdf_parallel_mode_enabled = enable_parallel_mode == "true"
+
+    ocr_languages = ("+".join(m_ocr_languages) if len(m_ocr_languages) else "eng").lower()
 
     try:
         if file_content_type == "application/pdf" and pdf_parallel_mode_enabled:
@@ -200,11 +203,16 @@ def pipeline_api(
                 file_filename=filename,
                 content_type=file_content_type,
                 strategy=strategy,
+                ocr_languages=ocr_languages,
                 coordinates=show_coordinates,
             )
         else:
             elements = partition(
-                file=file, file_filename=filename, content_type=file_content_type, strategy=strategy
+                file=file,
+                file_filename=filename,
+                content_type=file_content_type,
+                strategy=strategy,
+                ocr_languages=ocr_languages,
             )
     except ValueError as e:
         if "Invalid file" in e.args[0]:
@@ -343,7 +351,7 @@ def ungz_file(file: UploadFile, gz_uncompressed_content_type=None) -> UploadFile
 
 
 @router.post("/general/v0/general")
-@router.post("/general/v0.0.25/general")
+@router.post("/general/v0.0.27/general")
 def pipeline_1(
     request: Request,
     gz_uncompressed_content_type: Optional[str] = Form(default=None),
@@ -351,6 +359,7 @@ def pipeline_1(
     output_format: Union[str, None] = Form(default=None),
     strategy: List[str] = Form(default=[]),
     coordinates: List[str] = Form(default=[]),
+    ocr_languages: List[str] = Form(default=[]),
 ):
     if files:
         for file_index in range(len(files)):
@@ -387,6 +396,7 @@ def pipeline_1(
                     request=request,
                     m_strategy=strategy,
                     m_coordinates=coordinates,
+                    m_ocr_languages=ocr_languages,
                     response_type=media_type,
                     filename=file.filename,
                     file_content_type=file_content_type,

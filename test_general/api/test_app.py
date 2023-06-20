@@ -137,6 +137,23 @@ def test_coordinates_param():
         assert response_with_coords[i] == response_without_coords[i]
 
 
+def test_ocr_languages_param():
+    """
+    ...
+    """
+    client = TestClient(app)
+    test_file = Path("sample-docs") / "english-and-korean.png"
+    response = client.post(
+        MAIN_API_ROUTE,
+        files=[("files", (str(test_file), open(test_file, "rb")))],
+        data={"strategy": "ocr_only", "ocr_languages": ["eng", "kor"]},
+    )
+
+    assert response.status_code == 200
+    elements = response.json()
+    assert elements[3]["text"].startswith("안녕하세요, 저 희 는 YGEAS 그룹")
+
+
 def test_strategy_param_400():
     """Verify that we get a 400 if we pass in a bad strategy"""
     client = TestClient(app)
