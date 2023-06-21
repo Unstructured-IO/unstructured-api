@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # parallel-mode-test.sh
 # Iterate a list of curl commands, and run each one against two instances of the api
