@@ -35,30 +35,43 @@ def test_general_api_health_check():
 @pytest.mark.parametrize(
     "example_filename, content_type",
     [
-        pytest.param("fake-email.msg", None, marks=pytest.mark.xfail(reason="See CORE-1148")),
-        ("spring-weather.html.json", None),
-        ("alert.eml", None),
-        ("announcement.eml", None),
-        ("fake-email-attachment.eml", None),
-        ("fake-email-image-embedded.eml", None),
-        ("fake-email.eml", None),
-        ("fake-html.html", "text/html"),
-        pytest.param(
-            "fake-power-point.ppt",
-            "application/vnd.openxmlformats-officedocument.presentationml.presentation",
-            marks=pytest.mark.xfail(reason="See CORE-796"),
-        ),
-        ("fake-text.txt", "text/plain"),
-        pytest.param(
-            "fake.doc",
-            "application/msword",
-            marks=pytest.mark.xfail(reason="Encoding not supported yet"),
-        ),
+        # Note(yuming): Please sort filetypes alphabetically according to
+        # https://github.com/Unstructured-IO/unstructured/blob/main/unstructured/partition/auto.py#L14
+        ("stanley-cups.csv", "application/csv"),
+        ("fake.doc", "application/msword"),
         ("fake.docx", "application/vnd.openxmlformats-officedocument.wordprocessingml.document"),
-        ("family-day.eml", None),
-        pytest.param("fake-excel.xlsx", None, marks=pytest.mark.xfail(reason="not supported yet")),
-        ("layout-parser-paper.pdf", "application/pdf"),
+        ("family-day.eml", "message/rfc822"),
+        ("alert.eml", "message/rfc822"),
+        ("announcement.eml", "message/rfc822"),
+        ("fake-email-attachment.eml", "message/rfc822"),
+        ("fake-email-image-embedded.eml", "message/rfc822"),
+        ("fake-email.eml", "message/rfc822"),
+        ("winter-sports.epub", "application/epub"),
+        ("fake-html.html", "text/html"),
         ("layout-parser-paper-fast.jpg", "image/jpeg"),
+        ("spring-weather.html.json", "application/json"),
+        ("README.md", "text/markdown"),
+        pytest.param(
+            "fake-email.msg",
+            "application/x-ole-storage",
+            marks=pytest.mark.xfail(reason="See CORE-1148"),
+        ),
+        ("fake.odt", "application/vnd.oasis.opendocument.text"),
+        ("layout-parser-paper.pdf", "application/pdf"),
+        ("fake-power-point.ppt", "application/vnd.ms-powerpoint"),
+        (
+            "fake-power-point.pptx",
+            "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+        ),
+        ("README.rst", "text/x-rst"),
+        ("fake-doc.rtf", "application/rtf"),
+        ("fake-text.txt", "text/plain"),
+        ("stanley-cups.tsv", "text/tsv"),
+        (
+            "stanley-cups.xlsx",
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        ),
+        ("fake-xml.xml", "application/xml"),
     ],
 )
 def test_general_api(example_filename, content_type):
@@ -168,7 +181,7 @@ def test_strategy_param_400():
 def test_general_api_returns_400_unsupported_file(example_filename):
     client = TestClient(app)
     test_file = Path("sample-docs") / example_filename
-    filetype = "application/xml"
+    filetype = "invalid/filetype"
     response = client.post(
         MAIN_API_ROUTE, files=[("files", (str(test_file), open(test_file, "rb"), filetype))]
     )

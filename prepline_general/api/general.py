@@ -58,6 +58,9 @@ DEFAULT_MIMETYPES = (
     "application/vnd.oasis.opendocument.text,"
     "text/csv,text/x-csv,application/csv,application/x-csv,"
     "text/comma-separated-values,text/x-comma-separated-values,"
+    "application/xml,text/xml,text/x-rst,text/prs.fallenstein.rst,"
+    "text/tsv,text/tab-separated-values,"
+    "application/x-ole-storage,application/vnd.ms-outlook,"
 )
 
 if not os.environ.get("UNSTRUCTURED_ALLOWED_MIMETYPES", None):
