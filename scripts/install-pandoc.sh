@@ -1,6 +1,12 @@
 #!/bin/bash
 
 # Mainly used for installing pandoc on CI
+
+if [ "$(uname)" == "Darwin" ]; then
+    echo "This script is intended for Linux only."
+    exit 0
+fi
+
 set -euo pipefail
 if [ "${ARCH}" = "x86_64" ]; then
     export PANDOC_ARCH="amd64"
