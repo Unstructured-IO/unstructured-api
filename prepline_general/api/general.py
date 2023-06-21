@@ -21,8 +21,7 @@ from concurrent.futures import ThreadPoolExecutor
 from functools import partial
 from pypdf import PdfReader, PdfWriter
 from unstructured.partition.auto import partition
-from unstructured.partition.json import partition_json
-from unstructured.staging.base import convert_to_isd, convert_to_dataframe
+from unstructured.staging.base import convert_to_isd, convert_to_dataframe, elements_from_json
 import tempfile
 import pdfminer
 import requests
@@ -121,7 +120,7 @@ def partition_file_via_api(file_tuple, request, filename, content_type, **partit
         detail = response.json().get("detail") or response.text
         raise HTTPException(status_code=response.status_code, detail=detail)
 
-    elements = partition_json(text=response.text)
+    elements = elements_from_json(text=response.text)
 
     # We need to account for the original page numbers
     for element in elements:
@@ -237,11 +236,6 @@ def pipeline_api(
     result = convert_to_isd(elements)
     for element in result:
         element["metadata"]["filename"] = os.path.basename(filename)
-
-        # TODO (austin) - partition_via_api always returns a filetype of json
-        # If we've run a pdf in parallel mode, just change the type back for now
-        if "pdf" in element["metadata"]["filename"] and "json" in element["metadata"]["filetype"]:
-            element["metadata"]["filetype"] = "application/pdf"
 
         if not show_coordinates:
             del element["coordinates"]
