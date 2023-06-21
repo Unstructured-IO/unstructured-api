@@ -9,7 +9,7 @@
 This repo implements a pre-processing pipeline for the following documents. Currently, the pipeline is capable of recognizing the file type and choosing the relevant partition function to process the file.
 
 
-| Category  | File Extensions                |
+| Category  | Document Types                |
 |-----------|-------------------------------|
 | Plaintext | `.txt`, `.eml`, `.xml`, `.html`, `.md`, `.rst`, `.json`, `.rtf` |
 | Images    | `.jpeg`, `.png`               |
