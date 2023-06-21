@@ -99,7 +99,7 @@ idna==3.4
     #   anyio
     #   requests
     #   rfc3986
-importlib-metadata==6.7.0
+importlib-metadata==6.6.0
     # via
     #   jupyter-client
     #   markdown
@@ -146,7 +146,7 @@ markupsafe==2.1.3
     #   nbconvert
 matplotlib==3.7.1
     # via pycocotools
-mistune==3.0.1
+mistune==2.0.5
     # via nbconvert
 monotonic==1.6
     # via argilla
@@ -154,13 +154,13 @@ mpmath==1.3.0
     # via sympy
 msg-parser==1.2.0
     # via unstructured
-mypy==1.4.0
+mypy==1.3.0
     # via unstructured-api-tools
 mypy-extensions==1.0.0
     # via mypy
 nbclient==0.8.0
     # via nbconvert
-nbconvert==7.6.0
+nbconvert==7.5.0
     # via unstructured-api-tools
 nbformat==5.9.0
     # via
@@ -187,7 +187,7 @@ olefile==0.46
     # via msg-parser
 omegaconf==2.3.0
     # via effdet
-onnxruntime==1.15.1
+onnxruntime==1.15.0
     # via unstructured-inference
 opencv-python==4.7.0.72
     # via
@@ -233,7 +233,7 @@ pillow==9.5.0
     #   unstructured
 pkgutil-resolve-name==1.3.10
     # via jsonschema
-platformdirs==3.6.0
+platformdirs==3.5.3
     # via jupyter-core
 portalocker==2.7.0
     # via iopath
@@ -253,7 +253,7 @@ pygments==2.15.1
     #   rich
 pypandoc==1.11
     # via unstructured
-pyparsing==3.1.0
+pyparsing==3.0.9
     # via matplotlib
 pypdf2==3.0.1
     # via -r requirements/base.in
@@ -388,7 +388,7 @@ typing-extensions==4.6.3
     #   starlette
     #   torch
     #   typer
-unstructured[local-inference]==0.7.7
+unstructured[local-inference]==0.7.6
     # via -r requirements/base.in
 unstructured-api-tools==0.10.7
     # via -r requirements/base.in
