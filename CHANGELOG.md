@@ -2,6 +2,7 @@
 
 * Update documentation and tests for filetypes to sync with partition.auto
 * Add support for .rst, .tsv, .xml
+* Move PYPDF2 to pypdf since PYPDF2 is deprecated
 
 ## 0.0.26
 

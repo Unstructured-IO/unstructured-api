@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # docker-smoke-test.sh
 # Start the containerized api and run some end-to-end tests against it
