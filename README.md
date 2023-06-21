@@ -1,6 +1,17 @@
 <h3 align="center">
   <img src="img/unstructured_logo.png" height="200">
-</h3>
+<?/h3>
+?
+<h2 align="center">
+  <p>API Announcement!</p>
+</h2>
+<div align="center">
+  <p>We'll be requiring API keys in the near future, to prevent any disruption get yours <a href="https://www.unstructured.io/api-key/">here</a> now!</p>
+
+Checkout the rest of the readme below to get started making API calls. 
+We'd love to hear your feedback, let us know how it goes in our
+  <a href="https://join.slack.com/t/unstructuredw-kbe4326/shared_invite/zt-1x7cgo0pg-PTptXWylzPQF9xZolzCnwQ"> community slack</a>. And stay tuned for improvements to both quality and performance!</p>
+</div>
 
 <h3 align="center">
   <p>General Pre-Processing Pipeline for Documents</p>
