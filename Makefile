@@ -44,6 +44,10 @@ pip-compile:
 	pip-compile --upgrade requirements/base.in
 	pip-compile --upgrade -o requirements/test.txt requirements/base.txt requirements/test.in
 
+.PHONY: install-pandoc
+install-pandoc:
+	ARCH=${ARCH} ./scripts/install-pandoc.sh
+
 #########
 # Build #
 #########
@@ -138,13 +142,13 @@ check-src:
 .PHONY: check-tests
 check-tests:
 	black --line-length 100 test_${PIPELINE_PACKAGE} --check
-	flake8 test_${PIPELINE_PACKAGE}
+	flake8 test_${PIPELINE_PACKAGE} scripts/smoketest.py
 
 ## tidy:                        run black
 .PHONY: tidy
 tidy:
 	black --line-length 100 ${PACKAGE_NAME} --exclude ${PACKAGE_NAME}/api
-	black --line-length 100 test_${PIPELINE_PACKAGE}
+	black --line-length 100 test_${PIPELINE_PACKAGE} scripts/smoketest.py
 
 ## check-scripts:               run shellcheck
 .PHONY: check-scripts

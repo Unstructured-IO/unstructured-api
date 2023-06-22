@@ -1,7 +1,12 @@
-## 0.0.27-dev1
+## 0.0.28-dev1
 
-* Move PYPDF2 to pypdf since PYPDF2 is deprecated
 * Add smoke test for parallel mode and refactor
+
+## 0.0.27
+
+* Update documentation and tests for filetypes to sync with partition.auto
+* Add support for .rst, .tsv, .xml
+* Move PYPDF2 to pypdf since PYPDF2 is deprecated
 
 ## 0.0.26
 
