@@ -11,7 +11,7 @@ anyio==3.7.0
     #   httpcore
     #   starlette
     #   watchfiles
-argilla==1.10.0
+argilla==1.11.0
     # via unstructured
 attrs==23.1.0
     # via jsonschema
@@ -60,7 +60,7 @@ et-xmlfile==1.1.0
     # via openpyxl
 exceptiongroup==1.1.1
     # via anyio
-fastapi==0.97.0
+fastapi==0.98.0
     # via unstructured-api-tools
 fastjsonschema==2.17.1
     # via nbformat
@@ -119,7 +119,7 @@ joblib==1.2.0
     # via nltk
 jsonschema==4.17.3
     # via nbformat
-jupyter-client==8.2.0
+jupyter-client==8.3.0
     # via nbclient
 jupyter-core==5.3.1
     # via
@@ -154,7 +154,7 @@ mpmath==1.3.0
     # via sympy
 msg-parser==1.2.0
     # via unstructured
-mypy==1.3.0
+mypy==1.4.0
     # via unstructured-api-tools
 mypy-extensions==1.0.0
     # via mypy
@@ -233,7 +233,7 @@ pillow==9.5.0
     #   unstructured
 pkgutil-resolve-name==1.3.10
     # via jsonschema
-platformdirs==3.6.0
+platformdirs==3.8.0
     # via jupyter-core
 portalocker==2.7.0
     # via iopath
@@ -255,7 +255,7 @@ pypandoc==1.11
     # via unstructured
 pyparsing==3.1.0
     # via matplotlib
-pypdf==3.10.0
+pypdf==3.11.0
     # via -r requirements/base.in
 pyrsistent==0.19.3
     # via jsonschema
@@ -388,7 +388,7 @@ typing-extensions==4.6.3
     #   starlette
     #   torch
     #   typer
-unstructured[local-inference]==0.7.6
+unstructured[local-inference]==0.7.8
     # via -r requirements/base.in
 unstructured-api-tools==0.10.7
     # via -r requirements/base.in

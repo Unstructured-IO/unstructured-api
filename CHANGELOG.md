@@ -1,3 +1,7 @@
+## 0.0.28
+
+* Bump unstructured library to 0.7.8 for bug fixes
+
 ## 0.0.27
 
 * Update documentation and tests for filetypes to sync with partition.auto
