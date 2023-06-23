@@ -19,7 +19,7 @@ appnope==0.1.3
     # via
     #   ipykernel
     #   ipython
-argilla==1.10.0
+argilla==1.11.0
     # via
     #   -r requirements/base.txt
     #   unstructured
@@ -140,7 +140,7 @@ execnb==0.1.5
     # via nbdev
 executing==1.2.0
     # via stack-data
-fastapi==0.97.0
+fastapi==0.98.0
     # via
     #   -r requirements/base.txt
     #   unstructured-api-tools
@@ -232,7 +232,7 @@ iopath==0.1.10
     # via
     #   -r requirements/base.txt
     #   layoutparser
-ipykernel==6.23.2
+ipykernel==6.23.3
     # via
     #   ipywidgets
     #   jupyter
@@ -279,7 +279,7 @@ jsonschema[format-nongpl]==4.17.3
     #   nbformat
 jupyter==1.0.0
     # via -r requirements/test.in
-jupyter-client==8.2.0
+jupyter-client==8.3.0
     # via
     #   -r requirements/base.txt
     #   ipykernel
@@ -367,7 +367,7 @@ msg-parser==1.2.0
     # via
     #   -r requirements/base.txt
     #   unstructured
-mypy==1.3.0
+mypy==1.4.0
     # via
     #   -r requirements/base.txt
     #   -r requirements/test.in
@@ -520,12 +520,12 @@ pkgutil-resolve-name==1.3.10
     # via
     #   -r requirements/base.txt
     #   jsonschema
-platformdirs==3.6.0
+platformdirs==3.8.0
     # via
     #   -r requirements/base.txt
     #   black
     #   jupyter-core
-pluggy==1.0.0
+pluggy==1.2.0
     # via pytest
 portalocker==2.7.0
     # via
@@ -585,7 +585,7 @@ pyparsing==3.1.0
     # via
     #   -r requirements/base.txt
     #   matplotlib
-pypdf==3.10.0
+pypdf==3.11.0
     # via -r requirements/base.txt
 pyrsistent==0.19.3
     # via
@@ -595,7 +595,7 @@ pytesseract==0.3.10
     # via
     #   -r requirements/base.txt
     #   layoutparser
-pytest==7.3.2
+pytest==7.4.0
     # via pytest-cov
 pytest-cov==4.1.0
     # via -r requirements/test.in
@@ -842,7 +842,7 @@ typing-extensions==4.6.3
     #   starlette
     #   torch
     #   typer
-unstructured[local-inference]==0.7.6
+unstructured[local-inference]==0.7.8
     # via -r requirements/base.txt
 unstructured-api-tools==0.10.7
     # via -r requirements/base.txt
@@ -850,7 +850,7 @@ unstructured-inference==0.5.1
     # via
     #   -r requirements/base.txt
     #   unstructured
-uri-template==1.2.0
+uri-template==1.3.0
     # via jsonschema
 urllib3==2.0.3
     # via
@@ -883,7 +883,7 @@ webencodings==0.5.1
     #   -r requirements/base.txt
     #   bleach
     #   tinycss2
-websocket-client==1.6.0
+websocket-client==1.6.1
     # via jupyter-server
 websockets==11.0.3
     # via
