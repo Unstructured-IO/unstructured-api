@@ -1,6 +1,7 @@
 ## 0.0.28
 
 * Bump unstructured library to 0.7.8 for bug fixes
+* Support .msg files
 
 ## 0.0.27
 
