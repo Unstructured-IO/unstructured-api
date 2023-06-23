@@ -34,7 +34,7 @@ RUN python3.8 -m pip install pip==${PIP_VERSION} \
 USER ${NB_USER}
 
 RUN pip uninstall -y unstructured \
-  && git clone -b fix/handle-spooled-temp-file-eml https://github.com/Unstructured-IO/unstructured.git \
+  && git clone https://github.com/Unstructured-IO/unstructured.git \
   && cd unstructured \
   && pip install -e .
 
