@@ -170,6 +170,21 @@ def test_strategy_param_400():
     assert response.status_code == 400
 
 
+def test_encoding_param():
+    """
+    Verify that we get a 400 if we pass an invalid encoding
+    """
+    client = TestClient(app)
+    test_file = Path("sample-docs") / "fake-html.html"
+    response = client.post(
+        MAIN_API_ROUTE,
+        files=[("files", (str(test_file), open(test_file, "rb"), "text/plain"))],
+        data={"encoding": "invalid_encoding"},
+    )
+
+    assert response.status_code == 400
+
+
 @pytest.mark.parametrize(
     "example_filename",
     [
