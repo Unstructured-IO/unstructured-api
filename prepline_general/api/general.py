@@ -206,7 +206,7 @@ def pipeline_api(
 
     ocr_languages = ("+".join(m_ocr_languages) if len(m_ocr_languages) else "eng").lower()
 
-    encoding = m_encoding
+    encoding = m_encoding[0] if len(m_encoding) else None
 
     try:
         if file_content_type == "application/pdf" and pdf_parallel_mode_enabled:
