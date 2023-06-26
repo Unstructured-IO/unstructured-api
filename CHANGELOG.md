@@ -1,3 +1,8 @@
+## 0.0.29
+
+* Support .msg files
+* Refactor parallel mode and add smoke test
+
 ## 0.0.28
 
 * Bump unstructured library to 0.7.8 for bug fixes

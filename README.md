@@ -22,7 +22,7 @@ This repo implements a pre-processing pipeline for the following documents. Curr
 
 | Category  | Document Types                |
 |-----------|-------------------------------|
-| Plaintext | `.txt`, `.eml`, `.xml`, `.html`, `.md`, `.rst`, `.json`, `.rtf` |
+| Plaintext | `.txt`, `.eml`, `.msg`, `.xml`, `.html`, `.md`, `.rst`, `.json`, `.rtf` |
 | Images    | `.jpeg`, `.png`               |
 | Documents | `.doc`, `.docx`, `.ppt`, `.pptx`, `.pdf`, `.odt`, `.epub`, `.csv`, `.tsv`, `.xlsx` |
 
