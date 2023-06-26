@@ -36,6 +36,7 @@ Try our hosted API! It's freely available to use with any of the filetypes liste
   'https://api.unstructured.io/general/v0/general' \
   -H 'accept: application/json' \
   -H 'Content-Type: multipart/form-data' \
+  -H 'unstructured-api-key: <YOUR API KEY>'
   -F 'files=@sample-docs/family-day.eml' \
   | jq -C . | less -R
 ```
