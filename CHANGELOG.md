@@ -1,6 +1,10 @@
-## 0.0.28-dev1
+## 0.0.29-dev0
 
-* Add smoke test for parallel mode and refactor
+* Refactor parallel mode and add smoke test
+
+## 0.0.28
+
+* Bump unstructured library to 0.7.8 for bug fixes
 
 ## 0.0.27
 
