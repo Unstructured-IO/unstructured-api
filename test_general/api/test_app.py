@@ -12,6 +12,7 @@ from unstructured_api_tools.pipelines.api_conventions import get_pipeline_path
 
 from prepline_general.api.app import app
 from unstructured.partition.auto import partition
+from unstructured.staging.base import convert_to_isd
 import tempfile
 
 MAIN_API_ROUTE = get_pipeline_path("general")
@@ -122,6 +123,7 @@ def test_coordinates_param():
     response = client.post(
         MAIN_API_ROUTE,
         files=[("files", (str(test_file), open(test_file, "rb")))],
+        data={"strategy": "hi_res"},
     )
 
     assert response.status_code == 200
@@ -130,7 +132,7 @@ def test_coordinates_param():
     response = client.post(
         MAIN_API_ROUTE,
         files=[("files", (str(test_file), open(test_file, "rb")))],
-        data={"coordinates": "true"},
+        data={"coordinates": "true", "strategy": "hi_res"},
     )
 
     assert response.status_code == 200
@@ -203,10 +205,37 @@ def test_general_api_returns_500_bad_pdf():
     tmp.close()
 
 
+class MockResponse:
+    def __init__(self, status_code):
+        self.status_code = status_code
+        self.body = {}
+        self.text = ""
+
+    def json(self):
+        return self.body
+
+
+def mock_partition_file_via_api(url, **kwargs):
+    file = kwargs["files"]["files"][1]
+
+    partition_kwargs = kwargs["data"]
+
+    # Hack - the api takes `coordinates` but regular partition does not
+    del partition_kwargs["coordinates"]
+
+    elements = partition(file=file, **partition_kwargs)
+
+    response = MockResponse(200)
+    response.body = elements
+    response.text = json.dumps(convert_to_isd(elements))
+    return response
+
+
 def test_parallel_mode_correct_result(monkeypatch):
     """
     Validate that parallel processing mode merges the results
-    to look the same as normal mode
+    to look the same as normal mode. The api call is mocked to
+    use local partition, so this is just testing the merge logic.
     """
     client = TestClient(app)
     test_file = Path("sample-docs") / "layout-parser-paper.pdf"
@@ -223,8 +252,9 @@ def test_parallel_mode_correct_result(monkeypatch):
     monkeypatch.setenv("UNSTRUCTURED_PARALLEL_MODE_URL", "unused")
     # Replace our callout with regular old partition
     monkeypatch.setattr(
-        "prepline_general.api.general.partition_via_api",
-        lambda file, api_url, **kwargs: partition(file=file, **kwargs),
+        requests,
+        "post",
+        lambda *args, **kwargs: mock_partition_file_via_api(*args, **kwargs),
     )
 
     response = client.post(
@@ -232,18 +262,12 @@ def test_parallel_mode_correct_result(monkeypatch):
         files=[("files", (str(test_file), open(test_file, "rb"), "application/pdf"))],
     )
 
-    print(response.text)
     assert response.status_code == 200
     result_parallel = response.json()
 
     for pair in zip(result_serial, result_parallel):
         print(json.dumps(pair, indent=2))
         assert pair[0] == pair[1]
-
-
-class MockResponse:
-    def __init__(self, status_code):
-        self.status_code = status_code
 
 
 def test_parallel_mode_returns_errors(monkeypatch):
@@ -269,9 +293,6 @@ def test_parallel_mode_returns_errors(monkeypatch):
 
     assert response.status_code == 500
 
-    # TODO (austin) - Right now any non 200 is going to turn into a 500
-    # because of how partition_via_api_works
-    # At the very least we can return a message with a bit more info
     monkeypatch.setattr(
         requests,
         "post",
@@ -287,5 +308,4 @@ def test_parallel_mode_returns_errors(monkeypatch):
         data={"pdf_processing_mode": "parallel"},
     )
 
-    assert response.status_code == 500
-    assert response.json() == {"detail": "Receive unexpected status code 400 from the API."}
+    assert response.status_code == 400
