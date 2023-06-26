@@ -20,11 +20,11 @@ import secrets
 from concurrent.futures import ThreadPoolExecutor
 from functools import partial
 from pypdf import PdfReader, PdfWriter
-from unstructured.partition.api import partition_via_api
 from unstructured.partition.auto import partition
-from unstructured.staging.base import convert_to_isd, convert_to_dataframe
+from unstructured.staging.base import convert_to_isd, convert_to_dataframe, elements_from_json
 import tempfile
 import pdfminer
+import requests
 
 
 app = FastAPI()
@@ -93,12 +93,16 @@ def get_pdf_splits(pdf, split_size=1):
     return split_pdfs
 
 
-def partition_file_via_api(file_tuple, **kwargs):
+def partition_file_via_api(file_tuple, request, filename, content_type, **partition_kwargs):
     """
-    Given a file-like, use partition_via_api to retrieve its elements.
+    Send the given file to be partitioned remotely, where the remote url is set by env var.
+
+    Args:
+    file_tuple is in the form (file, page_offest)
+    request is used to forward the api key header
+    filename and content_type are passed in the file form data
+    partition_kwargs holds any form parameters to be sent on
     """
-    # Note (austin) - we'll need to have the Request object here to forward
-    # any important context, e.g. api keys
     request_url = os.environ.get("UNSTRUCTURED_PARALLEL_MODE_URL")
 
     if not request_url:
@@ -106,15 +110,20 @@ def partition_file_via_api(file_tuple, **kwargs):
 
     file, page_offset = file_tuple
 
-    try:
-        # Note (austin) - consider using partition_multiple_via_api to cut down on traffic
-        # This would serialize the work that we just tried to split up,
-        # so we first need to parallelize multi file input
-        elements = partition_via_api(file=file, api_url=request_url, **kwargs)
-    except ValueError as e:
-        # TODO (austin) - the status code comes back in an error message
-        # Need to pull that back out and set it here
-        raise HTTPException(status_code=500, detail=f"{e}")
+    headers = {"unstructured-api-key": request.headers.get("unstructured_api_key")}
+
+    response = requests.post(
+        request_url,
+        files={"files": (filename, file, content_type)},
+        data=partition_kwargs,
+        headers=headers,
+    )
+
+    if response.status_code != 200:
+        detail = response.json().get("detail") or response.text
+        raise HTTPException(status_code=response.status_code, detail=detail)
+
+    elements = elements_from_json(text=response.text)
 
     # We need to account for the original page numbers
     for element in elements:
@@ -123,23 +132,43 @@ def partition_file_via_api(file_tuple, **kwargs):
     return elements
 
 
-def partition_pdf_splits(file, **kwargs):
+def partition_pdf_splits(
+    request, file, file_filename, content_type, coordinates, **partition_kwargs
+):
     """
-    Split up a pdf and process in parallel by sending back into the api
+    Split a pdf into chunks and process in parallel with more api calls, or partition
+    locally if the chunk is small enough. As soon as any remote call fails, bubble up
+    the error.
+
+    Arguments:
+    request is used to forward relevant headers to the api calls
+    file, file_filename and content_type are passed on in the file argument to requests.post
+    coordinates is passed on to the api calls, but cannot be used in the local partition case
+    partition_kwargs holds any others parameters that will be forwarded, or passed to partition
     """
     pages_per_pdf = 1
     pdf = PdfReader(file)
 
     # If it's small enough, just process locally
     if len(pdf.pages) <= pages_per_pdf:
-        return partition(file=file, **kwargs)
+        return partition(
+            file=file, file_filename=file_filename, content_type=content_type, **partition_kwargs
+        )
 
     results = []
-    pages = get_pdf_splits(pdf, split_size=pages_per_pdf)
-    partition_func = partial(partition_file_via_api, **kwargs)
+    page_tuples = get_pdf_splits(pdf, split_size=pages_per_pdf)
+
+    partition_func = partial(
+        partition_file_via_api,
+        request=request,
+        filename=file_filename,
+        content_type=content_type,
+        coordinates=coordinates,
+        **partition_kwargs,
+    )
 
     with ThreadPoolExecutor() as executor:
-        for result in executor.map(partition_func, pages):
+        for result in executor.map(partition_func, page_tuples):
             results.extend(result)
 
     return results
@@ -147,6 +176,7 @@ def partition_pdf_splits(file, **kwargs):
 
 def pipeline_api(
     file,
+    request=None,
     filename="",
     m_strategy=[],
     m_coordinates=[],
@@ -169,20 +199,22 @@ def pipeline_api(
     show_coordinates_str = (m_coordinates[0] if len(m_coordinates) else "false").lower()
     show_coordinates = show_coordinates_str == "true"
 
-    pdf_parallel_mode_enabled = (
-        os.environ.get("UNSTRUCTURED_PARALLEL_MODE_ENABLED", "false") == "true"
-    )
+    # Parallel mode is set by env variable
+    enable_parallel_mode = os.environ.get("UNSTRUCTURED_PARALLEL_MODE_ENABLED", "false")
+    pdf_parallel_mode_enabled = enable_parallel_mode == "true"
 
     ocr_languages = ("+".join(m_ocr_languages) if len(m_ocr_languages) else "eng").lower()
 
     try:
         if file_content_type == "application/pdf" and pdf_parallel_mode_enabled:
             elements = partition_pdf_splits(
+                request,
                 file=file,
                 file_filename=filename,
                 content_type=file_content_type,
                 strategy=strategy,
                 ocr_languages=ocr_languages,
+                coordinates=show_coordinates,
             )
         else:
             elements = partition(
@@ -212,11 +244,6 @@ def pipeline_api(
     result = convert_to_isd(elements)
     for element in result:
         element["metadata"]["filename"] = os.path.basename(filename)
-
-        # TODO (austin) - partition_via_api always returns a filetype of json
-        # If we've run a pdf in parallel mode, just change the type back for now
-        if "pdf" in element["metadata"]["filename"] and "json" in element["metadata"]["filetype"]:
-            element["metadata"]["filetype"] = "application/pdf"
 
         if not show_coordinates:
             del element["coordinates"]
@@ -371,6 +398,7 @@ def pipeline_1(
 
                 response = pipeline_api(
                     _file,
+                    request=request,
                     m_strategy=strategy,
                     m_coordinates=coordinates,
                     m_ocr_languages=ocr_languages,

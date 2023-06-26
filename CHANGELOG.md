@@ -1,6 +1,7 @@
 ## 0.0.29
 
 * Support .msg files
+* Refactor parallel mode and add smoke test
 
 ## 0.0.28
 
