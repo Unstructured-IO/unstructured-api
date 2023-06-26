@@ -184,6 +184,11 @@ def pipeline_api(
     file_content_type=None,
     response_type="application/json",
 ):
+    if filename.endswith(".msg"):
+        # Note(yuming): convert file type for msg files
+        # since fast api might sent the wrong one.
+        file_content_type = "application/x-ole-storage"
+
     strategy = (m_strategy[0] if len(m_strategy) else "fast").lower()
     strategies = ["fast", "hi_res", "auto", "ocr_only"]
     if strategy not in strategies:

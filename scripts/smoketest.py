@@ -43,11 +43,7 @@ def send_document(filename, content_type, strategy="fast", output_format="applic
         ),
         ("spring-weather.html.json", "application/json"),
         ("README.md", "text/markdown"),
-        pytest.param(
-            "fake-email.msg",
-            "application/x-ole-storage",
-            marks=pytest.mark.xfail(reason="See CORE-1148"),
-        ),
+        ("fake-email.msg", "application/x-ole-storage"),
         ("fake.odt", "application/vnd.oasis.opendocument.text"),
         # Note(austin) The two inference calls will hang on mac with unsupported hardware error
         # Skip these with SKIP_INFERENCE_TESTS=true make docker-test
