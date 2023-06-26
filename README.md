@@ -1,6 +1,17 @@
 <h3 align="center">
   <img src="img/unstructured_logo.png" height="200">
 </h3>
+<h3 align="center">
+  <p>API Announcement!</p>
+</h3>
+
+<p>While access to the hosted Unstructured API will remain free, API Keys will soon be required to make requests. To prevent any disruption, get yours <a href="https://www.unstructured.io/api-key/">here</a> now and start using it today!</p>
+  
+<p>Checkout the rest of the readme below to get started making API calls. 
+We'd love to hear your feedback, let us know how it goes in our
+  <a href="https://join.slack.com/t/unstructuredw-kbe4326/shared_invite/zt-1x7cgo0pg-PTptXWylzPQF9xZolzCnwQ"> community slack</a>. And stay tuned for improvements to both quality and performance!</p>
+  
+---
 
 <h3 align="center">
   <p>General Pre-Processing Pipeline for Documents</p>
@@ -25,6 +36,7 @@ Try our hosted API! It's freely available to use with any of the filetypes liste
   'https://api.unstructured.io/general/v0/general' \
   -H 'accept: application/json' \
   -H 'Content-Type: multipart/form-data' \
+  -H 'unstructured-api-key: <YOUR API KEY>'
   -F 'files=@sample-docs/family-day.eml' \
   | jq -C . | less -R
 ```
