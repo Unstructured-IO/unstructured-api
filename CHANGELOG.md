@@ -3,6 +3,7 @@
 * Support .msg files
 * Refactor parallel mode and add smoke test
 * Fix header value for api key
+* Add support for `encoding` parameter
 
 ## 0.0.28
 

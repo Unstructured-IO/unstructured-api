@@ -169,6 +169,7 @@ def test_strategy_param_400():
     )
     assert response.status_code == 400
 
+
 def test_valid_encoding_param():
     """
     Verify that we get a 200 for passing an encoding param
@@ -182,6 +183,7 @@ def test_valid_encoding_param():
     )
     assert response.status_code == 200
 
+
 def test_invalid_encoding_param():
     """
     Verify that we get a 500 if we pass an invalid encoding through to partition
@@ -192,7 +194,7 @@ def test_invalid_encoding_param():
         response = client.post(
             MAIN_API_ROUTE,
             files=[("files", (str(test_file), open(test_file, "rb"), "text/plain"))],
-            data={"encoding": "invalid_encoding"},
+            data={"encoding": "not_an_encoding"},
         )
 
         assert response.status_code == 500
