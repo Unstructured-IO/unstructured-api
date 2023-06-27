@@ -2,6 +2,7 @@
 
 * Support .msg files
 * Refactor parallel mode and add smoke test
+* Fix header value for api key
 
 ## 0.0.28
 

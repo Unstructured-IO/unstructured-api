@@ -110,7 +110,7 @@ def partition_file_via_api(file_tuple, request, filename, content_type, **partit
 
     file, page_offset = file_tuple
 
-    headers = {"unstructured-api-key": request.headers.get("unstructured_api_key")}
+    headers = {"unstructured-api-key": request.headers.get("unstructured-api-key")}
 
     response = requests.post(
         request_url,
