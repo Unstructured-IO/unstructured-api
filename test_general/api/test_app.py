@@ -4,6 +4,7 @@ from typing import List
 import json
 import io
 import pytest
+import re
 import requests
 import ast
 import pandas as pd
@@ -234,6 +235,53 @@ def test_api_with_different_encodings():
             data={"encoding": "utf8"},
         )
     assert "invalid start byte" in str(excinfo.value)
+
+
+def test_xml_keep_tags_param():
+    """
+    Verify that responses do not include xml tags unless requested
+    """
+    client = TestClient(app)
+    test_file = Path("sample-docs") / "fake-xml.xml"
+    response = client.post(
+        MAIN_API_ROUTE,
+        files=[("files", (str(test_file), open(test_file, "rb")))],
+        data={"strategy": "hi_res"},
+    )
+    assert response.status_code == 200
+    response_without_xml_tags = response.json()
+
+    response = client.post(
+        MAIN_API_ROUTE,
+        files=[("files", (str(test_file), open(test_file, "rb")))],
+        data={"xml_keep_tags": "true", "strategy": "hi_res"},
+    )
+    assert response.status_code == 200
+    response_with_xml_tags = response.json()[3:]  # skip the initial encoding tag(s)
+
+    # The responses should have the same content except for the xml tags
+    response_with_xml_tags_index, response_without_xml_tags_index = 0, 0
+    while response_without_xml_tags_index < len(response_without_xml_tags):
+        xml_tagged_line = response_with_xml_tags[response_with_xml_tags_index]["text"]
+        assert xml_tagged_line.startswith("<")
+        assert xml_tagged_line.endswith(">")
+
+        # if there is content on this line, ensure it matches the content on the non tagged line
+        xml_tagged_line_content = xml_tagged_line.split(">", 1)[1]  # remove opening tag
+        if not xml_tagged_line_content:
+            response_with_xml_tags_index += 1
+
+        else:
+            xml_tagged_line_content = xml_tagged_line_content.split("<", 1)[0]  # remove closing tag
+
+            xml_untagged_line = response_without_xml_tags[response_without_xml_tags_index]["text"]
+            xml_tagged_line_content_parsed = re.sub(
+                "&amp;", "&", xml_tagged_line_content
+            )  # xml_keep_tags does not currently parse the inner content
+            assert xml_tagged_line_content_parsed == xml_untagged_line
+
+            response_with_xml_tags_index += 1
+            response_without_xml_tags_index += 1
 
 
 @pytest.mark.parametrize(
