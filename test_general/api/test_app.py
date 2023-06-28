@@ -198,6 +198,7 @@ def test_invalid_encoding_param():
         )
     assert "unknown encoding" in str(excinfo.value)
 
+
 def test_api_with_different_encodings():
     """
     Verify that we get different text results for different encodings
