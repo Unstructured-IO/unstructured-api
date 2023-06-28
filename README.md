@@ -98,7 +98,7 @@ When elements are extracted from PDFs or images, it may be useful to get their b
 You can specify the encoding to use to decode the text input. If no value is provided, utf-8 will be used.
 
 ```
-curl  -X 'POST'  'http://localhost:8000/general/v0/general'  \
+curl -X 'POST' 'https://api.unstructured.io/general/v0/general' \
  -H 'accept: application/json'  \
  -H 'Content-Type: multipart/form-data' \
  -F 'files=@sample-docs/fake-power-point.pptx' \
