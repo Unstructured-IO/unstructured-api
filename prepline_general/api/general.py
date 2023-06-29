@@ -167,7 +167,8 @@ def partition_pdf_splits(
         **partition_kwargs,
     )
 
-    with ThreadPoolExecutor() as executor:
+    thread_count = int(os.environ.get("UNSTRUCTURED_PARALLEL_MODE_THREADS", 3))
+    with ThreadPoolExecutor(max_workers=thread_count) as executor:
         for result in executor.map(partition_func, page_tuples):
             results.extend(result)
 
