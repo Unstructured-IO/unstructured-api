@@ -146,7 +146,7 @@ def partition_pdf_splits(
     coordinates is passed on to the api calls, but cannot be used in the local partition case
     partition_kwargs holds any others parameters that will be forwarded, or passed to partition
     """
-    pages_per_pdf = 1
+    pages_per_pdf = int(os.environ.get("UNSTRUCTURED_PARALLEL_MODE_SPLIT_SIZE", 1))
     pdf = PdfReader(file)
 
     # If it's small enough, just process locally
@@ -167,7 +167,8 @@ def partition_pdf_splits(
         **partition_kwargs,
     )
 
-    with ThreadPoolExecutor() as executor:
+    thread_count = int(os.environ.get("UNSTRUCTURED_PARALLEL_MODE_THREADS", 3))
+    with ThreadPoolExecutor(max_workers=thread_count) as executor:
         for result in executor.map(partition_func, page_tuples):
             results.extend(result)
 

@@ -206,6 +206,8 @@ As mentioned above, processing a pdf using `hi_res` is currently a slow operatio
 
 * `UNSTRUCTURED_PARALLEL_MODE_ENABLED` - set to `true` to process individual pdf pages remotely 
 * `UNSTRUCTURED_PARALLEL_MODE_URL` - the location to send pdf page asynchronously
+* `UNSTRUCTURED_PARALLEL_MODE_THREADS` - the number of threads making requests at once. See `partition_pdf_splits` for the current default.
+* `UNSTRUCTURED_PARALLEL_MODE_SPLIT_SIZE` - the number of pages to be processed in one request
 
 ### Generating Python files from the pipeline notebooks
 
