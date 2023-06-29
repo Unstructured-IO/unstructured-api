@@ -182,6 +182,7 @@ def pipeline_api(
     m_coordinates=[],
     m_ocr_languages=[],
     m_encoding=[],
+    m_xml_keep_tags=[],
     file_content_type=None,
     response_type="application/json",
 ):
@@ -208,6 +209,9 @@ def pipeline_api(
 
     encoding = m_encoding[0] if len(m_encoding) else None
 
+    xml_keep_tags_str = (m_xml_keep_tags[0] if len(m_xml_keep_tags) else "false").lower()
+    xml_keep_tags = xml_keep_tags_str == "true"
+
     try:
         if file_content_type == "application/pdf" and pdf_parallel_mode_enabled:
             elements = partition_pdf_splits(
@@ -228,6 +232,7 @@ def pipeline_api(
                 strategy=strategy,
                 ocr_languages=ocr_languages,
                 encoding=encoding,
+                xml_keep_tags=xml_keep_tags,
             )
     except ValueError as e:
         if "Invalid file" in e.args[0]:
@@ -371,6 +376,7 @@ def pipeline_1(
     coordinates: List[str] = Form(default=[]),
     ocr_languages: List[str] = Form(default=[]),
     encoding: List[str] = Form(default=[]),
+    xml_keep_tags: List[str] = Form(default=[]),
 ):
     if files:
         for file_index in range(len(files)):
@@ -409,6 +415,7 @@ def pipeline_1(
                     m_coordinates=coordinates,
                     m_ocr_languages=ocr_languages,
                     m_encoding=encoding,
+                    m_xml_keep_tags=xml_keep_tags,
                     response_type=media_type,
                     filename=file.filename,
                     file_content_type=file_content_type,
