@@ -266,7 +266,7 @@ jinja2==3.1.2
     #   notebook
     #   torch
     #   unstructured-api-tools
-joblib==1.2.0
+joblib==1.3.0
     # via
     #   -r requirements/base.txt
     #   nltk
@@ -306,7 +306,7 @@ jupyter-core==5.3.1
     #   qtconsole
 jupyter-events==0.6.3
     # via jupyter-server
-jupyter-server==2.6.0
+jupyter-server==2.7.0
     # via
     #   nbclassic
     #   notebook-shim
@@ -367,7 +367,7 @@ msg-parser==1.2.0
     # via
     #   -r requirements/base.txt
     #   unstructured
-mypy==1.4.0
+mypy==1.4.1
     # via
     #   -r requirements/base.txt
     #   -r requirements/test.in
@@ -585,7 +585,7 @@ pyparsing==3.1.0
     # via
     #   -r requirements/base.txt
     #   matplotlib
-pypdf==3.11.0
+pypdf==3.11.1
     # via -r requirements/base.txt
 pyrsistent==0.19.3
     # via
@@ -828,7 +828,7 @@ types-urllib3==1.26.25.13
     # via
     #   -r requirements/base.txt
     #   types-requests
-typing-extensions==4.6.3
+typing-extensions==4.7.0
     # via
     #   -r requirements/base.txt
     #   black
@@ -842,7 +842,7 @@ typing-extensions==4.6.3
     #   starlette
     #   torch
     #   typer
-unstructured[local-inference]==0.7.8
+unstructured[local-inference]==0.7.10
     # via -r requirements/base.txt
 unstructured-api-tools==0.10.7
     # via -r requirements/base.txt

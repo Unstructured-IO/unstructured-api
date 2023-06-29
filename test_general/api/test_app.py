@@ -170,6 +170,72 @@ def test_strategy_param_400():
     assert response.status_code == 400
 
 
+def test_valid_encoding_param():
+    """
+    Verify that we get a 200 for passing an encoding param
+    """
+    client = TestClient(app)
+    test_file = Path("sample-docs") / "fake-xml.xml"
+    response = client.post(
+        MAIN_API_ROUTE,
+        files=[("files", (str(test_file), open(test_file, "rb"), "text/plain"))],
+        data={"encoding": "ascii"},
+    )
+    assert response.status_code == 200
+
+
+def test_invalid_encoding_param():
+    """
+    Verify that we get a 500 if we pass an invalid encoding through to partition
+    """
+    client = TestClient(app)
+    test_file = Path("sample-docs") / "fake-html.html"
+    with pytest.raises(LookupError) as excinfo:
+        client.post(
+            MAIN_API_ROUTE,
+            files=[("files", (str(test_file), open(test_file, "rb"), "text/plain"))],
+            data={"encoding": "not_an_encoding"},
+        )
+    assert "unknown encoding" in str(excinfo.value)
+
+
+def test_api_with_different_encodings():
+    """
+    Verify that we get different text results for different encodings
+    """
+    client = TestClient(app)
+    test_file = Path("sample-docs") / "fake-text-utf-32.txt"
+
+    # utf-16
+    response_16 = client.post(
+        MAIN_API_ROUTE,
+        files=[("files", (str(test_file), open(test_file, "rb"), "text/plain"))],
+        data={"encoding": "utf-16"},
+    )
+    assert response_16.status_code == 200
+    elements_16 = response_16.json()
+    assert elements_16[0]["text"].startswith("\x00T\x00h\x00i\x00s\x00 \x00i\x00s\x00")
+
+    # utf-32
+    response_32 = client.post(
+        MAIN_API_ROUTE,
+        files=[("files", (str(test_file), open(test_file, "rb"), "text/plain"))],
+        data={"encoding": "utf-32"},
+    )
+    assert response_32.status_code == 200
+    elements_32 = response_32.json()
+    assert elements_32[2]["text"].startswith("Important points:")
+
+    # utf-8
+    with pytest.raises(UnicodeDecodeError) as excinfo:
+        client.post(
+            MAIN_API_ROUTE,
+            files=[("files", (str(test_file), open(test_file, "rb"), "text/plain"))],
+            data={"encoding": "utf8"},
+        )
+    assert "invalid start byte" in str(excinfo.value)
+
+
 @pytest.mark.parametrize(
     "example_filename",
     [

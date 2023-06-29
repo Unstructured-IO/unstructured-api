@@ -1,3 +1,7 @@
+## 0.0.30-dev0
+
+* Add support for `encoding` parameter
+
 ## 0.0.29
 
 * Support .msg files

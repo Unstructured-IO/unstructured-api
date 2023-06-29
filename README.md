@@ -93,6 +93,20 @@ When elements are extracted from PDFs or images, it may be useful to get their b
   | jq -C . | less -R
 ```
 
+#### Encoding
+
+You can specify the encoding to use to decode the text input. If no value is provided, utf-8 will be used.
+
+```
+curl -X 'POST' 
+ 'https://api.unstructured.io/general/v0/general' \
+ -H 'accept: application/json'  \
+ -H 'Content-Type: multipart/form-data' \
+ -F 'files=@sample-docs/fake-power-point.pptx' \
+ -F 'encoding=utf_8' \
+ | jq -C . | less -R
+```
+
 
 ## Developer Quick Start
 
