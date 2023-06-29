@@ -1,7 +1,7 @@
 ## 0.0.30-dev1
 
 * Add support for `encoding` parameter
-* Add env variable for number of threads in parallel mode
+* Add env variables for additional parallel mode tweaking
 
 ## 0.0.29
 
