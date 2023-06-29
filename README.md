@@ -107,6 +107,19 @@ curl -X 'POST'
  | jq -C . | less -R
 ```
 
+#### XML Tags
+
+When processing XML documents, set the `xml_keep_tags` parameter to `true` to retain the XML tags in the output. If not specified, it will simply extract the text from within the tags.
+
+```
+curl -X 'POST' 
+ 'https://api.unstructured.io/general/v0/general' \
+ -H 'accept: application/json'  \
+ -H 'Content-Type: multipart/form-data' \
+ -F 'files=@sample-docs/fake-xml.xml' \
+ -F 'xml_keep_tags = true' \
+ | jq -C . | less -R
+```
 
 ## Developer Quick Start
 
