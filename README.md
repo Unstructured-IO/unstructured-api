@@ -117,7 +117,7 @@ curl -X 'POST'
  -H 'accept: application/json'  \
  -H 'Content-Type: multipart/form-data' \
  -F 'files=@sample-docs/fake-xml.xml' \
- -F 'xml_keep_tags = true' \
+ -F 'xml_keep_tags=true' \
  | jq -C . | less -R
 ```
 
