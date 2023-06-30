@@ -95,7 +95,7 @@ When elements are extracted from PDFs or images, it may be useful to get their b
 
 #### PDF Table Extraction
 
-To extract the table structure from PDF files using the `hi_res` strategy, ensure that the `pdf_infer_table_structure` parameter is set to `true`. This setting includes the table's text content in the response. By default, this parameter is set to `true`, but if you wish to avoid the expensive reading process, you can set it to `false`.
+To extract the table structure from PDF files using the `hi_res` strategy, ensure that the `pdf_infer_table_structure` parameter is set to `true`. This setting includes the table's text content in the response. By default, this parameter is set to `false` to avoid the expensive reading process.
 
 ```
  curl -X 'POST' \
