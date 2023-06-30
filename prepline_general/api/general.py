@@ -17,10 +17,14 @@ from starlette.types import Send
 from base64 import b64encode
 from typing import Optional, Mapping, Iterator, Tuple
 import secrets
+from concurrent.futures import ThreadPoolExecutor
+from functools import partial
+from pypdf import PdfReader, PdfWriter
 from unstructured.partition.auto import partition
-from unstructured.staging.base import convert_to_isd
+from unstructured.staging.base import convert_to_isd, convert_to_dataframe, elements_from_json
 import tempfile
 import pdfminer
+import requests
 
 
 app = FastAPI()
@@ -52,33 +56,166 @@ DEFAULT_MIMETYPES = (
     "application/epub,application/epub+zip,"
     "application/rtf,text/rtf,"
     "application/vnd.oasis.opendocument.text,"
+    "text/csv,text/x-csv,application/csv,application/x-csv,"
+    "text/comma-separated-values,text/x-comma-separated-values,"
+    "application/xml,text/xml,text/x-rst,text/prs.fallenstein.rst,"
+    "text/tsv,text/tab-separated-values,"
+    "application/x-ole-storage,application/vnd.ms-outlook,"
 )
 
 if not os.environ.get("UNSTRUCTURED_ALLOWED_MIMETYPES", None):
     os.environ["UNSTRUCTURED_ALLOWED_MIMETYPES"] = DEFAULT_MIMETYPES
 
 
+def get_pdf_splits(pdf, split_size=1):
+    """
+    Given a pdf (PdfReader) with n pages, split it into pdfs each with split_size # of pages
+    Return the files with their page offset in the form [( BytesIO, int)]
+    """
+    split_pdfs = []
+
+    offset = 0
+
+    while offset < len(pdf.pages):
+        new_pdf = PdfWriter()
+        pdf_buffer = io.BytesIO()
+
+        end = offset + split_size
+        for page in pdf.pages[offset:end]:
+            new_pdf.add_page(page)
+
+        new_pdf.write(pdf_buffer)
+        pdf_buffer.seek(0)
+
+        split_pdfs.append((pdf_buffer, offset))
+        offset += split_size
+
+    return split_pdfs
+
+
+def partition_file_via_api(file_tuple, request, filename, content_type, **partition_kwargs):
+    """
+    Send the given file to be partitioned remotely, where the remote url is set by env var.
+
+    Args:
+    file_tuple is in the form (file, page_offest)
+    request is used to forward the api key header
+    filename and content_type are passed in the file form data
+    partition_kwargs holds any form parameters to be sent on
+    """
+    request_url = os.environ.get("UNSTRUCTURED_PARALLEL_MODE_URL")
+
+    if not request_url:
+        raise HTTPException(status_code=500, detail="Parallel mode enabled but no url set!")
+
+    file, page_offset = file_tuple
+
+    headers = {"unstructured-api-key": request.headers.get("unstructured-api-key")}
+
+    response = requests.post(
+        request_url,
+        files={"files": (filename, file, content_type)},
+        data=partition_kwargs,
+        headers=headers,
+    )
+
+    if response.status_code != 200:
+        detail = response.json().get("detail") or response.text
+        raise HTTPException(status_code=response.status_code, detail=detail)
+
+    elements = elements_from_json(text=response.text)
+
+    # We need to account for the original page numbers
+    for element in elements:
+        element.metadata.page_number += page_offset
+
+    return elements
+
+
+def partition_pdf_splits(
+    request, file, file_filename, content_type, coordinates, **partition_kwargs
+):
+    """
+    Split a pdf into chunks and process in parallel with more api calls, or partition
+    locally if the chunk is small enough. As soon as any remote call fails, bubble up
+    the error.
+
+    Arguments:
+    request is used to forward relevant headers to the api calls
+    file, file_filename and content_type are passed on in the file argument to requests.post
+    coordinates is passed on to the api calls, but cannot be used in the local partition case
+    partition_kwargs holds any others parameters that will be forwarded, or passed to partition
+    """
+    pages_per_pdf = int(os.environ.get("UNSTRUCTURED_PARALLEL_MODE_SPLIT_SIZE", 1))
+    pdf = PdfReader(file)
+
+    # If it's small enough, just process locally
+    if len(pdf.pages) <= pages_per_pdf:
+        return partition(
+            file=file, file_filename=file_filename, content_type=content_type, **partition_kwargs
+        )
+
+    results = []
+    page_tuples = get_pdf_splits(pdf, split_size=pages_per_pdf)
+
+    partition_func = partial(
+        partition_file_via_api,
+        request=request,
+        filename=file_filename,
+        content_type=content_type,
+        coordinates=coordinates,
+        **partition_kwargs,
+    )
+
+    thread_count = int(os.environ.get("UNSTRUCTURED_PARALLEL_MODE_THREADS", 3))
+    with ThreadPoolExecutor(max_workers=thread_count) as executor:
+        for result in executor.map(partition_func, page_tuples):
+            results.extend(result)
+
+    return results
+
+
 def pipeline_api(
     file,
+    request=None,
     filename="",
     m_strategy=[],
     m_coordinates=[],
+    m_ocr_languages=[],
+    m_encoding=[],
+    m_xml_keep_tags=[],
     m_pdf_infer_table_structure=[],
     file_content_type=None,
     response_type="application/json",
 ):
+    if filename.endswith(".msg"):
+        # Note(yuming): convert file type for msg files
+        # since fast api might sent the wrong one.
+        file_content_type = "application/x-ole-storage"
+
     strategy = (m_strategy[0] if len(m_strategy) else "fast").lower()
-    if strategy not in ["fast", "hi_res"]:
+    strategies = ["fast", "hi_res", "auto", "ocr_only"]
+    if strategy not in strategies:
         raise HTTPException(
-            status_code=400,
-            detail=f"Invalid strategy: {strategy}. Must be one of ['fast', 'hi_res']",
+            status_code=400, detail=f"Invalid strategy: {strategy}. Must be one of {strategies}"
         )
 
     show_coordinates_str = (m_coordinates[0] if len(m_coordinates) else "false").lower()
     show_coordinates = show_coordinates_str == "true"
 
+    # Parallel mode is set by env variable
+    enable_parallel_mode = os.environ.get("UNSTRUCTURED_PARALLEL_MODE_ENABLED", "false")
+    pdf_parallel_mode_enabled = enable_parallel_mode == "true"
+
+    ocr_languages = ("+".join(m_ocr_languages) if len(m_ocr_languages) else "eng").lower()
+
+    encoding = m_encoding[0] if len(m_encoding) else None
+
+    xml_keep_tags_str = (m_xml_keep_tags[0] if len(m_xml_keep_tags) else "false").lower()
+    xml_keep_tags = xml_keep_tags_str == "true"
+
     pdf_infer_table_structure = (
-        m_pdf_infer_table_structure[0] if len(m_pdf_infer_table_structure) else "true"
+        m_pdf_infer_table_structure[0] if len(m_pdf_infer_table_structure) else "false"
     ).lower()
     if strategy == "hi_res" and pdf_infer_table_structure == "true":
         pdf_infer_table_structure = True
@@ -86,13 +223,29 @@ def pipeline_api(
         pdf_infer_table_structure = False
 
     try:
-        elements = partition(
-            file=file,
-            file_filename=filename,
-            content_type=file_content_type,
-            strategy=strategy,
-            pdf_infer_table_structure=pdf_infer_table_structure,
-        )
+        if file_content_type == "application/pdf" and pdf_parallel_mode_enabled:
+            elements = partition_pdf_splits(
+                request,
+                file=file,
+                file_filename=filename,
+                content_type=file_content_type,
+                strategy=strategy,
+                ocr_languages=ocr_languages,
+                coordinates=show_coordinates,
+                pdf_infer_table_structure=pdf_infer_table_structure,
+                encoding=encoding,
+            )
+        else:
+            elements = partition(
+                file=file,
+                file_filename=filename,
+                content_type=file_content_type,
+                strategy=strategy,
+                ocr_languages=ocr_languages,
+                pdf_infer_table_structure=pdf_infer_table_structure,
+                encoding=encoding,
+                xml_keep_tags=xml_keep_tags,
+            )
     except ValueError as e:
         if "Invalid file" in e.args[0]:
             raise HTTPException(
@@ -102,8 +255,14 @@ def pipeline_api(
     except pdfminer.pdfparser.PDFSyntaxError:
         raise HTTPException(status_code=400, detail=f"{filename} does not appear to be a valid PDF")
 
-    # Due to the above, elements have an ugly temp filename in their metadata
-    # For now, replace this with the basename
+    if response_type == "text/csv":
+        df = convert_to_dataframe(elements)
+        df["filename"] = os.path.basename(filename)
+        if not show_coordinates:
+            df.drop(columns=["coordinates"], inplace=True)
+
+        return df.to_csv(index=False)
+
     result = convert_to_isd(elements)
     for element in result:
         element["metadata"]["filename"] = os.path.basename(filename)
@@ -219,7 +378,7 @@ def ungz_file(file: UploadFile, gz_uncompressed_content_type=None) -> UploadFile
 
 
 @router.post("/general/v0/general")
-@router.post("/general/v0.0.22/general")
+@router.post("/general/v0.0.30/general")
 def pipeline_1(
     request: Request,
     gz_uncompressed_content_type: Optional[str] = Form(default=None),
@@ -227,6 +386,9 @@ def pipeline_1(
     output_format: Union[str, None] = Form(default=None),
     strategy: List[str] = Form(default=[]),
     coordinates: List[str] = Form(default=[]),
+    ocr_languages: List[str] = Form(default=[]),
+    encoding: List[str] = Form(default=[]),
+    xml_keep_tags: List[str] = Form(default=[]),
     pdf_infer_table_structure: List[str] = Form(default=[]),
 ):
     if files:
@@ -261,8 +423,12 @@ def pipeline_1(
 
                 response = pipeline_api(
                     _file,
+                    request=request,
                     m_strategy=strategy,
                     m_coordinates=coordinates,
+                    m_ocr_languages=ocr_languages,
+                    m_encoding=encoding,
+                    m_xml_keep_tags=xml_keep_tags,
                     m_pdf_infer_table_structure=pdf_infer_table_structure,
                     response_type=media_type,
                     filename=file.filename,

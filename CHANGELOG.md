@@ -1,6 +1,47 @@
-## 0.0.22
+## 0.0.30
 
 * Add table extraction support for hi_res strategy
+* Add support for `encoding` parameter
+* Add support for `xml_keep_tags` parameter
+* Add env variables for additional parallel mode tweaking
+
+## 0.0.29
+
+* Support .msg files
+* Refactor parallel mode and add smoke test
+* Fix header value for api key
+
+## 0.0.28
+
+* Bump unstructured library to 0.7.8 for bug fixes
+
+## 0.0.27
+
+* Update documentation and tests for filetypes to sync with partition.auto
+* Add support for .rst, .tsv, .xml
+* Move PYPDF2 to pypdf since PYPDF2 is deprecated
+
+## 0.0.26
+
+* Add support for `ocr_only` strategy and `ocr_languages` parameter
+* Remove building `detectron2` from source in Dockerfile
+* Convert strategy from fast to auto for images since there is no fast strategy for images
+
+## 0.0.25
+
+* Bump image to use python 3.8.17 instead of 3.8.15 
+
+## 0.0.24
+
+* Add returning text/csv to pipeline_api
+
+## 0.0.23
+
+* Add support for csv files
+
+## 0.0.22
+
+* Add parallel processing mode for pages within a pdf
 
 ## 0.0.21
 

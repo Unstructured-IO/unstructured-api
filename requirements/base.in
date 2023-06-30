@@ -2,5 +2,6 @@ unstructured[local-inference]>=0.7.1
 unstructured-api-tools>=0.6.0
 ratelimit
 requests
+pypdf
 
 
