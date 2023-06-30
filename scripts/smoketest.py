@@ -13,13 +13,22 @@ API_URL = "http://localhost:8000/general/v0/general"
 skip_inference_tests = os.getenv("SKIP_INFERENCE_TESTS", "").lower() in {"true", "yes", "y", "1"}
 
 
-def send_document(filename, content_type, strategy="fast", pdf_infer_table_structure="true"):
-    files = {"files": (str(filename), open(filename, "rb"))}
-    return requests.post(API_URL, files=files, data={"strategy": strategy, "pdf_infer_table_structure": pdf_infer_table_structure})
-def send_document(filename, content_type, strategy="fast", output_format="application/json"):
+def send_document(
+    filename,
+    content_type,
+    strategy="fast",
+    output_format="application/json",
+    pdf_infer_table_structure="false",
+):
     files = {"files": (str(filename), open(filename, "rb"))}
     return requests.post(
-        API_URL, files=files, data={"strategy": strategy, "output_format": output_format}
+        API_URL,
+        files=files,
+        data={
+            "strategy": strategy,
+            "output_format": output_format,
+            "pdf_infer_table_structure": pdf_infer_table_structure,
+        },
     )
 
 
@@ -113,22 +122,33 @@ def test_strategy_performance():
 
 
 @pytest.mark.skipif(skip_inference_tests, reason="emulated architecture")
-@pytest.mark.parametrize("strategy, pdf_infer_table_structure, expected_table_num", 
-                         [("fast", "True", 0),
-                          ("fast", "False", 0),
-                          ("hi_res", "True", 2),
-                          ("hi_res", "False", 0),
-                          ]
+@pytest.mark.parametrize(
+    "strategy, pdf_infer_table_structure, expected_table_num",
+    [
+        ("fast", "True", 0),
+        ("fast", "False", 0),
+        ("hi_res", "True", 2),
+        ("hi_res", "False", 0),
+    ],
 )
 def test_table_support(strategy, pdf_infer_table_structure, expected_table_num):
-    '''
+    """
     Test that table extraction works on hi_res strategy
-    '''
+    """
     test_file = Path("sample-docs") / "layout-parser-paper.pdf"
-    response = send_document(test_file, "application/pdf", strategy=strategy, pdf_infer_table_structure=pdf_infer_table_structure)
+    response = send_document(
+        test_file,
+        "application/pdf",
+        strategy=strategy,
+        pdf_infer_table_structure=pdf_infer_table_structure,
+    )
 
-    assert(response.status_code == 200)
-    extracted_tables = [el["metadata"]["text_as_html"] for el in response.json() if "text_as_html" in el["metadata"].keys()]
+    assert response.status_code == 200
+    extracted_tables = [
+        el["metadata"]["text_as_html"]
+        for el in response.json()
+        if "text_as_html" in el["metadata"].keys()
+    ]
     assert len(extracted_tables) == expected_table_num
     if expected_table_num > 0:
         # Test a text form a table is extracted
