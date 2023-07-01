@@ -3,7 +3,6 @@
 * Add support for `encoding` parameter
 * Add support for `xml_keep_tags` parameter
 * Add env variables for additional parallel mode tweaking
-* Latest security patches
 
 ## 0.0.29
 
