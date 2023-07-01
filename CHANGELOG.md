@@ -1,4 +1,4 @@
-## 0.0.30-dev1
+## 0.0.30
 
 * Add support for `encoding` parameter
 * Add support for `xml_keep_tags` parameter
