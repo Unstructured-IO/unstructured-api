@@ -15,6 +15,7 @@ skip_inference_tests = os.getenv("SKIP_INFERENCE_TESTS", "").lower() in {"true",
 
 def send_document(
     filename,
+    content_type,
     strategy="fast",
     output_format="application/json",
     pdf_infer_table_structure="false",
