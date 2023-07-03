@@ -131,7 +131,7 @@ et-xmlfile==1.1.0
     # via
     #   -r requirements/base.txt
     #   openpyxl
-exceptiongroup==1.1.1
+exceptiongroup==1.1.2
     # via
     #   -r requirements/base.txt
     #   anyio
@@ -140,7 +140,7 @@ execnb==0.1.5
     # via nbdev
 executing==1.2.0
     # via stack-data
-fastapi==0.98.0
+fastapi==0.99.1
     # via
     #   -r requirements/base.txt
     #   unstructured-api-tools
@@ -232,7 +232,7 @@ iopath==0.1.10
     # via
     #   -r requirements/base.txt
     #   layoutparser
-ipykernel==6.23.3
+ipykernel==6.24.0
     # via
     #   ipywidgets
     #   jupyter
@@ -444,7 +444,7 @@ onnxruntime==1.15.1
     # via
     #   -r requirements/base.txt
     #   unstructured-inference
-opencv-python==4.7.0.72
+opencv-python==4.8.0.74
     # via
     #   -r requirements/base.txt
     #   layoutparser
@@ -505,7 +505,7 @@ pexpect==4.8.0
     # via ipython
 pickleshare==0.7.5
     # via ipython
-pillow==9.5.0
+pillow==10.0.0
     # via
     #   -r requirements/base.txt
     #   layoutparser
@@ -562,7 +562,7 @@ pycparser==2.21
     # via
     #   -r requirements/base.txt
     #   cffi
-pydantic==1.10.9
+pydantic==1.10.10
     # via
     #   -r requirements/base.txt
     #   argilla
@@ -585,7 +585,7 @@ pyparsing==3.1.0
     # via
     #   -r requirements/base.txt
     #   matplotlib
-pypdf==3.11.1
+pypdf==3.12.0
     # via -r requirements/base.txt
 pyrsistent==0.19.3
     # via
@@ -596,8 +596,12 @@ pytesseract==0.3.10
     #   -r requirements/base.txt
     #   layoutparser
 pytest==7.4.0
-    # via pytest-cov
+    # via
+    #   pytest-cov
+    #   pytest-mock
 pytest-cov==4.1.0
+    # via -r requirements/test.in
+pytest-mock==3.11.1
     # via -r requirements/test.in
 python-dateutil==2.8.2
     # via
@@ -828,10 +832,11 @@ types-urllib3==1.26.25.13
     # via
     #   -r requirements/base.txt
     #   types-requests
-typing-extensions==4.7.0
+typing-extensions==4.7.1
     # via
     #   -r requirements/base.txt
     #   black
+    #   fastapi
     #   huggingface-hub
     #   iopath
     #   ipython
@@ -841,11 +846,11 @@ typing-extensions==4.7.0
     #   rich
     #   starlette
     #   torch
-unstructured[local-inference]==0.7.10
+unstructured[local-inference]==0.7.12
     # via -r requirements/base.txt
 unstructured-api-tools==0.10.7
     # via -r requirements/base.txt
-unstructured-inference==0.5.1
+unstructured-inference==0.5.4
     # via
     #   -r requirements/base.txt
     #   unstructured
