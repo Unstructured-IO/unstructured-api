@@ -25,6 +25,7 @@ from unstructured.staging.base import convert_to_isd, convert_to_dataframe, elem
 import tempfile
 import pdfminer
 import requests
+import time
 
 
 app = FastAPI()
@@ -95,7 +96,8 @@ def get_pdf_splits(pdf, split_size=1):
 
 def partition_file_via_api(file_tuple, request, filename, content_type, **partition_kwargs):
     """
-    Send the given file to be partitioned remotely, where the remote url is set by env var.
+    Send the given file to be partitioned remotely with retry logic,
+    where the remote url is set by env var.
 
     Args:
     file_tuple is in the form (file, page_offest)
@@ -112,16 +114,28 @@ def partition_file_via_api(file_tuple, request, filename, content_type, **partit
 
     headers = {"unstructured-api-key": request.headers.get("unstructured-api-key")}
 
-    response = requests.post(
-        request_url,
-        files={"files": (filename, file, content_type)},
-        data=partition_kwargs,
-        headers=headers,
-    )
+    # Retry parameters
+    retry_enabled = bool(os.environ.get("UNSTRUCTURED_PARALLEL_RETRY_ENABLED", False))
+    retry_attempts = int(os.environ.get("UNSTRUCTURED_PARALLEL_RETRY_ATTEMPTS", 1))
+    retry_backoff_time = float(os.environ.get("UNSTRUCTURED_PARALLEL_RETRY_BACKOFF_TIME", 1.0))
 
-    if response.status_code != 200:
-        detail = response.json().get("detail") or response.text
-        raise HTTPException(status_code=response.status_code, detail=detail)
+    for _ in range(retry_attempts + 1):
+        response = requests.post(
+            request_url,
+            files={"files": (filename, file, content_type)},
+            data=partition_kwargs,
+            headers=headers,
+        )
+
+        if response.status_code != 200:
+            if not retry_enabled:
+                detail = response.json().get("detail") or response.text
+                raise HTTPException(status_code=response.status_code, detail=detail)
+            else:
+                # Retry after backoff
+                time.sleep(retry_backoff_time)
+        else:
+            break
 
     elements = elements_from_json(text=response.text)
 
@@ -367,7 +381,7 @@ def ungz_file(file: UploadFile, gz_uncompressed_content_type=None) -> UploadFile
 
 
 @router.post("/general/v0/general")
-@router.post("/general/v0.0.30/general")
+@router.post("/general/v0.0.31/general")
 def pipeline_1(
     request: Request,
     gz_uncompressed_content_type: Optional[str] = Form(default=None),
