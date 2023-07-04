@@ -140,7 +140,7 @@ execnb==0.1.5
     # via nbdev
 executing==1.2.0
     # via stack-data
-fastapi==0.98.0
+fastapi==0.99.0
     # via
     #   -r requirements/base.txt
     #   unstructured-api-tools
@@ -444,7 +444,7 @@ onnxruntime==1.15.1
     # via
     #   -r requirements/base.txt
     #   unstructured-inference
-opencv-python==4.7.0.72
+opencv-python==4.8.0.74
     # via
     #   -r requirements/base.txt
     #   layoutparser
@@ -562,7 +562,7 @@ pycparser==2.21
     # via
     #   -r requirements/base.txt
     #   cffi
-pydantic==1.10.9
+pydantic==1.10.10
     # via
     #   -r requirements/base.txt
     #   argilla
@@ -832,6 +832,7 @@ typing-extensions==4.7.0
     # via
     #   -r requirements/base.txt
     #   black
+    #   fastapi
     #   huggingface-hub
     #   iopath
     #   ipython
@@ -841,11 +842,11 @@ typing-extensions==4.7.0
     #   rich
     #   starlette
     #   torch
-unstructured[local-inference]==0.7.10
+unstructured[local-inference]==0.7.11
     # via -r requirements/base.txt
 unstructured-api-tools==0.10.7
     # via -r requirements/base.txt
-unstructured-inference==0.5.1
+unstructured-inference==0.5.4
     # via
     #   -r requirements/base.txt
     #   unstructured

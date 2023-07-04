@@ -1,5 +1,6 @@
 ## 0.0.30
 
+* Add table extraction support for hi_res strategy
 * Add support for `encoding` parameter
 * Add support for `xml_keep_tags` parameter
 * Add env variables for additional parallel mode tweaking
