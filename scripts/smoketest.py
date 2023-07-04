@@ -20,6 +20,7 @@ def send_document(
     output_format="application/json",
     pdf_infer_table_structure="false",
 ):
+    # Note: `content_type` is not passed into request since fast API will overwrite it.
     files = {"files": (str(filename), open(filename, "rb"))}
     return requests.post(
         API_URL,
