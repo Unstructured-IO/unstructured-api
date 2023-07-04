@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - main
+  pull_request:
+    branches: [ main ]
 
 env:
   DOCKER_REPOSITORY: quay.io/unstructured-io/unstructured-api
@@ -52,7 +54,7 @@ jobs:
       SHORT_SHA: ${{ needs.set-short-sha.outputs.short_sha }}
     steps:
     - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v2
+      uses: docker/setup-buildx-action@v1
       with:
         driver: 'docker'
     - name: Checkout code
