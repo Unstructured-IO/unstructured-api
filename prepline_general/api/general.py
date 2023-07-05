@@ -199,6 +199,7 @@ def pipeline_api(
     m_ocr_languages=[],
     m_encoding=[],
     m_xml_keep_tags=[],
+    m_pdf_infer_table_structure=[],
     file_content_type=None,
     response_type="application/json",
 ):
@@ -228,6 +229,14 @@ def pipeline_api(
     xml_keep_tags_str = (m_xml_keep_tags[0] if len(m_xml_keep_tags) else "false").lower()
     xml_keep_tags = xml_keep_tags_str == "true"
 
+    pdf_infer_table_structure = (
+        m_pdf_infer_table_structure[0] if len(m_pdf_infer_table_structure) else "false"
+    ).lower()
+    if strategy == "hi_res" and pdf_infer_table_structure == "true":
+        pdf_infer_table_structure = True
+    else:
+        pdf_infer_table_structure = False
+
     try:
         if file_content_type == "application/pdf" and pdf_parallel_mode_enabled:
             elements = partition_pdf_splits(
@@ -238,6 +247,7 @@ def pipeline_api(
                 strategy=strategy,
                 ocr_languages=ocr_languages,
                 coordinates=show_coordinates,
+                pdf_infer_table_structure=pdf_infer_table_structure,
                 encoding=encoding,
             )
         else:
@@ -247,6 +257,7 @@ def pipeline_api(
                 content_type=file_content_type,
                 strategy=strategy,
                 ocr_languages=ocr_languages,
+                pdf_infer_table_structure=pdf_infer_table_structure,
                 encoding=encoding,
                 xml_keep_tags=xml_keep_tags,
             )
@@ -393,6 +404,7 @@ def pipeline_1(
     ocr_languages: List[str] = Form(default=[]),
     encoding: List[str] = Form(default=[]),
     xml_keep_tags: List[str] = Form(default=[]),
+    pdf_infer_table_structure: List[str] = Form(default=[]),
 ):
     if files:
         for file_index in range(len(files)):
@@ -432,6 +444,7 @@ def pipeline_1(
                     m_ocr_languages=ocr_languages,
                     m_encoding=encoding,
                     m_xml_keep_tags=xml_keep_tags,
+                    m_pdf_infer_table_structure=pdf_infer_table_structure,
                     response_type=media_type,
                     filename=file.filename,
                     file_content_type=file_content_type,

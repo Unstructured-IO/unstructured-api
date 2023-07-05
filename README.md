@@ -93,6 +93,21 @@ When elements are extracted from PDFs or images, it may be useful to get their b
   | jq -C . | less -R
 ```
 
+#### PDF Table Extraction
+
+To extract the table structure from PDF files using the `hi_res` strategy, ensure that the `pdf_infer_table_structure` parameter is set to `true`. This setting includes the table's text content in the response. By default, this parameter is set to `false` to avoid the expensive reading process.
+
+```
+ curl -X 'POST' \
+  'https://api.unstructured.io/general/v0/general' \
+  -H 'accept: application/json' \
+  -H 'Content-Type: multipart/form-data' \
+  -F 'files=@sample-docs/layout-parser-paper.pdf' \
+  -F 'strategy=hi_res' \
+  -F 'pdf_infer_table_structure=true' \
+  | jq -C . | less -R
+```
+
 #### Encoding
 
 You can specify the encoding to use to decode the text input. If no value is provided, utf-8 will be used.

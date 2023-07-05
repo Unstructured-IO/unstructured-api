@@ -60,7 +60,7 @@ et-xmlfile==1.1.0
     # via openpyxl
 exceptiongroup==1.1.2
     # via anyio
-fastapi==0.99.1
+fastapi==0.99.0
     # via unstructured-api-tools
 fastjsonschema==2.17.1
     # via nbformat
@@ -388,7 +388,7 @@ typing-extensions==4.7.1
     #   rich
     #   starlette
     #   torch
-unstructured[local-inference]==0.7.12
+unstructured[local-inference]==0.7.11
     # via -r requirements/base.in
 unstructured-api-tools==0.10.7
     # via -r requirements/base.in

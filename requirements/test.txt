@@ -140,7 +140,7 @@ execnb==0.1.5
     # via nbdev
 executing==1.2.0
     # via stack-data
-fastapi==0.99.1
+fastapi==0.99.0
     # via
     #   -r requirements/base.txt
     #   unstructured-api-tools
@@ -846,7 +846,7 @@ typing-extensions==4.7.1
     #   rich
     #   starlette
     #   torch
-unstructured[local-inference]==0.7.12
+unstructured[local-inference]==0.7.11
     # via -r requirements/base.txt
 unstructured-api-tools==0.10.7
     # via -r requirements/base.txt
