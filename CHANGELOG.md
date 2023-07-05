@@ -1,3 +1,7 @@
+## 0.0.31-dev0
+
+* Add retry parameters on fanout requests
+
 ## 0.0.30
 
 * Add table extraction support for hi_res strategy
