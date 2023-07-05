@@ -426,7 +426,6 @@ def test_partition_file_via_api_retry(monkeypatch, mocker):
     monkeypatch.setenv("UNSTRUCTURED_PARALLEL_MODE_URL", "unused")
     monkeypatch.setenv("UNSTRUCTURED_PARALLEL_MODE_THREADS", "1")
 
-    monkeypatch.setenv("UNSTRUCTURED_PARALLEL_RETRY_ENABLED", "True")
     monkeypatch.setenv("UNSTRUCTURED_PARALLEL_RETRY_ATTEMPTS", "2")
     monkeypatch.setenv("UNSTRUCTURED_PARALLEL_RETRY_BACKOFF_TIME", "0.1")
 
