@@ -115,26 +115,26 @@ def partition_file_via_api(file_tuple, request, filename, content_type, **partit
     headers = {"unstructured-api-key": request.headers.get("unstructured-api-key")}
 
     # Retry parameters
-    retry_enabled = bool(os.environ.get("UNSTRUCTURED_PARALLEL_RETRY_ENABLED", False))
-    retry_attempts = int(os.environ.get("UNSTRUCTURED_PARALLEL_RETRY_ATTEMPTS", 1))
+    try_attempts = int(os.environ.get("UNSTRUCTURED_PARALLEL_RETRY_ATTEMPTS", 1)) + 1
     retry_backoff_time = float(os.environ.get("UNSTRUCTURED_PARALLEL_RETRY_BACKOFF_TIME", 1.0))
 
-    while retry_attempts >= 0:
+    while try_attempts >= 0:
         response = requests.post(
             request_url,
             files={"files": (filename, file, content_type)},
             data=partition_kwargs,
             headers=headers,
         )
-
+        try_attempts -= 1
+        non_retryable_error_codes = [400, 401, 402, 403]
+        status_code = response.status_code
         if response.status_code != 200:
-            if not retry_enabled or retry_attempts == 0:
+            if try_attempts == 0 or status_code in non_retryable_error_codes:
                 detail = response.json().get("detail") or response.text
                 raise HTTPException(status_code=response.status_code, detail=detail)
             else:
                 # Retry after backoff
                 time.sleep(retry_backoff_time)
-                retry_attempts -= 1
         else:
             break
 

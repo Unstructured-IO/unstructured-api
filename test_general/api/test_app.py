@@ -446,3 +446,30 @@ def test_partition_file_via_api_retry(monkeypatch, mocker):
 
     assert response.status_code == 500
     assert mock_sleep.call_count == 2
+
+
+def test_partition_file_via_api_no_retryable_error_code(monkeypatch, mocker):
+    monkeypatch.setenv("UNSTRUCTURED_PARALLEL_MODE_ENABLED", "true")
+    monkeypatch.setenv("UNSTRUCTURED_PARALLEL_MODE_URL", "unused")
+    monkeypatch.setenv("UNSTRUCTURED_PARALLEL_MODE_THREADS", "1")
+
+    monkeypatch.setenv("UNSTRUCTURED_PARALLEL_RETRY_ATTEMPTS", "2")
+    monkeypatch.setenv("UNSTRUCTURED_PARALLEL_RETRY_BACKOFF_TIME", "0.1")
+
+    monkeypatch.setattr(
+        requests,
+        "post",
+        lambda *args, **kwargs: MockResponse(status_code=401),
+    )
+    mock_sleep = mocker.patch("time.sleep")
+    client = TestClient(app)
+    test_file = Path("sample-docs") / "layout-parser-paper.pdf"
+
+    response = client.post(
+        MAIN_API_ROUTE,
+        files=[("files", (str(test_file), open(test_file, "rb"), "application/pdf"))],
+        data={"pdf_processing_mode": "parallel"},
+    )
+
+    assert response.status_code == 401
+    assert mock_sleep.call_count == 0
