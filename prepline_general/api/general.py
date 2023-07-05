@@ -128,7 +128,7 @@ def partition_file_via_api(file_tuple, request, filename, content_type, **partit
         try_attempts -= 1
         non_retryable_error_codes = [400, 401, 402, 403]
         status_code = response.status_code
-        if response.status_code != 200:
+        if status_code != 200:
             if try_attempts == 0 or status_code in non_retryable_error_codes:
                 detail = response.json().get("detail") or response.text
                 raise HTTPException(status_code=response.status_code, detail=detail)
