@@ -219,12 +219,12 @@ Title,Data Scientist,46b174f1ec7c25d23e5e50ffff0cc55b,alert.eml,1,,['Mallori Har
 #### Parallel Mode for PDFs
 As mentioned above, processing a pdf using `hi_res` is currently a slow operation. One workaround is to split the pdf into smaller files, process these asynchronously, and merge the results. You can enable parallel processing mode with the following env variables:
 
-* `UNSTRUCTURED_PARALLEL_MODE_ENABLED` - set to `true` to process individual pdf pages remotely 
-* `UNSTRUCTURED_PARALLEL_MODE_URL` - the location to send pdf page asynchronously
-* `UNSTRUCTURED_PARALLEL_MODE_THREADS` - the number of threads making requests at once. See `partition_pdf_splits` for the current default.
-* `UNSTRUCTURED_PARALLEL_MODE_SPLIT_SIZE` - the number of pages to be processed in one request
-* `UNSTRUCTURED_PARALLEL_RETRY_ATTEMPTS` - the number of retry attempts
-* `UNSTRUCTURED_PARALLEL_RETRY_BACKOFF_TIME` - the backoff time in seconds for each retry attempt
+* `UNSTRUCTURED_PARALLEL_MODE_ENABLED` - set to `true` to process individual pdf pages remotely, default is `false`.
+* `UNSTRUCTURED_PARALLEL_MODE_URL` - the location to send pdf page asynchronously, no default setting at the moment.
+* `UNSTRUCTURED_PARALLEL_MODE_THREADS` - the number of threads making requests at once, default is `3`.
+* `UNSTRUCTURED_PARALLEL_MODE_SPLIT_SIZE` - the number of pages to be processed in one request, default is `1`.
+* `UNSTRUCTURED_PARALLEL_RETRY_ATTEMPTS` - the number of retry attempts, default is `1`.
+* `UNSTRUCTURED_PARALLEL_RETRY_BACKOFF_TIME` - the backoff time in seconds for each retry attempt, default is `1.0`.
 
 ### Generating Python files from the pipeline notebooks
 
