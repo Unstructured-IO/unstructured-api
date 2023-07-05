@@ -8,7 +8,7 @@ antlr4-python3-runtime==4.9.3
     # via
     #   -r requirements/base.txt
     #   omegaconf
-anyio==3.7.0
+anyio==3.7.1
     # via
     #   -r requirements/base.txt
     #   httpcore
@@ -140,7 +140,7 @@ execnb==0.1.5
     # via nbdev
 executing==1.2.0
     # via stack-data
-fastapi==0.99.0
+fastapi==0.99.1
     # via
     #   -r requirements/base.txt
     #   unstructured-api-tools
@@ -198,7 +198,7 @@ httpx==0.23.3
     # via
     #   -r requirements/base.txt
     #   argilla
-huggingface-hub==0.15.1
+huggingface-hub==0.16.2
     # via
     #   -r requirements/base.txt
     #   timm
@@ -251,7 +251,7 @@ ipython-genutils==0.2.0
     #   nbclassic
     #   notebook
     #   qtconsole
-ipywidgets==8.0.6
+ipywidgets==8.0.7
     # via jupyter
 isoduration==20.11.0
     # via jsonschema
@@ -316,7 +316,7 @@ jupyterlab-pygments==0.2.2
     # via
     #   -r requirements/base.txt
     #   nbconvert
-jupyterlab-widgets==3.0.7
+jupyterlab-widgets==3.0.8
     # via ipywidgets
 kiwisolver==1.4.4
     # via
@@ -326,7 +326,7 @@ layoutparser[layoutmodels,tesseract]==0.3.4
     # via
     #   -r requirements/base.txt
     #   unstructured-inference
-lxml==4.9.2
+lxml==4.9.3
     # via
     #   -r requirements/base.txt
     #   python-docx
@@ -536,7 +536,7 @@ prometheus-client==0.17.0
     #   jupyter-server
     #   nbclassic
     #   notebook
-prompt-toolkit==3.0.38
+prompt-toolkit==3.0.39
     # via
     #   ipython
     #   jupyter-console
@@ -562,7 +562,7 @@ pycparser==2.21
     # via
     #   -r requirements/base.txt
     #   cffi
-pydantic==1.10.10
+pydantic==1.10.11
     # via
     #   -r requirements/base.txt
     #   argilla
@@ -846,7 +846,7 @@ typing-extensions==4.7.1
     #   rich
     #   starlette
     #   torch
-unstructured[local-inference]==0.7.11
+unstructured[local-inference]==0.7.12
     # via -r requirements/base.txt
 unstructured-api-tools==0.10.7
     # via -r requirements/base.txt
@@ -895,7 +895,7 @@ websockets==11.0.3
     #   uvicorn
 wheel==0.40.0
     # via astunparse
-widgetsnbextension==4.0.7
+widgetsnbextension==4.0.8
     # via ipywidgets
 wrapt==1.14.1
     # via
