@@ -6,12 +6,12 @@
 #
 antlr4-python3-runtime==4.9.3
     # via omegaconf
-anyio==3.7.0
+anyio==3.7.1
     # via
     #   httpcore
     #   starlette
     #   watchfiles
-argilla==1.8.0
+argilla==1.12.0
     # via unstructured
 attrs==23.1.0
     # via jsonschema
@@ -44,7 +44,7 @@ coloredlogs==15.0.1
     # via onnxruntime
 commonmark==0.9.1
     # via rich
-contourpy==1.0.7
+contourpy==1.1.0
     # via matplotlib
 cryptography==41.0.1
     # via pdfminer-six
@@ -58,22 +58,24 @@ effdet==0.4.1
     # via layoutparser
 et-xmlfile==1.1.0
     # via openpyxl
-exceptiongroup==1.1.1
+exceptiongroup==1.1.2
     # via anyio
-fastapi==0.96.0
+fastapi==0.99.1
     # via unstructured-api-tools
 fastjsonschema==2.17.1
     # via nbformat
-filelock==3.12.0
+filelock==3.12.2
     # via
     #   huggingface-hub
     #   torch
     #   transformers
+filetype==1.2.0
+    # via unstructured
 flatbuffers==23.5.26
     # via onnxruntime
-fonttools==4.39.4
+fonttools==4.40.0
     # via matplotlib
-fsspec==2023.5.0
+fsspec==2023.6.0
     # via huggingface-hub
 h11==0.14.0
     # via
@@ -85,7 +87,7 @@ httptools==0.5.0
     # via uvicorn
 httpx==0.23.3
     # via argilla
-huggingface-hub==0.15.1
+huggingface-hub==0.16.2
     # via
     #   timm
     #   transformers
@@ -97,7 +99,7 @@ idna==3.4
     #   anyio
     #   requests
     #   rfc3986
-importlib-metadata==6.6.0
+importlib-metadata==6.7.0
     # via
     #   jupyter-client
     #   markdown
@@ -113,13 +115,13 @@ jinja2==3.1.2
     #   nbconvert
     #   torch
     #   unstructured-api-tools
-joblib==1.2.0
+joblib==1.3.1
     # via nltk
 jsonschema==4.17.3
     # via nbformat
-jupyter-client==8.2.0
+jupyter-client==8.3.0
     # via nbclient
-jupyter-core==5.3.0
+jupyter-core==5.3.1
     # via
     #   jupyter-client
     #   nbclient
@@ -131,7 +133,7 @@ kiwisolver==1.4.4
     # via matplotlib
 layoutparser[layoutmodels,tesseract]==0.3.4
     # via unstructured-inference
-lxml==4.9.2
+lxml==4.9.3
     # via
     #   python-docx
     #   python-pptx
@@ -144,7 +146,7 @@ markupsafe==2.1.3
     #   nbconvert
 matplotlib==3.7.1
     # via pycocotools
-mistune==2.0.5
+mistune==3.0.1
     # via nbconvert
 monotonic==1.6
     # via argilla
@@ -152,13 +154,13 @@ mpmath==1.3.0
     # via sympy
 msg-parser==1.2.0
     # via unstructured
-mypy==1.3.0
+mypy==1.4.1
     # via unstructured-api-tools
 mypy-extensions==1.0.0
     # via mypy
 nbclient==0.8.0
     # via nbconvert
-nbconvert==7.4.0
+nbconvert==7.6.0
     # via unstructured-api-tools
 nbformat==5.9.0
     # via
@@ -185,9 +187,9 @@ olefile==0.46
     # via msg-parser
 omegaconf==2.3.0
     # via effdet
-onnxruntime==1.15.0
+onnxruntime==1.15.1
     # via unstructured-inference
-opencv-python==4.7.0.72
+opencv-python==4.8.0.74
     # via
     #   layoutparser
     #   unstructured-inference
@@ -210,14 +212,16 @@ pandas==1.5.3
 pandocfilters==1.5.0
     # via nbconvert
 pdf2image==1.16.3
-    # via layoutparser
+    # via
+    #   layoutparser
+    #   unstructured
 pdfminer-six==20221105
     # via
     #   pdfplumber
     #   unstructured
 pdfplumber==0.9.0
     # via layoutparser
-pillow==9.5.0
+pillow==10.0.0
     # via
     #   layoutparser
     #   matplotlib
@@ -229,17 +233,17 @@ pillow==9.5.0
     #   unstructured
 pkgutil-resolve-name==1.3.10
     # via jsonschema
-platformdirs==3.5.1
+platformdirs==3.8.0
     # via jupyter-core
 portalocker==2.7.0
     # via iopath
-protobuf==4.23.2
+protobuf==4.23.3
     # via onnxruntime
 pycocotools==2.0.6
     # via effdet
 pycparser==2.21
     # via cffi
-pydantic==1.10.9
+pydantic==1.10.11
     # via
     #   argilla
     #   fastapi
@@ -249,9 +253,9 @@ pygments==2.15.1
     #   rich
 pypandoc==1.11
     # via unstructured
-pyparsing==3.0.9
+pyparsing==3.1.0
     # via matplotlib
-pypdf2==3.0.1
+pypdf==3.12.0
     # via -r requirements/base.in
 pyrsistent==0.19.3
     # via jsonschema
@@ -363,32 +367,32 @@ traitlets==5.9.0
     #   nbclient
     #   nbconvert
     #   nbformat
-transformers==4.30.0
+transformers==4.30.2
     # via unstructured-inference
-typer==0.9.0
+typer==0.7.0
     # via argilla
 types-requests==2.31.0.1
     # via unstructured-api-tools
-types-ujson==5.7.0.5
+types-ujson==5.8.0.0
     # via unstructured-api-tools
 types-urllib3==1.26.25.13
     # via types-requests
-typing-extensions==4.6.3
+typing-extensions==4.7.1
     # via
+    #   fastapi
     #   huggingface-hub
     #   iopath
     #   mypy
     #   pydantic
-    #   pypdf2
+    #   pypdf
     #   rich
     #   starlette
     #   torch
-    #   typer
-unstructured[local-inference]==0.7.2
+unstructured[local-inference]==0.7.12
     # via -r requirements/base.in
-unstructured-api-tools==0.10.6
+unstructured-api-tools==0.10.7
     # via -r requirements/base.in
-unstructured-inference==0.5.1
+unstructured-inference==0.5.4
     # via unstructured
 urllib3==2.0.3
     # via requests

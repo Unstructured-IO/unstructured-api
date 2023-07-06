@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:experimental
-FROM quay.io/unstructured-io/base-images:rocky8.7-1
+FROM quay.io/unstructured-io/base-images:rocky8.7-3
 
 # NOTE(crag): NB_USER ARG for mybinder.org compat:
 #             https://mybinder.readthedocs.io/en/latest/tutorials/dockerfile.html
@@ -27,9 +27,6 @@ COPY requirements/base.txt requirements-base.txt
 RUN python3.8 -m pip install pip==${PIP_VERSION} \
   && dnf -y groupinstall "Development Tools" \
   && su -l ${NB_USER} -c 'pip3.8 install  --no-cache  -r requirements-base.txt' \
-  # required for detectron2 install on Mac M1
-  && su -l ${NB_USER} -c  'pip3.8 install --no-cache tensorboard>=2.12.2' \
-  && su -l ${NB_USER} -c 'pip3.8 install --no-cache "detectron2@git+https://github.com/facebookresearch/detectron2.git@e2ce8dc#egg=detectron2"' \
   && dnf -y groupremove "Development Tools" \
   && dnf clean all \
   && ln -s /home/notebook-user/.local/bin/pip /usr/local/bin/pip || true
