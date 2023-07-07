@@ -1,5 +1,6 @@
-## 0.0.31-dev0
+## 0.0.31
 
+* Bump unstructured library to 0.8.0
 * Add retry parameters on fanout requests
 
 ## 0.0.30
