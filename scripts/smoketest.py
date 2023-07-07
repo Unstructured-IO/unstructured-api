@@ -20,7 +20,10 @@ def send_document(
     pdf_infer_table_structure="false",
 ):
     # Note: `content_type` is not passed into request since fast API will overwrite it.
-    files = {"files": (str(filename), open(filename, "rb"))}
+    if str(filename).endswith(".gz"):
+        files = {"files": (str(filename), open(filename, "rb"), "application/gzip")}
+    else:
+        files = {"files": (str(filename), open(filename, "rb"))}  
     return requests.post(
         API_URL,
         files=files,
@@ -78,6 +81,7 @@ def send_document(
             "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
         ),
         ("fake-xml.xml", "text/xml"),
+        ("layout-parser-paper.pdf.gz", "application/gzip")
     ],
 )
 def test_happy_path(example_filename, content_type):
@@ -88,6 +92,9 @@ def test_happy_path(example_filename, content_type):
     test_file = Path("sample-docs") / example_filename
     print(f"sending {content_type}")
     json_response = send_document(test_file, content_type)
+    
+    if json_response.status_code != 200:
+        print(json_response.json())
 
     print(json_response.content)
     assert json_response.status_code == 200
