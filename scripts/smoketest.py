@@ -24,7 +24,7 @@ def send_document(
     if str(filename).endswith(".gz"):
         files = {"files": (str(filename), open(filename, "rb"), "application/gzip")}
     else:
-        files = {"files": (str(filename), open(filename, "rb"))}  
+        files = {"files": (str(filename), open(filename, "rb"))}
     return requests.post(
         API_URL,
         files=files,
@@ -92,10 +92,6 @@ def test_happy_path(example_filename, content_type):
     """
     test_file = Path("sample-docs") / example_filename
     json_response = send_document(test_file, content_type)
-    
-    if json_response.status_code != 200:
-        print(json_response.json())
-
     assert json_response.status_code == 200
     assert len(json_response.json()) > 0
     assert len("".join(elem["text"] for elem in json_response.json())) > 20
