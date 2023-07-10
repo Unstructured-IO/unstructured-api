@@ -15,7 +15,6 @@ from prepline_general.api.app import app
 from unstructured.partition.auto import partition
 from unstructured.staging.base import convert_to_isd
 import tempfile
-import pypdf
 
 MAIN_API_ROUTE = get_pipeline_path("general")
 
