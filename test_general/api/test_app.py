@@ -15,6 +15,7 @@ from prepline_general.api.app import app
 from unstructured.partition.auto import partition
 from unstructured.staging.base import convert_to_isd
 import tempfile
+import pypdf
 
 MAIN_API_ROUTE = get_pipeline_path("general")
 
@@ -110,6 +111,7 @@ def test_general_api(example_filename, content_type):
     dfs = multifile_response_to_dfs(csv_response)
     assert len(response.json()) == len(dfs)
 
+
 # Note(yuming): Disable this test until we bump unsturctured library to 0.8.0 in CORE-1369
 # def test_coordinates_param():
 #     """
@@ -144,7 +146,7 @@ def test_general_api(example_filename, content_type):
 
 def test_ocr_languages_param():
     """
-    ...
+    Verify that we get the corresponding languages from the response with ocr_languages
     """
     client = TestClient(app)
     test_file = Path("sample-docs") / "english-and-korean.png"
@@ -303,7 +305,10 @@ def test_general_api_returns_400_unsupported_file(example_filename):
     assert response.status_code == 400
 
 
-def test_general_api_returns_500_bad_pdf():
+def test_general_api_returns_400_bad_pdf():
+    """
+    Verify that we get a 400 for invalid PDF files
+    """
     tmp = tempfile.NamedTemporaryFile(suffix=".pdf")
     tmp.write(b"This is not a valid PDF")
     client = TestClient(app)
@@ -422,6 +427,9 @@ def test_parallel_mode_returns_errors(monkeypatch):
 
 
 def test_partition_file_via_api_retry(monkeypatch, mocker):
+    """
+    Verify number of retries with parallel mode
+    """
     monkeypatch.setenv("UNSTRUCTURED_PARALLEL_MODE_ENABLED", "true")
     monkeypatch.setenv("UNSTRUCTURED_PARALLEL_MODE_URL", "unused")
     monkeypatch.setenv("UNSTRUCTURED_PARALLEL_MODE_THREADS", "1")
@@ -449,6 +457,9 @@ def test_partition_file_via_api_retry(monkeypatch, mocker):
 
 
 def test_partition_file_via_api_no_retryable_error_code(monkeypatch, mocker):
+    """
+    Verify we didn't retry if the error code is not retryable
+    """
     monkeypatch.setenv("UNSTRUCTURED_PARALLEL_MODE_ENABLED", "true")
     monkeypatch.setenv("UNSTRUCTURED_PARALLEL_MODE_URL", "unused")
     monkeypatch.setenv("UNSTRUCTURED_PARALLEL_MODE_THREADS", "1")
@@ -473,3 +484,35 @@ def test_partition_file_via_api_no_retryable_error_code(monkeypatch, mocker):
 
     assert response.status_code == 401
     assert mock_sleep.call_count == 0
+
+
+def test_password_protected_pdf():
+    """
+    Verify we get a 400 error if the PDF is password protected
+    """
+    client = TestClient(app)
+    test_file = Path("sample-docs") / "layout-parser-paper.pdf"
+
+    password = "test_password"
+
+    with open(test_file, "rb") as file:
+        reader = pypdf.PdfReader(file)
+        writer = pypdf.PdfWriter()
+
+        for page in reader.pages:
+            writer.add_page(page)
+
+        writer.encrypt(password)
+
+        temp_pdf = tempfile.NamedTemporaryFile(suffix=".pdf")
+        password_protected_file = temp_pdf.name
+        with open(password_protected_file, "wb") as output_file:
+            writer.write(output_file)
+
+        response = client.post(
+            MAIN_API_ROUTE,
+            files=[("files", (str(password_protected_file), open(password_protected_file, "rb")))],
+            data={"strategy": "fast"},
+        )
+        assert response.status_code == 400
+        temp_pdf.close()
