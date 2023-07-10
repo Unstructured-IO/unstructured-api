@@ -491,28 +491,13 @@ def test_password_protected_pdf():
     Verify we get a 400 error if the PDF is password protected
     """
     client = TestClient(app)
-    test_file = Path("sample-docs") / "layout-parser-paper.pdf"
+    # a password protected pdf file, password is "password"
+    test_file = Path("sample-docs") / "layout-parser-paper-password-protected.pdf"
 
-    password = "test_password"
-
-    with open(test_file, "rb") as file:
-        reader = pypdf.PdfReader(file)
-        writer = pypdf.PdfWriter()
-
-        for page in reader.pages:
-            writer.add_page(page)
-
-        writer.encrypt(password)
-
-        temp_pdf = tempfile.NamedTemporaryFile(suffix=".pdf")
-        password_protected_file = temp_pdf.name
-        with open(password_protected_file, "wb") as output_file:
-            writer.write(output_file)
-
-        response = client.post(
-            MAIN_API_ROUTE,
-            files=[("files", (str(password_protected_file), open(password_protected_file, "rb")))],
-            data={"strategy": "fast"},
-        )
-        assert response.status_code == 400
-        temp_pdf.close()
+    response = client.post(
+        MAIN_API_ROUTE,
+        files=[("files", (str(test_file), open(test_file, "rb")))],
+        data={"strategy": "fast"},
+    )
+    assert response.status_code == 400
+    assert response.json() == {"detail": f"File: {str(test_file)} is encrypted. Please decrypt it with password."}
