@@ -208,6 +208,12 @@ def pipeline_api(
         # since fast api might sent the wrong one.
         file_content_type = "application/x-ole-storage"
 
+    if filename.endswith(".pdf") and PdfReader(file).is_encrypted:
+        raise HTTPException(
+            status_code=400,
+            detail=f"File: {filename} is encrypted. Please decrypt it with password.",
+        )
+
     strategy = (m_strategy[0] if len(m_strategy) else "fast").lower()
     strategies = ["fast", "hi_res", "auto", "ocr_only"]
     if strategy not in strategies:
