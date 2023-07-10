@@ -110,7 +110,7 @@ def test_general_api(example_filename, content_type):
     dfs = multifile_response_to_dfs(csv_response)
     assert len(response.json()) == len(dfs)
 
-# Note(yuming): Disable this test until we bump unsturctured library to 0.8.0
+# Note(yuming): Disable this test until we bump unsturctured library to 0.8.0 in CORE-1369
 # def test_coordinates_param():
 #     """
 #     Verify that responses do not include coordinates unless requested
