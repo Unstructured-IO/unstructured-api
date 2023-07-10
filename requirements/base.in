@@ -1,9 +1,7 @@
-# TODO(yuming): please change < to >= once we can bump to 0.8.0
-unstructured[local-inference]<0.8.0
+unstructured[local-inference]>=0.7.1
 unstructured-api-tools>=0.6.0
 ratelimit
 requests
 pypdf
-pycryptodome
-# Note(yuming): sync with test.in to avoid version conflict
-click==8.1.3
+
+

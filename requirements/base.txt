@@ -4,8 +4,6 @@
 #
 #    pip-compile requirements/base.in
 #
-annotated-types==0.5.0
-    # via pydantic
 antlr4-python3-runtime==4.9.3
     # via omegaconf
 anyio==3.7.1
@@ -16,9 +14,7 @@ anyio==3.7.1
 argilla==1.12.0
     # via unstructured
 attrs==23.1.0
-    # via
-    #   jsonschema
-    #   referencing
+    # via jsonschema
 backoff==2.2.1
     # via argilla
 beautifulsoup4==4.12.2
@@ -34,13 +30,12 @@ cffi==1.15.1
     # via cryptography
 chardet==5.1.0
     # via unstructured
-charset-normalizer==3.2.0
+charset-normalizer==3.1.0
     # via
     #   pdfminer-six
     #   requests
 click==8.1.3
     # via
-    #   -r requirements/base.in
     #   nltk
     #   typer
     #   unstructured-api-tools
@@ -65,7 +60,7 @@ et-xmlfile==1.1.0
     # via openpyxl
 exceptiongroup==1.1.2
     # via anyio
-fastapi==0.100.0
+fastapi==0.99.1
     # via unstructured-api-tools
 fastjsonschema==2.17.1
     # via nbformat
@@ -88,11 +83,11 @@ h11==0.14.0
     #   uvicorn
 httpcore==0.16.3
     # via httpx
-httptools==0.6.0
+httptools==0.5.0
     # via uvicorn
 httpx==0.23.3
     # via argilla
-huggingface-hub==0.16.4
+huggingface-hub==0.16.2
     # via
     #   timm
     #   transformers
@@ -104,15 +99,14 @@ idna==3.4
     #   anyio
     #   requests
     #   rfc3986
-importlib-metadata==6.8.0
+importlib-metadata==6.7.0
     # via
     #   jupyter-client
     #   markdown
     #   nbconvert
-importlib-resources==6.0.0
+importlib-resources==5.12.0
     # via
     #   jsonschema
-    #   jsonschema-specifications
     #   matplotlib
 iopath==0.1.10
     # via layoutparser
@@ -123,10 +117,8 @@ jinja2==3.1.2
     #   unstructured-api-tools
 joblib==1.3.1
     # via nltk
-jsonschema==4.18.0
+jsonschema==4.17.3
     # via nbformat
-jsonschema-specifications==2023.6.1
-    # via jsonschema
 jupyter-client==8.3.0
     # via nbclient
 jupyter-core==5.3.1
@@ -152,7 +144,7 @@ markupsafe==2.1.3
     # via
     #   jinja2
     #   nbconvert
-matplotlib==3.7.2
+matplotlib==3.7.1
     # via pycocotools
 mistune==3.0.1
     # via nbconvert
@@ -170,7 +162,7 @@ nbclient==0.8.0
     # via nbconvert
 nbconvert==7.6.0
     # via unstructured-api-tools
-nbformat==5.9.1
+nbformat==5.9.0
     # via
     #   nbclient
     #   nbconvert
@@ -241,34 +233,32 @@ pillow==10.0.0
     #   unstructured
 pkgutil-resolve-name==1.3.10
     # via jsonschema
-platformdirs==3.8.1
+platformdirs==3.8.0
     # via jupyter-core
 portalocker==2.7.0
     # via iopath
-protobuf==4.23.4
+protobuf==4.23.3
     # via onnxruntime
 pycocotools==2.0.6
     # via effdet
 pycparser==2.21
     # via cffi
-pycryptodome==3.18.0
-    # via -r requirements/base.in
-pydantic==2.0.2
+pydantic==1.10.11
     # via
     #   argilla
     #   fastapi
-pydantic-core==2.1.2
-    # via pydantic
 pygments==2.15.1
     # via
     #   nbconvert
     #   rich
 pypandoc==1.11
     # via unstructured
-pyparsing==3.0.9
+pyparsing==3.1.0
     # via matplotlib
-pypdf==3.12.1
+pypdf==3.12.0
     # via -r requirements/base.in
+pyrsistent==0.19.3
+    # via jsonschema
 pytesseract==0.3.10
     # via layoutparser
 python-dateutil==2.8.2
@@ -302,10 +292,6 @@ pyzmq==25.1.0
     # via jupyter-client
 ratelimit==2.2.1
     # via -r requirements/base.in
-referencing==0.29.1
-    # via
-    #   jsonschema
-    #   jsonschema-specifications
 regex==2023.6.3
     # via
     #   nltk
@@ -321,10 +307,6 @@ rfc3986[idna2008]==1.5.0
     # via httpx
 rich==13.0.1
     # via argilla
-rpds-py==0.8.10
-    # via
-    #   jsonschema
-    #   referencing
 safetensors==0.3.1
     # via
     #   timm
@@ -397,13 +379,11 @@ types-urllib3==1.26.25.13
     # via types-requests
 typing-extensions==4.7.1
     # via
-    #   annotated-types
     #   fastapi
     #   huggingface-hub
     #   iopath
     #   mypy
     #   pydantic
-    #   pydantic-core
     #   pypdf
     #   rich
     #   starlette
@@ -438,7 +418,7 @@ xlrd==2.0.1
     # via unstructured
 xlsxwriter==3.1.2
     # via python-pptx
-zipp==3.16.0
+zipp==3.15.0
     # via
     #   importlib-metadata
     #   importlib-resources
