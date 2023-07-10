@@ -500,4 +500,6 @@ def test_password_protected_pdf():
         data={"strategy": "fast"},
     )
     assert response.status_code == 400
-    assert response.json() == {"detail": f"File: {str(test_file)} is encrypted. Please decrypt it with password."}
+    assert response.json() == {
+        "detail": f"File: {str(test_file)} is encrypted. Please decrypt it with password."
+    }
