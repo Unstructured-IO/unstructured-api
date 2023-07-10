@@ -243,6 +243,8 @@ pycocotools==2.0.6
     # via effdet
 pycparser==2.21
     # via cffi
+pycryptodome==3.18.0
+    # via -r requirements/base.in
 pydantic==1.10.11
     # via
     #   argilla
