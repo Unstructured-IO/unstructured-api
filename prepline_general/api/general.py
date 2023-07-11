@@ -43,6 +43,9 @@ def is_expected_response_type(media_type, response_type):
         return False
 
 
+# pipeline-api
+
+
 DEFAULT_MIMETYPES = (
     "application/pdf,application/msword,image/jpeg,image/png,text/markdown,"
     "text/x-markdown,text/html,"
@@ -190,10 +193,6 @@ def partition_pdf_splits(
 
 
 logger = logging.getLogger("unstructured_api")
-handler = logging.StreamHandler()
-formatter = logging.Formatter("%(asctime)s %(processName)-10s %(levelname)-8s %(message)s")
-handler.setFormatter(formatter)
-logger.addHandler(handler)
 
 
 def pipeline_api(
