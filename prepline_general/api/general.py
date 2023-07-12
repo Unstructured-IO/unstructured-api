@@ -202,6 +202,7 @@ def pipeline_api(
     m_strategy=[],
     m_coordinates=[],
     m_ocr_languages=[],
+    m_include_page_breaks=[],
     m_encoding=[],
     m_xml_keep_tags=[],
     m_pdf_infer_table_structure=[],
@@ -258,6 +259,11 @@ def pipeline_api(
 
     ocr_languages = ("+".join(m_ocr_languages) if len(m_ocr_languages) else "eng").lower()
 
+    include_page_breaks_str = (
+        m_include_page_breaks[0] if len(m_include_page_breaks) else "false"
+    ).lower()
+    include_page_breaks = include_page_breaks_str == "true"
+
     encoding = m_encoding[0] if len(m_encoding) else None
 
     xml_keep_tags_str = (m_xml_keep_tags[0] if len(m_xml_keep_tags) else "false").lower()
@@ -300,6 +306,7 @@ def pipeline_api(
                 ocr_languages=ocr_languages,
                 coordinates=show_coordinates,
                 pdf_infer_table_structure=pdf_infer_table_structure,
+                include_page_breaks=include_page_breaks,
                 encoding=encoding,
                 model_name=hi_res_model_name,
             )
@@ -311,6 +318,7 @@ def pipeline_api(
                 strategy=strategy,
                 ocr_languages=ocr_languages,
                 pdf_infer_table_structure=pdf_infer_table_structure,
+                include_page_breaks=include_page_breaks,
                 encoding=encoding,
                 xml_keep_tags=xml_keep_tags,
                 model_name=hi_res_model_name,
@@ -467,6 +475,7 @@ def pipeline_1(
     strategy: List[str] = Form(default=[]),
     coordinates: List[str] = Form(default=[]),
     ocr_languages: List[str] = Form(default=[]),
+    include_page_breaks: List[str] = Form(default=[]),
     encoding: List[str] = Form(default=[]),
     xml_keep_tags: List[str] = Form(default=[]),
     pdf_infer_table_structure: List[str] = Form(default=[]),
@@ -513,6 +522,7 @@ def pipeline_1(
                     m_strategy=strategy,
                     m_coordinates=coordinates,
                     m_ocr_languages=ocr_languages,
+                    m_include_page_breaks=include_page_breaks,
                     m_encoding=encoding,
                     m_xml_keep_tags=xml_keep_tags,
                     m_pdf_infer_table_structure=pdf_infer_table_structure,
