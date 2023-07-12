@@ -137,8 +137,8 @@ def test_coordinates_param():
 
     # Each element should be the same except for the coordinates field
     for i in range(len(response_with_coords)):
-        assert "coordinates" in response_with_coords[i]
-        del response_with_coords[i]["coordinates"]
+        assert "coordinates" in response_with_coords[i]["metadata"]
+        del response_with_coords[i]["metadata"]["coordinates"]
         assert response_with_coords[i] == response_without_coords[i]
 
 
