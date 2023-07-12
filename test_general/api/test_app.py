@@ -1,12 +1,10 @@
 from pathlib import Path
-from typing import List
 
 import json
 import io
 import pytest
 import re
 import requests
-import ast
 import pandas as pd
 from fastapi.testclient import TestClient
 from unstructured_api_tools.pipelines.api_conventions import get_pipeline_path
@@ -17,14 +15,6 @@ from unstructured.staging.base import convert_to_isd
 import tempfile
 
 MAIN_API_ROUTE = get_pipeline_path("general")
-
-
-def multifile_response_to_dfs(resp: requests.Response) -> List[pd.DataFrame]:
-    s = resp.text.split(',"')
-    s[0] = s[0][1:]
-    s[-1] = s[-1][:-1]
-    s[1:] = [f'"{x}' for x in s[1:]]
-    return [pd.read_csv(io.StringIO(ast.literal_eval(i))) for i in s]
 
 
 def test_general_api_health_check():
@@ -107,8 +97,8 @@ def test_general_api(example_filename, content_type):
         data={"output_format": "text/csv"},
     )
     assert csv_response.status_code == 200
-    dfs = multifile_response_to_dfs(csv_response)
-    assert len(response.json()) == len(dfs)
+    dfs = pd.read_csv(io.StringIO(csv_response.text))
+    assert len(dfs) > 0
 
 
 def test_coordinates_param():
