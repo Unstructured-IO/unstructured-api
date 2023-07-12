@@ -8,59 +8,49 @@ antlr4-python3-runtime==4.9.3
     # via omegaconf
 anyio==3.7.1
     # via
-    #   httpcore
     #   starlette
     #   watchfiles
-argilla==1.12.0
-    # via unstructured
 attrs==23.1.0
-    # via jsonschema
-backoff==2.2.1
-    # via argilla
+    # via
+    #   jsonschema
+    #   referencing
 beautifulsoup4==4.12.2
     # via nbconvert
 bleach==6.0.0
     # via nbconvert
 certifi==2023.5.7
-    # via
-    #   httpcore
-    #   httpx
-    #   requests
+    # via requests
 cffi==1.15.1
     # via cryptography
 chardet==5.1.0
     # via unstructured
-charset-normalizer==3.1.0
+charset-normalizer==3.2.0
     # via
     #   pdfminer-six
     #   requests
 click==8.1.3
     # via
+    #   -r requirements/base.in
     #   nltk
-    #   typer
     #   unstructured-api-tools
     #   uvicorn
 coloredlogs==15.0.1
     # via onnxruntime
-commonmark==0.9.1
-    # via rich
 contourpy==1.1.0
     # via matplotlib
-cryptography==41.0.1
+cryptography==41.0.2
     # via pdfminer-six
 cycler==0.11.0
     # via matplotlib
 defusedxml==0.7.1
     # via nbconvert
-deprecated==1.2.14
-    # via argilla
 effdet==0.4.1
     # via layoutparser
 et-xmlfile==1.1.0
     # via openpyxl
 exceptiongroup==1.1.2
     # via anyio
-fastapi==0.99.1
+fastapi==0.100.0
     # via unstructured-api-tools
 fastjsonschema==2.17.1
     # via nbformat
@@ -78,16 +68,10 @@ fonttools==4.40.0
 fsspec==2023.6.0
     # via huggingface-hub
 h11==0.14.0
-    # via
-    #   httpcore
-    #   uvicorn
-httpcore==0.16.3
-    # via httpx
-httptools==0.5.0
     # via uvicorn
-httpx==0.23.3
-    # via argilla
-huggingface-hub==0.16.2
+httptools==0.6.0
+    # via uvicorn
+huggingface-hub==0.16.4
     # via
     #   timm
     #   transformers
@@ -98,15 +82,15 @@ idna==3.4
     # via
     #   anyio
     #   requests
-    #   rfc3986
-importlib-metadata==6.7.0
+importlib-metadata==6.8.0
     # via
     #   jupyter-client
     #   markdown
     #   nbconvert
-importlib-resources==5.12.0
+importlib-resources==6.0.0
     # via
     #   jsonschema
+    #   jsonschema-specifications
     #   matplotlib
 iopath==0.1.10
     # via layoutparser
@@ -117,8 +101,10 @@ jinja2==3.1.2
     #   unstructured-api-tools
 joblib==1.3.1
     # via nltk
-jsonschema==4.17.3
+jsonschema==4.18.0
     # via nbformat
+jsonschema-specifications==2023.6.1
+    # via jsonschema
 jupyter-client==8.3.0
     # via nbclient
 jupyter-core==5.3.1
@@ -144,12 +130,10 @@ markupsafe==2.1.3
     # via
     #   jinja2
     #   nbconvert
-matplotlib==3.7.1
+matplotlib==3.7.2
     # via pycocotools
 mistune==3.0.1
     # via nbconvert
-monotonic==1.6
-    # via argilla
 mpmath==1.3.0
     # via sympy
 msg-parser==1.2.0
@@ -162,7 +146,7 @@ nbclient==0.8.0
     # via nbconvert
 nbconvert==7.6.0
     # via unstructured-api-tools
-nbformat==5.9.0
+nbformat==5.9.1
     # via
     #   nbclient
     #   nbconvert
@@ -170,9 +154,8 @@ networkx==3.1
     # via torch
 nltk==3.8.1
     # via unstructured
-numpy==1.23.5
+numpy==1.24.4
     # via
-    #   argilla
     #   contourpy
     #   layoutparser
     #   matplotlib
@@ -197,16 +180,14 @@ openpyxl==3.1.2
     # via unstructured
 packaging==23.1
     # via
-    #   argilla
     #   huggingface-hub
     #   matplotlib
     #   nbconvert
     #   onnxruntime
     #   pytesseract
     #   transformers
-pandas==1.5.3
+pandas==2.0.3
     # via
-    #   argilla
     #   layoutparser
     #   unstructured
 pandocfilters==1.5.0
@@ -233,11 +214,11 @@ pillow==10.0.0
     #   unstructured
 pkgutil-resolve-name==1.3.10
     # via jsonschema
-platformdirs==3.8.0
+platformdirs==3.8.1
     # via jupyter-core
 portalocker==2.7.0
     # via iopath
-protobuf==4.23.3
+protobuf==4.23.4
     # via onnxruntime
 pycocotools==2.0.6
     # via effdet
@@ -245,20 +226,16 @@ pycparser==2.21
     # via cffi
 pydantic==1.10.11
     # via
-    #   argilla
+    #   -r requirements/base.in
     #   fastapi
 pygments==2.15.1
-    # via
-    #   nbconvert
-    #   rich
+    # via nbconvert
 pypandoc==1.11
     # via unstructured
-pyparsing==3.1.0
+pyparsing==3.0.9
     # via matplotlib
-pypdf==3.12.0
+pypdf==3.12.1
     # via -r requirements/base.in
-pyrsistent==0.19.3
-    # via jsonschema
 pytesseract==0.3.10
     # via layoutparser
 python-dateutil==2.8.2
@@ -292,6 +269,10 @@ pyzmq==25.1.0
     # via jupyter-client
 ratelimit==2.2.1
     # via -r requirements/base.in
+referencing==0.29.1
+    # via
+    #   jsonschema
+    #   jsonschema-specifications
 regex==2023.6.3
     # via
     #   nltk
@@ -303,10 +284,10 @@ requests==2.31.0
     #   torchvision
     #   transformers
     #   unstructured
-rfc3986[idna2008]==1.5.0
-    # via httpx
-rich==13.0.1
-    # via argilla
+rpds-py==0.8.10
+    # via
+    #   jsonschema
+    #   referencing
 safetensors==0.3.1
     # via
     #   timm
@@ -318,10 +299,7 @@ six==1.16.0
     #   bleach
     #   python-dateutil
 sniffio==1.3.0
-    # via
-    #   anyio
-    #   httpcore
-    #   httpx
+    # via anyio
 soupsieve==2.4.1
     # via beautifulsoup4
 starlette==0.27.0
@@ -355,7 +333,6 @@ tornado==6.3.2
     # via jupyter-client
 tqdm==4.65.0
     # via
-    #   argilla
     #   huggingface-hub
     #   iopath
     #   nltk
@@ -369,8 +346,6 @@ traitlets==5.9.0
     #   nbformat
 transformers==4.30.2
     # via unstructured-inference
-typer==0.7.0
-    # via argilla
 types-requests==2.31.0.1
     # via unstructured-api-tools
 types-ujson==5.8.0.0
@@ -385,14 +360,15 @@ typing-extensions==4.7.1
     #   mypy
     #   pydantic
     #   pypdf
-    #   rich
     #   starlette
     #   torch
-unstructured[local-inference]==0.7.12
+tzdata==2023.3
+    # via pandas
+unstructured[local-inference]==0.8.1
     # via -r requirements/base.in
 unstructured-api-tools==0.10.7
     # via -r requirements/base.in
-unstructured-inference==0.5.4
+unstructured-inference==0.5.5
     # via unstructured
 urllib3==2.0.3
     # via requests
@@ -410,15 +386,11 @@ webencodings==0.5.1
     #   tinycss2
 websockets==11.0.3
     # via uvicorn
-wrapt==1.14.1
-    # via
-    #   argilla
-    #   deprecated
 xlrd==2.0.1
     # via unstructured
 xlsxwriter==3.1.2
     # via python-pptx
-zipp==3.15.0
+zipp==3.16.0
     # via
     #   importlib-metadata
     #   importlib-resources
