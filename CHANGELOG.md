@@ -1,6 +1,8 @@
-## 0.0.31-dev0
+## 0.0.31
 
 * Add retry parameters on fanout requests
+* Bump unstructured library to 0.8.1
+* Fix how to remove an element's coordinate information
 
 ## 0.0.30
 

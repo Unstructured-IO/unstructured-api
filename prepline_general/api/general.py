@@ -274,7 +274,18 @@ def pipeline_api(
         df = convert_to_dataframe(elements)
         df["filename"] = os.path.basename(filename)
         if not show_coordinates:
-            df.drop(columns=["coordinates"], inplace=True)
+            columns_to_drop = [
+                col
+                for col in [
+                    "coordinates_points",
+                    "coordinates_system",
+                    "coordinates_layout_width",
+                    "coordinates_layout_height",
+                ]
+                if col in df.columns
+            ]
+            if columns_to_drop:
+                df.drop(columns=columns_to_drop, inplace=True)
 
         return df.to_csv(index=False)
 
@@ -282,8 +293,8 @@ def pipeline_api(
     for element in result:
         element["metadata"]["filename"] = os.path.basename(filename)
 
-        if not show_coordinates:
-            del element["coordinates"]
+        if not show_coordinates and "coordinates" in element["metadata"]:
+            del element["metadata"]["coordinates"]
 
     return result
 
