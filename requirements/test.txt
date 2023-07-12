@@ -39,6 +39,10 @@ attrs==23.1.0
     #   -r requirements/base.txt
     #   jsonschema
     #   referencing
+autoflake==2.2.0
+    # via
+    #   -r requirements/base.txt
+    #   unstructured-api-tools
 backcall==0.2.0
     # via ipython
 beautifulsoup4==4.12.2
@@ -457,6 +461,7 @@ pandas==2.0.3
     #   -r requirements/base.txt
     #   layoutparser
     #   unstructured
+    #   unstructured-api-tools
 pandocfilters==1.5.0
     # via
     #   -r requirements/base.txt
@@ -545,7 +550,10 @@ pydantic==1.10.11
     #   -r requirements/base.txt
     #   fastapi
 pyflakes==3.0.1
-    # via flake8
+    # via
+    #   -r requirements/base.txt
+    #   autoflake
+    #   flake8
 pygments==2.15.1
     # via
     #   -r requirements/base.txt
@@ -733,6 +741,7 @@ tokenizers==0.13.3
 tomli==2.0.1
     # via
     #   -r requirements/base.txt
+    #   autoflake
     #   black
     #   coverage
     #   mypy
@@ -820,7 +829,7 @@ tzdata==2023.3
     #   pandas
 unstructured[local-inference]==0.8.1
     # via -r requirements/base.txt
-unstructured-api-tools==0.10.7
+unstructured-api-tools==0.10.10
     # via -r requirements/base.txt
 unstructured-inference==0.5.5
     # via
