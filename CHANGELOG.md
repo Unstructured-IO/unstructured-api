@@ -1,5 +1,6 @@
 ## 0.0.31
 
+* Support model name as api parameter
 * Add retry parameters on fanout requests
 * Bump unstructured library to 0.8.1
 * Fix how to remove an element's coordinate information

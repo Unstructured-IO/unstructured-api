@@ -15,17 +15,19 @@ from fastapi.responses import StreamingResponse
 from starlette.datastructures import Headers
 from starlette.types import Send
 from base64 import b64encode
-from typing import Optional, Mapping, Iterator, Tuple
+from typing import Optional, Mapping
 import secrets
+import pandas as pd
 from concurrent.futures import ThreadPoolExecutor
 from functools import partial
 from pypdf import PdfReader, PdfWriter
 from unstructured.partition.auto import partition
 from unstructured.staging.base import convert_to_isd, convert_to_dataframe, elements_from_json
-import tempfile
 import pdfminer
 import requests
 import time
+from unstructured_inference.models.chipper import MODEL_TYPES as CHIPPER_MODEL_TYPES
+import logging
 
 
 app = FastAPI()
@@ -190,6 +192,9 @@ def partition_pdf_splits(
     return results
 
 
+logger = logging.getLogger("unstructured_api")
+
+
 def pipeline_api(
     file,
     request=None,
@@ -200,9 +205,23 @@ def pipeline_api(
     m_encoding=[],
     m_xml_keep_tags=[],
     m_pdf_infer_table_structure=[],
+    m_hi_res_model_name=[],
     file_content_type=None,
     response_type="application/json",
 ):
+    logger.debug(
+        f"\npipeline_api input params:\n"
+        f"filename: {filename}\n"
+        f"m_strategy: {m_strategy}\n"
+        f"m_coordinates: {m_coordinates}\n"
+        f"m_ocr_languages: {m_ocr_languages}\n"
+        f"m_encoding: {m_encoding}\n"
+        f"m_xml_keep_tags: {m_xml_keep_tags}\n"
+        f"m_pdf_infer_table_structure: {m_pdf_infer_table_structure}\n"
+        f"m_hi_res_model_name: {m_hi_res_model_name}\n"
+        f"file_content_type: {file_content_type}\n"
+        f"response_type: {response_type}"
+    )
     if filename.endswith(".msg"):
         # Note(yuming): convert file type for msg files
         # since fast api might sent the wrong one.
@@ -217,6 +236,14 @@ def pipeline_api(
 
     show_coordinates_str = (m_coordinates[0] if len(m_coordinates) else "false").lower()
     show_coordinates = show_coordinates_str == "true"
+
+    hi_res_model_name = m_hi_res_model_name[0] if len(m_hi_res_model_name) else None
+
+    if hi_res_model_name and hi_res_model_name in CHIPPER_MODEL_TYPES and show_coordinates:
+        raise HTTPException(
+            status_code=400,
+            detail=f"coordinates aren't available when using the {hi_res_model_name} model type",
+        )
 
     # Parallel mode is set by env variable
     enable_parallel_mode = os.environ.get("UNSTRUCTURED_PARALLEL_MODE_ENABLED", "false")
@@ -238,6 +265,18 @@ def pipeline_api(
         pdf_infer_table_structure = False
 
     try:
+        logger.debug(
+            f"\npartition input data:\n"
+            f"content_type: {file_content_type}\n"
+            f"strategy: {strategy}\n"
+            f"ocr_languages: {ocr_languages}\n"
+            f"coordinates: {show_coordinates}\n"
+            f"pdf_infer_table_structure: {pdf_infer_table_structure}\n"
+            f"encoding: {encoding}\n"
+            f"model_name: {hi_res_model_name}\n"
+            f"xml_keep_tags: {xml_keep_tags}\n"
+        )
+
         if file_content_type == "application/pdf" and pdf_parallel_mode_enabled:
             elements = partition_pdf_splits(
                 request,
@@ -249,6 +288,7 @@ def pipeline_api(
                 coordinates=show_coordinates,
                 pdf_infer_table_structure=pdf_infer_table_structure,
                 encoding=encoding,
+                model_name=hi_res_model_name,
             )
         else:
             elements = partition(
@@ -260,6 +300,7 @@ def pipeline_api(
                 pdf_infer_table_structure=pdf_infer_table_structure,
                 encoding=encoding,
                 xml_keep_tags=xml_keep_tags,
+                model_name=hi_res_model_name,
             )
     except ValueError as e:
         if "Invalid file" in e.args[0]:
@@ -416,6 +457,7 @@ def pipeline_1(
     encoding: List[str] = Form(default=[]),
     xml_keep_tags: List[str] = Form(default=[]),
     pdf_infer_table_structure: List[str] = Form(default=[]),
+    hi_res_model_name: List[str] = Form(default=[]),
 ):
     if files:
         for file_index in range(len(files)):
@@ -432,7 +474,12 @@ def pipeline_1(
 
     if isinstance(files, list) and len(files):
         if len(files) > 1:
-            if content_type and content_type not in ["*/*", "multipart/mixed", "application/json"]:
+            if content_type and content_type not in [
+                "*/*",
+                "multipart/mixed",
+                "application/json",
+                "text/csv",
+            ]:
                 raise HTTPException(
                     detail=(
                         f"Conflict in media type {content_type}"
@@ -456,6 +503,7 @@ def pipeline_1(
                     m_encoding=encoding,
                     m_xml_keep_tags=xml_keep_tags,
                     m_pdf_infer_table_structure=pdf_infer_table_structure,
+                    m_hi_res_model_name=hi_res_model_name,
                     response_type=media_type,
                     filename=file.filename,
                     file_content_type=file_content_type,
@@ -475,12 +523,24 @@ def pipeline_1(
                     if is_multipart:
                         if type(response) not in [str, bytes]:
                             response = json.dumps(response)
+                    elif media_type == "text/csv":
+                        response = PlainTextResponse(response)
                     yield response
                 else:
                     raise HTTPException(
                         detail=f"Unsupported media type {media_type}.\n",
                         status_code=status.HTTP_406_NOT_ACCEPTABLE,
                     )
+
+        def join_responses(responses):
+            if media_type != "text/csv":
+                return responses
+            data = pd.read_csv(io.BytesIO(responses[0].body))
+            if len(responses) > 1:
+                for resp in responses[1:]:
+                    resp_data = pd.read_csv(io.BytesIO(resp.body))
+                    data = data.merge(resp_data, how="outer")
+            return PlainTextResponse(data.to_csv())
 
         if content_type == "multipart/mixed":
             return MultipartMixedResponse(
@@ -490,7 +550,7 @@ def pipeline_1(
             return (
                 list(response_generator(is_multipart=False))[0]
                 if len(files) == 1
-                else response_generator(is_multipart=False)
+                else join_responses(list(response_generator(is_multipart=False)))
             )
     else:
         raise HTTPException(

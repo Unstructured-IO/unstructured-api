@@ -6,7 +6,6 @@ import pytest
 import requests
 import pandas as pd
 import io
-import ast
 
 API_URL = "http://localhost:8000/general/v0/general"
 # NOTE(rniko): Skip inference tests if we're running on an emulated architecture
@@ -87,8 +86,10 @@ def test_happy_path(example_filename, content_type):
     and some structured response
     """
     test_file = Path("sample-docs") / example_filename
+    print(f"sending {content_type}")
     json_response = send_document(test_file, content_type)
 
+    print(json_response.content)
     assert json_response.status_code == 200
     assert len(json_response.json()) > 0
     assert len("".join(elem["text"] for elem in json_response.json())) > 20
@@ -96,7 +97,7 @@ def test_happy_path(example_filename, content_type):
     csv_response = send_document(test_file, content_type, output_format="text/csv")
     assert csv_response.status_code == 200
     assert len(csv_response.text) > 0
-    df = pd.read_csv(io.StringIO(ast.literal_eval(csv_response.text)))
+    df = pd.read_csv(io.StringIO(csv_response.text))
     assert len(df) == len(json_response.json())
 
 
