@@ -241,7 +241,7 @@ def pipeline_api(
 
     if hi_res_model_name and hi_res_model_name in CHIPPER_MODEL_TYPES and show_coordinates:
         raise HTTPException(
-            status_code=403,
+            status_code=400,
             detail=f"coordinates aren't available when using the {hi_res_model_name} model type",
         )
 
