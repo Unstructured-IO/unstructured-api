@@ -11,6 +11,7 @@ antlr4-python3-runtime==4.9.3
 anyio==3.7.1
     # via
     #   -r requirements/base.txt
+    #   httpcore
     #   jupyter-server
     #   starlette
     #   watchfiles
@@ -53,6 +54,8 @@ bleach==6.0.0
 certifi==2023.5.7
     # via
     #   -r requirements/base.txt
+    #   httpcore
+    #   httpx
     #   requests
 cffi==1.15.1
     # via
@@ -165,11 +168,16 @@ ghapi==1.0.4
 h11==0.14.0
     # via
     #   -r requirements/base.txt
+    #   httpcore
     #   uvicorn
+httpcore==0.17.3
+    # via httpx
 httptools==0.6.0
     # via
     #   -r requirements/base.txt
     #   uvicorn
+httpx==0.24.1
+    # via -r requirements/test.in
 huggingface-hub==0.16.4
     # via
     #   -r requirements/base.txt
@@ -184,6 +192,7 @@ idna==3.4
     # via
     #   -r requirements/base.txt
     #   anyio
+    #   httpx
     #   jsonschema
     #   requests
 importlib-metadata==6.8.0
@@ -682,6 +691,8 @@ sniffio==1.3.0
     # via
     #   -r requirements/base.txt
     #   anyio
+    #   httpcore
+    #   httpx
 soupsieve==2.4.1
     # via
     #   -r requirements/base.txt

@@ -9,3 +9,4 @@ pytest-cov
 pytest-mock
 nbdev
 jupyter
+httpx
