@@ -227,7 +227,7 @@ def pipeline_api(
         # since fast api might sent the wrong one.
         file_content_type = "application/x-ole-storage"
 
-    strategy = (m_strategy[0] if len(m_strategy) else "fast").lower()
+    strategy = (m_strategy[0] if len(m_strategy) else "auto").lower()
     strategies = ["fast", "hi_res", "auto", "ocr_only"]
     if strategy not in strategies:
         raise HTTPException(
