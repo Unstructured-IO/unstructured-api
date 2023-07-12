@@ -15,14 +15,14 @@ from fastapi.responses import StreamingResponse
 from starlette.datastructures import Headers
 from starlette.types import Send
 from base64 import b64encode
-from typing import Optional, Mapping, Iterator, Tuple
+from typing import Optional, Mapping
 import secrets
+import pandas as pd
 from concurrent.futures import ThreadPoolExecutor
 from functools import partial
 from pypdf import PdfReader, PdfWriter
 from unstructured.partition.auto import partition
 from unstructured.staging.base import convert_to_isd, convert_to_dataframe, elements_from_json
-import tempfile
 import pdfminer
 import requests
 import time
@@ -314,7 +314,7 @@ def pipeline_api(
     if response_type == "text/csv":
         df = convert_to_dataframe(elements)
         df["filename"] = os.path.basename(filename)
-        if not show_coordinates and "coordinates" in df.columns:
+        if not show_coordinates:
             columns_to_drop = [
                 col
                 for col in [
@@ -474,7 +474,12 @@ def pipeline_1(
 
     if isinstance(files, list) and len(files):
         if len(files) > 1:
-            if content_type and content_type not in ["*/*", "multipart/mixed", "application/json"]:
+            if content_type and content_type not in [
+                "*/*",
+                "multipart/mixed",
+                "application/json",
+                "text/csv",
+            ]:
                 raise HTTPException(
                     detail=(
                         f"Conflict in media type {content_type}"
@@ -518,12 +523,24 @@ def pipeline_1(
                     if is_multipart:
                         if type(response) not in [str, bytes]:
                             response = json.dumps(response)
+                    elif media_type == "text/csv":
+                        response = PlainTextResponse(response)
                     yield response
                 else:
                     raise HTTPException(
                         detail=f"Unsupported media type {media_type}.\n",
                         status_code=status.HTTP_406_NOT_ACCEPTABLE,
                     )
+
+        def join_responses(responses):
+            if media_type != "text/csv":
+                return responses
+            data = pd.read_csv(io.BytesIO(responses[0].body))
+            if len(responses) > 1:
+                for resp in responses[1:]:
+                    resp_data = pd.read_csv(io.BytesIO(resp.body))
+                    data = data.merge(resp_data, how="outer")
+            return PlainTextResponse(data.to_csv())
 
         if content_type == "multipart/mixed":
             return MultipartMixedResponse(
@@ -533,7 +550,7 @@ def pipeline_1(
             return (
                 list(response_generator(is_multipart=False))[0]
                 if len(files) == 1
-                else response_generator(is_multipart=False)
+                else join_responses(list(response_generator(is_multipart=False)))
             )
     else:
         raise HTTPException(
