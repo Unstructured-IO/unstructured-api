@@ -157,7 +157,7 @@ flatbuffers==23.5.26
     # via
     #   -r requirements/base.txt
     #   onnxruntime
-fonttools==4.40.0
+fonttools==4.41.0
     # via
     #   -r requirements/base.txt
     #   matplotlib
@@ -257,7 +257,7 @@ joblib==1.3.1
     #   nltk
 jsonpointer==2.4
     # via jsonschema
-jsonschema[format-nongpl]==4.18.1
+jsonschema[format-nongpl]==4.18.3
     # via
     #   -r requirements/base.txt
     #   jupyter-events
@@ -886,7 +886,7 @@ xlsxwriter==3.1.2
     # via
     #   -r requirements/base.txt
     #   python-pptx
-zipp==3.16.0
+zipp==3.16.1
     # via
     #   -r requirements/base.txt
     #   importlib-metadata

@@ -283,7 +283,7 @@ def test_include_page_breaks_param():
     response = client.post(
         MAIN_API_ROUTE,
         files=[("files", (str(test_file), open(test_file, "rb")))],
-        data={"strategy": "hi_res"},
+        data={"strategy": "fast"},
     )
     assert response.status_code == 200
     response_without_page_breaks = response.json()
@@ -291,20 +291,38 @@ def test_include_page_breaks_param():
     response = client.post(
         MAIN_API_ROUTE,
         files=[("files", (str(test_file), open(test_file, "rb")))],
-        data={"include_page_breaks": "true", "strategy": "hi_res"},
+        data={"include_page_breaks": "true", "strategy": "fast"},
     )
     assert response.status_code == 200
     response_with_page_breaks = response.json()
 
     # The responses should have the same content except extra PageBreak objects
     response_with_page_breaks_index, response_without_page_breaks_index = 0, 0
-    while response_without_page_breaks_index < len(response_with_page_breaks):
-        curr_response_with_page_breaks_element = response_with_page_breaks[response_with_page_breaks_index]
-        curr_response_without_page_breaks_element = response_without_page_breaks[response_without_page_breaks_index]
+    while response_with_page_breaks_index <= len(response_without_page_breaks):
+        curr_response_with_page_breaks_element = response_with_page_breaks[
+            response_with_page_breaks_index
+        ]
+        curr_response_without_page_breaks_element = response_without_page_breaks[
+            response_without_page_breaks_index
+        ]
         if curr_response_with_page_breaks_element["type"] == "PageBreak":
             assert curr_response_without_page_breaks_element["type"] != "PageBreak"
+
+            response_with_page_breaks_index += 1
         else:
-            assert curr_response_without_page_breaks_element["text"] == curr_response_with_page_breaks_element["text"]
+            assert (
+                curr_response_without_page_breaks_element["text"]
+                == curr_response_with_page_breaks_element["text"]
+            )
+
+            response_with_page_breaks_index += 1
+            response_without_page_breaks_index += 1
+
+    last_response_with_page_breaks_element = response_with_page_breaks[
+        response_with_page_breaks_index
+    ]
+    assert last_response_with_page_breaks_element["type"] == "PageBreak"
+    assert response_without_page_breaks[-1]["type"] != "PageBreak"
 
 
 @pytest.mark.parametrize(
