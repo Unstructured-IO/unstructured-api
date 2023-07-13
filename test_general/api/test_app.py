@@ -274,6 +274,39 @@ def test_xml_keep_tags_param():
             response_without_xml_tags_index += 1
 
 
+def test_include_page_breaks_param():
+    """
+    Verify that responses do not include page breaks unless requested
+    """
+    client = TestClient(app)
+    test_file = Path("sample-docs") / "layout-parser-paper-fast.pdf"
+    response = client.post(
+        MAIN_API_ROUTE,
+        files=[("files", (str(test_file), open(test_file, "rb")))],
+        data={"strategy": "hi_res"},
+    )
+    assert response.status_code == 200
+    response_without_page_breaks = response.json()
+
+    response = client.post(
+        MAIN_API_ROUTE,
+        files=[("files", (str(test_file), open(test_file, "rb")))],
+        data={"include_page_breaks": "true", "strategy": "hi_res"},
+    )
+    assert response.status_code == 200
+    response_with_page_breaks = response.json()
+
+    # The responses should have the same content except extra PageBreak objects
+    response_with_page_breaks_index, response_without_page_breaks_index = 0, 0
+    while response_without_page_breaks_index < len(response_with_page_breaks):
+        curr_response_with_page_breaks_element = response_with_page_breaks[response_with_page_breaks_index]
+        curr_response_without_page_breaks_element = response_without_page_breaks[response_without_page_breaks_index]
+        if curr_response_with_page_breaks_element["type"] == "PageBreak":
+            assert curr_response_without_page_breaks_element["type"] != "PageBreak"
+        else:
+            assert curr_response_without_page_breaks_element["text"] == curr_response_with_page_breaks_element["text"]
+
+
 @pytest.mark.parametrize(
     "example_filename",
     [
