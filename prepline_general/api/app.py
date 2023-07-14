@@ -46,7 +46,6 @@ class MetricsCheckFilter(logging.Filter):
 
 
 logging.getLogger("uvicorn.access").addFilter(HealthCheckFilter())
-logging.getLogger("uvicorn.access").addFilter(MetricsCheckFilter())
 
 
 @app.get("/healthcheck", status_code=status.HTTP_200_OK, include_in_schema=False)
