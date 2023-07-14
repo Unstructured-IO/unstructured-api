@@ -43,9 +43,6 @@ def is_expected_response_type(media_type, response_type):
         return False
 
 
-# pipeline-api
-
-
 DEFAULT_MIMETYPES = (
     "application/pdf,application/msword,image/jpeg,image/png,text/markdown,"
     "text/x-markdown,text/html,"
@@ -210,17 +207,24 @@ def pipeline_api(
     response_type="application/json",
 ):
     logger.debug(
-        f"\npipeline_api input params:\n"
-        f"filename: {filename}\n"
-        f"m_strategy: {m_strategy}\n"
-        f"m_coordinates: {m_coordinates}\n"
-        f"m_ocr_languages: {m_ocr_languages}\n"
-        f"m_encoding: {m_encoding}\n"
-        f"m_xml_keep_tags: {m_xml_keep_tags}\n"
-        f"m_pdf_infer_table_structure: {m_pdf_infer_table_structure}\n"
-        f"m_hi_res_model_name: {m_hi_res_model_name}\n"
-        f"file_content_type: {file_content_type}\n"
-        f"response_type: {response_type}"
+        "pipeline_api input params: {}".format(
+            json.dumps(
+                {
+                    "request": request,
+                    "filename": filename,
+                    "m_strategy": m_strategy,
+                    "m_coordinates": m_coordinates,
+                    "m_ocr_languages": m_ocr_languages,
+                    "m_encoding": m_encoding,
+                    "m_xml_keep_tags": m_xml_keep_tags,
+                    "m_pdf_infer_table_structure": m_pdf_infer_table_structure,
+                    "m_hi_res_model_name": m_hi_res_model_name,
+                    "file_content_type": file_content_type,
+                    "response_type": response_type,
+                },
+                default=str,
+            )
+        )
     )
     if filename.endswith(".msg"):
         # Note(yuming): convert file type for msg files
@@ -266,15 +270,21 @@ def pipeline_api(
 
     try:
         logger.debug(
-            f"\npartition input data:\n"
-            f"content_type: {file_content_type}\n"
-            f"strategy: {strategy}\n"
-            f"ocr_languages: {ocr_languages}\n"
-            f"coordinates: {show_coordinates}\n"
-            f"pdf_infer_table_structure: {pdf_infer_table_structure}\n"
-            f"encoding: {encoding}\n"
-            f"model_name: {hi_res_model_name}\n"
-            f"xml_keep_tags: {xml_keep_tags}\n"
+            "partition input data: {}".format(
+                json.dumps(
+                    {
+                        "content_type": file_content_type,
+                        "strategy": strategy,
+                        "ocr_languages": ocr_languages,
+                        "coordinates": show_coordinates,
+                        "pdf_infer_table_structure": pdf_infer_table_structure,
+                        "encoding": encoding,
+                        "model_name": hi_res_model_name,
+                        "xml_keep_tags": xml_keep_tags,
+                    },
+                    default=str,
+                )
+            )
         )
 
         if file_content_type == "application/pdf" and pdf_parallel_mode_enabled:
@@ -445,7 +455,7 @@ def ungz_file(file: UploadFile, gz_uncompressed_content_type=None) -> UploadFile
 
 
 @router.post("/general/v0/general")
-@router.post("/general/v0.0.31/general")
+@router.post("/general/v0.0.32/general")
 def pipeline_1(
     request: Request,
     gz_uncompressed_content_type: Optional[str] = Form(default=None),
