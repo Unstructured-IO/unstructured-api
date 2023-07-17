@@ -4,6 +4,8 @@
 #
 #    pip-compile requirements/base.in
 #
+annotated-types==0.5.0
+    # via pydantic
 antlr4-python3-runtime==4.9.3
     # via omegaconf
 anyio==3.7.1
@@ -32,10 +34,12 @@ charset-normalizer==3.2.0
     #   requests
 click==8.1.3
     # via
-    #   -r requirements/base.in
+    #   -r base.in
     #   nltk
     #   unstructured-api-tools
     #   uvicorn
+cmake==3.26.4
+    # via triton
 coloredlogs==15.0.1
     # via onnxruntime
 contourpy==1.1.0
@@ -50,8 +54,6 @@ effdet==0.4.1
     # via layoutparser
 et-xmlfile==1.1.0
     # via openpyxl
-exceptiongroup==1.1.2
-    # via anyio
 fastapi==0.100.0
     # via unstructured-api-tools
 fastjsonschema==2.17.1
@@ -61,6 +63,7 @@ filelock==3.12.2
     #   huggingface-hub
     #   torch
     #   transformers
+    #   triton
 filetype==1.2.0
     # via unstructured
 flatbuffers==23.5.26
@@ -84,16 +87,6 @@ idna==3.4
     # via
     #   anyio
     #   requests
-importlib-metadata==6.8.0
-    # via
-    #   jupyter-client
-    #   markdown
-    #   nbconvert
-importlib-resources==6.0.0
-    # via
-    #   jsonschema
-    #   jsonschema-specifications
-    #   matplotlib
 iopath==0.1.10
     # via layoutparser
 jinja2==3.1.2
@@ -121,6 +114,8 @@ kiwisolver==1.4.4
     # via matplotlib
 layoutparser[layoutmodels,tesseract]==0.3.4
     # via unstructured-inference
+lit==16.0.6
+    # via triton
 lxml==4.9.3
     # via
     #   python-docx
@@ -168,6 +163,31 @@ numpy==1.24.4
     #   scipy
     #   torchvision
     #   transformers
+nvidia-cublas-cu11==11.10.3.66
+    # via
+    #   nvidia-cudnn-cu11
+    #   nvidia-cusolver-cu11
+    #   torch
+nvidia-cuda-cupti-cu11==11.7.101
+    # via torch
+nvidia-cuda-nvrtc-cu11==11.7.99
+    # via torch
+nvidia-cuda-runtime-cu11==11.7.99
+    # via torch
+nvidia-cudnn-cu11==8.5.0.96
+    # via torch
+nvidia-cufft-cu11==10.9.0.58
+    # via torch
+nvidia-curand-cu11==10.2.10.91
+    # via torch
+nvidia-cusolver-cu11==11.4.0.1
+    # via torch
+nvidia-cusparse-cu11==11.7.4.91
+    # via torch
+nvidia-nccl-cu11==2.14.3
+    # via torch
+nvidia-nvtx-cu11==11.7.91
+    # via torch
 olefile==0.46
     # via msg-parser
 omegaconf==2.3.0
@@ -215,8 +235,6 @@ pillow==10.0.0
     #   python-pptx
     #   torchvision
     #   unstructured
-pkgutil-resolve-name==1.3.10
-    # via jsonschema
 platformdirs==3.9.1
     # via jupyter-core
 portalocker==2.7.0
@@ -227,10 +245,12 @@ pycocotools==2.0.6
     # via effdet
 pycparser==2.21
     # via cffi
-pydantic==1.10.11
+pydantic==2.0.3
     # via
-    #   -r requirements/base.in
+    #   -r base.in
     #   fastapi
+pydantic-core==2.3.0
+    # via pydantic
 pyflakes==3.0.1
     # via autoflake
 pygments==2.15.1
@@ -240,7 +260,7 @@ pypandoc==1.11
 pyparsing==3.0.9
     # via matplotlib
 pypdf==3.12.2
-    # via -r requirements/base.in
+    # via -r base.in
 pypdfium2==4.18.0
     # via pdfplumber
 pytesseract==0.3.10
@@ -275,7 +295,7 @@ pyyaml==6.0
 pyzmq==25.1.0
     # via jupyter-client
 ratelimit==2.2.1
-    # via -r requirements/base.in
+    # via -r base.in
 referencing==0.29.1
     # via
     #   jsonschema
@@ -286,7 +306,7 @@ regex==2023.6.3
     #   transformers
 requests==2.31.0
     # via
-    #   -r requirements/base.in
+    #   -r base.in
     #   huggingface-hub
     #   torchvision
     #   transformers
@@ -323,16 +343,13 @@ tinycss2==1.2.1
     # via nbconvert
 tokenizers==0.13.3
     # via transformers
-tomli==2.0.1
-    # via
-    #   autoflake
-    #   mypy
 torch==2.0.1
     # via
     #   effdet
     #   layoutparser
     #   timm
     #   torchvision
+    #   triton
 torchvision==0.15.2
     # via
     #   effdet
@@ -355,6 +372,8 @@ traitlets==5.9.0
     #   nbformat
 transformers==4.30.2
     # via unstructured-inference
+triton==2.0.0
+    # via torch
 types-requests==2.31.0.1
     # via unstructured-api-tools
 types-ujson==5.8.0.0
@@ -368,15 +387,14 @@ typing-extensions==4.7.1
     #   iopath
     #   mypy
     #   pydantic
-    #   pypdf
-    #   starlette
+    #   pydantic-core
     #   torch
 tzdata==2023.3
     # via pandas
 unstructured[local-inference]==0.8.1
-    # via -r requirements/base.in
+    # via -r base.in
 unstructured-api-tools==0.10.10
-    # via -r requirements/base.in
+    # via -r base.in
 unstructured-inference==0.5.5
     # via unstructured
 urllib3==2.0.3
@@ -393,11 +411,15 @@ webencodings==0.5.1
     #   tinycss2
 websockets==11.0.3
     # via uvicorn
+wheel==0.40.0
+    # via
+    #   nvidia-cublas-cu11
+    #   nvidia-cuda-cupti-cu11
+    #   nvidia-cuda-runtime-cu11
+    #   nvidia-curand-cu11
+    #   nvidia-cusparse-cu11
+    #   nvidia-nvtx-cu11
 xlrd==2.0.1
     # via unstructured
 xlsxwriter==3.1.2
     # via python-pptx
-zipp==3.16.2
-    # via
-    #   importlib-metadata
-    #   importlib-resources
