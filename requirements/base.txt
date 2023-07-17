@@ -65,7 +65,7 @@ filetype==1.2.0
     # via unstructured
 flatbuffers==23.5.26
     # via onnxruntime
-fonttools==4.40.0
+fonttools==4.41.0
     # via matplotlib
 fsspec==2023.6.0
     # via huggingface-hub
@@ -103,7 +103,7 @@ jinja2==3.1.2
     #   unstructured-api-tools
 joblib==1.3.1
     # via nltk
-jsonschema==4.18.1
+jsonschema==4.18.3
     # via nbformat
 jsonschema-specifications==2023.6.1
     # via jsonschema
@@ -146,7 +146,7 @@ mypy-extensions==1.0.0
     # via mypy
 nbclient==0.8.0
     # via nbconvert
-nbconvert==7.6.0
+nbconvert==7.7.1
     # via unstructured-api-tools
 nbformat==5.9.1
     # via
@@ -203,7 +203,7 @@ pdfminer-six==20221105
     # via
     #   pdfplumber
     #   unstructured
-pdfplumber==0.9.0
+pdfplumber==0.10.0
     # via layoutparser
 pillow==10.0.0
     # via
@@ -217,7 +217,7 @@ pillow==10.0.0
     #   unstructured
 pkgutil-resolve-name==1.3.10
     # via jsonschema
-platformdirs==3.8.1
+platformdirs==3.9.1
     # via jupyter-core
 portalocker==2.7.0
     # via iopath
@@ -239,8 +239,10 @@ pypandoc==1.11
     # via unstructured
 pyparsing==3.0.9
     # via matplotlib
-pypdf==3.12.1
+pypdf==3.12.2
     # via -r requirements/base.in
+pypdfium2==4.18.0
+    # via pdfplumber
 pytesseract==0.3.10
     # via layoutparser
 python-dateutil==2.8.2
@@ -289,7 +291,7 @@ requests==2.31.0
     #   torchvision
     #   transformers
     #   unstructured
-rpds-py==0.8.10
+rpds-py==0.8.11
     # via
     #   jsonschema
     #   referencing
@@ -379,12 +381,10 @@ unstructured-inference==0.5.5
     # via unstructured
 urllib3==2.0.3
     # via requests
-uvicorn[standard]==0.22.0
+uvicorn[standard]==0.23.0
     # via unstructured-api-tools
 uvloop==0.17.0
     # via uvicorn
-wand==0.6.11
-    # via pdfplumber
 watchfiles==0.19.0
     # via uvicorn
 webencodings==0.5.1
@@ -397,7 +397,7 @@ xlrd==2.0.1
     # via unstructured
 xlsxwriter==3.1.2
     # via python-pptx
-zipp==3.16.0
+zipp==3.16.2
     # via
     #   importlib-metadata
     #   importlib-resources
