@@ -139,6 +139,20 @@ curl -X 'POST'
  | jq -C . | less -R
 ```
 
+#### Page Breaks
+
+For supported filetypes, set the `include_page_breaks` parameter to `true` to include `PageBreak` elements in the output.
+
+```
+curl -X 'POST' 
+ 'https://api.unstructured.io/general/v0/general' \
+ -H 'accept: application/json'  \
+ -H 'Content-Type: multipart/form-data' \
+ -F 'files=@sample-docs/layout-parser-paper-fast.pdf' \
+ -F 'include_page_breaks=true' \
+ | jq -C . | less -R
+```
+
 ## Developer Quick Start
 
 * Using `pyenv` to manage virtualenv's is recommended
