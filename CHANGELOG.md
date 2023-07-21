@@ -1,3 +1,8 @@
+## 0.0.32-dev0
+
+* Improve logging of params to single line json
+* Add support for `include_page_breaks` parameter
+
 ## 0.0.31
 
 * Support model name as api parameter
