@@ -1,5 +1,6 @@
-## 0.0.32-dev0
+## 0.0.32-dev1
 
+* Throw 400 error if a PDF is password protected
 * Improve logging of params to single line json
 * Add support for `include_page_breaks` parameter
 

@@ -134,7 +134,7 @@ def test_coordinates_param():
 
 def test_ocr_languages_param():
     """
-    ...
+    Verify that we get the corresponding languages from the response with ocr_languages
     """
     client = TestClient(app)
     test_file = Path("sample-docs") / "english-and-korean.png"
@@ -344,7 +344,10 @@ def test_general_api_returns_400_unsupported_file(example_filename):
     assert response.status_code == 400
 
 
-def test_general_api_returns_500_bad_pdf():
+def test_general_api_returns_400_bad_pdf():
+    """
+    Verify that we get a 400 for invalid PDF files
+    """
     tmp = tempfile.NamedTemporaryFile(suffix=".pdf")
     tmp.write(b"This is not a valid PDF")
     client = TestClient(app)
@@ -463,6 +466,9 @@ def test_parallel_mode_returns_errors(monkeypatch):
 
 
 def test_partition_file_via_api_retry(monkeypatch, mocker):
+    """
+    Verify number of retries with parallel mode
+    """
     monkeypatch.setenv("UNSTRUCTURED_PARALLEL_MODE_ENABLED", "true")
     monkeypatch.setenv("UNSTRUCTURED_PARALLEL_MODE_URL", "unused")
     monkeypatch.setenv("UNSTRUCTURED_PARALLEL_MODE_THREADS", "1")
@@ -490,6 +496,9 @@ def test_partition_file_via_api_retry(monkeypatch, mocker):
 
 
 def test_partition_file_via_api_no_retryable_error_code(monkeypatch, mocker):
+    """
+    Verify we didn't retry if the error code is not retryable
+    """
     monkeypatch.setenv("UNSTRUCTURED_PARALLEL_MODE_ENABLED", "true")
     monkeypatch.setenv("UNSTRUCTURED_PARALLEL_MODE_URL", "unused")
     monkeypatch.setenv("UNSTRUCTURED_PARALLEL_MODE_THREADS", "1")
@@ -514,3 +523,22 @@ def test_partition_file_via_api_no_retryable_error_code(monkeypatch, mocker):
 
     assert response.status_code == 401
     assert mock_sleep.call_count == 0
+
+
+def test_password_protected_pdf():
+    """
+    Verify we get a 400 error if the PDF is password protected
+    """
+    client = TestClient(app)
+    # a password protected pdf file, password is "password"
+    test_file = Path("sample-docs") / "layout-parser-paper-password-protected.pdf"
+
+    response = client.post(
+        MAIN_API_ROUTE,
+        files=[("files", (str(test_file), open(test_file, "rb")))],
+        data={"strategy": "fast"},
+    )
+    assert response.status_code == 400
+    assert response.json() == {
+        "detail": f"File: {str(test_file)} is encrypted. Please decrypt it with password."
+    }
