@@ -1,4 +1,4 @@
-## 0.0.32-dev1
+## 0.0.32
 
 * Throw 400 error if a PDF is password protected
 * Improve logging of params to single line json
