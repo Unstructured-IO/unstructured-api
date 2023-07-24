@@ -1,15 +1,18 @@
 <h3 align="center">
   <img src="img/unstructured_logo.png" height="200">
 </h3>
+
 <h3 align="center">
   <p>API Announcement!</p>
 </h3>
 
-<p>While access to the hosted Unstructured API will remain free, API Keys will soon be required to make requests. To prevent any disruption, get yours <a href="https://www.unstructured.io/api-key/">here</a> now and start using it today!</p>
-  
-<p>Checkout the rest of the readme below to get started making API calls. 
-We'd love to hear your feedback, let us know how it goes in our
-  <a href="https://join.slack.com/t/unstructuredw-kbe4326/shared_invite/zt-1x7cgo0pg-PTptXWylzPQF9xZolzCnwQ"> community slack</a>. And stay tuned for improvements to both quality and performance!</p>
+We are thrilled to announce our newly launched [Unstructured API](https://unstructured-io.github.io/unstructured/api.html). While access to the hosted Unstructured API will remain free, API Keys are required to make requests. To prevent disruption, get yours [here](https://www.unstructured.io/#get-api-key) now and start using it today! Check out the [readme](https://github.com/Unstructured-IO/unstructured-api#--) here to get started making API calls.</p>
+
+#### :rocket: Beta Feature: Chipper Model
+
+We are releasing the beta version of our Chipper model to deliver superior performance when processing high-resolution, complex documents. To start using the Chipper model in your API request, you can utilize the `hi_res` strategy. Please refer to the documentation [here](https://unstructured-io.github.io/unstructured/api.html#strategies).
+
+As the Chipper model is in beta version, we welcome feedback and suggestions. For those interested in testing the Chipper model, we encourage you to connect with us on [Slack community](https://join.slack.com/t/unstructuredw-kbe4326/shared_invite/zt-1x7cgo0pg-PTptXWylzPQF9xZolzCnwQ).
   
 ---
 
@@ -133,6 +136,20 @@ curl -X 'POST'
  -H 'Content-Type: multipart/form-data' \
  -F 'files=@sample-docs/fake-xml.xml' \
  -F 'xml_keep_tags=true' \
+ | jq -C . | less -R
+```
+
+#### Page Breaks
+
+For supported filetypes, set the `include_page_breaks` parameter to `true` to include `PageBreak` elements in the output.
+
+```
+curl -X 'POST' 
+ 'https://api.unstructured.io/general/v0/general' \
+ -H 'accept: application/json'  \
+ -H 'Content-Type: multipart/form-data' \
+ -F 'files=@sample-docs/layout-parser-paper-fast.pdf' \
+ -F 'include_page_breaks=true' \
  | jq -C . | less -R
 ```
 

@@ -19,10 +19,6 @@ appnope==0.1.3
     # via
     #   ipykernel
     #   ipython
-argilla==1.12.0
-    # via
-    #   -r requirements/base.txt
-    #   unstructured
 argon2-cffi==21.3.0
     # via
     #   jupyter-server
@@ -42,17 +38,18 @@ attrs==23.1.0
     # via
     #   -r requirements/base.txt
     #   jsonschema
-backcall==0.2.0
-    # via ipython
-backoff==2.2.1
+    #   referencing
+autoflake==2.2.0
     # via
     #   -r requirements/base.txt
-    #   argilla
+    #   unstructured-api-tools
+backcall==0.2.0
+    # via ipython
 beautifulsoup4==4.12.2
     # via
     #   -r requirements/base.txt
     #   nbconvert
-black==23.3.0
+black==23.7.0
     # via -r requirements/test.in
 bleach==6.0.0
     # via
@@ -73,7 +70,7 @@ chardet==5.1.0
     # via
     #   -r requirements/base.txt
     #   unstructured
-charset-normalizer==3.1.0
+charset-normalizer==3.2.0
     # via
     #   -r requirements/base.txt
     #   pdfminer-six
@@ -84,7 +81,6 @@ click==8.1.3
     #   -r requirements/test.in
     #   black
     #   nltk
-    #   typer
     #   unstructured-api-tools
     #   uvicorn
 coloredlogs==15.0.1
@@ -93,17 +89,13 @@ coloredlogs==15.0.1
     #   onnxruntime
 comm==0.1.3
     # via ipykernel
-commonmark==0.9.1
-    # via
-    #   -r requirements/base.txt
-    #   rich
 contourpy==1.1.0
     # via
     #   -r requirements/base.txt
     #   matplotlib
 coverage[toml]==7.2.7
     # via pytest-cov
-cryptography==41.0.1
+cryptography==41.0.2
     # via
     #   -r requirements/base.txt
     #   pdfminer-six
@@ -119,10 +111,6 @@ defusedxml==0.7.1
     # via
     #   -r requirements/base.txt
     #   nbconvert
-deprecated==1.2.14
-    # via
-    #   -r requirements/base.txt
-    #   argilla
 effdet==0.4.1
     # via
     #   -r requirements/base.txt
@@ -140,7 +128,7 @@ execnb==0.1.5
     # via nbdev
 executing==1.2.0
     # via stack-data
-fastapi==0.99.1
+fastapi==0.100.0
     # via
     #   -r requirements/base.txt
     #   unstructured-api-tools
@@ -169,7 +157,7 @@ flatbuffers==23.5.26
     # via
     #   -r requirements/base.txt
     #   onnxruntime
-fonttools==4.40.0
+fonttools==4.41.0
     # via
     #   -r requirements/base.txt
     #   matplotlib
@@ -186,19 +174,15 @@ h11==0.14.0
     #   -r requirements/base.txt
     #   httpcore
     #   uvicorn
-httpcore==0.16.3
-    # via
-    #   -r requirements/base.txt
-    #   httpx
-httptools==0.5.0
+httpcore==0.17.3
+    # via httpx
+httptools==0.6.0
     # via
     #   -r requirements/base.txt
     #   uvicorn
-httpx==0.23.3
-    # via
-    #   -r requirements/base.txt
-    #   argilla
-huggingface-hub==0.16.2
+httpx==0.24.1
+    # via -r requirements/test.in
+huggingface-hub==0.16.4
     # via
     #   -r requirements/base.txt
     #   timm
@@ -212,19 +196,20 @@ idna==3.4
     # via
     #   -r requirements/base.txt
     #   anyio
+    #   httpx
     #   jsonschema
     #   requests
-    #   rfc3986
-importlib-metadata==6.7.0
+importlib-metadata==6.8.0
     # via
     #   -r requirements/base.txt
     #   jupyter-client
     #   markdown
     #   nbconvert
-importlib-resources==5.12.0
+importlib-resources==6.0.0
     # via
     #   -r requirements/base.txt
     #   jsonschema
+    #   jsonschema-specifications
     #   matplotlib
 iniconfig==2.0.0
     # via pytest
@@ -272,11 +257,15 @@ joblib==1.3.1
     #   nltk
 jsonpointer==2.4
     # via jsonschema
-jsonschema[format-nongpl]==4.17.3
+jsonschema[format-nongpl]==4.18.3
     # via
     #   -r requirements/base.txt
     #   jupyter-events
     #   nbformat
+jsonschema-specifications==2023.6.1
+    # via
+    #   -r requirements/base.txt
+    #   jsonschema
 jupyter==1.0.0
     # via -r requirements/test.in
 jupyter-client==8.3.0
@@ -341,7 +330,7 @@ markupsafe==2.1.3
     #   -r requirements/base.txt
     #   jinja2
     #   nbconvert
-matplotlib==3.7.1
+matplotlib==3.7.2
     # via
     #   -r requirements/base.txt
     #   pycocotools
@@ -355,10 +344,6 @@ mistune==3.0.1
     # via
     #   -r requirements/base.txt
     #   nbconvert
-monotonic==1.6
-    # via
-    #   -r requirements/base.txt
-    #   argilla
 mpmath==1.3.0
     # via
     #   -r requirements/base.txt
@@ -383,7 +368,7 @@ nbclient==0.8.0
     # via
     #   -r requirements/base.txt
     #   nbconvert
-nbconvert==7.6.0
+nbconvert==7.7.1
     # via
     #   -r requirements/base.txt
     #   jupyter
@@ -393,7 +378,7 @@ nbconvert==7.6.0
     #   unstructured-api-tools
 nbdev==2.3.12
     # via -r requirements/test.in
-nbformat==5.9.0
+nbformat==5.9.1
     # via
     #   -r requirements/base.txt
     #   jupyter-server
@@ -418,10 +403,9 @@ notebook==6.5.4
     # via jupyter
 notebook-shim==0.2.3
     # via nbclassic
-numpy==1.23.5
+numpy==1.24.4
     # via
     #   -r requirements/base.txt
-    #   argilla
     #   contourpy
     #   layoutparser
     #   matplotlib
@@ -458,7 +442,6 @@ overrides==7.3.1
 packaging==23.1
     # via
     #   -r requirements/base.txt
-    #   argilla
     #   black
     #   fastcore
     #   ghapi
@@ -473,12 +456,12 @@ packaging==23.1
     #   qtconsole
     #   qtpy
     #   transformers
-pandas==1.5.3
+pandas==2.0.3
     # via
     #   -r requirements/base.txt
-    #   argilla
     #   layoutparser
     #   unstructured
+    #   unstructured-api-tools
 pandocfilters==1.5.0
     # via
     #   -r requirements/base.txt
@@ -497,7 +480,7 @@ pdfminer-six==20221105
     #   -r requirements/base.txt
     #   pdfplumber
     #   unstructured
-pdfplumber==0.9.0
+pdfplumber==0.10.0
     # via
     #   -r requirements/base.txt
     #   layoutparser
@@ -520,7 +503,7 @@ pkgutil-resolve-name==1.3.10
     # via
     #   -r requirements/base.txt
     #   jsonschema
-platformdirs==3.8.0
+platformdirs==3.9.1
     # via
     #   -r requirements/base.txt
     #   black
@@ -531,7 +514,7 @@ portalocker==2.7.0
     # via
     #   -r requirements/base.txt
     #   iopath
-prometheus-client==0.17.0
+prometheus-client==0.17.1
     # via
     #   jupyter-server
     #   nbclassic
@@ -540,7 +523,7 @@ prompt-toolkit==3.0.39
     # via
     #   ipython
     #   jupyter-console
-protobuf==4.23.3
+protobuf==4.23.4
     # via
     #   -r requirements/base.txt
     #   onnxruntime
@@ -565,10 +548,12 @@ pycparser==2.21
 pydantic==1.10.11
     # via
     #   -r requirements/base.txt
-    #   argilla
     #   fastapi
 pyflakes==3.0.1
-    # via flake8
+    # via
+    #   -r requirements/base.txt
+    #   autoflake
+    #   flake8
 pygments==2.15.1
     # via
     #   -r requirements/base.txt
@@ -576,21 +561,20 @@ pygments==2.15.1
     #   jupyter-console
     #   nbconvert
     #   qtconsole
-    #   rich
 pypandoc==1.11
     # via
     #   -r requirements/base.txt
     #   unstructured
-pyparsing==3.1.0
+pyparsing==3.0.9
     # via
     #   -r requirements/base.txt
     #   matplotlib
-pypdf==3.12.0
+pypdf==3.12.2
     # via -r requirements/base.txt
-pyrsistent==0.19.3
+pypdfium2==4.18.0
     # via
     #   -r requirements/base.txt
-    #   jsonschema
+    #   pdfplumber
 pytesseract==0.3.10
     # via
     #   -r requirements/base.txt
@@ -663,6 +647,11 @@ qtpy==2.3.1
     # via qtconsole
 ratelimit==2.2.1
     # via -r requirements/base.txt
+referencing==0.29.1
+    # via
+    #   -r requirements/base.txt
+    #   jsonschema
+    #   jsonschema-specifications
 regex==2023.6.3
     # via
     #   -r requirements/base.txt
@@ -679,18 +668,15 @@ rfc3339-validator==0.1.4
     # via
     #   jsonschema
     #   jupyter-events
-rfc3986[idna2008]==1.5.0
-    # via
-    #   -r requirements/base.txt
-    #   httpx
 rfc3986-validator==0.1.1
     # via
     #   jsonschema
     #   jupyter-events
-rich==13.0.1
+rpds-py==0.8.11
     # via
     #   -r requirements/base.txt
-    #   argilla
+    #   jsonschema
+    #   referencing
 safetensors==0.3.1
     # via
     #   -r requirements/base.txt
@@ -759,6 +745,7 @@ tokenizers==0.13.3
 tomli==2.0.1
     # via
     #   -r requirements/base.txt
+    #   autoflake
     #   black
     #   coverage
     #   mypy
@@ -788,7 +775,6 @@ tornado==6.3.2
 tqdm==4.65.0
     # via
     #   -r requirements/base.txt
-    #   argilla
     #   huggingface-hub
     #   iopath
     #   nltk
@@ -816,10 +802,6 @@ transformers==4.30.2
     # via
     #   -r requirements/base.txt
     #   unstructured-inference
-typer==0.7.0
-    # via
-    #   -r requirements/base.txt
-    #   argilla
 types-requests==2.31.0.1
     # via
     #   -r requirements/base.txt
@@ -843,14 +825,17 @@ typing-extensions==4.7.1
     #   mypy
     #   pydantic
     #   pypdf
-    #   rich
     #   starlette
     #   torch
-unstructured[local-inference]==0.7.12
+tzdata==2023.3
+    # via
+    #   -r requirements/base.txt
+    #   pandas
+unstructured[local-inference]==0.8.1
     # via -r requirements/base.txt
-unstructured-api-tools==0.10.7
+unstructured-api-tools==0.10.10
     # via -r requirements/base.txt
-unstructured-inference==0.5.4
+unstructured-inference==0.5.5
     # via
     #   -r requirements/base.txt
     #   unstructured
@@ -860,7 +845,7 @@ urllib3==2.0.3
     # via
     #   -r requirements/base.txt
     #   requests
-uvicorn[standard]==0.22.0
+uvicorn[standard]==0.23.0
     # via
     #   -r requirements/base.txt
     #   unstructured-api-tools
@@ -868,10 +853,6 @@ uvloop==0.17.0
     # via
     #   -r requirements/base.txt
     #   uvicorn
-wand==0.6.11
-    # via
-    #   -r requirements/base.txt
-    #   pdfplumber
 watchdog==3.0.0
     # via nbdev
 watchfiles==0.19.0
@@ -897,11 +878,6 @@ wheel==0.40.0
     # via astunparse
 widgetsnbextension==4.0.8
     # via ipywidgets
-wrapt==1.14.1
-    # via
-    #   -r requirements/base.txt
-    #   argilla
-    #   deprecated
 xlrd==2.0.1
     # via
     #   -r requirements/base.txt
@@ -910,7 +886,7 @@ xlsxwriter==3.1.2
     # via
     #   -r requirements/base.txt
     #   python-pptx
-zipp==3.15.0
+zipp==3.16.2
     # via
     #   -r requirements/base.txt
     #   importlib-metadata

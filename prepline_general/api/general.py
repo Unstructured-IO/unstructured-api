@@ -15,8 +15,9 @@ from fastapi.responses import StreamingResponse
 from starlette.datastructures import Headers
 from starlette.types import Send
 from base64 import b64encode
-from typing import Optional, Mapping, Iterator, Tuple
+from typing import Optional, Mapping
 import secrets
+import pandas as pd
 from concurrent.futures import ThreadPoolExecutor
 from functools import partial
 import pypdf
@@ -25,6 +26,8 @@ from unstructured.partition.auto import partition
 from unstructured.staging.base import convert_to_isd, convert_to_dataframe, elements_from_json
 import requests
 import time
+from unstructured_inference.models.chipper import MODEL_TYPES as CHIPPER_MODEL_TYPES
+import logging
 
 
 app = FastAPI()
@@ -188,6 +191,9 @@ def partition_pdf_splits(
     return results
 
 
+logger = logging.getLogger("unstructured_api")
+
+
 def pipeline_api(
     file,
     request=None,
@@ -195,12 +201,35 @@ def pipeline_api(
     m_strategy=[],
     m_coordinates=[],
     m_ocr_languages=[],
+    m_include_page_breaks=[],
     m_encoding=[],
     m_xml_keep_tags=[],
     m_pdf_infer_table_structure=[],
+    m_hi_res_model_name=[],
     file_content_type=None,
     response_type="application/json",
 ):
+    logger.debug(
+        "pipeline_api input params: {}".format(
+            json.dumps(
+                {
+                    "request": request,
+                    "filename": filename,
+                    "m_strategy": m_strategy,
+                    "m_coordinates": m_coordinates,
+                    "m_ocr_languages": m_ocr_languages,
+                    "m_include_page_breaks": m_include_page_breaks,
+                    "m_encoding": m_encoding,
+                    "m_xml_keep_tags": m_xml_keep_tags,
+                    "m_pdf_infer_table_structure": m_pdf_infer_table_structure,
+                    "m_hi_res_model_name": m_hi_res_model_name,
+                    "file_content_type": file_content_type,
+                    "response_type": response_type,
+                },
+                default=str,
+            )
+        )
+    )
     if filename.endswith(".msg"):
         # Note(yuming): convert file type for msg files
         # since fast api might sent the wrong one.
@@ -219,7 +248,7 @@ def pipeline_api(
                 detail=f"File: {filename} is encrypted. Please decrypt it with password.",
             )
 
-    strategy = (m_strategy[0] if len(m_strategy) else "fast").lower()
+    strategy = (m_strategy[0] if len(m_strategy) else "auto").lower()
     strategies = ["fast", "hi_res", "auto", "ocr_only"]
     if strategy not in strategies:
         raise HTTPException(
@@ -229,11 +258,24 @@ def pipeline_api(
     show_coordinates_str = (m_coordinates[0] if len(m_coordinates) else "false").lower()
     show_coordinates = show_coordinates_str == "true"
 
+    hi_res_model_name = m_hi_res_model_name[0] if len(m_hi_res_model_name) else None
+
+    if hi_res_model_name and hi_res_model_name in CHIPPER_MODEL_TYPES and show_coordinates:
+        raise HTTPException(
+            status_code=400,
+            detail=f"coordinates aren't available when using the {hi_res_model_name} model type",
+        )
+
     # Parallel mode is set by env variable
     enable_parallel_mode = os.environ.get("UNSTRUCTURED_PARALLEL_MODE_ENABLED", "false")
     pdf_parallel_mode_enabled = enable_parallel_mode == "true"
 
     ocr_languages = ("+".join(m_ocr_languages) if len(m_ocr_languages) else "eng").lower()
+
+    include_page_breaks_str = (
+        m_include_page_breaks[0] if len(m_include_page_breaks) else "false"
+    ).lower()
+    include_page_breaks = include_page_breaks_str == "true"
 
     encoding = m_encoding[0] if len(m_encoding) else None
 
@@ -249,6 +291,25 @@ def pipeline_api(
         pdf_infer_table_structure = False
 
     try:
+        logger.debug(
+            "partition input data: {}".format(
+                json.dumps(
+                    {
+                        "content_type": file_content_type,
+                        "strategy": strategy,
+                        "ocr_languages": ocr_languages,
+                        "coordinates": show_coordinates,
+                        "pdf_infer_table_structure": pdf_infer_table_structure,
+                        "include_page_breaks": include_page_breaks,
+                        "encoding": encoding,
+                        "model_name": hi_res_model_name,
+                        "xml_keep_tags": xml_keep_tags,
+                    },
+                    default=str,
+                )
+            )
+        )
+
         if file_content_type == "application/pdf" and pdf_parallel_mode_enabled:
             elements = partition_pdf_splits(
                 request,
@@ -260,7 +321,9 @@ def pipeline_api(
                 ocr_languages=ocr_languages,
                 coordinates=show_coordinates,
                 pdf_infer_table_structure=pdf_infer_table_structure,
+                include_page_breaks=include_page_breaks,
                 encoding=encoding,
+                model_name=hi_res_model_name,
             )
         else:
             elements = partition(
@@ -270,8 +333,10 @@ def pipeline_api(
                 strategy=strategy,
                 ocr_languages=ocr_languages,
                 pdf_infer_table_structure=pdf_infer_table_structure,
+                include_page_breaks=include_page_breaks,
                 encoding=encoding,
                 xml_keep_tags=xml_keep_tags,
+                model_name=hi_res_model_name,
             )
     except ValueError as e:
         if "Invalid file" in e.args[0]:
@@ -284,7 +349,18 @@ def pipeline_api(
         df = convert_to_dataframe(elements)
         df["filename"] = os.path.basename(filename)
         if not show_coordinates:
-            df.drop(columns=["coordinates"], inplace=True)
+            columns_to_drop = [
+                col
+                for col in [
+                    "coordinates_points",
+                    "coordinates_system",
+                    "coordinates_layout_width",
+                    "coordinates_layout_height",
+                ]
+                if col in df.columns
+            ]
+            if columns_to_drop:
+                df.drop(columns=columns_to_drop, inplace=True)
 
         return df.to_csv(index=False)
 
@@ -292,8 +368,8 @@ def pipeline_api(
     for element in result:
         element["metadata"]["filename"] = os.path.basename(filename)
 
-        if not show_coordinates:
-            del element["coordinates"]
+        if not show_coordinates and "coordinates" in element["metadata"]:
+            del element["metadata"]["coordinates"]
 
     return result
 
@@ -403,7 +479,7 @@ def ungz_file(file: UploadFile, gz_uncompressed_content_type=None) -> UploadFile
 
 
 @router.post("/general/v0/general")
-@router.post("/general/v0.0.31/general")
+@router.post("/general/v0.0.32/general")
 def pipeline_1(
     request: Request,
     gz_uncompressed_content_type: Optional[str] = Form(default=None),
@@ -412,9 +488,11 @@ def pipeline_1(
     strategy: List[str] = Form(default=[]),
     coordinates: List[str] = Form(default=[]),
     ocr_languages: List[str] = Form(default=[]),
+    include_page_breaks: List[str] = Form(default=[]),
     encoding: List[str] = Form(default=[]),
     xml_keep_tags: List[str] = Form(default=[]),
     pdf_infer_table_structure: List[str] = Form(default=[]),
+    hi_res_model_name: List[str] = Form(default=[]),
 ):
     if files:
         for file_index in range(len(files)):
@@ -431,7 +509,12 @@ def pipeline_1(
 
     if isinstance(files, list) and len(files):
         if len(files) > 1:
-            if content_type and content_type not in ["*/*", "multipart/mixed", "application/json"]:
+            if content_type and content_type not in [
+                "*/*",
+                "multipart/mixed",
+                "application/json",
+                "text/csv",
+            ]:
                 raise HTTPException(
                     detail=(
                         f"Conflict in media type {content_type}"
@@ -452,9 +535,11 @@ def pipeline_1(
                     m_strategy=strategy,
                     m_coordinates=coordinates,
                     m_ocr_languages=ocr_languages,
+                    m_include_page_breaks=include_page_breaks,
                     m_encoding=encoding,
                     m_xml_keep_tags=xml_keep_tags,
                     m_pdf_infer_table_structure=pdf_infer_table_structure,
+                    m_hi_res_model_name=hi_res_model_name,
                     response_type=media_type,
                     filename=file.filename,
                     file_content_type=file_content_type,
@@ -474,12 +559,24 @@ def pipeline_1(
                     if is_multipart:
                         if type(response) not in [str, bytes]:
                             response = json.dumps(response)
+                    elif media_type == "text/csv":
+                        response = PlainTextResponse(response)
                     yield response
                 else:
                     raise HTTPException(
                         detail=f"Unsupported media type {media_type}.\n",
                         status_code=status.HTTP_406_NOT_ACCEPTABLE,
                     )
+
+        def join_responses(responses):
+            if media_type != "text/csv":
+                return responses
+            data = pd.read_csv(io.BytesIO(responses[0].body))
+            if len(responses) > 1:
+                for resp in responses[1:]:
+                    resp_data = pd.read_csv(io.BytesIO(resp.body))
+                    data = data.merge(resp_data, how="outer")
+            return PlainTextResponse(data.to_csv())
 
         if content_type == "multipart/mixed":
             return MultipartMixedResponse(
@@ -489,7 +586,7 @@ def pipeline_1(
             return (
                 list(response_generator(is_multipart=False))[0]
                 if len(files) == 1
-                else response_generator(is_multipart=False)
+                else join_responses(list(response_generator(is_multipart=False)))
             )
     else:
         raise HTTPException(
