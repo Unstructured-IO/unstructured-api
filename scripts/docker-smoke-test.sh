@@ -71,14 +71,14 @@ stop_container() {
 # Always clean up the container
 # trap stop_container EXIT
 
-# start_container 8000 "false"
+start_container 8000 "false"
 await_server_ready 8000
 
 #######################
 # Smoke Tests
 #######################
 echo Running smoke tests
-PYTHONPATH=. SKIP_INFERENCE_TESTS=$SKIP_INFERENCE_TESTS pytest scripts/smoketest.py -vvv -s
+PYTHONPATH=. SKIP_INFERENCE_TESTS=$SKIP_INFERENCE_TESTS pytest scripts/smoketest.py
 
 #######################
 # Test parallel vs single mode

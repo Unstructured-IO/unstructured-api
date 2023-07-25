@@ -23,7 +23,13 @@ from functools import partial
 import pypdf
 from pypdf import PdfReader, PdfWriter
 from unstructured.partition.auto import partition
-from unstructured.staging.base import convert_to_isd, convert_to_dataframe, elements_from_json, convert_to_csv, dict_to_elements
+from unstructured.staging.base import (
+    convert_to_isd,
+    convert_to_dataframe,
+    elements_from_json,
+    dict_to_elements,
+    convert_to_csv,
+)
 import requests
 import time
 from unstructured_inference.models.chipper import MODEL_TYPES as CHIPPER_MODEL_TYPES
@@ -370,7 +376,6 @@ def pipeline_api(
 
         if not show_coordinates and "coordinates" in element["metadata"]:
             del element["metadata"]["coordinates"]
-
     if response_type == "text/csv":
         elements = dict_to_elements(result)
         result = convert_to_csv(elements)
