@@ -44,4 +44,9 @@ loggers:
     handlers:
       - standard_handler
     propagate: no
+  unstructured_api:
+    level: DEBUG
+    handlers:
+      - standard_handler
+    propagate: no
 

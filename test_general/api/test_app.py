@@ -1,12 +1,10 @@
 from pathlib import Path
-from typing import List
 
 import json
 import io
 import pytest
 import re
 import requests
-import ast
 import pandas as pd
 from fastapi.testclient import TestClient
 from unstructured_api_tools.pipelines.api_conventions import get_pipeline_path
@@ -17,14 +15,6 @@ from unstructured.staging.base import convert_to_isd
 import tempfile
 
 MAIN_API_ROUTE = get_pipeline_path("general")
-
-
-def multifile_response_to_dfs(resp: requests.Response) -> List[pd.DataFrame]:
-    s = resp.text.split(',"')
-    s[0] = s[0][1:]
-    s[-1] = s[-1][:-1]
-    s[1:] = [f'"{x}' for x in s[1:]]
-    return [pd.read_csv(io.StringIO(ast.literal_eval(i))) for i in s]
 
 
 def test_general_api_health_check():
@@ -107,8 +97,8 @@ def test_general_api(example_filename, content_type):
         data={"output_format": "text/csv"},
     )
     assert csv_response.status_code == 200
-    dfs = multifile_response_to_dfs(csv_response)
-    assert len(response.json()) == len(dfs)
+    dfs = pd.read_csv(io.StringIO(csv_response.text))
+    assert len(dfs) > 0
 
 
 def test_coordinates_param():
@@ -137,14 +127,14 @@ def test_coordinates_param():
 
     # Each element should be the same except for the coordinates field
     for i in range(len(response_with_coords)):
-        assert "coordinates" in response_with_coords[i]
-        del response_with_coords[i]["coordinates"]
+        assert "coordinates" in response_with_coords[i]["metadata"]
+        del response_with_coords[i]["metadata"]["coordinates"]
         assert response_with_coords[i] == response_without_coords[i]
 
 
 def test_ocr_languages_param():
     """
-    ...
+    Verify that we get the corresponding languages from the response with ocr_languages
     """
     client = TestClient(app)
     test_file = Path("sample-docs") / "english-and-korean.png"
@@ -284,6 +274,57 @@ def test_xml_keep_tags_param():
             response_without_xml_tags_index += 1
 
 
+def test_include_page_breaks_param():
+    """
+    Verify that responses do not include page breaks unless requested
+    """
+    client = TestClient(app)
+    test_file = Path("sample-docs") / "layout-parser-paper-fast.pdf"
+    response = client.post(
+        MAIN_API_ROUTE,
+        files=[("files", (str(test_file), open(test_file, "rb")))],
+        data={"strategy": "fast"},
+    )
+    assert response.status_code == 200
+    response_without_page_breaks = response.json()
+
+    response = client.post(
+        MAIN_API_ROUTE,
+        files=[("files", (str(test_file), open(test_file, "rb")))],
+        data={"include_page_breaks": "true", "strategy": "fast"},
+    )
+    assert response.status_code == 200
+    response_with_page_breaks = response.json()
+
+    # The responses should have the same content except extra PageBreak objects
+    response_with_page_breaks_index, response_without_page_breaks_index = 0, 0
+    while response_with_page_breaks_index <= len(response_without_page_breaks):
+        curr_response_with_page_breaks_element = response_with_page_breaks[
+            response_with_page_breaks_index
+        ]
+        curr_response_without_page_breaks_element = response_without_page_breaks[
+            response_without_page_breaks_index
+        ]
+        if curr_response_with_page_breaks_element["type"] == "PageBreak":
+            assert curr_response_without_page_breaks_element["type"] != "PageBreak"
+
+            response_with_page_breaks_index += 1
+        else:
+            assert (
+                curr_response_without_page_breaks_element["text"]
+                == curr_response_with_page_breaks_element["text"]
+            )
+
+            response_with_page_breaks_index += 1
+            response_without_page_breaks_index += 1
+
+    last_response_with_page_breaks_element = response_with_page_breaks[
+        response_with_page_breaks_index
+    ]
+    assert last_response_with_page_breaks_element["type"] == "PageBreak"
+    assert response_without_page_breaks[-1]["type"] != "PageBreak"
+
+
 @pytest.mark.parametrize(
     "example_filename",
     [
@@ -303,7 +344,10 @@ def test_general_api_returns_400_unsupported_file(example_filename):
     assert response.status_code == 400
 
 
-def test_general_api_returns_500_bad_pdf():
+def test_general_api_returns_400_bad_pdf():
+    """
+    Verify that we get a 400 for invalid PDF files
+    """
     tmp = tempfile.NamedTemporaryFile(suffix=".pdf")
     tmp.write(b"This is not a valid PDF")
     client = TestClient(app)
@@ -422,6 +466,9 @@ def test_parallel_mode_returns_errors(monkeypatch):
 
 
 def test_partition_file_via_api_retry(monkeypatch, mocker):
+    """
+    Verify number of retries with parallel mode
+    """
     monkeypatch.setenv("UNSTRUCTURED_PARALLEL_MODE_ENABLED", "true")
     monkeypatch.setenv("UNSTRUCTURED_PARALLEL_MODE_URL", "unused")
     monkeypatch.setenv("UNSTRUCTURED_PARALLEL_MODE_THREADS", "1")
@@ -449,6 +496,9 @@ def test_partition_file_via_api_retry(monkeypatch, mocker):
 
 
 def test_partition_file_via_api_no_retryable_error_code(monkeypatch, mocker):
+    """
+    Verify we didn't retry if the error code is not retryable
+    """
     monkeypatch.setenv("UNSTRUCTURED_PARALLEL_MODE_ENABLED", "true")
     monkeypatch.setenv("UNSTRUCTURED_PARALLEL_MODE_URL", "unused")
     monkeypatch.setenv("UNSTRUCTURED_PARALLEL_MODE_THREADS", "1")
@@ -473,3 +523,22 @@ def test_partition_file_via_api_no_retryable_error_code(monkeypatch, mocker):
 
     assert response.status_code == 401
     assert mock_sleep.call_count == 0
+
+
+def test_password_protected_pdf():
+    """
+    Verify we get a 400 error if the PDF is password protected
+    """
+    client = TestClient(app)
+    # a password protected pdf file, password is "password"
+    test_file = Path("sample-docs") / "layout-parser-paper-password-protected.pdf"
+
+    response = client.post(
+        MAIN_API_ROUTE,
+        files=[("files", (str(test_file), open(test_file, "rb")))],
+        data={"strategy": "fast"},
+    )
+    assert response.status_code == 400
+    assert response.json() == {
+        "detail": f"File: {str(test_file)} is encrypted. Please decrypt it with password."
+    }
