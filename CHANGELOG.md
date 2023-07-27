@@ -1,3 +1,7 @@
+## 0.0.33-dev0
+
+* Add table support for image with parameter `skip_infer_table_types`
+
 ## 0.0.32
 
 * Throw 400 error if a PDF is password protected
