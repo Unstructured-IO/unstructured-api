@@ -337,6 +337,7 @@ def pipeline_api(
                 encoding=encoding,
                 xml_keep_tags=xml_keep_tags,
                 model_name=hi_res_model_name,
+                skip_infer_table_types=["jpg"],
             )
     except ValueError as e:
         if "Invalid file" in e.args[0]:
@@ -479,7 +480,7 @@ def ungz_file(file: UploadFile, gz_uncompressed_content_type=None) -> UploadFile
 
 
 @router.post("/general/v0/general")
-@router.post("/general/v0.0.32/general")
+@router.post("/general/v0.0.33/general")
 def pipeline_1(
     request: Request,
     gz_uncompressed_content_type: Optional[str] = Form(default=None),
