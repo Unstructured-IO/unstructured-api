@@ -52,7 +52,7 @@ et-xmlfile==1.1.0
     # via openpyxl
 exceptiongroup==1.1.2
     # via anyio
-fastapi==0.100.0
+fastapi==0.100.1
     # via unstructured-api-tools
 fastjsonschema==2.18.0
     # via nbformat
@@ -126,7 +126,7 @@ lxml==4.9.3
     #   python-docx
     #   python-pptx
     #   unstructured
-markdown==3.4.3
+markdown==3.4.4
     # via unstructured
 markupsafe==2.1.3
     # via
@@ -146,7 +146,7 @@ mypy-extensions==1.0.0
     # via mypy
 nbclient==0.8.0
     # via nbconvert
-nbconvert==7.7.2
+nbconvert==7.7.3
     # via unstructured-api-tools
 nbformat==5.9.1
     # via
@@ -229,7 +229,7 @@ pycparser==2.21
     # via cffi
 pycryptodome==3.18.0
     # via -r requirements/base.in
-pydantic==1.10.11
+pydantic==1.10.12
     # via
     #   -r requirements/base.in
     #   fastapi
@@ -376,11 +376,11 @@ typing-extensions==4.7.1
     #   uvicorn
 tzdata==2023.3
     # via pandas
-unstructured[local-inference]==0.8.1
+unstructured[local-inference]==0.8.4
     # via -r requirements/base.in
 unstructured-api-tools==0.10.10
     # via -r requirements/base.in
-unstructured-inference==0.5.5
+unstructured-inference==0.5.7
     # via unstructured
 urllib3==2.0.4
     # via requests
