@@ -393,7 +393,7 @@ nbformat==5.9.1
     #   jupyter-server
     #   nbclient
     #   nbconvert
-nest-asyncio==1.5.6
+nest-asyncio==1.5.7
     # via ipykernel
 networkx==3.1
     # via
@@ -835,7 +835,7 @@ tzdata==2023.3
     # via
     #   -r requirements/base.txt
     #   pandas
-unstructured[local-inference]==0.8.5
+unstructured[local-inference]==0.8.4
     # via -r requirements/base.txt
 unstructured-api-tools==0.10.10
     # via -r requirements/base.txt
