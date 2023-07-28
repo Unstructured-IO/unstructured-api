@@ -179,9 +179,6 @@ def partition_pdf_splits(
         request=request,
         filename=file_filename,
         content_type=content_type,
-        # TODO: partition_file_via_api didn't use coordinates parameter
-        # we should use it in parallel partition like plain partition
-        # see jira ticket CORE-1504
         coordinates=coordinates,
         **partition_kwargs,
     )
@@ -336,6 +333,7 @@ def pipeline_api(
                 pdf_infer_table_structure=pdf_infer_table_structure,
                 skip_infer_table_types=skip_infer_table_types,
                 strategy=strategy,
+                xml_keep_tags=xml_keep_tags,
             )
         else:
             elements = partition(
@@ -350,8 +348,6 @@ def pipeline_api(
                 pdf_infer_table_structure=pdf_infer_table_structure,
                 skip_infer_table_types=skip_infer_table_types,
                 strategy=strategy,
-                # TODO: add this param into parallel mode as well
-                # see jira ticket CORE-1504
                 xml_keep_tags=xml_keep_tags,
             )
     except ValueError as e:

@@ -18,6 +18,7 @@ declare -a curl_params=(
     "-F files=@sample-docs/layout-parser-paper.pdf -F 'coordinates=true' -F 'strategy=fast'"
     "-F files=@sample-docs/layout-parser-paper.pdf -F 'coordinates=true' -F 'strategy=fast' -F 'encoding=utf-8'"
     "-F files=@sample-docs/layout-parser-paper.pdf -F 'coordinates=true' -F 'strategy=fast' -F 'include_page_breaks=true'"
+    "-F files=@sample-docs/layout-parser-paper.pdf -F 'coordinates=true' -F 'strategy=fast' -F 'xml_keep_tags=true'"
 )
 
 for params in "${curl_params[@]}"
