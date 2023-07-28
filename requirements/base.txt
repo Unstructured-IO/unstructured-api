@@ -52,7 +52,7 @@ et-xmlfile==1.1.0
     # via openpyxl
 exceptiongroup==1.1.2
     # via anyio
-fastapi==0.100.0
+fastapi==0.100.1
     # via unstructured-api-tools
 fastjsonschema==2.18.0
     # via nbformat
@@ -365,18 +365,20 @@ types-urllib3==1.26.25.14
     # via types-requests
 typing-extensions==4.7.1
     # via
+    #   annotated-types
     #   fastapi
     #   huggingface-hub
     #   iopath
     #   mypy
     #   pydantic
+    #   pydantic-core
     #   pypdf
     #   starlette
     #   torch
     #   uvicorn
 tzdata==2023.3
     # via pandas
-unstructured[local-inference]==0.8.5
+unstructured[local-inference]==0.8.7
     # via -r requirements/base.in
 unstructured-api-tools==0.10.10
     # via -r requirements/base.in

@@ -31,7 +31,7 @@ asttokens==2.2.1
     #   stack-data
 astunparse==1.6.3
     # via nbdev
-async-lru==2.0.3
+async-lru==2.0.4
     # via jupyterlab
 attrs==23.1.0
     # via
@@ -129,7 +129,7 @@ execnb==0.1.5
     # via nbdev
 executing==1.2.0
     # via stack-data
-fastapi==0.100.0
+fastapi==0.100.1
     # via
     #   -r requirements/base.txt
     #   unstructured-api-tools
@@ -393,7 +393,7 @@ nbformat==5.9.1
     #   jupyter-server
     #   nbclient
     #   nbconvert
-nest-asyncio==1.5.6
+nest-asyncio==1.5.7
     # via ipykernel
 networkx==3.1
     # via
@@ -597,6 +597,7 @@ pytest-mock==3.11.1
 python-dateutil==2.8.2
     # via
     #   -r requirements/base.txt
+    #   arrow
     #   jupyter-client
     #   matplotlib
     #   pandas
@@ -835,7 +836,7 @@ tzdata==2023.3
     # via
     #   -r requirements/base.txt
     #   pandas
-unstructured[local-inference]==0.8.5
+unstructured[local-inference]==0.8.7
     # via -r requirements/base.txt
 unstructured-api-tools==0.10.10
     # via -r requirements/base.txt
