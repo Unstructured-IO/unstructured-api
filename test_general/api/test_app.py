@@ -370,15 +370,14 @@ class MockResponse:
 
 
 def mock_partition_file_via_api(url, **kwargs):
-    file = kwargs["files"]["files"][1]
+    filename = kwargs["files"]["files"][0]
 
     partition_kwargs = kwargs["data"]
 
     # Hack - the api takes `coordinates` but regular partition does not
     del partition_kwargs["coordinates"]
 
-    elements = partition(file=file, **partition_kwargs)
-
+    elements = partition(filename=filename, **partition_kwargs)
     response = MockResponse(200)
     response.body = elements
     response.text = json.dumps(convert_to_isd(elements))
