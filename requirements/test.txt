@@ -835,7 +835,7 @@ tzdata==2023.3
     # via
     #   -r requirements/base.txt
     #   pandas
-unstructured[local-inference]==0.8.4
+unstructured[local-inference]==0.8.7
     # via -r requirements/base.txt
 unstructured-api-tools==0.10.10
     # via -r requirements/base.txt
