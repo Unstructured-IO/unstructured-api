@@ -179,6 +179,8 @@ def partition_pdf_splits(
         request=request,
         filename=file_filename,
         content_type=content_type,
+        # TODO: partition_file_via_api didn't use coordinates parameter
+        # we should use it in parallel partition like serial partition
         coordinates=coordinates,
         **partition_kwargs,
     )
