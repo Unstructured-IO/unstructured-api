@@ -357,34 +357,22 @@ def pipeline_api(
             )
         raise e
 
+    # Clean up returned elements
+    for i, element in enumerate(elements):
+        elements[i].metadata.filename = os.path.basename(filename)
+
+        if not show_coordinates and element.metadata.coordinates:
+            elements[i].metadata.coordinates = None
+
+        # Note(yuming): currently removing date from metadata since its unstable in the core library
+        if element.metadata.date:
+            element.metadata.date = None
+
     if response_type == "text/csv":
         df = convert_to_dataframe(elements)
-        df["filename"] = os.path.basename(filename)
-        if not show_coordinates:
-            columns_to_drop = [
-                col
-                for col in [
-                    "coordinates_points",
-                    "coordinates_system",
-                    "coordinates_layout_width",
-                    "coordinates_layout_height",
-                ]
-                if col in df.columns
-            ]
-            if columns_to_drop:
-                df.drop(columns=columns_to_drop, inplace=True)
-
         return df.to_csv(index=False)
 
     result = convert_to_isd(elements)
-    for element in result:
-        element["metadata"]["filename"] = os.path.basename(filename)
-
-        if not show_coordinates and "coordinates" in element["metadata"]:
-            del element["metadata"]["coordinates"]
-        # Note(yuming): currently removing date from metadata since its unstable in the core library
-        if "date" in element["metadata"].keys():
-            del element["metadata"]["date"]
 
     return result
 
