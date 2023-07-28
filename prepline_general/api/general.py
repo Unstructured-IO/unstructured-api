@@ -206,6 +206,7 @@ def pipeline_api(
     m_xml_keep_tags=[],
     m_pdf_infer_table_structure=[],
     m_hi_res_model_name=[],
+    m_skip_infer_table_types=[],
     file_content_type=None,
     response_type="application/json",
 ):
@@ -223,6 +224,7 @@ def pipeline_api(
                     "m_xml_keep_tags": m_xml_keep_tags,
                     "m_pdf_infer_table_structure": m_pdf_infer_table_structure,
                     "m_hi_res_model_name": m_hi_res_model_name,
+                    "m_skip_infer_table_types": m_skip_infer_table_types,
                     "file_content_type": file_content_type,
                     "response_type": response_type,
                 },
@@ -290,6 +292,10 @@ def pipeline_api(
     else:
         pdf_infer_table_structure = False
 
+    skip_infer_table_types = (
+        m_skip_infer_table_types if len(m_skip_infer_table_types) else ["pdf", "jpg", "png"]
+    )
+
     try:
         logger.debug(
             "partition input data: {}".format(
@@ -304,6 +310,7 @@ def pipeline_api(
                         "encoding": encoding,
                         "model_name": hi_res_model_name,
                         "xml_keep_tags": xml_keep_tags,
+                        "skip_infer_table_types": skip_infer_table_types,
                     },
                     default=str,
                 )
@@ -324,6 +331,7 @@ def pipeline_api(
                 include_page_breaks=include_page_breaks,
                 encoding=encoding,
                 model_name=hi_res_model_name,
+                skip_infer_table_types=skip_infer_table_types,
             )
         else:
             elements = partition(
@@ -337,7 +345,7 @@ def pipeline_api(
                 encoding=encoding,
                 xml_keep_tags=xml_keep_tags,
                 model_name=hi_res_model_name,
-                skip_infer_table_types=["jpg"],
+                skip_infer_table_types=skip_infer_table_types,
             )
     except ValueError as e:
         if "Invalid file" in e.args[0]:
@@ -494,6 +502,7 @@ def pipeline_1(
     xml_keep_tags: List[str] = Form(default=[]),
     pdf_infer_table_structure: List[str] = Form(default=[]),
     hi_res_model_name: List[str] = Form(default=[]),
+    skip_infer_table_types: List[str] = Form(default=[]),
 ):
     if files:
         for file_index in range(len(files)):
@@ -541,6 +550,7 @@ def pipeline_1(
                     m_xml_keep_tags=xml_keep_tags,
                     m_pdf_infer_table_structure=pdf_infer_table_structure,
                     m_hi_res_model_name=hi_res_model_name,
+                    m_skip_infer_table_types=skip_infer_table_types,
                     response_type=media_type,
                     filename=file.filename,
                     file_content_type=file_content_type,
