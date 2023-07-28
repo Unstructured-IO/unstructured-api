@@ -31,7 +31,7 @@ asttokens==2.2.1
     #   stack-data
 astunparse==1.6.3
     # via nbdev
-async-lru==2.0.4
+async-lru==2.0.3
     # via jupyterlab
 attrs==23.1.0
     # via
@@ -129,7 +129,7 @@ execnb==0.1.5
     # via nbdev
 executing==1.2.0
     # via stack-data
-fastapi==0.100.1
+fastapi==0.100.0
     # via
     #   -r requirements/base.txt
     #   unstructured-api-tools
@@ -223,7 +223,7 @@ iopath==0.1.10
     # via
     #   -r requirements/base.txt
     #   layoutparser
-ipykernel==6.25.0
+ipykernel==6.24.0
     # via
     #   ipywidgets
     #   jupyter
@@ -334,7 +334,7 @@ lxml==4.9.3
     #   python-docx
     #   python-pptx
     #   unstructured
-markdown==3.4.4
+markdown==3.4.3
     # via
     #   -r requirements/base.txt
     #   unstructured
@@ -379,7 +379,7 @@ nbclient==0.8.0
     # via
     #   -r requirements/base.txt
     #   nbconvert
-nbconvert==7.7.3
+nbconvert==7.7.2
     # via
     #   -r requirements/base.txt
     #   jupyter
@@ -393,7 +393,7 @@ nbformat==5.9.1
     #   jupyter-server
     #   nbclient
     #   nbconvert
-nest-asyncio==1.5.7
+nest-asyncio==1.5.6
     # via ipykernel
 networkx==3.1
     # via
@@ -552,7 +552,7 @@ pycparser==2.21
     #   cffi
 pycryptodome==3.18.0
     # via -r requirements/base.txt
-pydantic==1.10.12
+pydantic==1.10.11
     # via
     #   -r requirements/base.txt
     #   fastapi
@@ -835,11 +835,11 @@ tzdata==2023.3
     # via
     #   -r requirements/base.txt
     #   pandas
-unstructured[local-inference]==0.8.4
+unstructured[local-inference]==0.8.1
     # via -r requirements/base.txt
 unstructured-api-tools==0.10.10
     # via -r requirements/base.txt
-unstructured-inference==0.5.7
+unstructured-inference==0.5.5
     # via
     #   -r requirements/base.txt
     #   unstructured
