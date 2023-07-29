@@ -44,10 +44,9 @@ COPY --chown=${NB_USER}:${NB_USER} logger_config.yaml logger_config.yaml
 COPY --chown=${NB_USER}:${NB_USER} prepline_${PIPELINE_PACKAGE}/ prepline_${PIPELINE_PACKAGE}/
 COPY --chown=${NB_USER}:${NB_USER} exploration-notebooks exploration-notebooks
 COPY --chown=${NB_USER}:${NB_USER} pipeline-notebooks pipeline-notebooks
+COPY --chown=${NB_USER}:${NB_USER} scripts/app-start.sh scripts/app-start.sh
 
-ENTRYPOINT ["uvicorn", "prepline_general.api.app:app", \
-  "--log-config", "logger_config.yaml", \
-  "--host", "0.0.0.0"]
+ENTRYPOINT ["scripts/app-start.sh"]
 # Expose a default port of 8000. Note: The EXPOSE instruction does not actually publish the port,
 # but some tooling will inspect containers and perform work contingent on networking support declared.
 EXPOSE 8000
