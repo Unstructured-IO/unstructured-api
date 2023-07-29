@@ -29,7 +29,7 @@ RUN python3.8 -m pip install pip==${PIP_VERSION} \
   && su -l ${NB_USER} -c 'pip3.8 install  --no-cache  -r requirements-base.txt' \
   && dnf -y groupremove "Development Tools" \
   && dnf clean all \
-  && ln -s /home/notebook-user/.local/bin/pip /usr/local/bin/pip || true
+  && ln -s /home/notebook-user/.local/bin/pip3.8 /usr/local/bin/pip3.8 || true
 
 USER ${NB_USER}
 
