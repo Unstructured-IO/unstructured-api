@@ -15,7 +15,7 @@ skip_inference_tests = os.getenv("SKIP_INFERENCE_TESTS", "").lower() in {"true",
 def send_document(
     filename,
     content_type,
-    strategy="fast",
+    strategy="auto",
     output_format="application/json",
     pdf_infer_table_structure="false",
 ):
@@ -110,14 +110,21 @@ def test_strategy_performance():
     performance_ratio = 4
     test_file = Path("sample-docs") / "layout-parser-paper.pdf"
 
-    start_time = time.time()
+    start_time = time.monotonic()
     response = send_document(test_file, content_type="application/pdf", strategy="hi_res")
-    hi_res_time = time.time() - start_time
+    hi_res_time = time.monotonic() - start_time
     assert response.status_code == 200
 
-    start_time = time.time()
+    start_time = time.monotonic()
+    response = send_document(test_file, content_type="application/pdf", strategy="auto")
+    auto_time = time.monotonic() - start_time
+    assert response.status_code == 200
+
+    assert hi_res_time > performance_ratio * auto_time
+
+    start_time = time.monotonic()
     response = send_document(test_file, content_type="application/pdf", strategy="fast")
-    fast_time = time.time() - start_time
+    fast_time = time.monotonic() - start_time
     assert response.status_code == 200
 
     assert hi_res_time > performance_ratio * fast_time

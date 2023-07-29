@@ -20,10 +20,10 @@ import secrets
 import pandas as pd
 from concurrent.futures import ThreadPoolExecutor
 from functools import partial
+import pypdf
 from pypdf import PdfReader, PdfWriter
 from unstructured.partition.auto import partition
 from unstructured.staging.base import convert_to_isd, convert_to_dataframe, elements_from_json
-import pdfminer
 import requests
 import time
 from unstructured_inference.models.chipper import MODEL_TYPES as CHIPPER_MODEL_TYPES
@@ -70,7 +70,7 @@ if not os.environ.get("UNSTRUCTURED_ALLOWED_MIMETYPES", None):
     os.environ["UNSTRUCTURED_ALLOWED_MIMETYPES"] = DEFAULT_MIMETYPES
 
 
-def get_pdf_splits(pdf, split_size=1):
+def get_pdf_splits(pdf_pages, split_size=1):
     """
     Given a pdf (PdfReader) with n pages, split it into pdfs each with split_size # of pages
     Return the files with their page offset in the form [( BytesIO, int)]
@@ -79,12 +79,12 @@ def get_pdf_splits(pdf, split_size=1):
 
     offset = 0
 
-    while offset < len(pdf.pages):
+    while offset < len(pdf_pages):
         new_pdf = PdfWriter()
         pdf_buffer = io.BytesIO()
 
         end = offset + split_size
-        for page in pdf.pages[offset:end]:
+        for page in pdf_pages[offset:end]:
             new_pdf.add_page(page)
 
         new_pdf.write(pdf_buffer)
@@ -150,7 +150,7 @@ def partition_file_via_api(file_tuple, request, filename, content_type, **partit
 
 
 def partition_pdf_splits(
-    request, file, file_filename, content_type, coordinates, **partition_kwargs
+    request, pdf_pages, file, file_filename, content_type, coordinates, **partition_kwargs
 ):
     """
     Split a pdf into chunks and process in parallel with more api calls, or partition
@@ -164,16 +164,15 @@ def partition_pdf_splits(
     partition_kwargs holds any others parameters that will be forwarded, or passed to partition
     """
     pages_per_pdf = int(os.environ.get("UNSTRUCTURED_PARALLEL_MODE_SPLIT_SIZE", 1))
-    pdf = PdfReader(file)
 
     # If it's small enough, just process locally
-    if len(pdf.pages) <= pages_per_pdf:
+    if len(pdf_pages) <= pages_per_pdf:
         return partition(
             file=file, file_filename=file_filename, content_type=content_type, **partition_kwargs
         )
 
     results = []
-    page_tuples = get_pdf_splits(pdf, split_size=pages_per_pdf)
+    page_tuples = get_pdf_splits(pdf_pages, split_size=pages_per_pdf)
 
     partition_func = partial(
         partition_file_via_api,
@@ -236,7 +235,20 @@ def pipeline_api(
         # since fast api might sent the wrong one.
         file_content_type = "application/x-ole-storage"
 
-    strategy = (m_strategy[0] if len(m_strategy) else "fast").lower()
+    if filename.endswith(".pdf"):
+        try:
+            pdf = PdfReader(file)
+        except pypdf.errors.EmptyFileError:
+            raise HTTPException(
+                status_code=400, detail=f"{filename} does not appear to be a valid PDF"
+            )
+        if pdf.is_encrypted:
+            raise HTTPException(
+                status_code=400,
+                detail=f"File: {filename} is encrypted. Please decrypt it with password.",
+            )
+
+    strategy = (m_strategy[0] if len(m_strategy) else "auto").lower()
     strategies = ["fast", "hi_res", "auto", "ocr_only"]
     if strategy not in strategies:
         raise HTTPException(
@@ -301,6 +313,7 @@ def pipeline_api(
         if file_content_type == "application/pdf" and pdf_parallel_mode_enabled:
             elements = partition_pdf_splits(
                 request,
+                pdf_pages=pdf.pages,
                 file=file,
                 file_filename=filename,
                 content_type=file_content_type,
@@ -331,8 +344,6 @@ def pipeline_api(
                 status_code=400, detail=f"{file_content_type} not currently supported"
             )
         raise e
-    except pdfminer.pdfparser.PDFSyntaxError:
-        raise HTTPException(status_code=400, detail=f"{filename} does not appear to be a valid PDF")
 
     if response_type == "text/csv":
         df = convert_to_dataframe(elements)

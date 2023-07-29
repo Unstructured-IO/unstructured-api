@@ -20,7 +20,7 @@ beautifulsoup4==4.12.2
     # via nbconvert
 bleach==6.0.0
     # via nbconvert
-certifi==2023.5.7
+certifi==2023.7.22
     # via requests
 cffi==1.15.1
     # via cryptography
@@ -54,7 +54,7 @@ exceptiongroup==1.1.2
     # via anyio
 fastapi==0.100.0
     # via unstructured-api-tools
-fastjsonschema==2.17.1
+fastjsonschema==2.18.0
     # via nbformat
 filelock==3.12.2
     # via
@@ -65,7 +65,7 @@ filetype==1.2.0
     # via unstructured
 flatbuffers==23.5.26
     # via onnxruntime
-fonttools==4.41.0
+fonttools==4.41.1
     # via matplotlib
 fsspec==2023.6.0
     # via huggingface-hub
@@ -103,9 +103,9 @@ jinja2==3.1.2
     #   unstructured-api-tools
 joblib==1.3.1
     # via nltk
-jsonschema==4.18.3
+jsonschema==4.18.4
     # via nbformat
-jsonschema-specifications==2023.6.1
+jsonschema-specifications==2023.7.1
     # via jsonschema
 jupyter-client==8.3.0
     # via nbclient
@@ -146,7 +146,7 @@ mypy-extensions==1.0.0
     # via mypy
 nbclient==0.8.0
     # via nbconvert
-nbconvert==7.7.1
+nbconvert==7.7.2
     # via unstructured-api-tools
 nbformat==5.9.1
     # via
@@ -203,7 +203,7 @@ pdfminer-six==20221105
     # via
     #   pdfplumber
     #   unstructured
-pdfplumber==0.10.0
+pdfplumber==0.10.1
     # via layoutparser
 pillow==10.0.0
     # via
@@ -227,6 +227,8 @@ pycocotools==2.0.6
     # via effdet
 pycparser==2.21
     # via cffi
+pycryptodome==3.18.0
+    # via -r requirements/base.in
 pydantic==1.10.11
     # via
     #   -r requirements/base.in
@@ -239,7 +241,7 @@ pypandoc==1.11
     # via unstructured
 pyparsing==3.0.9
     # via matplotlib
-pypdf==3.12.2
+pypdf==3.13.0
     # via -r requirements/base.in
 pypdfium2==4.18.0
     # via pdfplumber
@@ -264,7 +266,7 @@ python-pptx==0.6.21
     # via unstructured
 pytz==2023.3
     # via pandas
-pyyaml==6.0
+pyyaml==6.0.1
     # via
     #   huggingface-hub
     #   layoutparser
@@ -276,7 +278,7 @@ pyzmq==25.1.0
     # via jupyter-client
 ratelimit==2.2.1
     # via -r requirements/base.in
-referencing==0.29.1
+referencing==0.30.0
     # via
     #   jsonschema
     #   jsonschema-specifications
@@ -291,7 +293,7 @@ requests==2.31.0
     #   torchvision
     #   transformers
     #   unstructured
-rpds-py==0.8.11
+rpds-py==0.9.2
     # via
     #   jsonschema
     #   referencing
@@ -353,13 +355,13 @@ traitlets==5.9.0
     #   nbclient
     #   nbconvert
     #   nbformat
-transformers==4.30.2
+transformers==4.31.0
     # via unstructured-inference
-types-requests==2.31.0.1
+types-requests==2.31.0.2
     # via unstructured-api-tools
-types-ujson==5.8.0.0
+types-ujson==5.8.0.1
     # via unstructured-api-tools
-types-urllib3==1.26.25.13
+types-urllib3==1.26.25.14
     # via types-requests
 typing-extensions==4.7.1
     # via
@@ -371,6 +373,7 @@ typing-extensions==4.7.1
     #   pypdf
     #   starlette
     #   torch
+    #   uvicorn
 tzdata==2023.3
     # via pandas
 unstructured[local-inference]==0.8.1
@@ -379,9 +382,9 @@ unstructured-api-tools==0.10.10
     # via -r requirements/base.in
 unstructured-inference==0.5.5
     # via unstructured
-urllib3==2.0.3
+urllib3==2.0.4
     # via requests
-uvicorn[standard]==0.23.0
+uvicorn[standard]==0.23.1
     # via unstructured-api-tools
 uvloop==0.17.0
     # via uvicorn
