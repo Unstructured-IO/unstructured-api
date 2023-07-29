@@ -36,8 +36,7 @@ USER ${NB_USER}
 FROM python-deps as model-deps
 RUN python3.8 -c "import nltk; nltk.download('punkt')" && \
   python3.8 -c "import nltk; nltk.download('averaged_perceptron_tagger')" && \
-   UNSTRUCTURED_HI_RES_SUPPORTED_MODEL=chipper python3.8 -c "from unstructured.ingest.doc_processor.generalized import initialize; initialize()"
-
+  python3.8 -c "from unstructured.ingest.doc_processor.generalized import initialize; initialize()"
 
 FROM model-deps as code
 COPY --chown=${NB_USER}:${NB_USER} CHANGELOG.md CHANGELOG.md
