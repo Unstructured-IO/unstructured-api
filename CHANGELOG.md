@@ -1,3 +1,7 @@
+## 0.0.33
+
+* Image tweak, move application entrypoint to scripts/app-start.sh
+
 ## 0.0.32
 
 * Throw 400 error if a PDF is password protected
