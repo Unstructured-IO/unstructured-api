@@ -364,7 +364,8 @@ def pipeline_api(
         if not show_coordinates and element.metadata.coordinates:
             elements[i].metadata.coordinates = None
 
-        # Note(yuming): currently removing date from metadata since its unstable in the core library
+        # Note(yuming): currently removing date from metadata
+        # since it should be fixed in the core library
         if element.metadata.date:
             elements[i].metadata.date = None
 
