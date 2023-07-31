@@ -114,7 +114,7 @@ To extract the table structure from PDF files using the `hi_res` strategy, ensur
 #### Skip Table Extraction
 
 Currently, we provide support for enabling and disabling table extraction for file types other than PDF files. Set parameter `skip_infer_table_types` to specify the document types that you want to skip table extraction with. By default, we skip table extraction
-for PDFs and Images, which are `pdf`, `jpg` and `png`. Again, please note that table extraction only works with `hi_res` strategy For example, if you only want to skip table extraction for PDFs, you can run:
+for PDFs and Images, which are `pdf`, `jpg` and `png`. Again, please note that table extraction only works with `hi_res` strategy. For example, if you only want to skip table extraction for PDFs, you can run:
 
 ```
  curl -X 'POST' \
