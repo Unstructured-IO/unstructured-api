@@ -151,7 +151,7 @@ def test_ocr_languages_param():
 
 def test_skip_infer_table_types_param():
     """
-    Verify that we skip table instruction unlesee specified
+    Verify that we skip table instruction unless specified
     """
     client = TestClient(app)
     test_file = Path("sample-docs") / "layout-parser-paper-with-table.jpg"
