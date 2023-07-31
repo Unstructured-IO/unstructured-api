@@ -366,7 +366,7 @@ def pipeline_api(
 
         # Note(yuming): currently removing date from metadata since its unstable in the core library
         if element.metadata.date:
-            element.metadata.date = None
+            elements[i].metadata.date = None
 
     if response_type == "text/csv":
         df = convert_to_dataframe(elements)
