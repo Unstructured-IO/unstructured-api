@@ -149,6 +149,37 @@ def test_ocr_languages_param():
     assert elements[3]["text"].startswith("안녕하세요, 저 희 는 YGEAS 그룹")
 
 
+def test_skip_infer_table_types_param():
+    """
+    Verify that we skip table instruction unlesee specified
+    """
+    client = TestClient(app)
+    test_file = Path("sample-docs") / "layout-parser-paper-with-table.jpg"
+    response = client.post(
+        MAIN_API_ROUTE,
+        files=[("files", (str(test_file), open(test_file, "rb")))],
+    )
+
+    assert response.status_code == 200
+    # test we skip table extraction by default
+    elements = response.json()
+    table = [el["metadata"]["text_as_html"] for el in elements if "text_as_html" in el["metadata"]]
+    assert len(table) == 0
+
+    response = client.post(
+        MAIN_API_ROUTE,
+        files=[("files", (str(test_file), open(test_file, "rb")))],
+        data={"skip_infer_table_types": ["pdf"]},
+    )
+
+    assert response.status_code == 200
+    # test we didn't specify to skip table extration with image
+    elements = response.json()
+    table = [el["metadata"]["text_as_html"] for el in elements if "text_as_html" in el["metadata"]]
+    assert len(table) == 1
+    assert "Layouts of history Japanese documents" in table[0]
+
+
 def test_strategy_param_400():
     """Verify that we get a 400 if we pass in a bad strategy"""
     client = TestClient(app)
