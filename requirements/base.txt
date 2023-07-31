@@ -376,11 +376,11 @@ typing-extensions==4.7.1
     #   uvicorn
 tzdata==2023.3
     # via pandas
-unstructured[local-inference]==0.8.7
+unstructured[local-inference]==0.8.1
     # via -r requirements/base.in
 unstructured-api-tools==0.10.10
     # via -r requirements/base.in
-unstructured-inference==0.5.7
+unstructured-inference==0.5.5
     # via unstructured
 urllib3==2.0.4
     # via requests
