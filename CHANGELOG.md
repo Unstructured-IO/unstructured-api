@@ -1,6 +1,8 @@
-## 0.0.34-dev0
+## 0.0.34-dev1
 
 * Add table support for image with parameter `skip_infer_table_types`
+* Add support for gzipped files
+  
 ## 0.0.33
 
 * Image tweak, move application entrypoint to scripts/app-start.sh

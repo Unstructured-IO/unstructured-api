@@ -28,6 +28,7 @@ This repo implements a pre-processing pipeline for the following documents. Curr
 | Plaintext | `.txt`, `.eml`, `.msg`, `.xml`, `.html`, `.md`, `.rst`, `.json`, `.rtf` |
 | Images    | `.jpeg`, `.png`               |
 | Documents | `.doc`, `.docx`, `.ppt`, `.pptx`, `.pdf`, `.odt`, `.epub`, `.csv`, `.tsv`, `.xlsx` |
+| Zipped    | `.gz`                         |
 
 
 ## :rocket: Unstructured API
