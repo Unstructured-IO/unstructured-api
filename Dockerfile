@@ -29,15 +29,14 @@ RUN python3.8 -m pip install pip==${PIP_VERSION} \
   && su -l ${NB_USER} -c 'pip3.8 install  --no-cache  -r requirements-base.txt' \
   && dnf -y groupremove "Development Tools" \
   && dnf clean all \
-  && ln -s /home/notebook-user/.local/bin/pip /usr/local/bin/pip || true
+  && ln -s /home/notebook-user/.local/bin/pip3.8 /usr/local/bin/pip3.8 || true
 
 USER ${NB_USER}
 
 FROM python-deps as model-deps
 RUN python3.8 -c "import nltk; nltk.download('punkt')" && \
   python3.8 -c "import nltk; nltk.download('averaged_perceptron_tagger')" && \
-   UNSTRUCTURED_HI_RES_SUPPORTED_MODEL=chipper python3.8 -c "from unstructured.ingest.doc_processor.generalized import initialize; initialize()"
-
+  python3.8 -c "from unstructured.ingest.doc_processor.generalized import initialize; initialize()"
 
 FROM model-deps as code
 COPY --chown=${NB_USER}:${NB_USER} CHANGELOG.md CHANGELOG.md
@@ -45,10 +44,9 @@ COPY --chown=${NB_USER}:${NB_USER} logger_config.yaml logger_config.yaml
 COPY --chown=${NB_USER}:${NB_USER} prepline_${PIPELINE_PACKAGE}/ prepline_${PIPELINE_PACKAGE}/
 COPY --chown=${NB_USER}:${NB_USER} exploration-notebooks exploration-notebooks
 COPY --chown=${NB_USER}:${NB_USER} pipeline-notebooks pipeline-notebooks
+COPY --chown=${NB_USER}:${NB_USER} scripts/app-start.sh scripts/app-start.sh
 
-ENTRYPOINT ["uvicorn", "prepline_general.api.app:app", \
-  "--log-config", "logger_config.yaml", \
-  "--host", "0.0.0.0"]
+ENTRYPOINT ["scripts/app-start.sh"]
 # Expose a default port of 8000. Note: The EXPOSE instruction does not actually publish the port,
 # but some tooling will inspect containers and perform work contingent on networking support declared.
 EXPOSE 8000
