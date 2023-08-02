@@ -23,13 +23,7 @@ from functools import partial
 import pypdf
 from pypdf import PdfReader, PdfWriter
 from unstructured.partition.auto import partition
-from unstructured.staging.base import (
-    convert_to_isd,
-    convert_to_dataframe,
-    elements_from_json,
-    dict_to_elements,
-    convert_to_csv,
-)
+from unstructured.staging.base import convert_to_isd, convert_to_dataframe, elements_from_json
 import requests
 import time
 from unstructured_inference.models.chipper import MODEL_TYPES as CHIPPER_MODEL_TYPES
@@ -380,7 +374,7 @@ def pipeline_api(
         return df.to_csv(index=False)
 
     result = convert_to_isd(elements)
-    
+
     return result
 
 
