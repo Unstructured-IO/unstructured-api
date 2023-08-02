@@ -30,13 +30,14 @@ start_container() {
 
     echo Starting container "$name"
     docker run -p "$port":"$port" \
+	   --entrypoint uvicorn \
            -d \
            --rm \
            --name "$name" \
            --env "UNSTRUCTURED_PARALLEL_MODE_URL=http://localhost:$port/general/v0/general" \
            --env "UNSTRUCTURED_PARALLEL_MODE_ENABLED=$use_parallel_mode" \
            "$DOCKER_IMAGE" \
-           --port "$port" --host 0.0.0.0
+           prepline_general.api.app:app --port "$port" --host 0.0.0.0
 }
 
 await_server_ready() {

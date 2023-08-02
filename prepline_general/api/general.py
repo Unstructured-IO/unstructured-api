@@ -198,16 +198,17 @@ def pipeline_api(
     file,
     request=None,
     filename="",
-    m_strategy=[],
-    m_coordinates=[],
-    m_ocr_languages=[],
-    m_include_page_breaks=[],
-    m_encoding=[],
-    m_xml_keep_tags=[],
-    m_pdf_infer_table_structure=[],
-    m_hi_res_model_name=[],
     file_content_type=None,
     response_type="application/json",
+    m_coordinates=[],
+    m_encoding=[],
+    m_hi_res_model_name=[],
+    m_include_page_breaks=[],
+    m_ocr_languages=[],
+    m_pdf_infer_table_structure=[],
+    m_skip_infer_table_types=[],
+    m_strategy=[],
+    m_xml_keep_tags=[],
 ):
     logger.debug(
         "pipeline_api input params: {}".format(
@@ -215,16 +216,17 @@ def pipeline_api(
                 {
                     "request": request,
                     "filename": filename,
-                    "m_strategy": m_strategy,
-                    "m_coordinates": m_coordinates,
-                    "m_ocr_languages": m_ocr_languages,
-                    "m_include_page_breaks": m_include_page_breaks,
-                    "m_encoding": m_encoding,
-                    "m_xml_keep_tags": m_xml_keep_tags,
-                    "m_pdf_infer_table_structure": m_pdf_infer_table_structure,
-                    "m_hi_res_model_name": m_hi_res_model_name,
                     "file_content_type": file_content_type,
                     "response_type": response_type,
+                    "m_coordinates": m_coordinates,
+                    "m_encoding": m_encoding,
+                    "m_hi_res_model_name": m_hi_res_model_name,
+                    "m_include_page_breaks": m_include_page_breaks,
+                    "m_ocr_languages": m_ocr_languages,
+                    "m_pdf_infer_table_structure": m_pdf_infer_table_structure,
+                    "m_skip_infer_table_types": m_skip_infer_table_types,
+                    "m_strategy": m_strategy,
+                    "m_xml_keep_tags": m_xml_keep_tags,
                 },
                 default=str,
             )
@@ -290,6 +292,10 @@ def pipeline_api(
     else:
         pdf_infer_table_structure = False
 
+    skip_infer_table_types = (
+        m_skip_infer_table_types if len(m_skip_infer_table_types) else ["pdf", "jpg", "png"]
+    )
+
     try:
         logger.debug(
             "partition input data: {}".format(
@@ -304,6 +310,7 @@ def pipeline_api(
                         "encoding": encoding,
                         "model_name": hi_res_model_name,
                         "xml_keep_tags": xml_keep_tags,
+                        "skip_infer_table_types": skip_infer_table_types,
                     },
                     default=str,
                 )
@@ -317,26 +324,31 @@ def pipeline_api(
                 file=file,
                 file_filename=filename,
                 content_type=file_content_type,
-                strategy=strategy,
-                ocr_languages=ocr_languages,
                 coordinates=show_coordinates,
-                pdf_infer_table_structure=pdf_infer_table_structure,
-                include_page_breaks=include_page_breaks,
+                # partition_kwargs
                 encoding=encoding,
+                include_page_breaks=include_page_breaks,
                 model_name=hi_res_model_name,
+                ocr_languages=ocr_languages,
+                pdf_infer_table_structure=pdf_infer_table_structure,
+                skip_infer_table_types=skip_infer_table_types,
+                strategy=strategy,
+                xml_keep_tags=xml_keep_tags,
             )
         else:
             elements = partition(
                 file=file,
                 file_filename=filename,
                 content_type=file_content_type,
-                strategy=strategy,
+                # partition_kwargs
+                encoding=encoding,
+                include_page_breaks=include_page_breaks,
+                model_name=hi_res_model_name,
                 ocr_languages=ocr_languages,
                 pdf_infer_table_structure=pdf_infer_table_structure,
-                include_page_breaks=include_page_breaks,
-                encoding=encoding,
+                skip_infer_table_types=skip_infer_table_types,
+                strategy=strategy,
                 xml_keep_tags=xml_keep_tags,
-                model_name=hi_res_model_name,
             )
     except ValueError as e:
         if "Invalid file" in e.args[0]:
@@ -345,31 +357,23 @@ def pipeline_api(
             )
         raise e
 
+    # Clean up returned elements
+    for i, element in enumerate(elements):
+        elements[i].metadata.filename = os.path.basename(filename)
+
+        if not show_coordinates and element.metadata.coordinates:
+            elements[i].metadata.coordinates = None
+
+        # Note(yuming): currently removing date from metadata
+        # since it should be fixed in the core library
+        if element.metadata.date:
+            elements[i].metadata.date = None
+
     if response_type == "text/csv":
         df = convert_to_dataframe(elements)
-        df["filename"] = os.path.basename(filename)
-        if not show_coordinates:
-            columns_to_drop = [
-                col
-                for col in [
-                    "coordinates_points",
-                    "coordinates_system",
-                    "coordinates_layout_width",
-                    "coordinates_layout_height",
-                ]
-                if col in df.columns
-            ]
-            if columns_to_drop:
-                df.drop(columns=columns_to_drop, inplace=True)
-
         return df.to_csv(index=False)
 
     result = convert_to_isd(elements)
-    for element in result:
-        element["metadata"]["filename"] = os.path.basename(filename)
-
-        if not show_coordinates and "coordinates" in element["metadata"]:
-            del element["metadata"]["coordinates"]
 
     return result
 
@@ -479,20 +483,21 @@ def ungz_file(file: UploadFile, gz_uncompressed_content_type=None) -> UploadFile
 
 
 @router.post("/general/v0/general")
-@router.post("/general/v0.0.32/general")
+@router.post("/general/v0.0.34/general")
 def pipeline_1(
     request: Request,
     gz_uncompressed_content_type: Optional[str] = Form(default=None),
     files: Union[List[UploadFile], None] = File(default=None),
     output_format: Union[str, None] = Form(default=None),
-    strategy: List[str] = Form(default=[]),
     coordinates: List[str] = Form(default=[]),
-    ocr_languages: List[str] = Form(default=[]),
-    include_page_breaks: List[str] = Form(default=[]),
     encoding: List[str] = Form(default=[]),
-    xml_keep_tags: List[str] = Form(default=[]),
-    pdf_infer_table_structure: List[str] = Form(default=[]),
     hi_res_model_name: List[str] = Form(default=[]),
+    include_page_breaks: List[str] = Form(default=[]),
+    ocr_languages: List[str] = Form(default=[]),
+    pdf_infer_table_structure: List[str] = Form(default=[]),
+    skip_infer_table_types: List[str] = Form(default=[]),
+    strategy: List[str] = Form(default=[]),
+    xml_keep_tags: List[str] = Form(default=[]),
 ):
     if files:
         for file_index in range(len(files)):
@@ -532,14 +537,15 @@ def pipeline_1(
                 response = pipeline_api(
                     _file,
                     request=request,
-                    m_strategy=strategy,
                     m_coordinates=coordinates,
-                    m_ocr_languages=ocr_languages,
-                    m_include_page_breaks=include_page_breaks,
                     m_encoding=encoding,
-                    m_xml_keep_tags=xml_keep_tags,
-                    m_pdf_infer_table_structure=pdf_infer_table_structure,
                     m_hi_res_model_name=hi_res_model_name,
+                    m_include_page_breaks=include_page_breaks,
+                    m_ocr_languages=ocr_languages,
+                    m_pdf_infer_table_structure=pdf_infer_table_structure,
+                    m_skip_infer_table_types=skip_infer_table_types,
+                    m_strategy=strategy,
+                    m_xml_keep_tags=xml_keep_tags,
                     response_type=media_type,
                     filename=file.filename,
                     file_content_type=file_content_type,
