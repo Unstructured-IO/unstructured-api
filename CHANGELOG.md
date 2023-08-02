@@ -60,7 +60,6 @@
 ## 0.0.23
 
 * Add support for csv files
-* Add returning text/csv to pipeline_api
 
 ## 0.0.22
 
