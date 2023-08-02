@@ -23,7 +23,7 @@ def send_document(
     if str(filename).endswith(".gz"):
         files = {"files": (str(filename), open(filename, "rb"), "application/gzip")}
     else:
-        files = {"files": (str(filename), open(filename, "rb"))}  
+        files = {"files": (str(filename), open(filename, "rb"))}
     return requests.post(
         API_URL,
         files=files,
@@ -81,7 +81,7 @@ def send_document(
             "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
         ),
         ("fake-xml.xml", "text/xml"),
-        ("layout-parser-paper.pdf.gz", "application/gzip")
+        ("layout-parser-paper.pdf.gz", "application/gzip"),
     ],
 )
 def test_happy_path(example_filename, content_type):
