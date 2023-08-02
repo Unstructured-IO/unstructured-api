@@ -70,7 +70,7 @@ stop_container() {
 }
 
 # Always clean up the container
-# trap stop_container EXIT
+trap stop_container EXIT
 
 start_container 8000 "false"
 await_server_ready 8000
