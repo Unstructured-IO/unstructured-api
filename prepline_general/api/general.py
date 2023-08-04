@@ -364,10 +364,8 @@ def pipeline_api(
         if not show_coordinates and element.metadata.coordinates:
             elements[i].metadata.coordinates = None
 
-        # Note(yuming): currently removing date from metadata
-        # since it should be fixed in the core library
-        if element.metadata.date:
-            elements[i].metadata.date = None
+        if element.metadata.last_modified:
+            elements[i].metadata.last_modified = None
 
     if response_type == "text/csv":
         df = convert_to_dataframe(elements)
