@@ -9,7 +9,7 @@ env:
   DOCKER_REPOSITORY: quay.io/unstructured-io/unstructured-api
   DOCKER_BUILD_REPOSITORY: quay.io/unstructured-io/build-unstructured-api
   PACKAGE: "unstructured-api"
-  PIPELINE_PACKAGE: "general"
+  PIPELINE_FAMILY: "general"
   PIP_VERSION: "22.2.1"
   PYTHON_VERSION: "3.8"
 
@@ -72,7 +72,7 @@ jobs:
         DOCKER_BUILDKIT=1 docker buildx build --platform=$ARCH --load \
           --build-arg PIP_VERSION=$PIP_VERSION \
           --build-arg BUILDKIT_INLINE_CACHE=1 \
-          --build-arg PIPELINE_PACKAGE=${{ env.PIPELINE_PACKAGE }} \
+          --build-arg PIPELINE_PACKAGE=${{ env.PIPELINE_FAMILY }} \
           --provenance=false \
           --progress plain \
           --cache-from $DOCKER_BUILD_REPOSITORY:$ARCH \
