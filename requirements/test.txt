@@ -598,7 +598,6 @@ pytest-mock==3.11.1
 python-dateutil==2.8.2
     # via
     #   -r requirements/base.txt
-    #   arrow
     #   jupyter-client
     #   matplotlib
     #   pandas

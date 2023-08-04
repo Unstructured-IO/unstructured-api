@@ -365,13 +365,11 @@ types-urllib3==1.26.25.14
     # via types-requests
 typing-extensions==4.7.1
     # via
-    #   annotated-types
     #   fastapi
     #   huggingface-hub
     #   iopath
     #   mypy
     #   pydantic
-    #   pydantic-core
     #   pypdf
     #   starlette
     #   torch
