@@ -1,5 +1,6 @@
-## 0.0.34-dev1
+## 0.0.34
 
+* Bump unstructured library to 0.9.0
 * Add table support for image with parameter `skip_infer_table_types`
 * Add support for gzipped files
   
