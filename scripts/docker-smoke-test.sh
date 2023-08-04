@@ -79,16 +79,16 @@ await_server_ready 8000
 # Smoke Tests
 #######################
 echo Running smoke tests
-# PYTHONPATH=. SKIP_INFERENCE_TESTS=$SKIP_INFERENCE_TESTS pytest scripts/smoketest.py
+PYTHONPATH=. SKIP_INFERENCE_TESTS=$SKIP_INFERENCE_TESTS pytest scripts/smoketest.py
 
 #######################
 # Test parallel vs single mode
 #######################
-# start_container 9000 true
-# await_server_ready 9000
+start_container 9000 true
+await_server_ready 9000
 
-# echo Running parallel mode test
-# ./scripts/parallel-mode-test.sh localhost:8000 localhost:9000
+echo Running parallel mode test
+./scripts/parallel-mode-test.sh localhost:8000 localhost:9000
 
 result=$?
 exit $result
