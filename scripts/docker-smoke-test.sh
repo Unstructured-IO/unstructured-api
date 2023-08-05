@@ -63,10 +63,10 @@ stop_container() {
     echo Stopping container "$CONTAINER_NAME"
     # Note (austin) - if you're getting an error from the api, try dumping the logs
     # docker logs $CONTAINER_NAME 2> docker_logs.txt
-    docker stop "$CONTAINER_NAME"
+    docker stop "$CONTAINER_NAME" 2> /dev/null || true
 
     echo Stopping container "$CONTAINER_NAME_PARALLEL"
-    docker stop "$CONTAINER_NAME_PARALLEL"
+    docker stop "$CONTAINER_NAME_PARALLEL" 2> /dev/null || true
 }
 
 # Always clean up the container
