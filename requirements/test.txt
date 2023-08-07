@@ -131,7 +131,7 @@ execnb==0.1.5
     # via nbdev
 executing==1.2.0
     # via stack-data
-fastapi==0.100.1
+fastapi==0.101.0
     # via
     #   -r requirements/base.txt
     #   unstructured-api-tools
@@ -211,7 +211,7 @@ importlib-metadata==6.8.0
     #   jupyterlab-server
     #   markdown
     #   nbconvert
-importlib-resources==6.0.0
+importlib-resources==6.0.1
     # via
     #   -r requirements/base.txt
     #   jsonschema
@@ -225,7 +225,7 @@ iopath==0.1.10
     # via
     #   -r requirements/base.txt
     #   layoutparser
-ipykernel==6.25.0
+ipykernel==6.25.1
     # via
     #   jupyter
     #   jupyter-console
@@ -262,7 +262,7 @@ json5==0.9.14
     # via jupyterlab-server
 jsonpointer==2.4
     # via jsonschema
-jsonschema[format-nongpl]==4.18.6
+jsonschema[format-nongpl]==4.19.0
     # via
     #   -r requirements/base.txt
     #   jupyter-events
@@ -444,7 +444,7 @@ openpyxl==3.1.2
     # via
     #   -r requirements/base.txt
     #   unstructured
-overrides==7.3.1
+overrides==7.4.0
     # via jupyter-server
 packaging==23.1
     # via
@@ -562,7 +562,7 @@ pyflakes==3.1.0
     #   -r requirements/base.txt
     #   autoflake
     #   flake8
-pygments==2.15.1
+pygments==2.16.1
     # via
     #   -r requirements/base.txt
     #   ipython
@@ -577,7 +577,7 @@ pyparsing==3.0.9
     # via
     #   -r requirements/base.txt
     #   matplotlib
-pypdf==3.14.0
+pypdf==3.15.0
     # via -r requirements/base.txt
 pypdfium2==4.18.0
     # via
@@ -598,6 +598,7 @@ pytest-mock==3.11.1
 python-dateutil==2.8.2
     # via
     #   -r requirements/base.txt
+    #   arrow
     #   jupyter-client
     #   matplotlib
     #   pandas
@@ -654,7 +655,7 @@ qtpy==2.3.1
     # via qtconsole
 ratelimit==2.2.1
     # via -r requirements/base.txt
-referencing==0.30.1
+referencing==0.30.2
     # via
     #   -r requirements/base.txt
     #   jsonschema
@@ -880,7 +881,7 @@ websockets==11.0.3
     # via
     #   -r requirements/base.txt
     #   uvicorn
-wheel==0.41.0
+wheel==0.41.1
     # via astunparse
 widgetsnbextension==4.0.8
     # via ipywidgets
