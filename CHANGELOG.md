@@ -1,4 +1,4 @@
-## 0.0.35
+## 0.0.35-dev0
 
 * Fix a misleading error in make docker-test
 
