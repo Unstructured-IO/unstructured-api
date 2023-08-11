@@ -1,6 +1,5 @@
 from pathlib import Path
 
-import json
 import io
 import pytest
 import re
@@ -10,8 +9,6 @@ from fastapi.testclient import TestClient
 from unstructured_api_tools.pipelines.api_conventions import get_pipeline_path
 
 from prepline_general.api.app import app
-from unstructured.partition.auto import partition
-from unstructured.staging.base import convert_to_isd
 import tempfile
 
 MAIN_API_ROUTE = get_pipeline_path("general")
