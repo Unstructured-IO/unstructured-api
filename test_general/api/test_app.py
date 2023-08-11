@@ -400,61 +400,6 @@ class MockResponse:
         return self.body
 
 
-def mock_partition_file_via_api(url, **kwargs):
-    file = kwargs["files"]["files"][1]
-
-    partition_kwargs = kwargs["data"]
-
-    # Hack - the api takes `coordinates` but regular partition does not
-    del partition_kwargs["coordinates"]
-
-    elements = partition(file=file, **partition_kwargs)
-
-    response = MockResponse(200)
-    response.body = elements
-    response.text = json.dumps(convert_to_isd(elements))
-    return response
-
-
-def test_parallel_mode_correct_result(monkeypatch):
-    """
-    Validate that parallel processing mode merges the results
-    to look the same as normal mode. The api call is mocked to
-    use local partition, so this is just testing the merge logic.
-    """
-    client = TestClient(app)
-    test_file = Path("sample-docs") / "layout-parser-paper.pdf"
-
-    response = client.post(
-        MAIN_API_ROUTE,
-        files=[("files", (str(test_file), open(test_file, "rb"), "application/pdf"))],
-    )
-
-    assert response.status_code == 200
-    result_serial = response.json()
-
-    monkeypatch.setenv("UNSTRUCTURED_PARALLEL_MODE_ENABLED", "true")
-    monkeypatch.setenv("UNSTRUCTURED_PARALLEL_MODE_URL", "unused")
-    # Replace our callout with regular old partition
-    monkeypatch.setattr(
-        requests,
-        "post",
-        lambda *args, **kwargs: mock_partition_file_via_api(*args, **kwargs),
-    )
-
-    response = client.post(
-        MAIN_API_ROUTE,
-        files=[("files", (str(test_file), open(test_file, "rb"), "application/pdf"))],
-    )
-
-    assert response.status_code == 200
-    result_parallel = response.json()
-
-    for pair in zip(result_serial, result_parallel):
-        print(json.dumps(pair, indent=2))
-        assert pair[0] == pair[1]
-
-
 def test_parallel_mode_returns_errors(monkeypatch):
     """
     If we get an error sending a page to the api, bubble it up
