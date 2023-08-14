@@ -1,5 +1,6 @@
-## 0.0.35-dev0
+## 0.0.35
 
+* Bump unstructured library to 0.9.2
 * Fix a misleading error in make docker-test
 
 ## 0.0.34
