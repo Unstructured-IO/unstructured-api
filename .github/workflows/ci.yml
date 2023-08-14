@@ -77,6 +77,7 @@ jobs:
         make install-nltk-models
         make test
         make check-coverage
+        make tidy-notebooks
         make check-notebooks
 
   changelog:
