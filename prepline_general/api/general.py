@@ -367,6 +367,9 @@ def pipeline_api(
         if element.metadata.last_modified:
             elements[i].metadata.last_modified = None
 
+        if element.metadata.file_directory:
+            elements[i].metadata.file_directory = None
+
     if response_type == "text/csv":
         df = convert_to_dataframe(elements)
         return df.to_csv(index=False)
