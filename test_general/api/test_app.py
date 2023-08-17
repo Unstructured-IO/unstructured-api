@@ -470,7 +470,7 @@ def test_partition_file_via_api_will_retry(monkeypatch, mocker):
     response = client.post(
         MAIN_API_ROUTE,
         files=[("files", (str(test_file), open(test_file, "rb"), "application/pdf"))],
-        )
+    )
 
     assert response.status_code == 200
 
