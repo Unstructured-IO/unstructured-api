@@ -1,6 +1,7 @@
-## 0.0.36-dev0
+## 0.0.36
 
 * Fix a bug in parallel mode causing `not a valid pdf` errors
+* Bump unstructured to 0.10.2, unstructured-inference to 0.5.13
 
 ## 0.0.35
 
