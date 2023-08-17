@@ -90,7 +90,7 @@ def get_pdf_splits(pdf_pages, split_size=1):
         new_pdf.write(pdf_buffer)
         pdf_buffer.seek(0)
 
-        split_pdfs.append((pdf_buffer, offset))
+        split_pdfs.append((pdf_buffer.read(), offset))
         offset += split_size
 
     return split_pdfs

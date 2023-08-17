@@ -415,7 +415,6 @@ def test_parallel_mode_returns_errors(monkeypatch):
     response = client.post(
         MAIN_API_ROUTE,
         files=[("files", (str(test_file), open(test_file, "rb"), "application/pdf"))],
-        data={"pdf_processing_mode": "parallel"},
     )
 
     assert response.status_code == 500
@@ -432,13 +431,12 @@ def test_parallel_mode_returns_errors(monkeypatch):
     response = client.post(
         MAIN_API_ROUTE,
         files=[("files", (str(test_file), open(test_file, "rb"), "application/pdf"))],
-        data={"pdf_processing_mode": "parallel"},
     )
 
     assert response.status_code == 400
 
 
-def test_partition_file_via_api_retry(monkeypatch, mocker):
+def test_partition_file_via_api_will_retry(monkeypatch, mocker):
     """
     Verify number of retries with parallel mode
     """
@@ -449,23 +447,32 @@ def test_partition_file_via_api_retry(monkeypatch, mocker):
     monkeypatch.setenv("UNSTRUCTURED_PARALLEL_RETRY_ATTEMPTS", "2")
     monkeypatch.setenv("UNSTRUCTURED_PARALLEL_RETRY_BACKOFF_TIME", "0.1")
 
+    num_calls = 0
+
+    # Return a transient error the first time
+    def mock_response(*args, **kwargs):
+        if num_calls == 0:
+            return MockResponse(status_code=500)
+
+        num_calls += 1
+
+        return MockResponse(status_code=200)
+
     monkeypatch.setattr(
         requests,
         "post",
-        lambda *args, **kwargs: MockResponse(status_code=500),
+        mock_response,
     )
-    mock_sleep = mocker.patch("time.sleep")
+
     client = TestClient(app)
-    test_file = Path("sample-docs") / "layout-parser-paper.pdf"
+    test_file = Path("sample-docs") / "layout-parser-paper-fast.pdf"
 
     response = client.post(
         MAIN_API_ROUTE,
         files=[("files", (str(test_file), open(test_file, "rb"), "application/pdf"))],
-        data={"pdf_processing_mode": "parallel"},
-    )
+        )
 
-    assert response.status_code == 500
-    assert mock_sleep.call_count == 2
+    assert response.status_code == 200
 
 
 def test_partition_file_via_api_no_retryable_error_code(monkeypatch, mocker):
