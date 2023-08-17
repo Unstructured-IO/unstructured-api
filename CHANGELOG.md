@@ -1,3 +1,7 @@
+## 0.0.36-dev0
+
+* Fix a bug in parallel mode causing `not a valid pdf` errors
+
 ## 0.0.35
 
 * Bump unstructured library to 0.9.2
