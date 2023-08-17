@@ -451,10 +451,11 @@ def test_partition_file_via_api_will_retry(monkeypatch, mocker):
 
     # Return a transient error the first time
     def mock_response(*args, **kwargs):
-        if num_calls == 0:
-            return MockResponse(status_code=500)
-
+        nonlocal num_calls
         num_calls += 1
+
+        if num_calls == 1:
+            return MockResponse(status_code=500)
 
         return MockResponse(status_code=200)
 
@@ -463,6 +464,9 @@ def test_partition_file_via_api_will_retry(monkeypatch, mocker):
         "post",
         mock_response,
     )
+
+    # This needs to be mocked when we return 200
+    mocker.patch("prepline_general.api.general.elements_from_json")
 
     client = TestClient(app)
     test_file = Path("sample-docs") / "layout-parser-paper-fast.pdf"
