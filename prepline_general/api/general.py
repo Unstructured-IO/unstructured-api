@@ -90,7 +90,7 @@ def get_pdf_splits(pdf_pages, split_size=1):
         new_pdf.write(pdf_buffer)
         pdf_buffer.seek(0)
 
-        split_pdfs.append((pdf_buffer, offset))
+        split_pdfs.append((pdf_buffer.read(), offset))
         offset += split_size
 
     return split_pdfs
@@ -367,6 +367,9 @@ def pipeline_api(
         if element.metadata.last_modified:
             elements[i].metadata.last_modified = None
 
+        if element.metadata.file_directory:
+            elements[i].metadata.file_directory = None
+
     if response_type == "text/csv":
         df = convert_to_dataframe(elements)
         return df.to_csv(index=False)
@@ -481,7 +484,7 @@ def ungz_file(file: UploadFile, gz_uncompressed_content_type=None) -> UploadFile
 
 
 @router.post("/general/v0/general")
-@router.post("/general/v0.0.35/general")
+@router.post("/general/v0.0.37/general")
 def pipeline_1(
     request: Request,
     gz_uncompressed_content_type: Optional[str] = Form(default=None),

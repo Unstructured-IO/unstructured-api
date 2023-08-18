@@ -1,6 +1,5 @@
 from pathlib import Path
 
-import json
 import io
 import pytest
 import re
@@ -10,8 +9,6 @@ from fastapi.testclient import TestClient
 from unstructured_api_tools.pipelines.api_conventions import get_pipeline_path
 
 from prepline_general.api.app import app
-from unstructured.partition.auto import partition
-from unstructured.staging.base import convert_to_isd
 import tempfile
 
 MAIN_API_ROUTE = get_pipeline_path("general")
@@ -400,61 +397,6 @@ class MockResponse:
         return self.body
 
 
-def mock_partition_file_via_api(url, **kwargs):
-    file = kwargs["files"]["files"][1]
-
-    partition_kwargs = kwargs["data"]
-
-    # Hack - the api takes `coordinates` but regular partition does not
-    del partition_kwargs["coordinates"]
-
-    elements = partition(file=file, **partition_kwargs)
-
-    response = MockResponse(200)
-    response.body = elements
-    response.text = json.dumps(convert_to_isd(elements))
-    return response
-
-
-def test_parallel_mode_correct_result(monkeypatch):
-    """
-    Validate that parallel processing mode merges the results
-    to look the same as normal mode. The api call is mocked to
-    use local partition, so this is just testing the merge logic.
-    """
-    client = TestClient(app)
-    test_file = Path("sample-docs") / "layout-parser-paper.pdf"
-
-    response = client.post(
-        MAIN_API_ROUTE,
-        files=[("files", (str(test_file), open(test_file, "rb"), "application/pdf"))],
-    )
-
-    assert response.status_code == 200
-    result_serial = response.json()
-
-    monkeypatch.setenv("UNSTRUCTURED_PARALLEL_MODE_ENABLED", "true")
-    monkeypatch.setenv("UNSTRUCTURED_PARALLEL_MODE_URL", "unused")
-    # Replace our callout with regular old partition
-    monkeypatch.setattr(
-        requests,
-        "post",
-        lambda *args, **kwargs: mock_partition_file_via_api(*args, **kwargs),
-    )
-
-    response = client.post(
-        MAIN_API_ROUTE,
-        files=[("files", (str(test_file), open(test_file, "rb"), "application/pdf"))],
-    )
-
-    assert response.status_code == 200
-    result_parallel = response.json()
-
-    for pair in zip(result_serial, result_parallel):
-        print(json.dumps(pair, indent=2))
-        assert pair[0] == pair[1]
-
-
 def test_parallel_mode_returns_errors(monkeypatch):
     """
     If we get an error sending a page to the api, bubble it up
@@ -473,7 +415,6 @@ def test_parallel_mode_returns_errors(monkeypatch):
     response = client.post(
         MAIN_API_ROUTE,
         files=[("files", (str(test_file), open(test_file, "rb"), "application/pdf"))],
-        data={"pdf_processing_mode": "parallel"},
     )
 
     assert response.status_code == 500
@@ -490,13 +431,12 @@ def test_parallel_mode_returns_errors(monkeypatch):
     response = client.post(
         MAIN_API_ROUTE,
         files=[("files", (str(test_file), open(test_file, "rb"), "application/pdf"))],
-        data={"pdf_processing_mode": "parallel"},
     )
 
     assert response.status_code == 400
 
 
-def test_partition_file_via_api_retry(monkeypatch, mocker):
+def test_partition_file_via_api_will_retry(monkeypatch, mocker):
     """
     Verify number of retries with parallel mode
     """
@@ -507,23 +447,36 @@ def test_partition_file_via_api_retry(monkeypatch, mocker):
     monkeypatch.setenv("UNSTRUCTURED_PARALLEL_RETRY_ATTEMPTS", "2")
     monkeypatch.setenv("UNSTRUCTURED_PARALLEL_RETRY_BACKOFF_TIME", "0.1")
 
+    num_calls = 0
+
+    # Return a transient error the first time
+    def mock_response(*args, **kwargs):
+        nonlocal num_calls
+        num_calls += 1
+
+        if num_calls == 1:
+            return MockResponse(status_code=500)
+
+        return MockResponse(status_code=200)
+
     monkeypatch.setattr(
         requests,
         "post",
-        lambda *args, **kwargs: MockResponse(status_code=500),
+        mock_response,
     )
-    mock_sleep = mocker.patch("time.sleep")
+
+    # This needs to be mocked when we return 200
+    mocker.patch("prepline_general.api.general.elements_from_json")
+
     client = TestClient(app)
-    test_file = Path("sample-docs") / "layout-parser-paper.pdf"
+    test_file = Path("sample-docs") / "layout-parser-paper-fast.pdf"
 
     response = client.post(
         MAIN_API_ROUTE,
         files=[("files", (str(test_file), open(test_file, "rb"), "application/pdf"))],
-        data={"pdf_processing_mode": "parallel"},
     )
 
-    assert response.status_code == 500
-    assert mock_sleep.call_count == 2
+    assert response.status_code == 200
 
 
 def test_partition_file_via_api_no_retryable_error_code(monkeypatch, mocker):

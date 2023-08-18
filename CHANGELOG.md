@@ -1,5 +1,15 @@
-## 0.0.35-dev0
+## 0.0.37
 
+* Bump unstructured to 0.10.4
+
+## 0.0.36
+
+* Fix a bug in parallel mode causing `not a valid pdf` errors
+* Bump unstructured to 0.10.2, unstructured-inference to 0.5.13
+
+## 0.0.35
+
+* Bump unstructured library to 0.9.2
 * Fix a misleading error in make docker-test
 
 ## 0.0.34
