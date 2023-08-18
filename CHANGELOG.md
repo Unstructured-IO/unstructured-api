@@ -1,3 +1,7 @@
+## 0.0.37
+
+* Bump unstructured to 0.10.4
+
 ## 0.0.36
 
 * Fix a bug in parallel mode causing `not a valid pdf` errors
