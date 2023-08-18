@@ -228,7 +228,7 @@ platformdirs==3.10.0
     # via jupyter-core
 portalocker==2.7.0
     # via iopath
-protobuf==4.24.0
+protobuf==4.24.1
     # via onnxruntime
 pycocotools==2.0.7
     # via effdet
@@ -373,22 +373,24 @@ types-urllib3==1.26.25.14
     # via types-requests
 typing-extensions==4.7.1
     # via
+    #   annotated-types
     #   fastapi
     #   huggingface-hub
     #   iopath
     #   mypy
     #   pydantic
+    #   pydantic-core
     #   pypdf
     #   starlette
     #   torch
     #   uvicorn
 tzdata==2023.3
     # via pandas
-unstructured[local-inference]==0.10.2
+unstructured[local-inference]==0.10.4
     # via -r requirements/base.in
 unstructured-api-tools==0.10.11
     # via -r requirements/base.in
-unstructured-inference==0.5.13
+unstructured-inference==0.5.14
     # via unstructured
 urllib3==2.0.4
     # via requests
