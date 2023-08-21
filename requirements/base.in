@@ -1,6 +1,6 @@
 unstructured[local-inference]>=0.8.1
 unstructured-api-tools>=0.10.10
-pydantic<2.0.2
+pydantic<2.2.2
 # Pinning click due to a unicode issue in black
 # can remove after black drops support for Python 3.6
 # ref: https://github.com/psf/black/issues/2964
