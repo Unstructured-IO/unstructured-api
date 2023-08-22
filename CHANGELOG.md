@@ -1,6 +1,6 @@
 ## 0.0.38-dev0
 
-* Fix page break has page number is None bug
+* Fix page break has None page number bug
 
 ## 0.0.37
 
