@@ -1,3 +1,7 @@
+## 0.0.38-dev0
+
+* Fix page break has page number is None bug
+
 ## 0.0.37
 
 * Bump unstructured to 0.10.4

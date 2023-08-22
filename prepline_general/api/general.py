@@ -144,7 +144,9 @@ def partition_file_via_api(file_tuple, request, filename, content_type, **partit
 
     # We need to account for the original page numbers
     for element in elements:
-        element.metadata.page_number += page_offset
+        if element.metadata.page_number:
+            # Page number could be None if we include page breaks
+            element.metadata.page_number += page_offset
 
     return elements
 
@@ -484,7 +486,7 @@ def ungz_file(file: UploadFile, gz_uncompressed_content_type=None) -> UploadFile
 
 
 @router.post("/general/v0/general")
-@router.post("/general/v0.0.37/general")
+@router.post("/general/v0.0.38/general")
 def pipeline_1(
     request: Request,
     gz_uncompressed_content_type: Optional[str] = Form(default=None),
