@@ -1,6 +1,7 @@
-## 0.0.38-dev0
+## 0.0.38-dev1
 
 * Fix page break has None page number bug
+* Fix a UnboundLocalError using pdfs in parallel mode
 
 ## 0.0.37
 
