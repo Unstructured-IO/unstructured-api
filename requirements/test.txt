@@ -696,7 +696,7 @@ rpds-py==0.9.2
     #   -r requirements/base.txt
     #   jsonschema
     #   referencing
-safetensors==0.3.3
+safetensors==0.3.2
     # via
     #   -r requirements/base.txt
     #   timm

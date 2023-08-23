@@ -9,4 +9,6 @@ ratelimit
 requests
 pypdf
 pycryptodome
+# Note(austin) higher versions need rust installed? pinning this until we address in the dockerfile
+safetensors<0.3.3
 
