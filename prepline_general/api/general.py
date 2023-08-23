@@ -294,7 +294,7 @@ def pipeline_api(
         pdf_infer_table_structure = False
 
     skip_infer_table_types = (
-        m_skip_infer_table_types if len(m_skip_infer_table_types) else ["pdf", "jpg", "png"]
+        m_skip_infer_table_types[0] if len(m_skip_infer_table_types) else ["pdf", "jpg", "png"]
     )
 
     try:
