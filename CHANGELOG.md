@@ -1,3 +1,7 @@
+## 0.0.39-dev0
+
+* Fix wrong handleing on param skip_infer_table_types
+
 ## 0.0.38
 
 * Fix page break has None page number bug
