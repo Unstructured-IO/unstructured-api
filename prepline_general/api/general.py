@@ -294,7 +294,7 @@ def pipeline_api(
         pdf_infer_table_structure = False
 
     skip_infer_table_types = (
-        m_skip_infer_table_types if len(m_skip_infer_table_types) else ["pdf", "jpg", "png"]
+        m_skip_infer_table_types[0] if len(m_skip_infer_table_types) else ["pdf", "jpg", "png"]
     )
 
     try:
@@ -485,7 +485,7 @@ def ungz_file(file: UploadFile, gz_uncompressed_content_type=None) -> UploadFile
 
 
 @router.post("/general/v0/general")
-@router.post("/general/v0.0.38/general")
+@router.post("/general/v0.0.39/general")
 def pipeline_1(
     request: Request,
     gz_uncompressed_content_type: Optional[str] = Form(default=None),
