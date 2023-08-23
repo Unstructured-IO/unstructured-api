@@ -124,7 +124,7 @@ for PDFs and Images, which are `pdf`, `jpg` and `png`. Again, please note that t
   -H 'Content-Type: multipart/form-data' \
   -F 'files=@sample-docs/layout-parser-paper-with-table.jpg' \
   -F 'strategy=hi_res' \
-  -F 'skip_infer_table_types=[]' \
+  -F 'skip_infer_table_types=pdf' \
   | jq -C . | less -R
 ```
 
