@@ -216,7 +216,6 @@ def pipeline_api(
         "pipeline_api input params: {}".format(
             json.dumps(
                 {
-                    "request": request,
                     "filename": filename,
                     "file_content_type": file_content_type,
                     "response_type": response_type,
@@ -239,7 +238,7 @@ def pipeline_api(
         # since fast api might sent the wrong one.
         file_content_type = "application/x-ole-storage"
 
-    if filename.endswith(".pdf"):
+    if file_content_type == "application/pdf":
         try:
             pdf = PdfReader(file)
         except pypdf.errors.EmptyFileError:

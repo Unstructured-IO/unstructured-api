@@ -3,7 +3,7 @@
 * Fix page break has None page number bug
 * Bump unstructured to 0.10.5
 * Bump unstructured-ingest to 0.5.15
-
+* Fix UnboundLocalError using pdfs in parallel mode
 
 ## 0.0.37
 
