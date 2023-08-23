@@ -166,7 +166,7 @@ def test_skip_infer_table_types_param():
     response = client.post(
         MAIN_API_ROUTE,
         files=[("files", (str(test_file), open(test_file, "rb")))],
-        data={"skip_infer_table_types": ["pdf"]},
+        data={"skip_infer_table_types": "['pdf']"},
     )
 
     assert response.status_code == 200
