@@ -216,7 +216,6 @@ def pipeline_api(
         "pipeline_api input params: {}".format(
             json.dumps(
                 {
-                    "request": request,
                     "filename": filename,
                     "file_content_type": file_content_type,
                     "response_type": response_type,
