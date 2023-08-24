@@ -7,6 +7,7 @@ import io
 import os
 import gzip
 import mimetypes
+import psutil
 from typing import List, Union
 from fastapi import status, FastAPI, File, Form, Request, UploadFile, APIRouter, HTTPException
 from fastapi.responses import PlainTextResponse
@@ -233,6 +234,16 @@ def pipeline_api(
             )
         )
     )
+
+    mem = psutil.virtual_memory()
+    logger.info(mem)
+
+    THRESHOLD = 1000 * 1024 * 1024 # 1000MB
+    if mem.available <= THRESHOLD:
+        raise HTTPException(
+            status_code=503, detail="Server is under heavy load. Please try again later."
+        )
+
     if filename.endswith(".msg"):
         # Note(yuming): convert file type for msg files
         # since fast api might sent the wrong one.
