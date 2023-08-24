@@ -1,6 +1,7 @@
-## 0.0.39-dev0
+## 0.0.39
 
 * Fix wrong handleing on param skip_infer_table_types
+* Pin `safetensors` to fix a build error with 0.0.38
 
 ## 0.0.38
 
