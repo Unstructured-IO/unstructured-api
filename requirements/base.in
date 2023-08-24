@@ -1,3 +1,4 @@
+-c constraints.in
 unstructured[local-inference]>=0.8.1
 unstructured-api-tools>=0.10.10
 pydantic<2.0.2
@@ -9,6 +10,5 @@ ratelimit
 requests
 pypdf
 pycryptodome
-# Note(austin) higher versions need rust installed? pinning this until we address in the dockerfile
-safetensors<0.3.3
+psutil
 

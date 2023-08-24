@@ -123,7 +123,7 @@ jupyter-core==5.3.1
     #   nbformat
 jupyterlab-pygments==0.2.2
     # via nbconvert
-kiwisolver==1.4.4
+kiwisolver==1.4.5
     # via matplotlib
 layoutparser[layoutmodels,tesseract]==0.3.4
     # via unstructured-inference
@@ -230,6 +230,8 @@ portalocker==2.7.0
     # via iopath
 protobuf==4.24.1
     # via onnxruntime
+psutil==5.9.5
+    # via -r requirements/base.in
 pycocotools==2.0.7
     # via effdet
 pycparser==2.21
@@ -306,7 +308,7 @@ rpds-py==0.9.2
     #   referencing
 safetensors==0.3.2
     # via
-    #   -r requirements/base.in
+    #   -c requirements/constraints.in
     #   timm
     #   transformers
 scipy==1.10.1
@@ -397,7 +399,7 @@ uvicorn[standard]==0.23.2
     # via unstructured-api-tools
 uvloop==0.17.0
     # via uvicorn
-watchfiles==0.19.0
+watchfiles==0.20.0
     # via uvicorn
 webencodings==0.5.1
     # via
