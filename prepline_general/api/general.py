@@ -235,12 +235,12 @@ def pipeline_api(
         )
     )
 
-    # Reject traffic if memory pressure is currently too high
+    # If this var is set, reject traffic when free memory is below minimum
     # Allow internal requests - these are parallel calls already in progress
     mem = psutil.virtual_memory()
-    memory_free_minimum = int(os.environ.get("UNSTRUCTURED_MEMORY_FREE_MINIMUM_MB", 4000))
+    memory_free_minimum = int(os.environ.get("UNSTRUCTURED_MEMORY_FREE_MINIMUM_MB", 0))
 
-    if mem.available <= memory_free_minimum * 1024 * 1024:
+    if memory_free_minimum > 0 and mem.available <= memory_free_minimum * 1024 * 1024:
         origin = str(request.client.host)
         if not (origin.startswith("10.5") or origin.startswith("10.4")):
             raise HTTPException(
