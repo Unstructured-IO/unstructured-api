@@ -1,3 +1,7 @@
+## 0.0.40-dev0
+
+* Reject traffic when we're overloaded via `UNSTRUCTURED_MEMORY_FREE_MINIMUM_MB`
+
 ## 0.0.39
 
 * Fix wrong handleing on param skip_infer_table_types

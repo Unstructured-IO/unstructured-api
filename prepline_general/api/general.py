@@ -7,7 +7,6 @@ import io
 import os
 import gzip
 import mimetypes
-import psutil
 from typing import List, Union
 from fastapi import status, FastAPI, File, Form, Request, UploadFile, APIRouter, HTTPException
 from fastapi.responses import PlainTextResponse
@@ -25,6 +24,7 @@ import pypdf
 from pypdf import PdfReader, PdfWriter
 from unstructured.partition.auto import partition
 from unstructured.staging.base import convert_to_isd, convert_to_dataframe, elements_from_json
+import psutil
 import requests
 import time
 from unstructured_inference.models.chipper import MODEL_TYPES as CHIPPER_MODEL_TYPES
@@ -235,14 +235,17 @@ def pipeline_api(
         )
     )
 
+    # Reject traffic if memory pressure is currently too high
+    # Allow internal requests - these are parallel calls already in progress
     mem = psutil.virtual_memory()
-    logger.info(mem)
+    memory_free_minimum = int(os.environ.get("UNSTRUCTURED_MEMORY_FREE_MINIMUM_MB", 4000))
 
-    THRESHOLD = 1000 * 1024 * 1024 # 1000MB
-    if mem.available <= THRESHOLD:
-        raise HTTPException(
-            status_code=503, detail="Server is under heavy load. Please try again later."
-        )
+    if mem.available <= memory_free_minimum * 1024 * 1024:
+        origin = str(request.client.host)
+        if not (origin.startswith("10.5") or origin.startswith("10.4")):
+            raise HTTPException(
+                status_code=503, detail="Server is under heavy load. Please try again later."
+            )
 
     if filename.endswith(".msg"):
         # Note(yuming): convert file type for msg files
@@ -496,7 +499,7 @@ def ungz_file(file: UploadFile, gz_uncompressed_content_type=None) -> UploadFile
 
 
 @router.post("/general/v0/general")
-@router.post("/general/v0.0.39/general")
+@router.post("/general/v0.0.40/general")
 def pipeline_1(
     request: Request,
     gz_uncompressed_content_type: Optional[str] = Form(default=None),
