@@ -1,0 +1,7 @@
+####################################################################################################
+# This file can house global constraints that aren't *direct* requirements of the package or any
+# extras. Putting a dependency here will only affect dependency sets that contain them -- in other
+# words, if something does not require a constraint, it will not be installed.
+####################################################################################################
+# Note(austin) - preventing a build error with 0.3.3
+safetensors<0.3.3
