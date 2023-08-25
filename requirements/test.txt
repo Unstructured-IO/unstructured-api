@@ -700,6 +700,7 @@ rpds-py==0.9.2
     #   referencing
 safetensors==0.3.2
     # via
+    #   -c requirements/constraints.in
     #   -r requirements/base.txt
     #   timm
     #   transformers

@@ -241,8 +241,11 @@ def pipeline_api(
     memory_free_minimum = int(os.environ.get("UNSTRUCTURED_MEMORY_FREE_MINIMUM_MB", 0))
 
     if memory_free_minimum > 0 and mem.available <= memory_free_minimum * 1024 * 1024:
-        origin = str(request.client.host)
-        if not (origin.startswith("10.5") or origin.startswith("10.4")):
+        # Note(yuming): Use X-Forwarded-For header to find the orginal IP for external API
+        # requests,since LB forwards requests in AWS
+        origin_ip = request.headers.get("X-Forwarded-For") or request.client.host
+
+        if not origin_ip.startswith("10."):
             raise HTTPException(
                 status_code=503, detail="Server is under heavy load. Please try again later."
             )
