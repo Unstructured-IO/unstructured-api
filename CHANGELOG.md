@@ -1,3 +1,7 @@
+## 0.0.41-dev0
+
+* Update readme for parameter `hi_res_model_name`
+
 ## 0.0.40
 
 * Reject traffic when overloaded via `UNSTRUCTURED_MEMORY_FREE_MINIMUM_MB`
