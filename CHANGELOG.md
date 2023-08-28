@@ -1,6 +1,7 @@
-## 0.0.40-dev0
+## 0.0.40
 
-* Reject traffic when we're overloaded via `UNSTRUCTURED_MEMORY_FREE_MINIMUM_MB`
+* Reject traffic when overloaded via `UNSTRUCTURED_MEMORY_FREE_MINIMUM_MB`
+* Docker image built with Python 3.10 rather than 3.8
 
 ## 0.0.39
 
