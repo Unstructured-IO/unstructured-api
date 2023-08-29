@@ -1,3 +1,8 @@
+## 0.0.41
+
+* Bump unstructured library to 0.10.8
+* Bump unstructured-inference to 0.5.17
+
 ## 0.0.40
 
 * Reject traffic when overloaded via `UNSTRUCTURED_MEMORY_FREE_MINIMUM_MB`
