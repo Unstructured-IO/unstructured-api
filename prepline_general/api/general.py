@@ -153,7 +153,7 @@ def partition_file_via_api(file_tuple, request, filename, content_type, **partit
 
 
 def partition_pdf_splits(
-    request, pdf_pages, file, file_filename, content_type, coordinates, **partition_kwargs
+    request, pdf_pages, file, metadata_filename, content_type, coordinates, **partition_kwargs
 ):
     """
     Split a pdf into chunks and process in parallel with more api calls, or partition
@@ -162,7 +162,7 @@ def partition_pdf_splits(
 
     Arguments:
     request is used to forward relevant headers to the api calls
-    file, file_filename and content_type are passed on in the file argument to requests.post
+    file, metadata_filename and content_type are passed on in the file argument to requests.post
     coordinates is passed on to the api calls, but cannot be used in the local partition case
     partition_kwargs holds any others parameters that will be forwarded, or passed to partition
     """
@@ -171,7 +171,10 @@ def partition_pdf_splits(
     # If it's small enough, just process locally
     if len(pdf_pages) <= pages_per_pdf:
         return partition(
-            file=file, file_filename=file_filename, content_type=content_type, **partition_kwargs
+            file=file,
+            metadata_filename=metadata_filename,
+            content_type=content_type,
+            **partition_kwargs,
         )
 
     results = []
@@ -180,7 +183,7 @@ def partition_pdf_splits(
     partition_func = partial(
         partition_file_via_api,
         request=request,
-        filename=file_filename,
+        filename=metadata_filename,
         content_type=content_type,
         coordinates=coordinates,
         **partition_kwargs,
@@ -340,7 +343,7 @@ def pipeline_api(
                 request,
                 pdf_pages=pdf.pages,
                 file=file,
-                file_filename=filename,
+                metadata_filename=filename,
                 content_type=file_content_type,
                 coordinates=show_coordinates,
                 # partition_kwargs
@@ -356,7 +359,7 @@ def pipeline_api(
         else:
             elements = partition(
                 file=file,
-                file_filename=filename,
+                metadata_filename=filename,
                 content_type=file_content_type,
                 # partition_kwargs
                 encoding=encoding,
