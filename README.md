@@ -82,7 +82,7 @@ The `hi_res` strategy supports different models, and the default is `detectron2o
   | jq -C . | less -R
 ```
 
-We also support models be used locally for example, `yolox`. Please refer to the `using-the-api-locally` section for more information on how to use the local API.
+We also support models to be used locally, for example, `yolox`. Please refer to the `using-the-api-locally` section for more information on how to use the local API.
 
 #### OCR languages
 
