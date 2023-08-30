@@ -67,6 +67,23 @@ The `ocr_only` strategy runs the document through Tesseract for OCR. Currently, 
 
 For the best of all worlds, `auto` will determine when a page can be extracted using `fast` or `ocr_only` mode, otherwise it will fall back to `hi_res`.
 
+#### Hi Res model name
+
+The `hi_res` strategy supports different models, and the default is `detectron2onnx`. You can also specify `hi_res_model_name` parameter to run `hi_res` strategy with the chipper model while using the host API:
+
+```
+ curl -X 'POST' \
+  'https://api.unstructured.io/general/v0/general' \
+  -H 'accept: application/json' \
+  -H 'Content-Type: multipart/form-data' \
+  -F 'files=@sample-docs/layout-parser-paper.pdf' \
+  -F 'strategy=hi_res' \
+  -F 'hi_res_model_name=chipper'  \
+  | jq -C . | less -R
+```
+
+We also support models to be used locally, for example, `yolox`. Please refer to the `using-the-api-locally` section for more information on how to use the local API.
+
 #### OCR languages
 
 You can also specify what languages to use for OCR with the `ocr_languages` kwarg. See the [Tesseract documentation](https://github.com/tesseract-ocr/tessdata) for a full list of languages and install instructions. OCR is only applied if the text is not already available in the PDF document.
