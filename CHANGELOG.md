@@ -1,6 +1,10 @@
-## 0.0.41-dev0
+## 0.0.42-dev0
 
 * Update readme for parameter `hi_res_model_name`
+## 0.0.41
+
+* Bump unstructured library to 0.10.8
+* Bump unstructured-inference to 0.5.17
 
 ## 0.0.40
 
