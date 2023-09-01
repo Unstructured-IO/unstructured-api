@@ -456,8 +456,6 @@ def test_parallel_mode_passes_params(monkeypatch):
     client = TestClient(app)
     test_file = Path("sample-docs") / "layout-parser-paper.pdf"
 
-    # with patch.object(general, "partition") as mock_partition:
-    # with patch.object(unstructured.partition.auto, "partition") as mock_partition:
     response = client.post(
         MAIN_API_ROUTE,
         files=[("files", (str(test_file), open(test_file, "rb"), "application/pdf"))],
