@@ -24,6 +24,7 @@ import pypdf
 from pypdf import PdfReader, PdfWriter
 from unstructured.partition.auto import partition
 from unstructured.staging.base import convert_to_isd, convert_to_dataframe, elements_from_json
+import psutil
 import requests
 import time
 from unstructured_inference.models.chipper import MODEL_TYPES as CHIPPER_MODEL_TYPES
@@ -152,7 +153,7 @@ def partition_file_via_api(file_tuple, request, filename, content_type, **partit
 
 
 def partition_pdf_splits(
-    request, pdf_pages, file, file_filename, content_type, coordinates, **partition_kwargs
+    request, pdf_pages, file, metadata_filename, content_type, coordinates, **partition_kwargs
 ):
     """
     Split a pdf into chunks and process in parallel with more api calls, or partition
@@ -161,7 +162,7 @@ def partition_pdf_splits(
 
     Arguments:
     request is used to forward relevant headers to the api calls
-    file, file_filename and content_type are passed on in the file argument to requests.post
+    file, metadata_filename and content_type are passed on in the file argument to requests.post
     coordinates is passed on to the api calls, but cannot be used in the local partition case
     partition_kwargs holds any others parameters that will be forwarded, or passed to partition
     """
@@ -175,7 +176,10 @@ def partition_pdf_splits(
             del partition_kwargs["hi_res_model_name"]
 
         return partition(
-            file=file, file_filename=file_filename, content_type=content_type, **partition_kwargs
+            file=file,
+            metadata_filename=metadata_filename,
+            content_type=content_type,
+            **partition_kwargs,
         )
 
     results = []
@@ -184,7 +188,7 @@ def partition_pdf_splits(
     partition_func = partial(
         partition_file_via_api,
         request=request,
-        filename=file_filename,
+        filename=metadata_filename,
         content_type=content_type,
         coordinates=coordinates,
         **partition_kwargs,
@@ -238,6 +242,22 @@ def pipeline_api(
             )
         )
     )
+
+    # If this var is set, reject traffic when free memory is below minimum
+    # Allow internal requests - these are parallel calls already in progress
+    mem = psutil.virtual_memory()
+    memory_free_minimum = int(os.environ.get("UNSTRUCTURED_MEMORY_FREE_MINIMUM_MB", 0))
+
+    if memory_free_minimum > 0 and mem.available <= memory_free_minimum * 1024 * 1024:
+        # Note(yuming): Use X-Forwarded-For header to find the orginal IP for external API
+        # requests,since LB forwards requests in AWS
+        origin_ip = request.headers.get("X-Forwarded-For") or request.client.host
+
+        if not origin_ip.startswith("10."):
+            raise HTTPException(
+                status_code=503, detail="Server is under heavy load. Please try again later."
+            )
+
     if filename.endswith(".msg"):
         # Note(yuming): convert file type for msg files
         # since fast api might sent the wrong one.
@@ -331,7 +351,7 @@ def pipeline_api(
                 request,
                 pdf_pages=pdf.pages,
                 file=file,
-                file_filename=filename,
+                metadata_filename=filename,
                 content_type=file_content_type,
                 coordinates=show_coordinates,
                 # partition_kwargs
@@ -347,7 +367,7 @@ def pipeline_api(
         else:
             elements = partition(
                 file=file,
-                file_filename=filename,
+                metadata_filename=filename,
                 content_type=file_content_type,
                 # partition_kwargs
                 encoding=encoding,
@@ -493,7 +513,7 @@ def ungz_file(file: UploadFile, gz_uncompressed_content_type=None) -> UploadFile
 
 
 @router.post("/general/v0/general")
-@router.post("/general/v0.0.39/general")
+@router.post("/general/v0.0.42/general")
 def pipeline_1(
     request: Request,
     gz_uncompressed_content_type: Optional[str] = Form(default=None),

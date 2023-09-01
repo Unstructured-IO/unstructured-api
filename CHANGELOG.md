@@ -1,3 +1,17 @@
+## 0.0.42-dev0
+
+* Update readme for parameter `hi_res_model_name`
+
+## 0.0.41
+
+* Bump unstructured library to 0.10.8
+* Bump unstructured-inference to 0.5.17
+
+## 0.0.40
+
+* Reject traffic when overloaded via `UNSTRUCTURED_MEMORY_FREE_MINIMUM_MB`
+* Docker image built with Python 3.10 rather than 3.8
+
 ## 0.0.39
 
 * Fix wrong handleing on param skip_infer_table_types

@@ -1,3 +1,4 @@
+-c constraints.in
 black
 # NOTE(mrobinson) - Pinning click due to a unicode issue in black
 # can remove after black drops support for Python 3.6
