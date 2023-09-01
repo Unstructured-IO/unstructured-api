@@ -221,27 +221,41 @@ def pipeline_api(
     m_strategy=[],
     m_xml_keep_tags=[],
 ):
-    logger.debug(
-        "pipeline_api input params: {}".format(
-            json.dumps(
-                {
-                    "filename": filename,
-                    "file_content_type": file_content_type,
-                    "response_type": response_type,
-                    "m_coordinates": m_coordinates,
-                    "m_encoding": m_encoding,
-                    "m_hi_res_model_name": m_hi_res_model_name,
-                    "m_include_page_breaks": m_include_page_breaks,
-                    "m_ocr_languages": m_ocr_languages,
-                    "m_pdf_infer_table_structure": m_pdf_infer_table_structure,
-                    "m_skip_infer_table_types": m_skip_infer_table_types,
-                    "m_strategy": m_strategy,
-                    "m_xml_keep_tags": m_xml_keep_tags,
-                },
-                default=str,
+    if filename.endswith(".msg"):
+        # Note(yuming): convert file type for msg files
+        # since fast api might sent the wrong one.
+        file_content_type = "application/x-ole-storage"
+
+    is_internal_request = False
+    # Note(austin) - request is None in this notebook (can clean this up soon)
+    if request is not None:
+        # We don't want to keep logging the same params for every parallel call
+        origin_ip = request.headers.get("X-Forwarded-For") or request.client.host
+        is_internal_request = origin_ip.startswith("10.")
+
+    if is_internal_request:
+        logger.debug(
+            "pipeline_api input params: {}".format(
+                json.dumps(
+                    {
+                        "filename": filename,
+                        "response_type": response_type,
+                        "m_coordinates": m_coordinates,
+                        "m_encoding": m_encoding,
+                        "m_hi_res_model_name": m_hi_res_model_name,
+                        "m_include_page_breaks": m_include_page_breaks,
+                        "m_ocr_languages": m_ocr_languages,
+                        "m_pdf_infer_table_structure": m_pdf_infer_table_structure,
+                        "m_skip_infer_table_types": m_skip_infer_table_types,
+                        "m_strategy": m_strategy,
+                        "m_xml_keep_tags": m_xml_keep_tags,
+                    },
+                    default=str,
+                )
             )
         )
-    )
+
+        logger.debug(f"filetype: {file_content_type}")
 
     # If this var is set, reject traffic when free memory is below minimum
     # Allow internal requests - these are parallel calls already in progress
@@ -257,11 +271,6 @@ def pipeline_api(
             raise HTTPException(
                 status_code=503, detail="Server is under heavy load. Please try again later."
             )
-
-    if filename.endswith(".msg"):
-        # Note(yuming): convert file type for msg files
-        # since fast api might sent the wrong one.
-        file_content_type = "application/x-ole-storage"
 
     if file_content_type == "application/pdf":
         try:
