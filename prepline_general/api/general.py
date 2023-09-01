@@ -27,8 +27,8 @@ from unstructured.staging.base import convert_to_isd, convert_to_dataframe, elem
 import psutil
 import requests
 import backoff
-from unstructured_inference.models.chipper import MODEL_TYPES as CHIPPER_MODEL_TYPES
 import logging
+from unstructured_inference.models.chipper import MODEL_TYPES as CHIPPER_MODEL_TYPES
 
 
 app = FastAPI()
@@ -68,6 +68,10 @@ if not os.environ.get("UNSTRUCTURED_ALLOWED_MIMETYPES", None):
     os.environ["UNSTRUCTURED_ALLOWED_MIMETYPES"] = DEFAULT_MIMETYPES
 
 
+# This adds the exponential backoff logs to our stream
+logging.getLogger("backoff").addHandler(logging.StreamHandler())
+
+
 def get_pdf_splits(pdf_pages, split_size=1):
     """
     Given a pdf (PdfReader) with n pages, split it into pdfs each with split_size # of pages
@@ -94,17 +98,16 @@ def get_pdf_splits(pdf_pages, split_size=1):
     return split_pdfs
 
 
-@backoff.on_exception(
-    backoff.expo,
-    HTTPException,
-    max_tries=3,
-)
-# giveup=lambda e: 400 <= e.status_code < 500)
+# Do not do exponential retries with these status codes
+def is_non_retryable(e):
+    return 400 <= e.status_code < 500
+
+
+@backoff.on_exception(backoff.expo, HTTPException, max_tries=3, giveup=is_non_retryable)
 def call_api(request_url, api_key, filename, file, content_type, **partition_kwargs):
     """
     Call the api with the given request_url.
     """
-
     headers = {"unstructured-api-key": api_key}
 
     response = requests.post(
@@ -142,12 +145,6 @@ def partition_file_via_api(file_tuple, request, filename, content_type, **partit
 
     result = call_api(request_url, api_key, filename, file, content_type, **partition_kwargs)
     elements = elements_from_json(text=result)
-
-    # Retry parameters
-    # try_attempts = int(os.environ.get("UNSTRUCTURED_PARALLEL_RETRY_ATTEMPTS", 1)) + 1
-
-    # non_retryable_error_codes = [400, 401, 402, 403]
-    # status_code = response.status_code
 
     # We need to account for the original page numbers
     for element in elements:
@@ -209,7 +206,6 @@ def partition_pdf_splits(
 
 
 logger = logging.getLogger("unstructured_api")
-logging.getLogger('backoff').addHandler(logging.StreamHandler())
 
 
 def pipeline_api(

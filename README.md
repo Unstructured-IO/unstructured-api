@@ -274,8 +274,6 @@ As mentioned above, processing a pdf using `hi_res` is currently a slow operatio
 * `UNSTRUCTURED_PARALLEL_MODE_URL` - the location to send pdf page asynchronously, no default setting at the moment.
 * `UNSTRUCTURED_PARALLEL_MODE_THREADS` - the number of threads making requests at once, default is `3`.
 * `UNSTRUCTURED_PARALLEL_MODE_SPLIT_SIZE` - the number of pages to be processed in one request, default is `1`.
-* `UNSTRUCTURED_PARALLEL_RETRY_ATTEMPTS` - the number of retry attempts, default is `1`.
-* `UNSTRUCTURED_PARALLEL_RETRY_BACKOFF_TIME` - the backoff time in seconds for each retry attempt, default is `1.0`.
 
 ### Generating Python files from the pipeline notebooks
 

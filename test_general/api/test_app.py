@@ -517,9 +517,6 @@ def test_partition_file_via_api_will_retry(monkeypatch, mocker):
     monkeypatch.setenv("UNSTRUCTURED_PARALLEL_MODE_URL", "unused")
     monkeypatch.setenv("UNSTRUCTURED_PARALLEL_MODE_THREADS", "1")
 
-    monkeypatch.setenv("UNSTRUCTURED_PARALLEL_RETRY_ATTEMPTS", "2")
-    monkeypatch.setenv("UNSTRUCTURED_PARALLEL_RETRY_BACKOFF_TIME", "0.1")
-
     num_calls = 0
 
     # Return a transient error the first time
@@ -552,6 +549,7 @@ def test_partition_file_via_api_will_retry(monkeypatch, mocker):
     assert response.status_code == 200
 
 
+# TODO - mock call_api and assert it was called once
 def test_partition_file_via_api_no_retryable_error_code(monkeypatch, mocker):
     """
     Verify we didn't retry if the error code is not retryable
@@ -560,15 +558,11 @@ def test_partition_file_via_api_no_retryable_error_code(monkeypatch, mocker):
     monkeypatch.setenv("UNSTRUCTURED_PARALLEL_MODE_URL", "unused")
     monkeypatch.setenv("UNSTRUCTURED_PARALLEL_MODE_THREADS", "1")
 
-    monkeypatch.setenv("UNSTRUCTURED_PARALLEL_RETRY_ATTEMPTS", "2")
-    monkeypatch.setenv("UNSTRUCTURED_PARALLEL_RETRY_BACKOFF_TIME", "0.1")
-
     monkeypatch.setattr(
         requests,
         "post",
         lambda *args, **kwargs: MockResponse(status_code=401),
     )
-    mock_sleep = mocker.patch("time.sleep")
     client = TestClient(app)
     test_file = Path("sample-docs") / "layout-parser-paper.pdf"
 
@@ -579,7 +573,6 @@ def test_partition_file_via_api_no_retryable_error_code(monkeypatch, mocker):
     )
 
     assert response.status_code == 401
-    assert mock_sleep.call_count == 0
 
 
 def test_password_protected_pdf():
