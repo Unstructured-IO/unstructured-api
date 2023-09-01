@@ -437,7 +437,8 @@ class MockResponse:
 def test_parallel_mode_passes_params(monkeypatch):
     """
     Verify that parallel mode passes all params correctly into local partition.
-    If you add something to partition_kwargs, you need to explicitly test it here.
+    If you add something to partition_kwargs, you need to explicitly test it here
+    with some non default value.
     TODO - do the same test when params are sent back to the api
     """
     monkeypatch.setenv("UNSTRUCTURED_PARALLEL_MODE_ENABLED", "true")
