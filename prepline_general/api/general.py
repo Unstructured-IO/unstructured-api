@@ -26,7 +26,7 @@ from unstructured.partition.auto import partition
 from unstructured.staging.base import convert_to_isd, convert_to_dataframe, elements_from_json
 import psutil
 import requests
-import time
+import backoff
 from unstructured_inference.models.chipper import MODEL_TYPES as CHIPPER_MODEL_TYPES
 import logging
 
@@ -42,9 +42,6 @@ def is_expected_response_type(media_type, response_type):
         return True
     else:
         return False
-
-
-# pipeline-api
 
 
 DEFAULT_MIMETYPES = (
@@ -97,6 +94,33 @@ def get_pdf_splits(pdf_pages, split_size=1):
     return split_pdfs
 
 
+@backoff.on_exception(
+    backoff.expo,
+    HTTPException,
+    max_tries=3,
+)
+# giveup=lambda e: 400 <= e.status_code < 500)
+def call_api(request_url, api_key, filename, file, content_type, **partition_kwargs):
+    """
+    Call the api with the given request_url.
+    """
+
+    headers = {"unstructured-api-key": api_key}
+
+    response = requests.post(
+        request_url,
+        files={"files": (filename, file, content_type)},
+        data=partition_kwargs,
+        headers=headers,
+    )
+
+    if response.status_code != 200:
+        detail = response.json().get("detail") or response.text
+        raise HTTPException(status_code=response.status_code, detail=detail)
+
+    return response.text
+
+
 def partition_file_via_api(file_tuple, request, filename, content_type, **partition_kwargs):
     """
     Send the given file to be partitioned remotely with retry logic,
@@ -108,40 +132,22 @@ def partition_file_via_api(file_tuple, request, filename, content_type, **partit
     filename and content_type are passed in the file form data
     partition_kwargs holds any form parameters to be sent on
     """
-    request_url = os.environ.get("UNSTRUCTURED_PARALLEL_MODE_URL")
+    file, page_offset = file_tuple
 
+    request_url = os.environ.get("UNSTRUCTURED_PARALLEL_MODE_URL")
     if not request_url:
         raise HTTPException(status_code=500, detail="Parallel mode enabled but no url set!")
 
-    file, page_offset = file_tuple
+    api_key = request.headers.get("unstructured-api-key")
 
-    headers = {"unstructured-api-key": request.headers.get("unstructured-api-key")}
+    result = call_api(request_url, api_key, filename, file, content_type, **partition_kwargs)
+    elements = elements_from_json(text=result)
 
     # Retry parameters
-    try_attempts = int(os.environ.get("UNSTRUCTURED_PARALLEL_RETRY_ATTEMPTS", 1)) + 1
-    retry_backoff_time = float(os.environ.get("UNSTRUCTURED_PARALLEL_RETRY_BACKOFF_TIME", 1.0))
+    # try_attempts = int(os.environ.get("UNSTRUCTURED_PARALLEL_RETRY_ATTEMPTS", 1)) + 1
 
-    while try_attempts >= 0:
-        response = requests.post(
-            request_url,
-            files={"files": (filename, file, content_type)},
-            data=partition_kwargs,
-            headers=headers,
-        )
-        try_attempts -= 1
-        non_retryable_error_codes = [400, 401, 402, 403]
-        status_code = response.status_code
-        if status_code != 200:
-            if try_attempts == 0 or status_code in non_retryable_error_codes:
-                detail = response.json().get("detail") or response.text
-                raise HTTPException(status_code=response.status_code, detail=detail)
-            else:
-                # Retry after backoff
-                time.sleep(retry_backoff_time)
-        else:
-            break
-
-    elements = elements_from_json(text=response.text)
+    # non_retryable_error_codes = [400, 401, 402, 403]
+    # status_code = response.status_code
 
     # We need to account for the original page numbers
     for element in elements:
@@ -203,6 +209,7 @@ def partition_pdf_splits(
 
 
 logger = logging.getLogger("unstructured_api")
+logging.getLogger('backoff').addHandler(logging.StreamHandler())
 
 
 def pipeline_api(
