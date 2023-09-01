@@ -404,23 +404,6 @@ def test_general_api_returns_503(monkeypatch, mocker):
 
     assert response.status_code == 503
 
-    mock_client = mocker.patch("fastapi.Request.client")
-    mock_client.host = "10.5.0.0"
-    response = client.post(
-        MAIN_API_ROUTE,
-        files=[("files", (str(test_file), open(test_file, "rb")))],
-    )
-
-    assert response.status_code == 200
-
-    mock_client.host = "10.4.0.0"
-    response = client.post(
-        MAIN_API_ROUTE,
-        files=[("files", (str(test_file), open(test_file, "rb")))],
-    )
-
-    assert response.status_code == 200
-
 
 class MockResponse:
     def __init__(self, status_code):

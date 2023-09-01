@@ -226,10 +226,10 @@ def pipeline_api(
         # since fast api might sent the wrong one.
         file_content_type = "application/x-ole-storage"
 
-    is_internal_request = False
+    # We don't want to keep logging the same params for every parallel call
     # Note(austin) - request is None in this notebook (can clean this up soon)
+    is_internal_request = False
     if request is not None:
-        # We don't want to keep logging the same params for every parallel call
         origin_ip = request.headers.get("X-Forwarded-For") or request.client.host
         is_internal_request = origin_ip.startswith("10.")
 
@@ -263,14 +263,9 @@ def pipeline_api(
     memory_free_minimum = int(os.environ.get("UNSTRUCTURED_MEMORY_FREE_MINIMUM_MB", 0))
 
     if memory_free_minimum > 0 and mem.available <= memory_free_minimum * 1024 * 1024:
-        # Note(yuming): Use X-Forwarded-For header to find the orginal IP for external API
-        # requests,since LB forwards requests in AWS
-        origin_ip = request.headers.get("X-Forwarded-For") or request.client.host
-
-        if not origin_ip.startswith("10."):
-            raise HTTPException(
-                status_code=503, detail="Server is under heavy load. Please try again later."
-            )
+        raise HTTPException(
+            status_code=503, detail="Server is under heavy load. Please try again later."
+        )
 
     if file_content_type == "application/pdf":
         try:
