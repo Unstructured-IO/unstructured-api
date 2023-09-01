@@ -170,10 +170,9 @@ def partition_pdf_splits(
     # If it's small enough, just process locally
     # (Some kwargs need to be renamed for local partition)
     if len(pdf_pages) <= pages_per_pdf:
-        # Get the test to fail first
-        # if "hi_res_model_name" in partition_kwargs:
-        #     partition_kwargs['model_name'] = partition_kwargs['hi_res_model_name']
-        #     del partition_kwargs['hi_res_model_name']
+        if "hi_res_model_name" in partition_kwargs:
+            partition_kwargs["model_name"] = partition_kwargs["hi_res_model_name"]
+            del partition_kwargs["hi_res_model_name"]
 
         return partition(
             file=file, file_filename=file_filename, content_type=content_type, **partition_kwargs
@@ -325,8 +324,8 @@ def pipeline_api(
         )
 
         # Be careful of naming differences in api params vs partition params!
-        # These kwargs are going back into the api
-        # If needed, rename them in partition_pdf_splits
+        # These kwargs are going back into the api, not into partition
+        # If there's a difference, remap the param in partition_pdf_splits
         if file_content_type == "application/pdf" and pdf_parallel_mode_enabled:
             elements = partition_pdf_splits(
                 request,
@@ -338,7 +337,7 @@ def pipeline_api(
                 # partition_kwargs
                 encoding=encoding,
                 include_page_breaks=include_page_breaks,
-                hi_res_model_name=hi_res_model_name,
+                model_name=hi_res_model_name,
                 ocr_languages=ocr_languages,
                 pdf_infer_table_structure=pdf_infer_table_structure,
                 skip_infer_table_types=skip_infer_table_types,

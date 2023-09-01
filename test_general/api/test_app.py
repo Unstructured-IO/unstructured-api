@@ -7,7 +7,7 @@ import requests
 import pandas as pd
 from fastapi.testclient import TestClient
 from unstructured_api_tools.pipelines.api_conventions import get_pipeline_path
-from unittest.mock import patch, Mock
+from unittest.mock import patch, Mock, ANY
 
 import unstructured
 
@@ -401,55 +401,18 @@ class MockResponse:
         return self.body
 
 
-@pytest.mark.only
-def test_parallel_mode_params(monkeypatch):
+def test_parallel_mode_passes_params(monkeypatch):
     """
-    Verify that parallel mode passes all params to local partition.
+    Verify that parallel mode passes all params correctly into local partition.
     If you add something to partition_kwargs, you need to explicitly test it here.
+    TODO - do the same test when params are sent back to the api
     """
     monkeypatch.setenv("UNSTRUCTURED_PARALLEL_MODE_ENABLED", "true")
 
     # Make this really big so we just call partition
     monkeypatch.setenv("UNSTRUCTURED_PARALLEL_MODE_SPLIT_SIZE", "500")
 
-    # Verify we can pass a non-default value for everything
-    m_encoding = "foo"
-    m_hi_res_model_name = "the_big_chipper"
-    m_strategy = "highest_res"
-
-    m_ocr_languages = ["all", "of", "them"]
-    m_skip_infer_table_types = []
-
-    m_pdf_infer_table_structure = True
-    m_include_page_breaks = True
-    m_xml_keep_tags = True
-
-    # use mock to assert called with
-    def validate_local_params(
-            file,
-            file_filename,
-            content_type,
-            encoding,
-            include_page_breaks,
-            model_name,
-            ocr_languages,
-            pdf_infer_table_structure,
-            skip_infer_table_types,
-            strategy,
-            xml_keep_tags,
-    ):
-        assert encoding == m_encoding
-        assert include_page_breaks == m_include_page_breaks
-        assert model_name == m_hi_res_model_name
-        assert ocr_languages == m_ocr_languages
-        assert pdf_infer_table_structure == m_pdf_infer_table_structure
-        assert skip_infer_table_types == m_skip_infer_table_types
-        assert strategy == m_strategy
-        assert xml_keep_tags == m_xml_keep_tags
-
-        return []
-
-    mock_partition = Mock()
+    mock_partition = Mock(return_value={})
 
     monkeypatch.setattr(
         general,
@@ -466,22 +429,32 @@ def test_parallel_mode_params(monkeypatch):
         MAIN_API_ROUTE,
         files=[("files", (str(test_file), open(test_file, "rb"), "application/pdf"))],
         data={
-            "encoding": m_encoding,
-            "include_page_breaks": m_include_page_breaks,
-            "hi_res_model_name": m_hi_res_model_name,
-            "ocr_languages": m_ocr_languages,
-            "pdf_infer_table_structure": m_pdf_infer_table_structure,
-            "skip_infer_table_types": m_skip_infer_table_types,
-            "strategy": m_strategy,
-            # "xml_keep_tags": m_xml_keep_tags,
-        }
-    )
-
-    mock_partition.assert_called_once_with(
-        encoding="foo"
+            "encoding": "foo",
+            "hi_res_model_name": "yolox",
+            "include_page_breaks": True,
+            "ocr_languages": "foo",
+            "pdf_infer_table_structure": True,
+            "strategy": "hi_res",
+            "xml_keep_tags": True,
+            "skip_infer_table_types": "foo",
+        },
     )
 
     assert response.status_code == 200
+
+    mock_partition.assert_called_once_with(
+        file=ANY,
+        file_filename=str(test_file),
+        content_type="application/pdf",
+        model_name="yolox",
+        encoding="foo",
+        include_page_breaks=True,
+        ocr_languages="foo",
+        pdf_infer_table_structure=True,
+        strategy="hi_res",
+        xml_keep_tags=True,
+        skip_infer_table_types="foo",
+    )
 
 
 def test_parallel_mode_returns_errors(monkeypatch):
