@@ -9,8 +9,6 @@ from fastapi.testclient import TestClient
 from unstructured_api_tools.pipelines.api_conventions import get_pipeline_path
 from unittest.mock import patch, Mock, ANY
 
-import unstructured
-
 from prepline_general.api.app import app
 from prepline_general.api import general
 import tempfile
