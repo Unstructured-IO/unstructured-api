@@ -477,7 +477,7 @@ def test_parallel_mode_passes_params(monkeypatch):
 
     mock_partition.assert_called_once_with(
         file=ANY,
-        file_filename=str(test_file),
+        metadata_filename=str(test_file),
         content_type="application/pdf",
         model_name="yolox",
         encoding="foo",
