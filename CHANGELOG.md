@@ -1,4 +1,4 @@
-## 0.0.42-dev2
+## 0.0.42
 
 * Update readme for parameter `hi_res_model_name`
 * Fix a bug using `hi_res_model_name` in parallel mode
