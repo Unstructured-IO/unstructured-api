@@ -172,8 +172,7 @@ def partition_pdf_splits(
     # (Some kwargs need to be renamed for local partition)
     if len(pdf_pages) <= pages_per_pdf:
         if "hi_res_model_name" in partition_kwargs:
-            partition_kwargs["model_name"] = partition_kwargs["hi_res_model_name"]
-            del partition_kwargs["hi_res_model_name"]
+            partition_kwargs["model_name"] = partition_kwargs.pop("hi_res_model_name")
 
         return partition(
             file=file,
