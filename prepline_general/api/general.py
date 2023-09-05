@@ -356,7 +356,7 @@ def pipeline_api(
                 # partition_kwargs
                 encoding=encoding,
                 include_page_breaks=include_page_breaks,
-                model_name=hi_res_model_name,
+                hi_res_model_name=hi_res_model_name,
                 ocr_languages=ocr_languages,
                 pdf_infer_table_structure=pdf_infer_table_structure,
                 skip_infer_table_types=skip_infer_table_types,
