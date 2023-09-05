@@ -15,9 +15,10 @@ declare -a curl_params=(
     "-F files=@sample-docs/layout-parser-paper.pdf -F 'strategy=fast'"
     "-F files=@sample-docs/layout-parser-paper.pdf -F 'strategy=auto"
     "-F files=@sample-docs/layout-parser-paper.pdf -F 'strategy=hi_res'"
-    "-F files=@sample-docs/layout-parser-paper.pdf -F 'coordinates=true' -F 'strategy=fast'"
-    "-F files=@sample-docs/layout-parser-paper.pdf -F 'coordinates=true' -F 'strategy=fast' -F 'encoding=utf-8'"
-    "-F files=@sample-docs/layout-parser-paper.pdf -F 'coordinates=true' -F 'strategy=fast' -F 'include_page_breaks=true'"
+    "-F files=@sample-docs/layout-parser-paper.pdf -F 'coordinates=true'"
+    "-F files=@sample-docs/layout-parser-paper.pdf -F 'encoding=utf-8'"
+    "-F files=@sample-docs/layout-parser-paper.pdf -F 'include_page_breaks=true'"
+    "-F files=@sample-docs/layout-parser-paper.pdf -F 'hi_res_model_name=yolox'"
 )
 
 for params in "${curl_params[@]}"

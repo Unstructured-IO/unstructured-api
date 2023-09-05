@@ -7,8 +7,10 @@ import requests
 import pandas as pd
 from fastapi.testclient import TestClient
 from unstructured_api_tools.pipelines.api_conventions import get_pipeline_path
+from unittest.mock import Mock, ANY
 
 from prepline_general.api.app import app
+from prepline_general.api import general
 import tempfile
 
 MAIN_API_ROUTE = get_pipeline_path("general")
@@ -428,6 +430,61 @@ class MockResponse:
 
     def json(self):
         return self.body
+
+
+def test_parallel_mode_passes_params(monkeypatch):
+    """
+    Verify that parallel mode passes all params correctly into local partition.
+    If you add something to partition_kwargs, you need to explicitly test it here
+    with some non default value.
+    TODO - do the same test when params are sent back to the api
+    """
+    monkeypatch.setenv("UNSTRUCTURED_PARALLEL_MODE_ENABLED", "true")
+
+    # Make this really big so we just call partition
+    monkeypatch.setenv("UNSTRUCTURED_PARALLEL_MODE_SPLIT_SIZE", "500")
+
+    mock_partition = Mock(return_value={})
+
+    monkeypatch.setattr(
+        general,
+        "partition",
+        mock_partition,
+    )
+
+    client = TestClient(app)
+    test_file = Path("sample-docs") / "layout-parser-paper.pdf"
+
+    response = client.post(
+        MAIN_API_ROUTE,
+        files=[("files", (str(test_file), open(test_file, "rb"), "application/pdf"))],
+        data={
+            "encoding": "foo",
+            "hi_res_model_name": "yolox",
+            "include_page_breaks": True,
+            "ocr_languages": "foo",
+            "pdf_infer_table_structure": True,
+            "strategy": "hi_res",
+            "xml_keep_tags": True,
+            "skip_infer_table_types": "foo",
+        },
+    )
+
+    assert response.status_code == 200
+
+    mock_partition.assert_called_once_with(
+        file=ANY,
+        metadata_filename=str(test_file),
+        content_type="application/pdf",
+        model_name="yolox",
+        encoding="foo",
+        include_page_breaks=True,
+        ocr_languages="foo",
+        pdf_infer_table_structure=True,
+        strategy="hi_res",
+        xml_keep_tags=True,
+        skip_infer_table_types="foo",
+    )
 
 
 def test_parallel_mode_returns_errors(monkeypatch):
