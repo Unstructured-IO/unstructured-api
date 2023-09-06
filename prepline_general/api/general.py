@@ -242,7 +242,7 @@ def pipeline_api(
         origin_ip = request.headers.get("X-Forwarded-For") or request.client.host
         is_internal_request = origin_ip.startswith("10.")
 
-    if is_internal_request:
+    if not is_internal_request:
         logger.debug(
             "pipeline_api input params: {}".format(
                 json.dumps(
