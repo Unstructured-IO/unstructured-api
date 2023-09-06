@@ -44,6 +44,9 @@ def is_expected_response_type(media_type, response_type):
         return False
 
 
+# pipeline-api
+
+
 DEFAULT_MIMETYPES = (
     "application/pdf,application/msword,image/jpeg,image/png,text/markdown,"
     "text/x-markdown,text/html,"
@@ -66,7 +69,6 @@ DEFAULT_MIMETYPES = (
 
 if not os.environ.get("UNSTRUCTURED_ALLOWED_MIMETYPES", None):
     os.environ["UNSTRUCTURED_ALLOWED_MIMETYPES"] = DEFAULT_MIMETYPES
-
 
 # This adds the exponential backoff logs to our stream
 logging.getLogger("backoff").addHandler(logging.StreamHandler())
@@ -524,7 +526,7 @@ def ungz_file(file: UploadFile, gz_uncompressed_content_type=None) -> UploadFile
 
 
 @router.post("/general/v0/general")
-@router.post("/general/v0.0.42/general")
+@router.post("/general/v0.0.43/general")
 def pipeline_1(
     request: Request,
     gz_uncompressed_content_type: Optional[str] = Form(default=None),

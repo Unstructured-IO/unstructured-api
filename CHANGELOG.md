@@ -1,3 +1,7 @@
+## 0.0.43-dev0
+
+* Improve parallel mode retry handling
+
 ## 0.0.42
 
 * Update readme for parameter `hi_res_model_name`
