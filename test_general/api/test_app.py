@@ -277,10 +277,12 @@ def test_xml_keep_tags_param():
         data={"xml_keep_tags": "true", "strategy": "hi_res"},
     )
     assert response.status_code == 200
-    response_with_xml_tags = response.json()[0]  # xml_keep_tags returns one element with the full xml
 
+    # xml_keep_tags returns one element with the full xml
+    # Just assert the tags are still present
+    response_with_xml_tags = response.json()[0]
     for element in response_without_xml_tags:
-        assert element['text'].replace("&", "&amp;") in response_with_xml_tags['text']
+        assert element["text"].replace("&", "&amp;") in response_with_xml_tags["text"]
 
 
 def test_include_page_breaks_param():
