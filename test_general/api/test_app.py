@@ -499,12 +499,12 @@ def test_partition_file_via_api_will_retry(monkeypatch, mocker):
 
     num_calls = 0
 
-    # Return a transient error the first time
+    # Validate the retry count by returning an error the first 2 times
     def mock_response(*args, **kwargs):
         nonlocal num_calls
         num_calls += 1
 
-        if num_calls == 1:
+        if num_calls <= 2:
             return MockResponse(status_code=500)
 
         return MockResponse(status_code=200)

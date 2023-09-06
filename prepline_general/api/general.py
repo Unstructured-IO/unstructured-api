@@ -106,7 +106,7 @@ def is_non_retryable(e):
 @backoff.on_exception(
     backoff.expo,
     HTTPException,
-    max_tries=int(os.environ.get("UNSTRUCTURED_PARALLEL_RETRY_ATTEMPTS", 3)),
+    max_tries=int(os.environ.get("UNSTRUCTURED_PARALLEL_RETRY_ATTEMPTS", 2)) + 1,
     giveup=is_non_retryable,
 )
 def call_api(request_url, api_key, filename, file, content_type, **partition_kwargs):
