@@ -48,18 +48,6 @@ pip-compile:
 install-pandoc:
 	ARCH=${ARCH} ./scripts/install-pandoc.sh
 
-#########
-# Build #
-#########
-
-## generate-api:                generates the FastAPI python APIs from notebooks
-.PHONY: generate-api
-generate-api:
-	PYTHONPATH=. unstructured_api_tools convert-pipeline-notebooks \
-		--input-directory ./pipeline-notebooks \
-		--output-directory ./${PACKAGE_NAME}/api
-
-
 ##########
 # Docker #
 ##########
@@ -80,12 +68,6 @@ docker-build:
 docker-start-api:
 	docker run -p 8000:8000 --mount type=bind,source=$(realpath .),target=/home/notebook-user/local -it --rm pipeline-family-${PIPELINE_FAMILY}-dev:latest scripts/app-start.sh
 
-# Note(austin) we need to install the dev dependencies for this to work
-# Do we want to build separate dev images?
-.PHONY: docker-start-jupyter
-docker-start-jupyter:
-	docker run -p 8888:8888 --mount type=bind,source=$(realpath .),target=/home/notebook-user/local --entrypoint jupyter -t --rm pipeline-family-${PIPELINE_FAMILY}-dev:latest run --port 8888 --ip 0.0.0.0 --NotebookApp.token='' --NotebookApp.password=''
-
 .PHONY: docker-test
 docker-test:
 	DOCKER_IMAGE=${DOCKER_IMAGE} ./scripts/docker-smoke-test.sh
@@ -93,11 +75,6 @@ docker-test:
 #########
 # Local #
 #########
-
-## run-jupyter:                 starts jupyter notebook
-.PHONY: run-jupyter
-run-jupyter:
-	PYTHONPATH=$(realpath .) JUPYTER_PATH=$(realpath .) jupyter-notebook --NotebookApp.token='' --NotebookApp.password=''
 
 ## run-web-app:                 runs the FastAPI api with hot reloading
 .PHONY: run-web-app
@@ -117,16 +94,6 @@ test:
 .PHONY: check-coverage
 check-coverage:
 	coverage report --fail-under=60
-
-## test-integration:            runs integration tests
-.PHONY: test-integration
-test-integration:
-	PYTHONPATH=. pytest test_${PIPELINE_PACKAGE}_integration
-
-## api-check:                   verifies auto-generated pipeline APIs match the existing ones
-.PHONY: api-check
-api-check:
-	PYTHONPATH=. PACKAGE_NAME=${PACKAGE_NAME} ./scripts/test-doc-pipeline-apis-consistent.sh
 
 ## check:                       runs linters (includes tests)
 .PHONY: check
@@ -162,21 +129,11 @@ check-version:
 # Fail if syncing version would produce changes
 	scripts/version-sync.sh -c \
 		-s CHANGELOG.md \
-		-f preprocessing-pipeline-family.yaml release
-
-## check-notebooks:             check that executing and cleaning notebooks doesn't produce changes
-.PHONY: check-notebooks
-check-notebooks:
-	scripts/check-and-format-notebooks.py --check
-
-## tidy-notebooks:	             execute notebooks and remove metadata
-.PHONY: tidy-notebooks
-tidy-notebooks:
-	scripts/check-and-format-notebooks.py
+		-f ${PACKAGE_NAME}/api/general.py release
 
 ## version-sync:                update references to version with most recent version from CHANGELOG.md
 .PHONY: version-sync
 version-sync:
 	scripts/version-sync.sh \
 		-s CHANGELOG.md \
-		-f preprocessing-pipeline-family.yaml release
+		-f ${PACKAGE_NAME}/api/general.py release
