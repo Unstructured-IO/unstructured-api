@@ -2,7 +2,6 @@ from pathlib import Path
 
 import io
 import pytest
-import re
 import requests
 import pandas as pd
 from fastapi.testclient import TestClient
