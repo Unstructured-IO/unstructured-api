@@ -277,31 +277,10 @@ def test_xml_keep_tags_param():
         data={"xml_keep_tags": "true", "strategy": "hi_res"},
     )
     assert response.status_code == 200
-    response_with_xml_tags = response.json()[3:]  # skip the initial encoding tag(s)
+    response_with_xml_tags = response.json()[0]  # xml_keep_tags returns one element with the full xml
 
-    # The responses should have the same content except for the xml tags
-    response_with_xml_tags_index, response_without_xml_tags_index = 0, 0
-    while response_without_xml_tags_index < len(response_without_xml_tags):
-        xml_tagged_line = response_with_xml_tags[response_with_xml_tags_index]["text"]
-        assert xml_tagged_line.startswith("<")
-        assert xml_tagged_line.endswith(">")
-
-        # if there is content on this line, ensure it matches the content on the non tagged line
-        xml_tagged_line_content = xml_tagged_line.split(">", 1)[1]  # remove opening tag
-        if not xml_tagged_line_content:
-            response_with_xml_tags_index += 1
-
-        else:
-            xml_tagged_line_content = xml_tagged_line_content.split("<", 1)[0]  # remove closing tag
-
-            xml_untagged_line = response_without_xml_tags[response_without_xml_tags_index]["text"]
-            xml_tagged_line_content_parsed = re.sub(
-                "&amp;", "&", xml_tagged_line_content
-            )  # xml_keep_tags does not currently parse the inner content
-            assert xml_tagged_line_content_parsed == xml_untagged_line
-
-            response_with_xml_tags_index += 1
-            response_without_xml_tags_index += 1
+    for element in response_without_xml_tags:
+        assert element['text'].replace("&", "&amp;") in response_with_xml_tags['text']
 
 
 def test_include_page_breaks_param():
