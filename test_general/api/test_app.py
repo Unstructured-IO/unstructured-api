@@ -529,8 +529,7 @@ def test_partition_file_via_api_will_retry(monkeypatch, mocker):
     assert response.status_code == 200
 
 
-# TODO - mock call_api and assert it was called once
-def test_partition_file_via_api_no_retryable_error_code(monkeypatch, mocker):
+def test_partition_file_via_api_not_retryable_error_code(monkeypatch, mocker):
     """
     Verify we didn't retry if the error code is not retryable
     """
