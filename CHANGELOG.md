@@ -1,7 +1,9 @@
-## 0.0.42-dev1
+## 0.0.42
 
 * Update readme for parameter `hi_res_model_name`
 * Fix a bug using `hi_res_model_name` in parallel mode
+* Bump unstructured library to 0.10.12
+* Bump unstructured-inference to 0.5.22
 
 ## 0.0.41
 
