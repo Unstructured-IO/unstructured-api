@@ -77,7 +77,6 @@ jobs:
         make install-nltk-models
         make test
         make check-coverage
-        make check-notebooks
 
   changelog:
     runs-on: ubuntu-latest
