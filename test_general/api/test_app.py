@@ -5,14 +5,13 @@ import pytest
 import requests
 import pandas as pd
 from fastapi.testclient import TestClient
-from unstructured_api_tools.pipelines.api_conventions import get_pipeline_path
 from unittest.mock import Mock, ANY
 
 from prepline_general.api.app import app
 from prepline_general.api import general
 import tempfile
 
-MAIN_API_ROUTE = get_pipeline_path("general")
+MAIN_API_ROUTE = "general/v0/general"
 
 
 def test_general_api_health_check():

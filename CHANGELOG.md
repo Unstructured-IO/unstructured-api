@@ -1,5 +1,6 @@
-## 0.0.43-dev0
+## 0.0.43-dev1
 
+* Remove dependency on unstructured-api-tools
 * Improve parallel mode retry handling
 
 ## 0.0.42
