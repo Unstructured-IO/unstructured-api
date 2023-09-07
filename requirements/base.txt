@@ -3,25 +3,15 @@
 # by the following command:
 #
 #    pip-compile requirements/base.in
+#
 antlr4-python3-runtime==4.9.3
     # via omegaconf
 anyio==3.7.1
     # via
     #   fastapi
     #   starlette
-    #   watchfiles
-attrs==23.1.0
-    # via
-    #   jsonschema
-    #   referencing
-autoflake==2.2.1
-    # via unstructured-api-tools
 beautifulsoup4==4.12.2
-    # via
-    #   nbconvert
-    #   unstructured
-bleach==6.0.0
-    # via nbconvert
+    # via unstructured
 certifi==2023.7.22
     # via requests
 cffi==1.15.1
@@ -36,7 +26,6 @@ click==8.1.3
     # via
     #   -r requirements/base.in
     #   nltk
-    #   unstructured-api-tools
     #   uvicorn
 coloredlogs==15.0.1
     # via onnxruntime
@@ -48,8 +37,6 @@ cycler==0.11.0
     # via matplotlib
 dataclasses-json==0.6.0
     # via unstructured
-defusedxml==0.7.1
-    # via nbconvert
 ebooklib==0.18
     # via unstructured
 effdet==0.4.1
@@ -61,9 +48,7 @@ et-xmlfile==1.1.0
 exceptiongroup==1.1.3
     # via anyio
 fastapi==0.103.1
-    # via unstructured-api-tools
-fastjsonschema==2.18.0
-    # via nbformat
+    # via -r requirements/base.in
 filelock==3.12.3
     # via
     #   huggingface-hub
@@ -79,8 +64,6 @@ fsspec==2023.9.0
     # via huggingface-hub
 h11==0.14.0
     # via uvicorn
-httptools==0.6.0
-    # via uvicorn
 huggingface-hub==0.16.4
     # via
     #   timm
@@ -95,26 +78,9 @@ idna==3.4
 iopath==0.1.10
     # via layoutparser
 jinja2==3.1.2
-    # via
-    #   nbconvert
-    #   torch
-    #   unstructured-api-tools
+    # via torch
 joblib==1.3.2
     # via nltk
-jsonschema==4.19.0
-    # via nbformat
-jsonschema-specifications==2023.7.1
-    # via jsonschema
-jupyter-client==8.3.1
-    # via nbclient
-jupyter-core==5.3.1
-    # via
-    #   jupyter-client
-    #   nbclient
-    #   nbconvert
-    #   nbformat
-jupyterlab-pygments==0.2.2
-    # via nbconvert
 kiwisolver==1.4.5
     # via matplotlib
 layoutparser[layoutmodels,tesseract]==0.3.4
@@ -128,33 +94,17 @@ lxml==4.9.3
 markdown==3.4.4
     # via unstructured
 markupsafe==2.1.3
-    # via
-    #   jinja2
-    #   nbconvert
+    # via jinja2
 marshmallow==3.20.1
     # via dataclasses-json
 matplotlib==3.7.2
     # via pycocotools
-mistune==3.0.1
-    # via nbconvert
 mpmath==1.3.0
     # via sympy
 msg-parser==1.2.0
     # via unstructured
-mypy==1.5.1
-    # via unstructured-api-tools
 mypy-extensions==1.0.0
-    # via
-    #   mypy
-    #   typing-inspect
-nbclient==0.8.0
-    # via nbconvert
-nbconvert==7.8.0
-    # via unstructured-api-tools
-nbformat==5.9.2
-    # via
-    #   nbclient
-    #   nbconvert
+    # via typing-inspect
 networkx==3.1
     # via torch
 nltk==3.8.1
@@ -191,7 +141,6 @@ packaging==23.1
     #   huggingface-hub
     #   marshmallow
     #   matplotlib
-    #   nbconvert
     #   onnxruntime
     #   pytesseract
     #   transformers
@@ -199,9 +148,6 @@ pandas==2.1.0
     # via
     #   layoutparser
     #   unstructured
-    #   unstructured-api-tools
-pandocfilters==1.5.0
-    # via nbconvert
 pdf2image==1.16.3
     # via
     #   layoutparser
@@ -221,8 +167,6 @@ pillow==10.0.0
     #   pytesseract
     #   python-pptx
     #   torchvision
-platformdirs==3.10.0
-    # via jupyter-core
 portalocker==2.7.0
     # via iopath
 protobuf==4.24.2
@@ -241,10 +185,6 @@ pydantic==1.10.12
     # via
     #   -r requirements/base.in
     #   fastapi
-pyflakes==3.1.0
-    # via autoflake
-pygments==2.16.1
-    # via nbconvert
 pypandoc==1.11
     # via unstructured
 pyparsing==3.0.9
@@ -257,19 +197,14 @@ pytesseract==0.3.10
     # via layoutparser
 python-dateutil==2.8.2
     # via
-    #   jupyter-client
     #   matplotlib
     #   pandas
 python-docx==0.8.11
     # via unstructured
-python-dotenv==1.0.0
-    # via uvicorn
 python-magic==0.4.27
     # via unstructured
 python-multipart==0.0.6
-    # via
-    #   unstructured-api-tools
-    #   unstructured-inference
+    # via unstructured-inference
 python-pptx==0.6.21
     # via unstructured
 pytz==2023.3.post1
@@ -281,15 +216,8 @@ pyyaml==6.0.1
     #   omegaconf
     #   timm
     #   transformers
-    #   uvicorn
-pyzmq==25.1.1
-    # via jupyter-client
 ratelimit==2.2.1
     # via -r requirements/base.in
-referencing==0.30.2
-    # via
-    #   jsonschema
-    #   jsonschema-specifications
 regex==2023.8.8
     # via
     #   nltk
@@ -301,10 +229,6 @@ requests==2.31.0
     #   torchvision
     #   transformers
     #   unstructured
-rpds-py==0.10.2
-    # via
-    #   jsonschema
-    #   referencing
 safetensors==0.3.2
     # via
     #   -c requirements/constraints.in
@@ -314,7 +238,6 @@ scipy==1.11.2
     # via layoutparser
 six==1.16.0
     # via
-    #   bleach
     #   ebooklib
     #   python-dateutil
 sniffio==1.3.0
@@ -331,14 +254,8 @@ tabulate==0.9.0
     # via unstructured
 timm==0.9.7
     # via effdet
-tinycss2==1.2.1
-    # via nbconvert
 tokenizers==0.13.3
     # via transformers
-tomli==2.0.1
-    # via
-    #   autoflake
-    #   mypy
 torch==2.0.1
     # via
     #   effdet
@@ -350,36 +267,20 @@ torchvision==0.15.2
     #   effdet
     #   layoutparser
     #   timm
-tornado==6.3.3
-    # via jupyter-client
 tqdm==4.66.1
     # via
     #   huggingface-hub
     #   iopath
     #   nltk
     #   transformers
-traitlets==5.9.0
-    # via
-    #   jupyter-client
-    #   jupyter-core
-    #   nbclient
-    #   nbconvert
-    #   nbformat
-transformers==4.33.0
+transformers==4.33.1
     # via unstructured-inference
-types-requests==2.31.0.2
-    # via unstructured-api-tools
-types-ujson==5.8.0.1
-    # via unstructured-api-tools
-types-urllib3==1.26.25.14
-    # via types-requests
 typing-extensions==4.7.1
     # via
     #   fastapi
     #   filelock
     #   huggingface-hub
     #   iopath
-    #   mypy
     #   onnx
     #   pydantic
     #   pydantic-core
@@ -392,24 +293,12 @@ tzdata==2023.3
     # via pandas
 unstructured[local-inference]==0.10.12
     # via -r requirements/base.in
-unstructured-api-tools==0.10.11
-    # via -r requirements/base.in
 unstructured-inference==0.5.22
     # via unstructured
 urllib3==2.0.4
     # via requests
-uvicorn[standard]==0.23.2
-    # via unstructured-api-tools
-uvloop==0.17.0
-    # via uvicorn
-watchfiles==0.20.0
-    # via uvicorn
-webencodings==0.5.1
-    # via
-    #   bleach
-    #   tinycss2
-websockets==11.0.3
-    # via uvicorn
+uvicorn==0.23.2
+    # via -r requirements/base.in
 xlrd==2.0.1
     # via unstructured
 xlsxwriter==3.1.2

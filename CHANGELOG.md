@@ -1,3 +1,7 @@
+## 0.0.43-dev0
+
+* Remove dependency on unstructured-api-tools
+
 ## 0.0.42
 
 * Update readme for parameter `hi_res_model_name`
