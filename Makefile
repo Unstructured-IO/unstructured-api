@@ -129,6 +129,7 @@ check-version:
 # Fail if syncing version would produce changes
 	scripts/version-sync.sh -c \
 		-s CHANGELOG.md \
+		-f preprocessing-pipeline-family.yaml release \
 		-f ${PACKAGE_NAME}/api/general.py release
 
 ## version-sync:                update references to version with most recent version from CHANGELOG.md
@@ -136,4 +137,5 @@ check-version:
 version-sync:
 	scripts/version-sync.sh \
 		-s CHANGELOG.md \
+		-f preprocessing-pipeline-family.yaml release \
 		-f ${PACKAGE_NAME}/api/general.py release
