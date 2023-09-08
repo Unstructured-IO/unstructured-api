@@ -1,4 +1,4 @@
-name: Bump Unstructured Libraries
+name: Bump Unstructured deps and cut release
 
 on:
   push:
