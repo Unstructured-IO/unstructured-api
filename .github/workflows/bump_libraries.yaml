@@ -18,7 +18,7 @@ jobs:
         - name: Create release version
           run: |
             changelog_message="Bump ${{ steps.metadata.outputs.dependency-names }} to ${{ steps.metadata.outputs.new-version }}"
-            ./scripts/version-increment.sh $changelog_message
+            ./scripts/version-increment.sh "$changelog_message"
             make version-sync
             git commit -am "Bump api version"
         - uses: stefanzweifel/git-auto-commit-action@v4
