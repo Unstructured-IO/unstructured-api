@@ -1,0 +1,26 @@
+name: Bump Unstructured Libraries
+
+on:
+  push:
+    branches:
+      - "dependabot/pip/**"
+
+jobs:
+    bump-changelog:
+        runs-on: ubuntu-latest
+        if: ${{ github.actor == 'dependabot[bot]' }}
+        steps:
+        - name: Dependabot metadata
+            id: metadata
+            uses: dependabot/fetch-metadata@v1
+            with:
+            github-token: "${{ secrets.GITHUB_TOKEN }}"
+        - name: Create release version
+          run: |
+            changelog_message="Bump ${{ steps.metadata.outputs.dependency-names }} to ${{ steps.metadata.outputs.new-version }}"
+            ./scripts/version-increment.sh $changelog_message
+            make version-sync
+            git commit -am "Bump api version"
+        - uses: stefanzweifel/git-auto-commit-action@v4
+          commit_message: "Bump libraries and release"
+

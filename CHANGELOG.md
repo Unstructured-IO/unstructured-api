@@ -1,4 +1,4 @@
-## 0.0.43-dev1
+## 0.0.43-dev2
 
 * Remove dependency on unstructured-api-tools
 * Add a top level error handler for more consistent response bodies
