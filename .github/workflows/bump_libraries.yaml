@@ -3,12 +3,12 @@ name: Bump Unstructured deps and cut release
 on:
   push:
     branches:
-      - "dependabot/pip/**"
+      # - "dependabot/pip/**"
 
 jobs:
     bump-changelog:
         runs-on: ubuntu-latest
-        if: ${{ github.actor == 'dependabot[bot]' }}
+        # if: ${{ github.actor == 'dependabot[bot]' }}
         steps:
         - name: Dependabot metadata
           id: metadata
@@ -20,7 +20,6 @@ jobs:
             changelog_message="Bump ${{ steps.metadata.outputs.dependency-names }} to ${{ steps.metadata.outputs.new-version }}"
             ./scripts/version-increment.sh "$changelog_message"
             make version-sync
-            git commit -am "Bump api version"
         - uses: stefanzweifel/git-auto-commit-action@v4
           commit_message: "Bump libraries and release"
 
