@@ -2,20 +2,22 @@ name: Dependabot: Bump libs and cut release
 
 on:
   pull_request:
-    types: [opened, reopened]
+    types:
+      - opened
+      - reopened
     paths:
       - 'requirements/**'
 
 jobs:
     bump-changelog:
         runs-on: ubuntu-latest
-        # if: ${{ github.actor == 'dependabot[bot]' }}
+        if: ${{ github.actor == 'dependabot[bot]' }}
         steps:
-        # - name: Dependabot metadata
-        #   id: metadata
-        #   uses: dependabot/fetch-metadata@v1
-        #   with:
-        #     github-token: "${{ secrets.GITHUB_TOKEN }}"
+        - name: Dependabot metadata
+          id: metadata
+          uses: dependabot/fetch-metadata@v1
+          with:
+            github-token: "${{ secrets.GITHUB_TOKEN }}"
         - name: Create release version
           run: |
             changelog_message="Bump ${{ steps.metadata.outputs.dependency-names }} to ${{ steps.metadata.outputs.new-version }}"
