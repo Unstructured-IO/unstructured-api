@@ -21,5 +21,6 @@ jobs:
             ./scripts/version-increment.sh "$changelog_message"
             make version-sync
         - uses: stefanzweifel/git-auto-commit-action@v4
-          commit_message: "Bump libraries and release"
+          with:
+            commit_message: "Bump libraries and release"
 
