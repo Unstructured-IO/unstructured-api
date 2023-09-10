@@ -1,4 +1,4 @@
-name: Dependabot: Bump libs and cut release
+name: Dependabot - Bump libs and cut release
 
 on:
   pull_request:
