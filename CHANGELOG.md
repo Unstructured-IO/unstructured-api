@@ -2,6 +2,7 @@
 
 * Remove dependency on unstructured-api-tools
 * Add a top level error handler for more consistent response bodies
+* Tesseract minor version bump to 5.3.2
 
 ## 0.0.42
 
