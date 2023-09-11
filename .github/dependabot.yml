@@ -7,7 +7,6 @@ updates:
     # Only use this to bump our libraries
     allow:
       - dependency-name: "unstructured*"
-        dependency-type: "direct"
 
   - package-ecosystem: "github-actions"
     # NOTE(robinson) - Workflow files stored in the
