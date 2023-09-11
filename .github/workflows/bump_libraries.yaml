@@ -12,6 +12,8 @@ jobs:
     bump-changelog:
         runs-on: ubuntu-latest
         if: ${{ github.actor == 'dependabot[bot]' }}
+        permissions:
+          contents: write 
         steps:
         - uses: actions/checkout@v4
         - name: Dependabot metadata
