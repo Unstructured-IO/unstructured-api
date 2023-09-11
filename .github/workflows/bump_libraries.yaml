@@ -13,6 +13,7 @@ jobs:
         runs-on: ubuntu-latest
         if: ${{ github.actor == 'dependabot[bot]' }}
         steps:
+        - uses: actions/checkout@v4
         - name: Dependabot metadata
           id: metadata
           uses: dependabot/fetch-metadata@v1
