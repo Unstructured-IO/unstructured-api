@@ -174,7 +174,7 @@ def test_skip_infer_table_types_param():
     elements = response.json()
     table = [el["metadata"]["text_as_html"] for el in elements if "text_as_html" in el["metadata"]]
     assert len(table) == 1
-    # This test is not currently picked up
+    # This text is not currently picked up
     # assert "Layouts of history Japanese documents" in table[0]
 
 
