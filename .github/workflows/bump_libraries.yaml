@@ -23,7 +23,7 @@ jobs:
             github-token: "${{ secrets.GITHUB_TOKEN }}"
         - name: Create release version
           run: |
-            pip install pip-utils
+            pip install pip-tools
             make pip-compile
             changelog_message="Bump ${{ steps.metadata.outputs.dependency-names }} to ${{ steps.metadata.outputs.new-version }}"
             ./scripts/version-increment.sh "$changelog_message"
