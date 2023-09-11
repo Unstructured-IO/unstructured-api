@@ -1,0 +1,34 @@
+name: Dependabot - Bump libs and cut release
+
+on:
+  pull_request:
+    types:
+      - opened
+      - reopened
+    paths:
+      - 'requirements/**'
+
+jobs:
+    bump-changelog:
+        runs-on: ubuntu-latest
+        if: ${{ github.actor == 'dependabot[bot]' }}
+        permissions:
+          contents: write 
+        steps:
+        - uses: actions/checkout@v4
+        - name: Dependabot metadata
+          id: metadata
+          uses: dependabot/fetch-metadata@v1
+          with:
+            github-token: "${{ secrets.GITHUB_TOKEN }}"
+        - name: Create release version
+          run: |
+            pip install pip-tools
+            make pip-compile
+            changelog_message="Bump ${{ steps.metadata.outputs.dependency-names }} to ${{ steps.metadata.outputs.new-version }}"
+            ./scripts/version-increment.sh "$changelog_message"
+            make version-sync
+        - uses: stefanzweifel/git-auto-commit-action@v4
+          with:
+            commit_message: "Bump libraries and release"
+

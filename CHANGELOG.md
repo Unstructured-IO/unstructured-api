@@ -1,7 +1,14 @@
-## 0.0.43-dev1
+## 0.0.44-dev0
 
-* Remove dependency on unstructured-api-tools
 * Improve parallel mode retry handling
+
+## 0.0.43
+
+* Bump unstructured to 0.10.13
+* Bump unstructured-inference to 0.5.25
+* Remove dependency on unstructured-api-tools
+* Add a top level error handler for more consistent response bodies
+* Tesseract minor version bump to 5.3.2
 
 ## 0.0.42
 
