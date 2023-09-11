@@ -15,6 +15,10 @@ anyio==3.7.1
     #   httpcore
     #   jupyter-server
     #   starlette
+appnope==0.1.3
+    # via
+    #   ipykernel
+    #   ipython
 argon2-cffi==23.1.0
     # via jupyter-server
 argon2-cffi-bindings==21.2.0
@@ -73,10 +77,6 @@ click==8.1.3
     #   black
     #   nltk
     #   uvicorn
-cmake==3.27.4.1
-    # via
-    #   -r requirements/base.txt
-    #   triton
 coloredlogs==15.0.1
     # via
     #   -r requirements/base.txt
@@ -150,7 +150,6 @@ filelock==3.12.3
     #   huggingface-hub
     #   torch
     #   transformers
-    #   triton
 filetype==1.2.0
     # via
     #   -r requirements/base.txt
@@ -301,10 +300,6 @@ layoutparser[layoutmodels,tesseract]==0.3.4
     # via
     #   -r requirements/base.txt
     #   unstructured-inference
-lit==16.0.6
-    # via
-    #   -r requirements/base.txt
-    #   triton
 lxml==4.9.3
     # via
     #   -r requirements/base.txt
@@ -396,52 +391,6 @@ numpy==1.25.2
     #   scipy
     #   torchvision
     #   transformers
-nvidia-cublas-cu11==11.10.3.66
-    # via
-    #   -r requirements/base.txt
-    #   nvidia-cudnn-cu11
-    #   nvidia-cusolver-cu11
-    #   torch
-nvidia-cuda-cupti-cu11==11.7.101
-    # via
-    #   -r requirements/base.txt
-    #   torch
-nvidia-cuda-nvrtc-cu11==11.7.99
-    # via
-    #   -r requirements/base.txt
-    #   torch
-nvidia-cuda-runtime-cu11==11.7.99
-    # via
-    #   -r requirements/base.txt
-    #   torch
-nvidia-cudnn-cu11==8.5.0.96
-    # via
-    #   -r requirements/base.txt
-    #   torch
-nvidia-cufft-cu11==10.9.0.58
-    # via
-    #   -r requirements/base.txt
-    #   torch
-nvidia-curand-cu11==10.2.10.91
-    # via
-    #   -r requirements/base.txt
-    #   torch
-nvidia-cusolver-cu11==11.4.0.1
-    # via
-    #   -r requirements/base.txt
-    #   torch
-nvidia-cusparse-cu11==11.7.4.91
-    # via
-    #   -r requirements/base.txt
-    #   torch
-nvidia-nccl-cu11==2.14.3
-    # via
-    #   -r requirements/base.txt
-    #   torch
-nvidia-nvtx-cu11==11.7.91
-    # via
-    #   -r requirements/base.txt
-    #   torch
 olefile==0.46
     # via
     #   -r requirements/base.txt
@@ -765,7 +714,6 @@ torch==2.0.1
     #   layoutparser
     #   timm
     #   torchvision
-    #   triton
 torchvision==0.15.2
     # via
     #   -r requirements/base.txt
@@ -808,10 +756,6 @@ transformers==4.33.1
     # via
     #   -r requirements/base.txt
     #   unstructured-inference
-triton==2.0.0
-    # via
-    #   -r requirements/base.txt
-    #   torch
 typing-extensions==4.7.1
     # via
     #   -r requirements/base.txt
@@ -862,15 +806,7 @@ webencodings==0.5.1
 websocket-client==1.6.2
     # via jupyter-server
 wheel==0.41.2
-    # via
-    #   -r requirements/base.txt
-    #   astunparse
-    #   nvidia-cublas-cu11
-    #   nvidia-cuda-cupti-cu11
-    #   nvidia-cuda-runtime-cu11
-    #   nvidia-curand-cu11
-    #   nvidia-cusparse-cu11
-    #   nvidia-nvtx-cu11
+    # via astunparse
 widgetsnbextension==4.0.8
     # via ipywidgets
 xlrd==2.0.1
@@ -884,4 +820,3 @@ xlsxwriter==3.1.3
 
 # The following packages are considered to be unsafe in a requirements file:
 # pip
-# setuptools
