@@ -23,6 +23,7 @@ jobs:
             github-token: "${{ secrets.GITHUB_TOKEN }}"
         - name: Create release version
           run: |
+            make pip-compile
             changelog_message="Bump ${{ steps.metadata.outputs.dependency-names }} to ${{ steps.metadata.outputs.new-version }}"
             ./scripts/version-increment.sh "$changelog_message"
             make version-sync
