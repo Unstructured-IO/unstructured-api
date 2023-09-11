@@ -24,7 +24,7 @@ charset-normalizer==3.2.0
     #   requests
 click==8.1.3
     # via
-    #   -r base.in
+    #   -r requirements/base.in
     #   nltk
     #   uvicorn
 cmake==3.27.4.1
@@ -47,8 +47,10 @@ emoji==2.8.0
     # via unstructured
 et-xmlfile==1.1.0
     # via openpyxl
+exceptiongroup==1.1.3
+    # via anyio
 fastapi==0.103.1
-    # via -r base.in
+    # via -r requirements/base.in
 filelock==3.12.3
     # via
     #   huggingface-hub
@@ -197,29 +199,29 @@ pillow==10.0.0
     #   torchvision
 portalocker==2.7.0
     # via iopath
-protobuf==4.24.2
+protobuf==4.24.3
     # via
     #   onnx
     #   onnxruntime
 psutil==5.9.5
-    # via -r base.in
+    # via -r requirements/base.in
 pycocotools==2.0.7
     # via effdet
 pycparser==2.21
     # via cffi
 pycryptodome==3.18.0
-    # via -r base.in
+    # via -r requirements/base.in
 pydantic==1.10.12
     # via
-    #   -r base.in
+    #   -r requirements/base.in
     #   fastapi
 pypandoc==1.11
     # via unstructured
 pyparsing==3.0.9
     # via matplotlib
-pypdf==3.15.5
-    # via -r base.in
-pypdfium2==4.19.0
+pypdf==3.16.0
+    # via -r requirements/base.in
+pypdfium2==4.20.0
     # via pdfplumber
 pytesseract==0.3.10
     # via layoutparser
@@ -245,21 +247,21 @@ pyyaml==6.0.1
     #   timm
     #   transformers
 ratelimit==2.2.1
-    # via -r base.in
+    # via -r requirements/base.in
 regex==2023.8.8
     # via
     #   nltk
     #   transformers
 requests==2.31.0
     # via
-    #   -r base.in
+    #   -r requirements/base.in
     #   huggingface-hub
     #   torchvision
     #   transformers
     #   unstructured
 safetensors==0.3.2
     # via
-    #   -c constraints.in
+    #   -c requirements/constraints.in
     #   timm
     #   transformers
 scipy==1.11.2
@@ -309,24 +311,27 @@ triton==2.0.0
 typing-extensions==4.7.1
     # via
     #   fastapi
+    #   filelock
     #   huggingface-hub
     #   iopath
     #   onnx
     #   pydantic
+    #   pydantic-core
     #   torch
     #   typing-inspect
+    #   uvicorn
 typing-inspect==0.9.0
     # via dataclasses-json
 tzdata==2023.3
     # via pandas
-unstructured[local-inference]==0.10.12
-    # via -r base.in
+unstructured[local-inference]==0.10.13
+    # via -r requirements/base.in
 unstructured-inference==0.5.25
     # via unstructured
 urllib3==2.0.4
     # via requests
 uvicorn==0.23.2
-    # via -r base.in
+    # via -r requirements/base.in
 wheel==0.41.2
     # via
     #   nvidia-cublas-cu11
@@ -337,5 +342,8 @@ wheel==0.41.2
     #   nvidia-nvtx-cu11
 xlrd==2.0.1
     # via unstructured
-xlsxwriter==3.1.2
+xlsxwriter==3.1.3
     # via python-pptx
+
+# The following packages are considered to be unsafe in a requirements file:
+# setuptools
