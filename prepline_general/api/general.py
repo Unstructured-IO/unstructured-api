@@ -221,11 +221,8 @@ def pipeline_api(
         file_content_type = "application/x-ole-storage"
 
     # We don't want to keep logging the same params for every parallel call
-    # Note(austin) - request is None in this notebook (can clean this up soon)
-    is_internal_request = False
-    if request is not None:
-        origin_ip = request.headers.get("X-Forwarded-For") or request.client.host
-        is_internal_request = origin_ip.startswith("10.")
+    origin_ip = request.headers.get("X-Forwarded-For") or request.client.host
+    is_internal_request = origin_ip.startswith("10.")
 
     if not is_internal_request:
         logger.debug(
