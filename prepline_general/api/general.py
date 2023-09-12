@@ -39,7 +39,7 @@ def is_expected_response_type(media_type, response_type):
         return False
 
 
-# pipeline-api
+logger = logging.getLogger("unstructured_api")
 
 
 DEFAULT_MIMETYPES = (
@@ -64,9 +64,6 @@ DEFAULT_MIMETYPES = (
 
 if not os.environ.get("UNSTRUCTURED_ALLOWED_MIMETYPES", None):
     os.environ["UNSTRUCTURED_ALLOWED_MIMETYPES"] = DEFAULT_MIMETYPES
-
-# This adds the exponential backoff logs to our stream
-logging.getLogger("backoff").addHandler(logging.StreamHandler())
 
 
 def get_pdf_splits(pdf_pages, split_size=1):
@@ -95,16 +92,12 @@ def get_pdf_splits(pdf_pages, split_size=1):
     return split_pdfs
 
 
-# Do not retry with these status codes
-def is_non_retryable(e):
-    return 400 <= e.status_code < 500
-
-
 @backoff.on_exception(
     backoff.expo,
     HTTPException,
     max_tries=int(os.environ.get("UNSTRUCTURED_PARALLEL_RETRY_ATTEMPTS", 2)) + 1,
-    giveup=is_non_retryable,
+    giveup=lambda e: 400 <= e.status_code < 500,
+    logger=logger,
 )
 def call_api(request_url, api_key, filename, file, content_type, **partition_kwargs):
     """
@@ -204,9 +197,6 @@ def partition_pdf_splits(
             results.extend(result)
 
     return results
-
-
-logger = logging.getLogger("unstructured_api")
 
 
 def pipeline_api(
