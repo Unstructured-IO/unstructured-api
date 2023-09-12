@@ -1,6 +1,6 @@
-## 0.0.44
+## 0.0.44-dev0
 
-* Bump unstructured[local-inference] to 0.10.14
+* Bump unstructured to 0.10.14
 
 ## 0.0.43
 
