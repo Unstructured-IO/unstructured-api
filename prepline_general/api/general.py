@@ -92,11 +92,16 @@ def get_pdf_splits(pdf_pages, split_size=1):
     return split_pdfs
 
 
+# Do not retry with these status codes
+def is_non_retryable(e):
+    return 400 <= e.status_code < 500
+
+
 @backoff.on_exception(
     backoff.expo,
     HTTPException,
     max_tries=int(os.environ.get("UNSTRUCTURED_PARALLEL_RETRY_ATTEMPTS", 2)) + 1,
-    giveup=lambda e: 400 <= e.status_code < 500,
+    giveup=is_non_retryable,
     logger=logger,
 )
 def call_api(request_url, api_key, filename, file, content_type, **partition_kwargs):
