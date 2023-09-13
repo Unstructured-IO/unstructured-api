@@ -21,9 +21,9 @@ from unstructured.partition.auto import partition
 from unstructured.staging.base import convert_to_isd, convert_to_dataframe, elements_from_json
 import psutil
 import requests
-import time
-from unstructured_inference.models.chipper import MODEL_TYPES as CHIPPER_MODEL_TYPES
+import backoff
 import logging
+from unstructured_inference.models.chipper import MODEL_TYPES as CHIPPER_MODEL_TYPES
 
 
 app = FastAPI()
@@ -39,7 +39,7 @@ def is_expected_response_type(media_type, response_type):
         return False
 
 
-# pipeline-api
+logger = logging.getLogger("unstructured_api")
 
 
 DEFAULT_MIMETYPES = (
@@ -92,6 +92,38 @@ def get_pdf_splits(pdf_pages, split_size=1):
     return split_pdfs
 
 
+# Do not retry with these status codes
+def is_non_retryable(e):
+    return 400 <= e.status_code < 500
+
+
+@backoff.on_exception(
+    backoff.expo,
+    HTTPException,
+    max_tries=int(os.environ.get("UNSTRUCTURED_PARALLEL_RETRY_ATTEMPTS", 2)) + 1,
+    giveup=is_non_retryable,
+    logger=logger,
+)
+def call_api(request_url, api_key, filename, file, content_type, **partition_kwargs):
+    """
+    Call the api with the given request_url.
+    """
+    headers = {"unstructured-api-key": api_key}
+
+    response = requests.post(
+        request_url,
+        files={"files": (filename, file, content_type)},
+        data=partition_kwargs,
+        headers=headers,
+    )
+
+    if response.status_code != 200:
+        detail = response.json().get("detail") or response.text
+        raise HTTPException(status_code=response.status_code, detail=detail)
+
+    return response.text
+
+
 def partition_file_via_api(file_tuple, request, filename, content_type, **partition_kwargs):
     """
     Send the given file to be partitioned remotely with retry logic,
@@ -103,40 +135,16 @@ def partition_file_via_api(file_tuple, request, filename, content_type, **partit
     filename and content_type are passed in the file form data
     partition_kwargs holds any form parameters to be sent on
     """
-    request_url = os.environ.get("UNSTRUCTURED_PARALLEL_MODE_URL")
+    file, page_offset = file_tuple
 
+    request_url = os.environ.get("UNSTRUCTURED_PARALLEL_MODE_URL")
     if not request_url:
         raise HTTPException(status_code=500, detail="Parallel mode enabled but no url set!")
 
-    file, page_offset = file_tuple
+    api_key = request.headers.get("unstructured-api-key")
 
-    headers = {"unstructured-api-key": request.headers.get("unstructured-api-key")}
-
-    # Retry parameters
-    try_attempts = int(os.environ.get("UNSTRUCTURED_PARALLEL_RETRY_ATTEMPTS", 1)) + 1
-    retry_backoff_time = float(os.environ.get("UNSTRUCTURED_PARALLEL_RETRY_BACKOFF_TIME", 1.0))
-
-    while try_attempts >= 0:
-        response = requests.post(
-            request_url,
-            files={"files": (filename, file, content_type)},
-            data=partition_kwargs,
-            headers=headers,
-        )
-        try_attempts -= 1
-        non_retryable_error_codes = [400, 401, 402, 403]
-        status_code = response.status_code
-        if status_code != 200:
-            if try_attempts == 0 or status_code in non_retryable_error_codes:
-                detail = response.json().get("detail") or response.text
-                raise HTTPException(status_code=response.status_code, detail=detail)
-            else:
-                # Retry after backoff
-                time.sleep(retry_backoff_time)
-        else:
-            break
-
-    elements = elements_from_json(text=response.text)
+    result = call_api(request_url, api_key, filename, file, content_type, **partition_kwargs)
+    elements = elements_from_json(text=result)
 
     # We need to account for the original page numbers
     for element in elements:
@@ -196,9 +204,6 @@ def partition_pdf_splits(
     return results
 
 
-logger = logging.getLogger("unstructured_api")
-
-
 def pipeline_api(
     file,
     request=None,
@@ -215,47 +220,47 @@ def pipeline_api(
     m_strategy=[],
     m_xml_keep_tags=[],
 ):
-    logger.debug(
-        "pipeline_api input params: {}".format(
-            json.dumps(
-                {
-                    "filename": filename,
-                    "file_content_type": file_content_type,
-                    "response_type": response_type,
-                    "m_coordinates": m_coordinates,
-                    "m_encoding": m_encoding,
-                    "m_hi_res_model_name": m_hi_res_model_name,
-                    "m_include_page_breaks": m_include_page_breaks,
-                    "m_ocr_languages": m_ocr_languages,
-                    "m_pdf_infer_table_structure": m_pdf_infer_table_structure,
-                    "m_skip_infer_table_types": m_skip_infer_table_types,
-                    "m_strategy": m_strategy,
-                    "m_xml_keep_tags": m_xml_keep_tags,
-                },
-                default=str,
-            )
-        )
-    )
-
-    # If this var is set, reject traffic when free memory is below minimum
-    # Allow internal requests - these are parallel calls already in progress
-    mem = psutil.virtual_memory()
-    memory_free_minimum = int(os.environ.get("UNSTRUCTURED_MEMORY_FREE_MINIMUM_MB", 0))
-
-    if memory_free_minimum > 0 and mem.available <= memory_free_minimum * 1024 * 1024:
-        # Note(yuming): Use X-Forwarded-For header to find the orginal IP for external API
-        # requests,since LB forwards requests in AWS
-        origin_ip = request.headers.get("X-Forwarded-For") or request.client.host
-
-        if not origin_ip.startswith("10."):
-            raise HTTPException(
-                status_code=503, detail="Server is under heavy load. Please try again later."
-            )
-
     if filename.endswith(".msg"):
         # Note(yuming): convert file type for msg files
         # since fast api might sent the wrong one.
         file_content_type = "application/x-ole-storage"
+
+    # We don't want to keep logging the same params for every parallel call
+    origin_ip = request.headers.get("X-Forwarded-For") or request.client.host
+    is_internal_request = origin_ip.startswith("10.")
+
+    if not is_internal_request:
+        logger.debug(
+            "pipeline_api input params: {}".format(
+                json.dumps(
+                    {
+                        "filename": filename,
+                        "response_type": response_type,
+                        "m_coordinates": m_coordinates,
+                        "m_encoding": m_encoding,
+                        "m_hi_res_model_name": m_hi_res_model_name,
+                        "m_include_page_breaks": m_include_page_breaks,
+                        "m_ocr_languages": m_ocr_languages,
+                        "m_pdf_infer_table_structure": m_pdf_infer_table_structure,
+                        "m_skip_infer_table_types": m_skip_infer_table_types,
+                        "m_strategy": m_strategy,
+                        "m_xml_keep_tags": m_xml_keep_tags,
+                    },
+                    default=str,
+                )
+            )
+        )
+
+        logger.debug(f"filetype: {file_content_type}")
+
+    # If this var is set, reject traffic when free memory is below minimum
+    mem = psutil.virtual_memory()
+    memory_free_minimum = int(os.environ.get("UNSTRUCTURED_MEMORY_FREE_MINIMUM_MB", 0))
+
+    if memory_free_minimum > 0 and mem.available <= memory_free_minimum * 1024 * 1024:
+        raise HTTPException(
+            status_code=503, detail="Server is under heavy load. Please try again later."
+        )
 
     if file_content_type == "application/pdf":
         try:

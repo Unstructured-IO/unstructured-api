@@ -10,6 +10,8 @@ anyio==3.7.1
     # via
     #   fastapi
     #   starlette
+backoff==2.2.1
+    # via -r requirements/base.in
 beautifulsoup4==4.12.2
     # via unstructured
 certifi==2023.7.22

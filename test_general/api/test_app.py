@@ -5,6 +5,7 @@ import pytest
 import requests
 import pandas as pd
 from fastapi.testclient import TestClient
+from fastapi import HTTPException
 from unittest.mock import Mock, ANY
 
 from prepline_general.api.app import app
@@ -384,23 +385,6 @@ def test_general_api_returns_503(monkeypatch, mocker):
 
     assert response.status_code == 503
 
-    mock_client = mocker.patch("fastapi.Request.client")
-    mock_client.host = "10.5.0.0"
-    response = client.post(
-        MAIN_API_ROUTE,
-        files=[("files", (str(test_file), open(test_file, "rb")))],
-    )
-
-    assert response.status_code == 200
-
-    mock_client.host = "10.4.0.0"
-    response = client.post(
-        MAIN_API_ROUTE,
-        files=[("files", (str(test_file), open(test_file, "rb")))],
-    )
-
-    assert response.status_code == 200
-
 
 class MockResponse:
     def __init__(self, status_code):
@@ -514,17 +498,14 @@ def test_partition_file_via_api_will_retry(monkeypatch, mocker):
     monkeypatch.setenv("UNSTRUCTURED_PARALLEL_MODE_URL", "unused")
     monkeypatch.setenv("UNSTRUCTURED_PARALLEL_MODE_THREADS", "1")
 
-    monkeypatch.setenv("UNSTRUCTURED_PARALLEL_RETRY_ATTEMPTS", "2")
-    monkeypatch.setenv("UNSTRUCTURED_PARALLEL_RETRY_BACKOFF_TIME", "0.1")
-
     num_calls = 0
 
-    # Return a transient error the first time
+    # Validate the retry count by returning an error the first 2 times
     def mock_response(*args, **kwargs):
         nonlocal num_calls
         num_calls += 1
 
-        if num_calls == 1:
+        if num_calls <= 2:
             return MockResponse(status_code=500)
 
         return MockResponse(status_code=200)
@@ -549,34 +530,36 @@ def test_partition_file_via_api_will_retry(monkeypatch, mocker):
     assert response.status_code == 200
 
 
-def test_partition_file_via_api_no_retryable_error_code(monkeypatch, mocker):
+def test_partition_file_via_api_not_retryable_error_code(monkeypatch, mocker):
     """
     Verify we didn't retry if the error code is not retryable
     """
     monkeypatch.setenv("UNSTRUCTURED_PARALLEL_MODE_ENABLED", "true")
     monkeypatch.setenv("UNSTRUCTURED_PARALLEL_MODE_URL", "unused")
     monkeypatch.setenv("UNSTRUCTURED_PARALLEL_MODE_THREADS", "1")
+    monkeypatch.setenv("UNSTRUCTURED_PARALLEL_MODE_RETRY_ATTEMPTS", "3")
 
-    monkeypatch.setenv("UNSTRUCTURED_PARALLEL_RETRY_ATTEMPTS", "2")
-    monkeypatch.setenv("UNSTRUCTURED_PARALLEL_RETRY_BACKOFF_TIME", "0.1")
+    remote_partition = Mock(side_effect=HTTPException(status_code=401))
 
     monkeypatch.setattr(
         requests,
         "post",
-        lambda *args, **kwargs: MockResponse(status_code=401),
+        remote_partition,
     )
-    mock_sleep = mocker.patch("time.sleep")
     client = TestClient(app)
     test_file = Path("sample-docs") / "layout-parser-paper.pdf"
 
     response = client.post(
         MAIN_API_ROUTE,
         files=[("files", (str(test_file), open(test_file, "rb"), "application/pdf"))],
-        data={"pdf_processing_mode": "parallel"},
     )
 
     assert response.status_code == 401
-    assert mock_sleep.call_count == 0
+
+    # Often page 2 will start processing before the page 1 exception is raised.
+    # So we can't assert called_once, but we can assert the count is less than it
+    # would have been if we used all retries.
+    assert remote_partition.call_count < 4
 
 
 def test_password_protected_pdf():
