@@ -579,3 +579,29 @@ def test_password_protected_pdf():
     assert response.json() == {
         "detail": f"File: {str(test_file)} is encrypted. Please decrypt it with password."
     }
+
+
+def test_chunking_strategy_param():
+    """
+    Verify that responses do not chunk elements unless requested
+    """
+    client = TestClient(app)
+    test_file = Path("sample-docs") / "layout-parser-paper-fast.pdf"
+    response = client.post(
+        MAIN_API_ROUTE,
+        files=[("files", (str(test_file), open(test_file, "rb")))],
+        data={"strategy": "hi_res"},
+    )
+    assert response.status_code == 200
+    response_without_chunking = response.json()
+
+    response = client.post(
+        MAIN_API_ROUTE,
+        files=[("files", (str(test_file), open(test_file, "rb")))],
+        data={"chunking_strategy": "by_title"},
+    )
+    assert response.status_code == 200
+
+    # chunking_strategy 
+    response_with_chunking = response.json()[0]
+    assert len(response_with_chunking) != len(response_without_chunking)

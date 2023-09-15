@@ -219,6 +219,7 @@ def pipeline_api(
     m_skip_infer_table_types=[],
     m_strategy=[],
     m_xml_keep_tags=[],
+    m_chunking_strategy=[],
 ):
     if filename.endswith(".msg"):
         # Note(yuming): convert file type for msg files
@@ -245,6 +246,7 @@ def pipeline_api(
                         "m_skip_infer_table_types": m_skip_infer_table_types,
                         "m_strategy": m_strategy,
                         "m_xml_keep_tags": m_xml_keep_tags,
+                        "m_chunking_strategy": m_chunking_strategy,
                     },
                     default=str,
                 )
@@ -321,6 +323,13 @@ def pipeline_api(
         m_skip_infer_table_types[0] if len(m_skip_infer_table_types) else ["pdf", "jpg", "png"]
     )
 
+    chunking_strategy = (m_chunking_strategy[0].lower() if len(m_chunking_strategy) else None)
+    chunk_strategies = ["by_title"]
+    if chunking_strategy and (chunking_strategy not in chunk_strategies):
+        raise HTTPException(
+            status_code=400, detail=f"Invalid chunking strategy: {chunking_strategy}. Must be one of {chunk_strategies}"
+        )
+
     try:
         logger.debug(
             "partition input data: {}".format(
@@ -336,6 +345,7 @@ def pipeline_api(
                         "model_name": hi_res_model_name,
                         "xml_keep_tags": xml_keep_tags,
                         "skip_infer_table_types": skip_infer_table_types,
+                        "chunking_strategy": chunking_strategy,
                     },
                     default=str,
                 )
@@ -362,6 +372,7 @@ def pipeline_api(
                 skip_infer_table_types=skip_infer_table_types,
                 strategy=strategy,
                 xml_keep_tags=xml_keep_tags,
+                chunking_strategy=chunking_strategy,
             )
         else:
             elements = partition(
@@ -377,6 +388,7 @@ def pipeline_api(
                 skip_infer_table_types=skip_infer_table_types,
                 strategy=strategy,
                 xml_keep_tags=xml_keep_tags,
+                chunking_strategy=chunking_strategy,
             )
     except ValueError as e:
         if "Invalid file" in e.args[0]:
@@ -527,6 +539,7 @@ def pipeline_1(
     skip_infer_table_types: List[str] = Form(default=[]),
     strategy: List[str] = Form(default=[]),
     xml_keep_tags: List[str] = Form(default=[]),
+    chunking_strategy: List[str] = Form(default=[]),
 ):
     if files:
         for file_index in range(len(files)):
@@ -578,6 +591,7 @@ def pipeline_1(
                     response_type=media_type,
                     filename=file.filename,
                     file_content_type=file_content_type,
+                    m_chunking_strategy=chunking_strategy,
                 )
 
                 if is_expected_response_type(media_type, type(response)):
