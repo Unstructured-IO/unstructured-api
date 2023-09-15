@@ -1,7 +1,8 @@
-## 0.0.44-dev1
+## 0.0.44
 
 * Bump unstructured to 0.10.14
 * Improve parallel mode retry handling
+* Ensure that error handlers are logging the right thing
 
 ## 0.0.43
 
