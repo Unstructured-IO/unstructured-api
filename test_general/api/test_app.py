@@ -602,6 +602,6 @@ def test_chunking_strategy_param():
     )
     assert response.status_code == 200
 
-    # chunking_strategy 
+    # chunking_strategy
     response_with_chunking = response.json()[0]
     assert len(response_with_chunking) != len(response_without_chunking)
