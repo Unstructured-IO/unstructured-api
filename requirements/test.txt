@@ -87,7 +87,7 @@ comm==0.1.4
     # via
     #   ipykernel
     #   ipywidgets
-contourpy==1.1.0
+contourpy==1.1.1
     # via
     #   -r requirements/base.txt
     #   matplotlib
@@ -105,7 +105,7 @@ dataclasses-json==0.6.0
     # via
     #   -r requirements/base.txt
     #   unstructured
-debugpy==1.7.0
+debugpy==1.8.0
     # via ipykernel
 decorator==5.1.1
     # via ipython
@@ -146,7 +146,7 @@ fastcore==1.5.29
     #   nbdev
 fastjsonschema==2.18.0
     # via nbformat
-filelock==3.12.3
+filelock==3.12.4
     # via
     #   -r requirements/base.txt
     #   huggingface-hub
@@ -168,7 +168,7 @@ fonttools==4.42.1
     #   matplotlib
 fqdn==1.5.1
     # via jsonschema
-fsspec==2023.9.0
+fsspec==2023.9.1
     # via
     #   -r requirements/base.txt
     #   huggingface-hub
@@ -183,7 +183,7 @@ httpcore==0.18.0
     # via httpx
 httpx==0.25.0
     # via -r requirements/test.in
-huggingface-hub==0.17.1
+huggingface-hub==0.17.2
     # via
     #   -r requirements/base.txt
     #   timm
@@ -220,7 +220,7 @@ ipython==8.15.0
     #   jupyter-console
 ipython-genutils==0.2.0
     # via qtconsole
-ipywidgets==8.1.0
+ipywidgets==8.1.1
     # via jupyter
 isoduration==20.11.0
     # via jsonschema
@@ -284,7 +284,7 @@ jupyter-server==2.7.3
     #   notebook-shim
 jupyter-server-terminals==0.4.4
     # via jupyter-server
-jupyterlab==4.0.5
+jupyterlab==4.0.6
     # via notebook
 jupyterlab-pygments==0.2.2
     # via nbconvert
@@ -292,7 +292,7 @@ jupyterlab-server==2.25.0
     # via
     #   jupyterlab
     #   notebook
-jupyterlab-widgets==3.0.8
+jupyterlab-widgets==3.0.9
     # via ipywidgets
 kiwisolver==1.4.5
     # via
@@ -322,7 +322,7 @@ marshmallow==3.20.1
     # via
     #   -r requirements/base.txt
     #   dataclasses-json
-matplotlib==3.7.3
+matplotlib==3.8.0
     # via
     #   -r requirements/base.txt
     #   pycocotools
@@ -363,7 +363,7 @@ nbformat==5.9.2
     #   jupyter-server
     #   nbclient
     #   nbconvert
-nest-asyncio==1.5.7
+nest-asyncio==1.5.8
     # via ipykernel
 networkx==3.1
     # via
@@ -379,7 +379,7 @@ notebook-shim==0.2.3
     # via
     #   jupyterlab
     #   notebook
-numpy==1.25.2
+numpy==1.26.0
     # via
     #   -r requirements/base.txt
     #   contourpy
@@ -440,6 +440,7 @@ packaging==23.1
     #   qtconsole
     #   qtpy
     #   transformers
+    #   unstructured-pytesseract
 pandas==2.1.0
     # via
     #   -r requirements/base.txt
@@ -469,7 +470,7 @@ pexpect==4.8.0
     # via ipython
 pickleshare==0.7.5
     # via ipython
-pillow==10.0.0
+pillow==10.0.1
     # via
     #   -r requirements/base.txt
     #   layoutparser
@@ -479,13 +480,14 @@ pillow==10.0.0
     #   pytesseract
     #   python-pptx
     #   torchvision
+    #   unstructured-pytesseract
 platformdirs==3.10.0
     # via
     #   black
     #   jupyter-core
 pluggy==1.3.0
     # via pytest
-portalocker==2.7.0
+portalocker==2.8.2
     # via
     #   -r requirements/base.txt
     #   iopath
@@ -520,7 +522,7 @@ pycparser==2.21
     # via
     #   -r requirements/base.txt
     #   cffi
-pycryptodome==3.18.0
+pycryptodome==3.19.0
     # via -r requirements/base.txt
 pydantic==1.10.12
     # via
@@ -542,7 +544,7 @@ pyparsing==3.1.1
     # via
     #   -r requirements/base.txt
     #   matplotlib
-pypdf==3.16.0
+pypdf==3.16.1
     # via -r requirements/base.txt
 pypdfium2==4.20.0
     # via
@@ -638,7 +640,7 @@ rfc3986-validator==0.1.1
     # via
     #   jsonschema
     #   jupyter-events
-rpds-py==0.10.2
+rpds-py==0.10.3
     # via
     #   jsonschema
     #   referencing
@@ -737,7 +739,7 @@ tqdm==4.66.1
     #   iopath
     #   nltk
     #   transformers
-traitlets==5.9.0
+traitlets==5.10.0
     # via
     #   comm
     #   ipykernel
@@ -754,17 +756,16 @@ traitlets==5.9.0
     #   nbconvert
     #   nbformat
     #   qtconsole
-transformers==4.33.1
+transformers==4.33.2
     # via
     #   -r requirements/base.txt
     #   unstructured-inference
-typing-extensions==4.7.1
+typing-extensions==4.8.0
     # via
     #   -r requirements/base.txt
     #   async-lru
     #   black
     #   fastapi
-    #   filelock
     #   huggingface-hub
     #   iopath
     #   mypy
@@ -781,9 +782,13 @@ tzdata==2023.3
     # via
     #   -r requirements/base.txt
     #   pandas
-unstructured[local-inference]==0.10.14
+unstructured[local-inference]==0.10.15
     # via -r requirements/base.txt
-unstructured-inference==0.5.25
+unstructured-inference==0.5.28
+    # via
+    #   -r requirements/base.txt
+    #   unstructured
+unstructured-pytesseract==0.3.12
     # via
     #   -r requirements/base.txt
     #   unstructured
@@ -809,13 +814,13 @@ websocket-client==1.6.3
     # via jupyter-server
 wheel==0.41.2
     # via astunparse
-widgetsnbextension==4.0.8
+widgetsnbextension==4.0.9
     # via ipywidgets
 xlrd==2.0.1
     # via
     #   -r requirements/base.txt
     #   unstructured
-xlsxwriter==3.1.3
+xlsxwriter==3.1.4
     # via
     #   -r requirements/base.txt
     #   python-pptx
