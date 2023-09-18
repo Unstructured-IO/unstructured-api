@@ -85,7 +85,7 @@ jobs:
           .venv
         key: ci-venv-${{ env.PIPELINE_FAMILY }}-${{ hashFiles('requirements/test.txt') }}
     - name: Set up QEMU
-      uses: docker/setup-qemu-action@v2
+      uses: docker/setup-qemu-action@v3
     - name: Test image
       run: |
         ARCH=$(cut -d "/" -f2 <<< ${{ matrix.docker-platform }})
