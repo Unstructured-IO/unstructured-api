@@ -386,6 +386,7 @@ def pipeline_api(
         raise e
 
     # Clean up returned elements
+    # Note(austin): pydantic should control this sort of thing for us
     for i, element in enumerate(elements):
         elements[i].metadata.filename = os.path.basename(filename)
 
@@ -397,6 +398,9 @@ def pipeline_api(
 
         if element.metadata.file_directory:
             elements[i].metadata.file_directory = None
+
+        if element.metadata.detection_class_prob:
+            elements[i].metadata.detection_class_prob = None
 
     if response_type == "text/csv":
         df = convert_to_dataframe(elements)
