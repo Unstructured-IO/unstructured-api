@@ -431,6 +431,7 @@ def test_parallel_mode_passes_params(monkeypatch):
             "strategy": "hi_res",
             "xml_keep_tags": True,
             "skip_infer_table_types": "foo",
+            "chunking_strategy": "foo",
         },
     )
 
@@ -448,6 +449,7 @@ def test_parallel_mode_passes_params(monkeypatch):
         strategy="hi_res",
         xml_keep_tags=True,
         skip_infer_table_types="foo",
+        chunking_strategy="foo",
     )
 
 
