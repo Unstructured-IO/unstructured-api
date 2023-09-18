@@ -1,4 +1,4 @@
-## 0.0.45
+## 0.0.45-dev0
 
 * Bump unstructured[local-inference] to 0.10.15
 
