@@ -99,9 +99,10 @@ def test_general_api(example_filename, content_type):
     assert len(dfs) > 0
 
 
-def test_coordinates_param():
+def test_metadata_fields_removed():
     """
     Verify that responses do not include coordinates unless requested
+    Verify that certain other metadata fields are dropped
     """
     client = TestClient(app)
     test_file = Path("sample-docs") / "layout-parser-paper-fast.jpg"
@@ -124,10 +125,15 @@ def test_coordinates_param():
     response_with_coords = response.json()
 
     # Each element should be the same except for the coordinates field
+    # Also, check for metadata fields we explicitly dropped
     for i in range(len(response_with_coords)):
         assert "coordinates" in response_with_coords[i]["metadata"]
         del response_with_coords[i]["metadata"]["coordinates"]
         assert response_with_coords[i] == response_without_coords[i]
+
+        assert "last_modified" not in response_without_coords[i]["metadata"]
+        assert "file_directory" not in response_without_coords[i]["metadata"]
+        assert "detection_class_prob" not in response_without_coords[i]["metadata"]
 
 
 def test_ocr_languages_param():
