@@ -18,10 +18,27 @@ app = FastAPI(
     openapi_url="/general/openapi.json",
 )
 
+# Note(austin) - This logger just dumps exceptions
+# We'd rather handle those below
+uvicorn_logger = logging.getLogger("uvicorn.error")
+uvicorn_logger.disabled = True
+
 
 # Catch all HTTPException for uniform logging and response
 @app.exception_handler(HTTPException)
 async def http_error_handler(request: Request, e: HTTPException):
+    logger.error(e.detail)
+
+    return JSONResponse(
+        status_code=e.status_code,
+        content={"detail": e.detail}
+    )
+
+
+# Note(austin) - Convert any other errors to HTTPException
+# to be handled above, and log the stack trace
+@app.exception_handler(Exception)
+async def error_handler(request: Request, e: Exception):
     trace = traceback.format_exc()
 
     # Note(austin) - If ENV is set, dump the stack in json
@@ -31,16 +48,6 @@ async def http_error_handler(request: Request, e: HTTPException):
 
     logger.error(trace)
 
-    return JSONResponse(
-        status_code=e.status_code,
-        content={"detail": e.detail}
-    )
-
-
-# Note(austin) - Convert any other errors to HTTPException
-# to be handled above
-@app.exception_handler(Exception)
-async def error_handler(request: Request, e: Exception):
     error = HTTPException(
         status_code=500,
         detail=str(e)
