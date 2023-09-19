@@ -192,13 +192,13 @@ curl -X 'POST'
 
 Set the `chunking_strategy` to chunk text into larger or smaller elements. Defaults to `None` with optional arg of `by_title`.
   Additional Parameters:
-    `multipage_sections``
+    `multipage_sections`
       If True, sections can span multiple pages. Defaults to True.
-    `combine_under_n_chars``
+    `combine_under_n_chars`
       Combines elements (for example a series of titles) until a section
-      reaches a length of n characters.
-    `new_after_n_chars``
-      Cuts off new sections once they reach a length of n characters
+      reaches a length of n characters. Defaults to 500.
+    `new_after_n_chars`
+      Cuts off new sections once they reach a length of "n" characters. Defaults to 1500.
 
 ```
 curl -X 'POST' 
