@@ -596,7 +596,8 @@ def test_chunking_strategy_param():
     )
     assert response.status_code == 200
     response_without_chunking = response.json()
-
+    
+    # chunking
     response = client.post(
         MAIN_API_ROUTE,
         files=[("files", (str(test_file), open(test_file, "rb")))],
@@ -604,6 +605,6 @@ def test_chunking_strategy_param():
     )
     assert response.status_code == 200
 
-    # chunking_strategy
-    response_with_chunking = response.json()[0]
+    response_with_chunking = response.json()
     assert len(response_with_chunking) != len(response_without_chunking)
+    assert 'CompositeElement' in [element.get('type') for element in response_with_chunking]
