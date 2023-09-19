@@ -398,6 +398,7 @@ def pipeline_api(
         raise e
 
     # Clean up returned elements
+    # Note(austin): pydantic should control this sort of thing for us
     for i, element in enumerate(elements):
         elements[i].metadata.filename = os.path.basename(filename)
 
@@ -409,6 +410,9 @@ def pipeline_api(
 
         if element.metadata.file_directory:
             elements[i].metadata.file_directory = None
+
+        if element.metadata.detection_class_prob:
+            elements[i].metadata.detection_class_prob = None
 
     if response_type == "text/csv":
         df = convert_to_dataframe(elements)
@@ -524,7 +528,7 @@ def ungz_file(file: UploadFile, gz_uncompressed_content_type=None) -> UploadFile
 
 
 @router.post("/general/v0/general")
-@router.post("/general/v0.0.44/general")
+@router.post("/general/v0.0.45/general")
 def pipeline_1(
     request: Request,
     gz_uncompressed_content_type: Optional[str] = Form(default=None),
