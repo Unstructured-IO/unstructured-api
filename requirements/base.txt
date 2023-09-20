@@ -33,7 +33,7 @@ coloredlogs==15.0.1
     # via onnxruntime
 contourpy==1.1.1
     # via matplotlib
-cryptography==41.0.3
+cryptography==41.0.4
     # via pdfminer-six
 cycler==0.11.0
     # via matplotlib
@@ -130,7 +130,7 @@ omegaconf==2.3.0
     # via effdet
 onnx==1.14.1
     # via unstructured-inference
-onnxruntime==1.15.1
+onnxruntime==1.16.0
     # via unstructured-inference
 opencv-python==4.8.0.76
     # via
@@ -204,6 +204,8 @@ python-dateutil==2.8.2
     #   matplotlib
     #   pandas
 python-docx==0.8.11
+    # via unstructured
+python-iso639==2023.6.15
     # via unstructured
 python-magic==0.4.27
     # via unstructured
@@ -294,13 +296,13 @@ typing-inspect==0.9.0
     # via dataclasses-json
 tzdata==2023.3
     # via pandas
-unstructured[local-inference]==0.10.15
+unstructured[local-inference]==0.10.16
     # via -r requirements/base.in
 unstructured-inference==0.5.28
     # via unstructured
 unstructured-pytesseract==0.3.12
     # via unstructured
-urllib3==2.0.4
+urllib3==2.0.5
     # via requests
 uvicorn==0.23.2
     # via -r requirements/base.in

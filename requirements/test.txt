@@ -93,7 +93,7 @@ contourpy==1.1.1
     #   matplotlib
 coverage[toml]==7.3.1
     # via pytest-cov
-cryptography==41.0.3
+cryptography==41.0.4
     # via
     #   -r requirements/base.txt
     #   pdfminer-six
@@ -242,7 +242,7 @@ json5==0.9.14
     # via jupyterlab-server
 jsonpointer==2.4
     # via jsonschema
-jsonschema[format-nongpl]==4.19.0
+jsonschema[format-nongpl]==4.19.1
     # via
     #   jupyter-events
     #   jupyterlab-server
@@ -373,7 +373,7 @@ nltk==3.8.1
     # via
     #   -r requirements/base.txt
     #   unstructured
-notebook==7.0.3
+notebook==7.0.4
     # via jupyter
 notebook-shim==0.2.3
     # via
@@ -405,7 +405,7 @@ onnx==1.14.1
     # via
     #   -r requirements/base.txt
     #   unstructured-inference
-onnxruntime==1.15.1
+onnxruntime==1.16.0
     # via
     #   -r requirements/base.txt
     #   unstructured-inference
@@ -570,6 +570,10 @@ python-dateutil==2.8.2
     #   matplotlib
     #   pandas
 python-docx==0.8.11
+    # via
+    #   -r requirements/base.txt
+    #   unstructured
+python-iso639==2023.6.15
     # via
     #   -r requirements/base.txt
     #   unstructured
@@ -782,7 +786,7 @@ tzdata==2023.3
     # via
     #   -r requirements/base.txt
     #   pandas
-unstructured[local-inference]==0.10.15
+unstructured[local-inference]==0.10.16
     # via -r requirements/base.txt
 unstructured-inference==0.5.28
     # via
@@ -794,7 +798,7 @@ unstructured-pytesseract==0.3.12
     #   unstructured
 uri-template==1.3.0
     # via jsonschema
-urllib3==2.0.4
+urllib3==2.0.5
     # via
     #   -r requirements/base.txt
     #   requests

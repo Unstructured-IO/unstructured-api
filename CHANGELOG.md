@@ -1,3 +1,7 @@
+## 0.0.46
+
+* Bump unstructured to 0.10.16
+
 ## 0.0.45
 
 * Drop `detection_class_prob` from the element metadata. This broke backwards compatibility when library users called `partition_via_api`.
