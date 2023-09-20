@@ -1,6 +1,6 @@
 ## 0.0.46
 
-* Bump unstructured[local-inference] to 0.10.16
+* Bump unstructured to 0.10.16
 
 ## 0.0.45
 
