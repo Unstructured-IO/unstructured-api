@@ -11,7 +11,7 @@ anyio==3.7.1
     #   fastapi
     #   starlette
 backoff==2.2.1
-    # via -r requirements/base.in
+    # via -r base.in
 beautifulsoup4==4.12.2
     # via unstructured
 certifi==2023.7.22
@@ -26,9 +26,11 @@ charset-normalizer==3.2.0
     #   requests
 click==8.1.3
     # via
-    #   -r requirements/base.in
+    #   -r base.in
     #   nltk
     #   uvicorn
+cmake==3.27.5
+    # via triton
 coloredlogs==15.0.1
     # via onnxruntime
 contourpy==1.1.1
@@ -47,15 +49,14 @@ emoji==2.8.0
     # via unstructured
 et-xmlfile==1.1.0
     # via openpyxl
-exceptiongroup==1.1.3
-    # via anyio
 fastapi==0.103.1
-    # via -r requirements/base.in
+    # via -r base.in
 filelock==3.12.4
     # via
     #   huggingface-hub
     #   torch
     #   transformers
+    #   triton
 filetype==1.2.0
     # via unstructured
 flatbuffers==23.5.26
@@ -87,6 +88,8 @@ kiwisolver==1.4.5
     # via matplotlib
 layoutparser[layoutmodels,tesseract]==0.3.4
     # via unstructured-inference
+lit==16.0.6
+    # via triton
 lxml==4.9.3
     # via
     #   ebooklib
@@ -124,6 +127,31 @@ numpy==1.26.0
     #   scipy
     #   torchvision
     #   transformers
+nvidia-cublas-cu11==11.10.3.66
+    # via
+    #   nvidia-cudnn-cu11
+    #   nvidia-cusolver-cu11
+    #   torch
+nvidia-cuda-cupti-cu11==11.7.101
+    # via torch
+nvidia-cuda-nvrtc-cu11==11.7.99
+    # via torch
+nvidia-cuda-runtime-cu11==11.7.99
+    # via torch
+nvidia-cudnn-cu11==8.5.0.96
+    # via torch
+nvidia-cufft-cu11==10.9.0.58
+    # via torch
+nvidia-curand-cu11==10.2.10.91
+    # via torch
+nvidia-cusolver-cu11==11.4.0.1
+    # via torch
+nvidia-cusparse-cu11==11.7.4.91
+    # via torch
+nvidia-nccl-cu11==2.14.3
+    # via torch
+nvidia-nvtx-cu11==11.7.91
+    # via torch
 olefile==0.46
     # via msg-parser
 omegaconf==2.3.0
@@ -178,23 +206,23 @@ protobuf==4.24.3
     #   onnx
     #   onnxruntime
 psutil==5.9.5
-    # via -r requirements/base.in
+    # via -r base.in
 pycocotools==2.0.7
     # via effdet
 pycparser==2.21
     # via cffi
 pycryptodome==3.19.0
-    # via -r requirements/base.in
+    # via -r base.in
 pydantic==1.10.12
     # via
-    #   -r requirements/base.in
+    #   -r base.in
     #   fastapi
 pypandoc==1.11
     # via unstructured
 pyparsing==3.1.1
     # via matplotlib
 pypdf==3.16.1
-    # via -r requirements/base.in
+    # via -r base.in
 pypdfium2==4.20.0
     # via pdfplumber
 pytesseract==0.3.10
@@ -204,6 +232,8 @@ python-dateutil==2.8.2
     #   matplotlib
     #   pandas
 python-docx==0.8.11
+    # via unstructured
+python-iso639==2023.6.15
     # via unstructured
 python-magic==0.4.27
     # via unstructured
@@ -221,21 +251,21 @@ pyyaml==6.0.1
     #   timm
     #   transformers
 ratelimit==2.2.1
-    # via -r requirements/base.in
+    # via -r base.in
 regex==2023.8.8
     # via
     #   nltk
     #   transformers
 requests==2.31.0
     # via
-    #   -r requirements/base.in
+    #   -r base.in
     #   huggingface-hub
     #   torchvision
     #   transformers
     #   unstructured
 safetensors==0.3.2
     # via
-    #   -c requirements/constraints.in
+    #   -c constraints.in
     #   timm
     #   transformers
 scipy==1.11.2
@@ -266,6 +296,7 @@ torch==2.0.1
     #   layoutparser
     #   timm
     #   torchvision
+    #   triton
 torchvision==0.15.2
     # via
     #   effdet
@@ -279,6 +310,8 @@ tqdm==4.66.1
     #   transformers
 transformers==4.33.2
     # via unstructured-inference
+triton==2.0.0
+    # via torch
 typing-extensions==4.8.0
     # via
     #   fastapi
@@ -286,16 +319,14 @@ typing-extensions==4.8.0
     #   iopath
     #   onnx
     #   pydantic
-    #   pydantic-core
     #   torch
     #   typing-inspect
-    #   uvicorn
 typing-inspect==0.9.0
     # via dataclasses-json
 tzdata==2023.3
     # via pandas
-unstructured[local-inference]==0.10.15
-    # via -r requirements/base.in
+unstructured[local-inference]==0.10.16
+    # via -r base.in
 unstructured-inference==0.5.28
     # via unstructured
 unstructured-pytesseract==0.3.12
@@ -303,7 +334,15 @@ unstructured-pytesseract==0.3.12
 urllib3==2.0.4
     # via requests
 uvicorn==0.23.2
-    # via -r requirements/base.in
+    # via -r base.in
+wheel==0.41.2
+    # via
+    #   nvidia-cublas-cu11
+    #   nvidia-cuda-cupti-cu11
+    #   nvidia-cuda-runtime-cu11
+    #   nvidia-curand-cu11
+    #   nvidia-cusparse-cu11
+    #   nvidia-nvtx-cu11
 xlrd==2.0.1
     # via unstructured
 xlsxwriter==3.1.4
