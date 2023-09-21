@@ -622,7 +622,7 @@ def test_chunking_strategy_param():
     assert "CompositeElement" in [element.get("type") for element in response_with_chunking]
 
 
-def test_add_chunking_strategy_on_partition_auto_respects_multipage():
+def test_chunking_strategy_additional_params():
     client = TestClient(app)
     test_file = Path("sample-docs") / "layout-parser-paper-fast.pdf"
     response_from_multipage_false_combine_chars_0 = client.post(
@@ -654,9 +654,6 @@ def test_add_chunking_strategy_on_partition_auto_respects_multipage():
             "new_after_n_chars": "50000",
         },
     )
-    import pdb
-
-    pdb.set_trace()
     assert (
         response_multipage_true_combine_chars_5000.json()
         != response_from_multipage_true_combine_chars_0.json()
