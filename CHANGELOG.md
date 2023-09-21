@@ -1,3 +1,7 @@
+## 0.0.47
+
+* **Adds `chunking_strategy` kwarg and associated params** These params allow users to "chunk" elements into larger or smaller `CompositeElement`s
+
 ## 0.0.46
 
 * Bump unstructured to 0.10.16
