@@ -220,6 +220,9 @@ def pipeline_api(
     m_strategy=[],
     m_xml_keep_tags=[],
     m_chunking_strategy=[],
+    m_multipage_sections=[],
+    m_combine_under_n_chars=[],
+    m_new_after_n_chars=[],
 ):
     if filename.endswith(".msg"):
         # Note(yuming): convert file type for msg files
@@ -247,6 +250,9 @@ def pipeline_api(
                         "m_strategy": m_strategy,
                         "m_xml_keep_tags": m_xml_keep_tags,
                         "m_chunking_strategy": m_chunking_strategy,
+                        "m_multipage_sections": m_multipage_sections,
+                        "m_combine_under_n_chars": m_combine_under_n_chars,
+                        "new_after_n_chars": m_new_after_n_chars,
                     },
                     default=str,
                 )
@@ -329,6 +335,13 @@ def pipeline_api(
         raise HTTPException(
             status_code=400, detail=f"Invalid chunking strategy: {chunking_strategy}. Must be one of {chunk_strategies}"
         )
+    
+    multipage_sections_str = (m_multipage_sections[0] if len(m_multipage_sections) else "false").lower()
+    multipage_sections = multipage_sections_str == "true"
+
+    combine_under_n_chars = (int(m_combine_under_n_chars[0]) if m_combine_under_n_chars and m_combine_under_n_chars[0].isdigit() else 500)
+
+    new_after_n_chars = (int(m_new_after_n_chars[0]) if m_new_after_n_chars and m_new_after_n_chars[0].isdigit() else 1500)
 
     try:
         logger.debug(
@@ -346,6 +359,9 @@ def pipeline_api(
                         "xml_keep_tags": xml_keep_tags,
                         "skip_infer_table_types": skip_infer_table_types,
                         "chunking_strategy": chunking_strategy,
+                        "multipage_sections": multipage_sections,
+                        "combine_under_n_chars": combine_under_n_chars,
+                        "new_after_n_chars": new_after_n_chars,
                     },
                     default=str,
                 )
@@ -373,6 +389,9 @@ def pipeline_api(
                 strategy=strategy,
                 xml_keep_tags=xml_keep_tags,
                 chunking_strategy=chunking_strategy,
+                multipage_sections=multipage_sections,
+                combine_under_n_chars=combine_under_n_chars,
+                new_after_n_chars=new_after_n_chars,
             )
         else:
             elements = partition(
@@ -389,6 +408,9 @@ def pipeline_api(
                 strategy=strategy,
                 xml_keep_tags=xml_keep_tags,
                 chunking_strategy=chunking_strategy,
+                multipage_sections=multipage_sections,
+                combine_under_n_chars=combine_under_n_chars,
+                new_after_n_chars=new_after_n_chars,
             )
     except ValueError as e:
         if "Invalid file" in e.args[0]:
@@ -544,6 +566,9 @@ def pipeline_1(
     strategy: List[str] = Form(default=[]),
     xml_keep_tags: List[str] = Form(default=[]),
     chunking_strategy: List[str] = Form(default=[]),
+    multipage_sections: List[str] = Form(default=[]),
+    combine_under_n_chars: List[str] = Form(default=[]),
+    new_after_n_chars: List[str] = Form(default=[]),
 ):
     if files:
         for file_index in range(len(files)):
@@ -596,6 +621,9 @@ def pipeline_1(
                     filename=file.filename,
                     file_content_type=file_content_type,
                     m_chunking_strategy=chunking_strategy,
+                    m_multipage_sections=multipage_sections,
+                    m_combine_under_n_chars=combine_under_n_chars,
+                    m_new_after_n_chars=new_after_n_chars,
                 )
 
                 if is_expected_response_type(media_type, type(response)):
