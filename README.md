@@ -187,6 +187,29 @@ curl -X 'POST'
  | jq -C . | less -R
 ```
 
+
+#### Chunking Elements
+
+Set the `chunking_strategy` to chunk text into larger or smaller elements. Defaults to `None` with optional arg of `by_title`.
+  Additional Parameters:
+    `multipage_sections`
+      If True, sections can span multiple pages. Defaults to True.
+    `combine_under_n_chars`
+      Combines elements (for example a series of titles) until a section
+      reaches a length of n characters. Defaults to 500.
+    `new_after_n_chars`
+      Cuts off new sections once they reach a length of "n" characters. Defaults to 1500.
+
+```
+curl -X 'POST' 
+ 'https://api.unstructured.io/general/v0/general' \
+ -H 'accept: application/json'  \
+ -H 'Content-Type: multipart/form-data' \
+ -F 'files=@sample-docs/layout-parser-paper-fast.pdf' \
+ -F 'chunking_strategy=by_title' \
+ | jq -C . | less -R
+```
+
 ## Developer Quick Start
 
 * Using `pyenv` to manage virtualenv's is recommended

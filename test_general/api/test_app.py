@@ -437,6 +437,10 @@ def test_parallel_mode_passes_params(monkeypatch):
             "strategy": "hi_res",
             "xml_keep_tags": True,
             "skip_infer_table_types": "foo",
+            "chunking_strategy": "by_title",
+            "multipage_sections": False,
+            "combine_under_n_chars": 501,
+            "new_after_n_chars": 1501,
         },
     )
 
@@ -454,6 +458,10 @@ def test_parallel_mode_passes_params(monkeypatch):
         strategy="hi_res",
         xml_keep_tags=True,
         skip_infer_table_types="foo",
+        chunking_strategy="by_title",
+        multipage_sections=False,
+        combine_under_n_chars=501,
+        new_after_n_chars=1501,
     )
 
 
@@ -585,3 +593,76 @@ def test_password_protected_pdf():
     assert response.json() == {
         "detail": f"File: {str(test_file)} is encrypted. Please decrypt it with password."
     }
+
+
+def test_chunking_strategy_param():
+    """
+    Verify that responses do not chunk elements unless requested
+    """
+    client = TestClient(app)
+    test_file = Path("sample-docs") / "layout-parser-paper-fast.pdf"
+    response = client.post(
+        MAIN_API_ROUTE,
+        files=[("files", (str(test_file), open(test_file, "rb")))],
+        data={"strategy": "hi_res"},
+    )
+    assert response.status_code == 200
+    response_without_chunking = response.json()
+
+    # chunking
+    response = client.post(
+        MAIN_API_ROUTE,
+        files=[("files", (str(test_file), open(test_file, "rb")))],
+        data={"chunking_strategy": "by_title"},
+    )
+    assert response.status_code == 200
+
+    response_with_chunking = response.json()
+    assert len(response_with_chunking) != len(response_without_chunking)
+    assert "CompositeElement" in [element.get("type") for element in response_with_chunking]
+
+
+def test_chunking_strategy_additional_params():
+    client = TestClient(app)
+    test_file = Path("sample-docs") / "layout-parser-paper-fast.pdf"
+    response_from_multipage_false_combine_chars_0 = client.post(
+        MAIN_API_ROUTE,
+        files=[("files", (str(test_file), open(test_file, "rb")))],
+        data={
+            "chunking_strategy": "by_title",
+            "multipage_sections": "False",
+            "combine_under_n_chars": "0",
+        },
+    )
+    response_from_multipage_true_combine_chars_0 = client.post(
+        MAIN_API_ROUTE,
+        files=[("files", (str(test_file), open(test_file, "rb")))],
+        data={
+            "chunking_strategy": "by_title",
+            "multipage_sections": "True",
+            "combine_under_n_chars": "0",
+        },
+    )
+    response_multipage_true_combine_chars_5000 = client.post(
+        MAIN_API_ROUTE,
+        files=[("files", (str(test_file), open(test_file, "rb")))],
+        data={
+            "chunking_strategy": "by_title",
+            "multipage_sections": "True",
+            "combine_under_n_chars": "5000",
+            # Defining new_after_n_chars since it has to be greater than combine_under_n_chars
+            "new_after_n_chars": "50000",
+        },
+    )
+    assert (
+        response_multipage_true_combine_chars_5000.json()
+        != response_from_multipage_true_combine_chars_0.json()
+    )
+    assert (
+        response_from_multipage_true_combine_chars_0.json()
+        != response_from_multipage_false_combine_chars_0.json()
+    )
+    assert (
+        response_multipage_true_combine_chars_5000.json()
+        != response_from_multipage_false_combine_chars_0.json()
+    )
