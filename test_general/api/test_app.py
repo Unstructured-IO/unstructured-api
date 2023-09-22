@@ -136,7 +136,7 @@ def test_metadata_fields_removed():
         assert "detection_class_prob" not in response_without_coords[i]["metadata"]
 
 
-def test_ocr_languages_param():
+def test_ocr_languages_param(): # will eventually be depricated
     """
     Verify that we get the corresponding languages from the response with ocr_languages
     """
@@ -151,6 +151,37 @@ def test_ocr_languages_param():
     assert response.status_code == 200
     elements = response.json()
     assert elements[3]["text"].startswith("안녕하세요, 저 희 는 YGEAS 그룹")
+
+
+def test_languages_param():
+    """
+    Verify that we get the corresponding languages from the response with `languages`
+    """
+    client = TestClient(app)
+    test_file = Path("sample-docs") / "english-and-korean.png"
+    response = client.post(
+        MAIN_API_ROUTE,
+        files=[("files", (str(test_file), open(test_file, "rb")))],
+        data={"strategy": "ocr_only", "languages": ["eng", "kor"]},
+    )
+
+    assert response.status_code == 200
+    elements = response.json()
+    assert elements[3]["text"].startswith("안녕하세요, 저 희 는 YGEAS 그룹")
+
+
+def test_languages_and_ocr_languages_raises_error():
+    """
+    Verify that we get the corresponding languages from the response with `languages`
+    """
+    with pytest.raises(ValueError):
+        client = TestClient(app)
+        test_file = Path("sample-docs") / "english-and-korean.png"
+        client.post(
+            MAIN_API_ROUTE,
+            files=[("files", (str(test_file), open(test_file, "rb")))],
+            data={"strategy": "ocr_only", "languages": ["eng", "kor"], "ocr_languages": ["eng", "kor"]},
+        )
 
 
 def test_skip_infer_table_types_param():
@@ -376,7 +407,7 @@ def test_general_api_returns_400_bad_pdf():
     tmp.close()
 
 
-def test_general_api_returns_503(monkeypatch, mocker):
+def test_general_api_returns_503(monkeypatch):
     """
     When available memory is below the minimum. return a 503, unless our origin ip is 10.{4,5}.x.x
     """
@@ -432,7 +463,8 @@ def test_parallel_mode_passes_params(monkeypatch):
             "encoding": "foo",
             "hi_res_model_name": "yolox",
             "include_page_breaks": True,
-            "ocr_languages": "foo",
+            # "ocr_languages": "foo",
+            "languages": "foo",
             "pdf_infer_table_structure": True,
             "strategy": "hi_res",
             "xml_keep_tags": True,
@@ -449,7 +481,8 @@ def test_parallel_mode_passes_params(monkeypatch):
         model_name="yolox",
         encoding="foo",
         include_page_breaks=True,
-        ocr_languages="foo",
+        ocr_languages=None,
+        languages=["foo"],
         pdf_infer_table_structure=True,
         strategy="hi_res",
         xml_keep_tags=True,
