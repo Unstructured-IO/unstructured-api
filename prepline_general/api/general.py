@@ -219,7 +219,7 @@ def pipeline_api(
     m_skip_infer_table_types=[],
     m_strategy=[],
     m_xml_keep_tags=[],
-    m_languages=["eng"],
+    languages=["eng"],
 ):
     if filename.endswith(".msg"):
         # Note(yuming): convert file type for msg files
@@ -246,7 +246,7 @@ def pipeline_api(
                         "m_skip_infer_table_types": m_skip_infer_table_types,
                         "m_strategy": m_strategy,
                         "m_xml_keep_tags": m_xml_keep_tags,
-                        "m_languages": m_languages,
+                        "languages": languages,
                     },
                     default=str,
                 )
@@ -322,8 +322,6 @@ def pipeline_api(
     skip_infer_table_types = (
         m_skip_infer_table_types[0] if len(m_skip_infer_table_types) else ["pdf", "jpg", "png"]
     )
-
-    languages = m_languages
 
     try:
         logger.debug(
@@ -590,7 +588,7 @@ def pipeline_1(
                     response_type=media_type,
                     filename=file.filename,
                     file_content_type=file_content_type,
-                    m_languages=languages,
+                    languages=languages,
                 )
 
                 if is_expected_response_type(media_type, type(response)):
