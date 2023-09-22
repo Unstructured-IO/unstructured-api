@@ -136,7 +136,7 @@ def test_metadata_fields_removed():
         assert "detection_class_prob" not in response_without_coords[i]["metadata"]
 
 
-def test_ocr_languages_param(): # will eventually be depricated
+def test_ocr_languages_param():  # will eventually be depricated
     """
     Verify that we get the corresponding languages from the response with ocr_languages
     """
@@ -180,7 +180,11 @@ def test_languages_and_ocr_languages_raises_error():
         client.post(
             MAIN_API_ROUTE,
             files=[("files", (str(test_file), open(test_file, "rb")))],
-            data={"strategy": "ocr_only", "languages": ["eng", "kor"], "ocr_languages": ["eng", "kor"]},
+            data={
+                "strategy": "ocr_only",
+                "languages": ["eng", "kor"],
+                "ocr_languages": ["eng", "kor"],
+            },
         )
 
 
