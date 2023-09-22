@@ -1,5 +1,6 @@
-## 0.0.47-dev0
+## 0.0.47-dev1
 
+* **Adds `languages` kwarg** `ocr_languages` will eventually be depricated and replaced by `lanugages` to specify what languages to use for OCR 
 * **Adds `chunking_strategy` kwarg and associated params** These params allow users to "chunk" elements into larger or smaller `CompositeElement`s
 
 ## 0.0.46
