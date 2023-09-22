@@ -86,6 +86,7 @@ We also support models to be used locally, for example, `yolox`. Please refer to
 
 #### OCR languages
 
+Note: This kwarg will eventually be depricated. Please use `languages`.
 You can also specify what languages to use for OCR with the `ocr_languages` kwarg. See the [Tesseract documentation](https://github.com/tesseract-ocr/tessdata) for a full list of languages and install instructions. OCR is only applied if the text is not already available in the PDF document.
 
 ```
@@ -97,6 +98,22 @@ curl -X 'POST' \
   -F 'strategy=ocr_only' \
   -F 'ocr_languages=eng'  \
   -F 'ocr_languages=kor'  \
+  | jq -C . | less -R
+```
+
+#### Languages
+
+You can also specify what languages to use for OCR with the `languages` kwarg. See the [Tesseract documentation](https://github.com/tesseract-ocr/tessdata) for a full list of languages and install instructions. OCR is only applied if the text is not already available in the PDF document.
+
+```
+curl -X 'POST' \
+  'https://api.unstructured.io/general/v0/general' \
+  -H 'accept: application/json' \
+  -H 'Content-Type: multipart/form-data' \
+  -F 'files=@sample-docs/english-and-korean.png' \
+  -F 'strategy=ocr_only' \
+  -F 'languages=eng'  \
+  -F 'languages=kor'  \
   | jq -C . | less -R
 ```
 
