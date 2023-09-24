@@ -6,7 +6,6 @@ import requests
 import pandas as pd
 from fastapi.testclient import TestClient
 from fastapi import HTTPException
-import pypdf
 from pypdf import PdfWriter, PdfReader
 from unittest.mock import Mock, ANY
 
