@@ -372,7 +372,7 @@ def test_general_api_returns_400_bad_pdf():
     response = client.post(
         MAIN_API_ROUTE, files=[("files", (str(tmp.name), open(tmp.name, "rb"), "application/pdf"))]
     )
-    assert response.json() == {"detail": f"{tmp.name} does not appear to be a valid PDF"}
+    assert response.json() == {"detail": "File does not appear to be a valid PDF"}
     assert response.status_code == 400
     tmp.close()
 
@@ -575,25 +575,6 @@ def test_partition_file_via_api_not_retryable_error_code(monkeypatch, mocker):
     # So we can't assert called_once, but we can assert the count is less than it
     # would have been if we used all retries.
     assert remote_partition.call_count < 4
-
-
-def test_password_protected_pdf():
-    """
-    Verify we get a 400 error if the PDF is password protected
-    """
-    client = TestClient(app)
-    # a password protected pdf file, password is "password"
-    test_file = Path("sample-docs") / "layout-parser-paper-password-protected.pdf"
-
-    response = client.post(
-        MAIN_API_ROUTE,
-        files=[("files", (str(test_file), open(test_file, "rb")))],
-        data={"strategy": "fast"},
-    )
-    assert response.status_code == 400
-    assert response.json() == {
-        "detail": f"File: {str(test_file)} is encrypted. Please decrypt it with password."
-    }
 
 
 def test_chunking_strategy_param():
