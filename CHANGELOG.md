@@ -1,7 +1,9 @@
-## 0.0.47-dev1
+## 0.0.47
 
 * **Adds `chunking_strategy` kwarg and associated params** These params allow users to "chunk" elements into larger or smaller `CompositeElement`s
 * **Remove `parent_id` from the element metadata**. New metadata fields are causing errors with existing installs. We'll readd this once a fix is widely available.
+* **Fix some pdfs incorrectly returning a file is encrypted error**. The `pypdf.is_encrypted` check caused us to return this error even if the file is readable.
+>>>>>>> main
 
 ## 0.0.46
 
