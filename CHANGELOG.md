@@ -1,6 +1,7 @@
-## 0.0.47-dev0
+## 0.0.47-dev1
 
 * **Adds `chunking_strategy` kwarg and associated params** These params allow users to "chunk" elements into larger or smaller `CompositeElement`s
+* **Remove `parent_id` from the element metadata**. New metadata fields are causing errors with existing installs. We'll readd this once a fix is widely available.
 
 ## 0.0.46
 
