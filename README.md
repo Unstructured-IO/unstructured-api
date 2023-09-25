@@ -313,13 +313,13 @@ NOTE: we build multi-platform images to support both x86_64 and Apple silicon ha
 We build Docker images for all pushes to `main`. We tag each image with the corresponding short commit hash (e.g. `fbc7a69`) and the application version (e.g. `0.5.5-dev1`). We also tag the most recent image with `latest`. To leverage this, `docker pull` from our image repository.
 
 ```bash
-docker pull quay.io/unstructured-io/unstructured-api:latest
+docker pull downloads.unstructured.io/unstructured-io/unstructured-api:latest
 ```
 
 Once pulled, you can launch the container as a web app on localhost:8000.
 
 ```bash
-docker run -p 8000:8000 -d --rm --name unstructured-api quay.io/unstructured-io/unstructured-api:latest --port 8000 --host 0.0.0.0
+docker run -p 8000:8000 -d --rm --name unstructured-api downloads.unstructured.io/unstructured-io/unstructured-api:latest --port 8000 --host 0.0.0.0
 ```
 
 ## Security Policy
@@ -334,3 +334,7 @@ information on how to report security vulnerabilities.
 | [Unstructured Community Github](https://github.com/Unstructured-IO/community) | Information about Unstructured.io community projects  |
 | [Unstructured Github](https://github.com/Unstructured-IO) | Unstructured.io open source repositories |
 | [Company Website](https://unstructured.io) | Unstructured.io product and company info |
+
+## :chart_with_upwards_trend: Analytics
+
+We’ve partnered with Scarf (https://scarf.sh) to collect anonymized user statistics to understand which features our community is using and how to prioritize product decision-making in the future. To learn more about how we collect and use this data, please read our [Privacy Policy](https://unstructured.io/privacy-policy).
