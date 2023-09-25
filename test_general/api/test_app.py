@@ -656,31 +656,31 @@ def test_encrypted_pdf():
     client = TestClient(app)
     test_file = Path("sample-docs") / "layout-parser-paper-fast.pdf"
     original_pdf = PdfReader(test_file)
-    temp_file = tempfile.NamedTemporaryFile()
 
-    # This file is user encrypted and cannot be read
-    writer = PdfWriter()
-    writer.append_pages_from_reader(original_pdf)
-    writer.encrypt(user_password="password123")
-    writer.write(temp_file.name)
+    with tempfile.NamedTemporaryFile() as temp_file:
+        # This file is user encrypted and cannot be read
+        writer = PdfWriter()
+        writer.append_pages_from_reader(original_pdf)
+        writer.encrypt(user_password="password123")
+        writer.write(temp_file.name)
 
-    # Response should be 400
-    response = client.post(
-        MAIN_API_ROUTE,
-        files=[("files", (str(temp_file.name), open(temp_file.name, "rb"), "application/pdf"))],
-    )
-    assert response.json() == {"detail": "File is encrypted. Please decrypt it with password."}
-    assert response.status_code == 400
+        # Response should be 400
+        response = client.post(
+            MAIN_API_ROUTE,
+            files=[("files", (str(temp_file.name), open(temp_file.name, "rb"), "application/pdf"))],
+        )
+        assert response.json() == {"detail": "File is encrypted. Please decrypt it with password."}
+        assert response.status_code == 400
 
-    # This file is owner encrypted, i.e. readable with edit restrictions
-    writer = PdfWriter()
-    writer.append_pages_from_reader(original_pdf)
-    writer.encrypt(user_password="", owner_password="password123", permissions_flag=0b1100)
-    writer.write(temp_file.name)
+        # This file is owner encrypted, i.e. readable with edit restrictions
+        writer = PdfWriter()
+        writer.append_pages_from_reader(original_pdf)
+        writer.encrypt(user_password="", owner_password="password123", permissions_flag=0b1100)
+        writer.write(temp_file.name)
 
-    # Response should be 200
-    response = client.post(
-        MAIN_API_ROUTE,
-        files=[("files", (str(temp_file.name), open(temp_file.name, "rb"), "application/pdf"))],
-    )
-    assert response.status_code == 200
+        # Response should be 200
+        response = client.post(
+            MAIN_API_ROUTE,
+            files=[("files", (str(temp_file.name), open(temp_file.name, "rb"), "application/pdf"))],
+        )
+        assert response.status_code == 200
