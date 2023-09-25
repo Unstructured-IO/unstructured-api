@@ -356,9 +356,7 @@ def test_general_api_returns_400_unsupported_file(example_filename):
     response = client.post(
         MAIN_API_ROUTE, files=[("files", (str(test_file), open(test_file, "rb"), filetype))]
     )
-    assert response.json() == {
-        "detail": f"Unable to process {str(test_file)}: " f"File type {filetype} is not supported."
-    }
+    assert response.json() == {"detail": f"File type {filetype} is not supported."}
     assert response.status_code == 400
 
 

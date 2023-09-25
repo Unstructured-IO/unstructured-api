@@ -473,7 +473,6 @@ def get_validated_mimetype(file):
             raise HTTPException(
                 status_code=400,
                 detail=(
-                    f"Unable to process {file.filename}: "
                     f"File type {content_type} is not supported."
                 ),
             )
