@@ -29,10 +29,7 @@ uvicorn_logger.disabled = True
 async def http_error_handler(request: Request, e: HTTPException):
     logger.error(e.detail)
 
-    return JSONResponse(
-        status_code=e.status_code,
-        content={"detail": e.detail}
-    )
+    return JSONResponse(status_code=e.status_code, content={"detail": e.detail})
 
 
 # Note(austin) - Convert any other errors to HTTPException
@@ -48,10 +45,7 @@ async def error_handler(request: Request, e: Exception):
 
     logger.error(trace)
 
-    error = HTTPException(
-        status_code=500,
-        detail=str(e)
-    )
+    error = HTTPException(status_code=500, detail=str(e))
 
     return await http_error_handler(request, error)
 
@@ -84,6 +78,7 @@ class MetricsCheckFilter(logging.Filter):
 
 logging.getLogger("uvicorn.access").addFilter(HealthCheckFilter())
 logging.getLogger("uvicorn.access").addFilter(MetricsCheckFilter())
+
 
 @app.get("/healthcheck", status_code=status.HTTP_200_OK, include_in_schema=False)
 def healthcheck(request: Request):

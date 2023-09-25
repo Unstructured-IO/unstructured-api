@@ -277,13 +277,11 @@ def pipeline_api(
             # This will raise if the file is encrypted
             pdf.metadata
         except pypdf.errors.EmptyFileError:
-            raise HTTPException(
-                status_code=400, detail=f"File does not appear to be a valid PDF"
-            )
+            raise HTTPException(status_code=400, detail="File does not appear to be a valid PDF")
         except pypdf.errors.FileNotDecryptedError:
             raise HTTPException(
                 status_code=400,
-                detail=f"File is encrypted. Please decrypt it with password.",
+                detail="File is encrypted. Please decrypt it with password.",
             )
 
     strategy = (m_strategy[0] if len(m_strategy) else "auto").lower()
@@ -332,19 +330,30 @@ def pipeline_api(
         m_skip_infer_table_types[0] if len(m_skip_infer_table_types) else ["pdf", "jpg", "png"]
     )
 
-    chunking_strategy = (m_chunking_strategy[0].lower() if len(m_chunking_strategy) else None)
+    chunking_strategy = m_chunking_strategy[0].lower() if len(m_chunking_strategy) else None
     chunk_strategies = ["by_title"]
     if chunking_strategy and (chunking_strategy not in chunk_strategies):
         raise HTTPException(
-            status_code=400, detail=f"Invalid chunking strategy: {chunking_strategy}. Must be one of {chunk_strategies}"
+            status_code=400,
+            detail=f"Invalid chunking strategy: {chunking_strategy}. Must be one of {chunk_strategies}",
         )
-    
-    multipage_sections_str = (m_multipage_sections[0] if len(m_multipage_sections) else "false").lower()
+
+    multipage_sections_str = (
+        m_multipage_sections[0] if len(m_multipage_sections) else "false"
+    ).lower()
     multipage_sections = multipage_sections_str == "true"
 
-    combine_under_n_chars = (int(m_combine_under_n_chars[0]) if m_combine_under_n_chars and m_combine_under_n_chars[0].isdigit() else 500)
+    combine_under_n_chars = (
+        int(m_combine_under_n_chars[0])
+        if m_combine_under_n_chars and m_combine_under_n_chars[0].isdigit()
+        else 500
+    )
 
-    new_after_n_chars = (int(m_new_after_n_chars[0]) if m_new_after_n_chars and m_new_after_n_chars[0].isdigit() else 1500)
+    new_after_n_chars = (
+        int(m_new_after_n_chars[0])
+        if m_new_after_n_chars and m_new_after_n_chars[0].isdigit()
+        else 1500
+    )
 
     try:
         logger.debug(
@@ -477,9 +486,7 @@ def get_validated_mimetype(file):
         if content_type not in allowed_mimetypes:
             raise HTTPException(
                 status_code=400,
-                detail=(
-                    f"File type {content_type} is not supported."
-                ),
+                detail=(f"File type {content_type} is not supported."),
             )
 
     return content_type
