@@ -1,3 +1,7 @@
+## 0.0.48
+
+* Bump unstructured-inference to 0.6.3
+
 ## 0.0.47
 
 * **Adds `chunking_strategy` kwarg and associated params** These params allow users to "chunk" elements into larger or smaller `CompositeElement`s
