@@ -219,6 +219,7 @@ def pipeline_api(
     m_skip_infer_table_types=[],
     m_strategy=[],
     m_xml_keep_tags=[],
+    languages=["eng"],
     m_chunking_strategy=[],
     m_multipage_sections=[],
     m_combine_under_n_chars=[],
@@ -249,6 +250,7 @@ def pipeline_api(
                         "m_skip_infer_table_types": m_skip_infer_table_types,
                         "m_strategy": m_strategy,
                         "m_xml_keep_tags": m_xml_keep_tags,
+                        "languages": languages,
                         "m_chunking_strategy": m_chunking_strategy,
                         "m_multipage_sections": m_multipage_sections,
                         "m_combine_under_n_chars": m_combine_under_n_chars,
@@ -306,7 +308,7 @@ def pipeline_api(
     enable_parallel_mode = os.environ.get("UNSTRUCTURED_PARALLEL_MODE_ENABLED", "false")
     pdf_parallel_mode_enabled = enable_parallel_mode == "true"
 
-    ocr_languages = ("+".join(m_ocr_languages) if len(m_ocr_languages) else "eng").lower()
+    ocr_languages = "+".join(m_ocr_languages) if m_ocr_languages and len(m_ocr_languages) else None
 
     include_page_breaks_str = (
         m_include_page_breaks[0] if len(m_include_page_breaks) else "false"
@@ -370,6 +372,7 @@ def pipeline_api(
                         "model_name": hi_res_model_name,
                         "xml_keep_tags": xml_keep_tags,
                         "skip_infer_table_types": skip_infer_table_types,
+                        "languages": languages,
                         "chunking_strategy": chunking_strategy,
                         "multipage_sections": multipage_sections,
                         "combine_under_n_chars": combine_under_n_chars,
@@ -400,6 +403,7 @@ def pipeline_api(
                 skip_infer_table_types=skip_infer_table_types,
                 strategy=strategy,
                 xml_keep_tags=xml_keep_tags,
+                languages=languages,
                 chunking_strategy=chunking_strategy,
                 multipage_sections=multipage_sections,
                 combine_under_n_chars=combine_under_n_chars,
@@ -419,6 +423,7 @@ def pipeline_api(
                 skip_infer_table_types=skip_infer_table_types,
                 strategy=strategy,
                 xml_keep_tags=xml_keep_tags,
+                languages=languages,
                 chunking_strategy=chunking_strategy,
                 multipage_sections=multipage_sections,
                 combine_under_n_chars=combine_under_n_chars,
@@ -564,7 +569,7 @@ def ungz_file(file: UploadFile, gz_uncompressed_content_type=None) -> UploadFile
 
 
 @router.post("/general/v0/general")
-@router.post("/general/v0.0.47/general")
+@router.post("/general/v0.0.48/general")
 def pipeline_1(
     request: Request,
     gz_uncompressed_content_type: Optional[str] = Form(default=None),
@@ -579,6 +584,7 @@ def pipeline_1(
     skip_infer_table_types: List[str] = Form(default=[]),
     strategy: List[str] = Form(default=[]),
     xml_keep_tags: List[str] = Form(default=[]),
+    languages: List[str] = ["eng"],
     chunking_strategy: List[str] = Form(default=[]),
     multipage_sections: List[str] = Form(default=[]),
     combine_under_n_chars: List[str] = Form(default=[]),
@@ -634,6 +640,7 @@ def pipeline_1(
                     response_type=media_type,
                     filename=file.filename,
                     file_content_type=file_content_type,
+                    languages=languages,
                     m_chunking_strategy=chunking_strategy,
                     m_multipage_sections=multipage_sections,
                     m_combine_under_n_chars=combine_under_n_chars,
