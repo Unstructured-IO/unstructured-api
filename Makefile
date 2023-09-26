@@ -130,7 +130,7 @@ check-version:
 	scripts/version-sync.sh -c \
 		-s CHANGELOG.md \
 		-f preprocessing-pipeline-family.yaml release \
-		-f ${PACKAGE_NAME}/api/general.py release
+		-f ${PACKAGE_NAME}/api/app.py release
 
 ## version-sync:                update references to version with most recent version from CHANGELOG.md
 .PHONY: version-sync
@@ -138,4 +138,4 @@ version-sync:
 	scripts/version-sync.sh \
 		-s CHANGELOG.md \
 		-f preprocessing-pipeline-family.yaml release \
-		-f ${PACKAGE_NAME}/api/general.py release
+		-f ${PACKAGE_NAME}/api/app.py release

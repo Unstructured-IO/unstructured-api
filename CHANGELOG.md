@@ -1,6 +1,7 @@
-## 0.0.48-dev0
+## 0.0.48
 
-* **Adds `languages` kwarg** `ocr_languages` will eventually be depricated and replaced by `lanugages` to specify what languages to use for OCR 
+* **Adds `languages` kwarg** `ocr_languages` will eventually be deprecated and replaced by `lanugages` to specify what languages to use for OCR 
+* Adds a startup log and other minor cleanups
 
 ## 0.0.47
 
