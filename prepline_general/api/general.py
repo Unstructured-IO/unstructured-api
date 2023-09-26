@@ -308,7 +308,7 @@ def pipeline_api(
     enable_parallel_mode = os.environ.get("UNSTRUCTURED_PARALLEL_MODE_ENABLED", "false")
     pdf_parallel_mode_enabled = enable_parallel_mode == "true"
 
-    ocr_languages = ("+".join(m_ocr_languages) if m_ocr_languages and len(m_ocr_languages) else None)
+    ocr_languages = "+".join(m_ocr_languages) if m_ocr_languages and len(m_ocr_languages) else None
 
     include_page_breaks_str = (
         m_include_page_breaks[0] if len(m_include_page_breaks) else "false"
