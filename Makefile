@@ -102,7 +102,7 @@ check: check-src check-tests check-version
 ## check-src:                   runs linters (source only, no tests)
 .PHONY: check-src
 check-src:
-	black --line-length 100 ${PACKAGE_NAME} --check --exclude ${PACKAGE_NAME}/api
+	black --line-length 100 ${PACKAGE_NAME} --check
 	flake8 ${PACKAGE_NAME}
 	mypy ${PACKAGE_NAME} --ignore-missing-imports --install-types --non-interactive --implicit-optional
 
@@ -114,7 +114,7 @@ check-tests:
 ## tidy:                        run black
 .PHONY: tidy
 tidy:
-	black --line-length 100 ${PACKAGE_NAME} --exclude ${PACKAGE_NAME}/api
+	black --line-length 100 ${PACKAGE_NAME}
 	black --line-length 100 test_${PIPELINE_PACKAGE} scripts/smoketest.py
 
 ## check-scripts:               run shellcheck
