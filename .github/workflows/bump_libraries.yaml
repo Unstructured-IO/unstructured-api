@@ -32,7 +32,10 @@ jobs:
           run: |
             pip install pip-tools
             make pip-compile
-            changelog_message="Bump ${{ steps.metadata.outputs.dependency-names }} to ${{ steps.metadata.outputs.new-version }}"
+            package=${{ steps.metadata.outputs.dependency-names }}
+            # Strip any [extras] from name
+            package=${package%\[*}
+            changelog_message="Bump $package to ${{ steps.metadata.outputs.new-version }}"
             ./scripts/version-increment.sh "$changelog_message"
             make version-sync
         - uses: stefanzweifel/git-auto-commit-action@v4
