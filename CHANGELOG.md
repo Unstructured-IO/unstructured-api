@@ -1,3 +1,7 @@
+## 0.0.49
+
+* Bump unstructured-inference to 0.6.6
+
 ## 0.0.48
 
 * **Adds `languages` kwarg** `ocr_languages` will eventually be deprecated and replaced by `lanugages` to specify what languages to use for OCR 
