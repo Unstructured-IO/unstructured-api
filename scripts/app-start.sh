@@ -1,4 +1,4 @@
-#!/usr/bin/env bash 
+#!/usr/bin/env bash
 
 UNSTRUCTURED_DOWNLOAD_CHIPPER=${UNSTRUCTURED_DOWNLOAD_CHIPPER:-"false"}
 
