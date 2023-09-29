@@ -1,3 +1,7 @@
+## 0.0.49
+
+* Remove spurious whitespace in `app-start.sh`. **This fixes deployments in some envs such as Google Cloud Run**.
+
 ## 0.0.48
 
 * **Adds `languages` kwarg** `ocr_languages` will eventually be deprecated and replaced by `lanugages` to specify what languages to use for OCR 
