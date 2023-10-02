@@ -1,3 +1,7 @@
+## 0.0.50
+
+* Bump unstructured to 0.10.18
+
 ## 0.0.49
 
 * Remove spurious whitespace in `app-start.sh`. **This fixes deployments in some envs such as Google Cloud Run**.
