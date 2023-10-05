@@ -409,6 +409,16 @@ def test_general_api_returns_400_bad_pdf():
     assert response.status_code == 400
     tmp.close()
 
+    # Don't blow up if this isn't actually a pdf
+    test_file = Path("sample-docs") / "fake-power-point.pptx"
+    response = client.post(
+        MAIN_API_ROUTE,
+        files=[("files", (str(test_file), open(test_file, "rb"), "application/pdf"))],
+    )
+
+    assert response.json() == {"detail": "File does not appear to be a valid PDF"}
+    assert response.status_code == 400
+
 
 def test_general_api_returns_503(monkeypatch):
     """

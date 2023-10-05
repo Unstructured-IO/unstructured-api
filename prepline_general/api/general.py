@@ -278,13 +278,16 @@ def pipeline_api(
 
             # This will raise if the file is encrypted
             pdf.metadata
-        except pypdf.errors.EmptyFileError:
+        except (pypdf.errors.EmptyFileError, pypdf.errors.PdfStreamError):
             raise HTTPException(status_code=400, detail="File does not appear to be a valid PDF")
         except pypdf.errors.FileNotDecryptedError:
             raise HTTPException(
                 status_code=400,
                 detail="File is encrypted. Please decrypt it with password.",
             )
+        except Exception as e:
+            logger.warn(f"PDF read error: {e}")
+            raise HTTPException(status_code=400, detail="File does not appear to be a valid PDF")
 
     strategy = (m_strategy[0] if len(m_strategy) else "auto").lower()
     strategies = ["fast", "hi_res", "auto", "ocr_only"]
