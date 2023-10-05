@@ -1,3 +1,7 @@
+## 0.0.52-dev0
+
+* Fix an unhandled error when a non pdf file is sent with content-type pdf
+
 ## 0.0.51
 
 * Bump unstructured to 0.10.19
