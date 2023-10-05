@@ -289,9 +289,6 @@ def pipeline_api(
                 status_code=400,
                 detail="File is encrypted. Please decrypt it with password.",
             )
-        except Exception as e:
-            logger.warn(f"PDF read error: {e}")
-            raise HTTPException(status_code=400, detail="File does not appear to be a valid PDF")
 
     strategy = (m_strategy[0] if len(m_strategy) else "auto").lower()
     strategies = ["fast", "hi_res", "auto", "ocr_only"]
