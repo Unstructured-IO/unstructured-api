@@ -1,3 +1,7 @@
+## 0.0.51
+
+* Bump unstructured to 0.10.19
+
 ## 0.0.50
 
 * Bump unstructured to 0.10.18
