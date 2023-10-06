@@ -259,11 +259,12 @@ def pipeline_api(
 
         logger.debug(f"filetype: {file_content_type}")
 
-    # If this var is set, reject traffic when free memory is below minimum
+    # Reject traffic when free memory is below minimum
+    # Default to 2GB
     mem = psutil.virtual_memory()
-    memory_free_minimum = int(os.environ.get("UNSTRUCTURED_MEMORY_FREE_MINIMUM_MB", 0))
+    memory_free_minimum = int(os.environ.get("UNSTRUCTURED_MEMORY_FREE_MINIMUM_MB", 2048))
 
-    if memory_free_minimum > 0 and mem.available <= memory_free_minimum * 1024 * 1024:
+    if mem.available <= memory_free_minimum * 1024 * 1024:
         raise HTTPException(
             status_code=503, detail="Server is under heavy load. Please try again later."
         )
