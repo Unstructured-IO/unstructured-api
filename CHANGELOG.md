@@ -1,6 +1,8 @@
-## 0.0.52-dev0
+## 0.0.52-dev1
 
 * Fix an unhandled error when a non pdf file is sent with content-type pdf
+* Use a generator when splitting pdfs in parallel mode
+* Add a default memory minimum for 503 check
 
 ## 0.0.51
 
