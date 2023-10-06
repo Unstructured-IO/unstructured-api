@@ -11,15 +11,16 @@ logger = logging.getLogger("unstructured_api")
 app = FastAPI(
     title="Unstructured Pipeline API",
     description="""""",
-    version="0.0.51",
+    version="0.0.52",
     docs_url="/general/docs",
     openapi_url="/general/openapi.json",
 )
 
 # Note(austin) - This logger just dumps exceptions
-# We'd rather handle those below
+# We'd rather handle those below, so disable this in deployments
 uvicorn_logger = logging.getLogger("uvicorn.error")
-uvicorn_logger.disabled = True
+if os.environ.get("ENV") in ["dev", "prod"]:
+    uvicorn_logger.disabled = True
 
 
 # Catch all HTTPException for uniform logging and response

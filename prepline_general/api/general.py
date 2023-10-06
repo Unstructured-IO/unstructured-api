@@ -278,13 +278,13 @@ def pipeline_api(
 
             # This will raise if the file is encrypted
             pdf.metadata
-        except pypdf.errors.EmptyFileError:
-            raise HTTPException(status_code=400, detail="File does not appear to be a valid PDF")
         except pypdf.errors.FileNotDecryptedError:
             raise HTTPException(
                 status_code=400,
                 detail="File is encrypted. Please decrypt it with password.",
             )
+        except pypdf.errors.PdfReadError:
+            raise HTTPException(status_code=400, detail="File does not appear to be a valid PDF")
 
     strategy = (m_strategy[0] if len(m_strategy) else "auto").lower()
     strategies = ["fast", "hi_res", "auto", "ocr_only"]
@@ -569,7 +569,7 @@ def ungz_file(file: UploadFile, gz_uncompressed_content_type=None) -> UploadFile
 
 
 @router.post("/general/v0/general")
-@router.post("/general/v0.0.51/general")
+@router.post("/general/v0.0.52/general")
 def pipeline_1(
     request: Request,
     gz_uncompressed_content_type: Optional[str] = Form(default=None),
