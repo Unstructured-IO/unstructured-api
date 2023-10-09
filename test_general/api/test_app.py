@@ -741,11 +741,16 @@ def test_general_api_returns_400_bad_docx():
     test_file = Path("sample-docs") / "fake-text.txt"
     response = client.post(
         MAIN_API_ROUTE,
-        files=[("files", (
-            str(test_file), 
-            open(test_file, 
-            "rb"), 
-            "application/vnd.openxmlformats-officedocument.wordprocessingml.document"))],
+        files=[
+            (
+                "files",
+                (
+                    str(test_file),
+                    open(test_file, "rb"),
+                    "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                ),
+            )
+        ],
     )
-    assert "txt is not a valid" in response.json().get('detail')
+    assert "txt is not a valid" in response.json().get("detail")
     assert response.status_code == 400
