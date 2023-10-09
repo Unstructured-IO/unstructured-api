@@ -462,7 +462,7 @@ def pipeline_api(
         if "File is not a zip file" in e.args[0]:
             raise HTTPException(
                 status_code=400,
-                detail=f"{filename.split('.')[1]} is not a valid '{file_content_type}' content type",
+                detail=f"{filename} is not a valid '{file_content_type}' content type",
             )
 
     # Clean up returned elements
