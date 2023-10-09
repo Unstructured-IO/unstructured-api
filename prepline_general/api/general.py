@@ -1,28 +1,50 @@
+# Standard Library Imports
 import io
 import os
 import gzip
 import mimetypes
-from typing import List, Union
-from fastapi import status, FastAPI, File, Form, Request, UploadFile, APIRouter, HTTPException
-from fastapi.responses import PlainTextResponse
-import json
-from fastapi.responses import StreamingResponse
-from starlette.datastructures import Headers
-from starlette.types import Send
+from typing import List, Union, Optional, Mapping
+from base64 import b64encode
+from typing import Optional
+from functools import partial
+import logging
+import zipfile
+
+# External Package Imports
+import pandas as pd
+from concurrent.futures import ThreadPoolExecutor
 from base64 import b64encode
 from typing import Optional, Mapping
-import secrets
-import pandas as pd
 from concurrent.futures import ThreadPoolExecutor
 from functools import partial
 import pypdf
 from pypdf import PdfReader, PdfWriter
-from unstructured.partition.auto import partition
-from unstructured.staging.base import convert_to_isd, convert_to_dataframe, elements_from_json
 import psutil
 import requests
 import backoff
-import logging
+from typing import Optional, Mapping
+from fastapi import (
+    status,
+    FastAPI,
+    File,
+    Form,
+    Request,
+    UploadFile,
+    APIRouter,
+    HTTPException,
+)
+from fastapi.responses import PlainTextResponse, StreamingResponse
+from starlette.datastructures import Headers
+from starlette.types import Send
+import secrets
+
+# Unstructured Imports
+from unstructured.partition.auto import partition
+from unstructured.staging.base import (
+    convert_to_isd,
+    convert_to_dataframe,
+    elements_from_json,
+)
 from unstructured_inference.models.chipper import MODEL_TYPES as CHIPPER_MODEL_TYPES
 
 
@@ -435,6 +457,12 @@ def pipeline_api(
                 status_code=400, detail=f"{file_content_type} not currently supported"
             )
         raise e
+    except zipfile.BadZipFile as e:
+        if "File is not a zip file" in e.args[0]:
+            raise HTTPException(
+                status_code=400, detail=f"{filename} is not a valid {file_content_type} content type"
+            )
+
 
     # Clean up returned elements
     # Note(austin): pydantic should control this sort of thing for us
