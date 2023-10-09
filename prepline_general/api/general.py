@@ -461,9 +461,9 @@ def pipeline_api(
     except zipfile.BadZipFile as e:
         if "File is not a zip file" in e.args[0]:
             raise HTTPException(
-                status_code=400, detail=f"{filename} is not a valid '{file_content_type}' content type"
+                status_code=400,
+                detail=f"{filename} is not a valid '{file_content_type}' content type",
             )
-
 
     # Clean up returned elements
     # Note(austin): pydantic should control this sort of thing for us
