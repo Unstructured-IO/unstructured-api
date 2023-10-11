@@ -1,6 +1,7 @@
-## 0.0.52-dev0
+## 0.0.52-dev1
 
 * Fix an unhandled error when a non pdf file is sent with content-type pdf
+* Fix unhandled error when a non docx file is sent with content-type docx
 
 ## 0.0.51
 

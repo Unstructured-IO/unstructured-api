@@ -731,3 +731,26 @@ def test_encrypted_pdf():
             files=[("files", (str(temp_file.name), open(temp_file.name, "rb"), "application/pdf"))],
         )
         assert response.status_code == 200
+
+
+def test_general_api_returns_400_bad_docx():
+    """
+    Verify that we get a 400 for invalid docx files
+    """
+    client = TestClient(app)
+    test_file = Path("sample-docs") / "fake-text.txt"
+    response = client.post(
+        MAIN_API_ROUTE,
+        files=[
+            (
+                "files",
+                (
+                    str(test_file),
+                    open(test_file, "rb"),
+                    "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                ),
+            )
+        ],
+    )
+    assert "txt is not a valid" in response.json().get("detail")
+    assert response.status_code == 400
