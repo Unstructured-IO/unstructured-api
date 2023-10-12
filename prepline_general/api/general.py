@@ -457,6 +457,11 @@ def pipeline_api(
             raise HTTPException(
                 status_code=400, detail=f"{file_content_type} not currently supported"
             )
+        if "Unstructured schema" in e.args[0]:
+            raise HTTPException(
+                status_code=400,
+                detail="Json schema does not match the Unstructured schema",
+            )
         raise e
     except zipfile.BadZipFile as e:
         if "File is not a zip file" in e.args[0]:
