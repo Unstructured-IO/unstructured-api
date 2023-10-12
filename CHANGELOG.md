@@ -1,5 +1,6 @@
-## 0.0.52-dev2
+## 0.0.52
 
+* Bump unstructured to 0.10.21
 * Fix an unhandled error when a non pdf file is sent with content-type pdf
 * Fix an unhandled error when a non docx file is sent with content-type docx
 * Fix an unhandled error when a non-Unstructured json schema is sent

@@ -56,7 +56,7 @@ jobs:
         uses: ludeeus/action-shellcheck@master
 
   test:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest-m
     needs: [setup, lint]
     steps:
     - uses: actions/checkout@v4
@@ -97,7 +97,7 @@ jobs:
   # TODO - figure out best practice for caching docker images
   # (Using the virtualenv to get pytest)
   test_dockerfile:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest-m
     needs: [setup, lint]
     steps:
     - uses: actions/checkout@v4
