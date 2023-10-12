@@ -457,6 +457,52 @@ def pipeline_api(
             raise HTTPException(
                 status_code=400, detail=f"{file_content_type} not currently supported"
             )
+        if "Json schema does not match the Unstructured schema" in e.args[0]:
+            raise HTTPException(
+                status_code=400,
+                detail="""Json schema does not match the Unstructured schema
+
+                Example schema:
+                [
+                    {
+                        "type": "UncategorizedText",
+                        "element_id": "d10b36aa74a59bcf4a88185837f658af",
+                        "metadata": {
+                            "coordinates": {
+                                "points": [
+                                    [
+                                        112.69200000000001,
+                                        85.803
+                                    ],
+                                    [
+                                        112.69200000000001,
+                                        93.803
+                                    ],
+                                    [
+                                        136.77200000000002,
+                                        93.803
+                                    ],
+                                    [
+                                        136.77200000000002,
+                                        85.803
+                                    ]
+                                ],
+                                "system": "PixelSpace",
+                                "layout_width": 612,
+                                "layout_height": 792
+                            },
+                            "filename": "interface-config-guide-p93.pdf",
+                            "file_directory": "example-docs",
+                            "last_modified": "2023-10-05T11:27:40",
+                            "filetype": "application/pdf",
+                            "page_number": 1,
+                            "links": []
+                        },
+                        "text": "}"
+                    },
+                ]
+                """,
+            )
         raise e
     except zipfile.BadZipFile as e:
         if "File is not a zip file" in e.args[0]:
