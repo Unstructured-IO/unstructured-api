@@ -1,7 +1,8 @@
-## 0.0.52-dev1
+## 0.0.52-dev2
 
 * Fix an unhandled error when a non pdf file is sent with content-type pdf
-* Fix unhandled error when a non docx file is sent with content-type docx
+* Fix an unhandled error when a non docx file is sent with content-type docx
+* Fix an unhandled error when a non-Unstructured json schema is sent
 
 ## 0.0.51
 
