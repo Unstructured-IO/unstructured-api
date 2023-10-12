@@ -785,5 +785,5 @@ def test_general_api_returns_400_bad_json(tmpdir):
             )
         ],
     )
-    assert "Example schema" in response.json().get("detail")
+    assert "Unstructured schema" in response.json().get("detail")
     assert response.status_code == 400
