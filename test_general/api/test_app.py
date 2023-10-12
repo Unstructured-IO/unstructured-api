@@ -1,4 +1,5 @@
 from pathlib import Path
+import os
 
 import io
 import pytest
@@ -753,4 +754,30 @@ def test_general_api_returns_400_bad_docx():
         ],
     )
     assert "txt is not a valid" in response.json().get("detail")
+    assert response.status_code == 400
+
+
+def test_general_api_returns_400_bad_json(tmpdir):
+    """
+    Verify that we get a 400 for invalid docx files
+    """
+    client = TestClient(app)
+    data = '{"hi": "there"}'
+
+    filepath = os.path.join(tmpdir, "unprocessable.json")
+    with open(filepath, "w") as f:
+        f.write(data)
+    response = client.post(
+        MAIN_API_ROUTE,
+        files=[
+            (
+                "files",
+                (
+                    str(filepath),
+                    open(filepath, "rb"),
+                ),
+            )
+        ],
+    )
+    assert "Example schema" in response.json().get("detail")
     assert response.status_code == 400
