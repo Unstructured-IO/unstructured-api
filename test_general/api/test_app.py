@@ -759,7 +759,7 @@ def test_general_api_returns_400_bad_docx():
 
 def test_general_api_returns_400_bad_json(tmpdir):
     """
-    Verify that we get a 400 for invalid docx files
+    Verify that we get a 400 for invalid json schemas
     """
     client = TestClient(app)
     data = '{"hi": "there"}'
