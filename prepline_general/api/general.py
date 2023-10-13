@@ -406,7 +406,7 @@ def pipeline_api(
             )
         )
 
-        # TODO(austin) - Unstructured 0.10.22 won't accept model_name=None
+        # TODO(austin) - Latest unstructured won't accept model_name=None
         # Just pass if it's set until the fix is released
         kwargs = {}
         if hi_res_model_name:
