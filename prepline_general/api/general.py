@@ -467,7 +467,7 @@ def pipeline_api(
         if "File is not a zip file" in e.args[0]:
             raise HTTPException(
                 status_code=400,
-                detail=f"{filename} is not a valid '{file_content_type}' content type",
+                detail="File is not a valid docx",
             )
 
     # Clean up returned elements
