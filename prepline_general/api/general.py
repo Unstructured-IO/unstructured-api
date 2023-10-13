@@ -467,7 +467,7 @@ def pipeline_api(
         if "File is not a zip file" in e.args[0]:
             raise HTTPException(
                 status_code=400,
-                detail=f"{filename} is not a valid '{file_content_type}' content type",
+                detail="File is not a valid docx",
             )
 
     # Clean up returned elements
@@ -603,7 +603,7 @@ def ungz_file(file: UploadFile, gz_uncompressed_content_type=None) -> UploadFile
 
 
 @router.post("/general/v0/general")
-@router.post("/general/v0.0.52/general")
+@router.post("/general/v0.0.53/general")
 def pipeline_1(
     request: Request,
     gz_uncompressed_content_type: Optional[str] = Form(default=None),
