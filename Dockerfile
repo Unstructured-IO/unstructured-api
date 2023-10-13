@@ -31,13 +31,19 @@ RUN python3.10 -m pip install pip==${PIP_VERSION} \
   && dnf clean all \
   && ln -s /home/notebook-user/.local/bin/pip3.10 /usr/local/bin/pip3.10 || true
 
-USER ${NB_USER}
-
 FROM python-deps as model-deps
 
 RUN python3.10 -c "import nltk; nltk.download('punkt')" && \
   python3.10 -c "import nltk; nltk.download('averaged_perceptron_tagger')" && \
   python3.10 -c "from unstructured.ingest.pipeline.initialize import initialize; initialize()"
+
+COPY --chown=${NB_USER}:${NB_USER} scripts/maybe-pull-chipper.sh scripts/maybe-pull-chipper.sh
+RUN --mount=type=secret,id=hf_token \
+     export UNSTRUCTURED_HF_TOKEN=$(cat /run/secrets/hf_token) && \
+    ./scripts/maybe-pull-chipper.sh
+
+
+USER ${NB_USER}
 
 FROM model-deps as code
 COPY --chown=${NB_USER}:${NB_USER} CHANGELOG.md CHANGELOG.md

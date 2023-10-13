@@ -16,11 +16,17 @@ DOCKER_BUILD_CMD=(docker buildx build --load -f Dockerfile \
   --progress plain \
   --target code \
   --cache-from "$DOCKER_REPOSITORY":latest \
-  -t "$DOCKER_IMAGE" .)
+  -t "$DOCKER_IMAGE")
+
+# If a token is present to download Chipper, pass it in as a secret file
+if [ -f hf_token ]; then
+  # --secret id=hf_token,src=env_file \
+  DOCKER_BUILD_CMD+=("--secret" "id=hf_token,src=hf_token")
+fi
 
 # only build for specific platform if DOCKER_PLATFORM is set
 if [ -n "${DOCKER_PLATFORM:-}" ]; then
   DOCKER_BUILD_CMD+=("--platform=$DOCKER_PLATFORM")
 fi
 
-DOCKER_BUILDKIT=1 "${DOCKER_BUILD_CMD[@]}"
+DOCKER_BUILDKIT=1 "${DOCKER_BUILD_CMD[@]}" .

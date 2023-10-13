@@ -67,12 +67,14 @@ jobs:
       run: |
         # Clear some space (https://github.com/actions/runner-images/issues/2840)
         sudo rm -rf /usr/share/dotnet /opt/ghc /usr/local/share/boost
+        echo ${{ secrets.HF_TOKEN }} >> hf_token
 
         ARCH=$(cut -d "/" -f2 <<< ${{ matrix.docker-platform }})
         DOCKER_BUILDKIT=1 docker buildx build --platform=$ARCH --load \
           --build-arg PIP_VERSION=$PIP_VERSION \
           --build-arg BUILDKIT_INLINE_CACHE=1 \
           --build-arg PIPELINE_PACKAGE=${{ env.PIPELINE_FAMILY }} \
+          --secret id=hf_token,src=hf_token \
           --provenance=false \
           --progress plain \
           --cache-from $DOCKER_BUILD_REPOSITORY:$ARCH \
