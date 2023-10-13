@@ -288,7 +288,7 @@ jupyter-server==2.7.3
     #   notebook-shim
 jupyter-server-terminals==0.4.4
     # via jupyter-server
-jupyterlab==4.0.6
+jupyterlab==4.0.7
     # via notebook
 jupyterlab-pygments==0.2.2
     # via nbconvert
@@ -381,7 +381,7 @@ nltk==3.8.1
     # via
     #   -r requirements/base.txt
     #   unstructured
-notebook==7.0.4
+notebook==7.0.5
     # via jupyter
 notebook-shim==0.2.3
     # via
@@ -525,7 +525,7 @@ pycocotools==2.0.7
     # via
     #   -r requirements/base.txt
     #   effdet
-pycodestyle==2.11.0
+pycodestyle==2.11.1
     # via flake8
 pycparser==2.21
     # via
@@ -578,7 +578,7 @@ python-dateutil==2.8.2
     #   jupyter-client
     #   matplotlib
     #   pandas
-python-docx==1.0.0
+python-docx==1.0.1
     # via
     #   -r requirements/base.txt
     #   unstructured
@@ -658,7 +658,7 @@ rfc3986-validator==0.1.1
     # via
     #   jsonschema
     #   jupyter-events
-rpds-py==0.10.5
+rpds-py==0.10.6
     # via
     #   jsonschema
     #   referencing
@@ -804,9 +804,9 @@ tzdata==2023.3
     # via
     #   -r requirements/base.txt
     #   pandas
-unstructured[local-inference]==0.10.21
+unstructured[local-inference]==0.10.22
     # via -r requirements/base.txt
-unstructured-inference==0.7.2
+unstructured-inference==0.7.3
     # via
     #   -r requirements/base.txt
     #   unstructured

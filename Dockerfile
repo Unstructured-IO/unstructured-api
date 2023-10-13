@@ -39,8 +39,6 @@ FROM python-deps as model-deps
 # Not relevant here - remove the imports for now
 RUN python3.10 -c "import nltk; nltk.download('punkt')" && \
   python3.10 -c "import nltk; nltk.download('averaged_perceptron_tagger')" && \
-  sed -i '/Chunker/d' ~/.local/lib/python3.10/site-packages/unstructured/ingest/pipeline/__init__.py  && \
-  sed -i '/Embedder/d' ~/.local/lib/python3.10/site-packages/unstructured/ingest/pipeline/__init__.py  && \
   python3.10 -c "from unstructured.ingest.pipeline.initialize import initialize; initialize()"
 
 FROM model-deps as code

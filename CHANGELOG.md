@@ -1,6 +1,7 @@
-## 0.0.53-dev0
+## 0.0.53-dev1
 
 * Simplify the error message for BadZipFile errors
+* Bump unstructured to 0.10.22
 
 ## 0.0.52
 
