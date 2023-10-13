@@ -759,7 +759,7 @@ def test_general_api_returns_400_bad_docx():
             )
         ],
     )
-    assert "txt is not a valid" in response.json().get("detail")
+    assert response.json().get("detail") == "File is not a valid docx"
     assert response.status_code == 400
 
 
