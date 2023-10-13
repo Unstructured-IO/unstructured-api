@@ -42,7 +42,6 @@ RUN --mount=type=secret,id=hf_token \
      export UNSTRUCTURED_HF_TOKEN=$(cat /run/secrets/hf_token) && \
     ./scripts/maybe-pull-chipper.sh
 
-
 USER ${NB_USER}
 
 FROM model-deps as code

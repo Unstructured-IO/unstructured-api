@@ -1,7 +1,8 @@
-## 0.0.53-dev1
+## 0.0.53-dev2
 
 * Simplify the error message for BadZipFile errors
 * Bump unstructured to 0.10.22
+* Prefetch the Chipper model in the image when we have a token
 
 ## 0.0.52
 
