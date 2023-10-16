@@ -275,11 +275,11 @@ jupyter-core==5.4.0
     #   nbconvert
     #   nbformat
     #   qtconsole
-jupyter-events==0.7.0
+jupyter-events==0.8.0
     # via jupyter-server
 jupyter-lsp==2.2.0
     # via jupyterlab
-jupyter-server==2.7.3
+jupyter-server==2.8.0
     # via
     #   jupyter-lsp
     #   jupyterlab
@@ -377,6 +377,7 @@ networkx==3.1
     # via
     #   -r requirements/base.txt
     #   torch
+    #   unstructured
 nltk==3.8.1
     # via
     #   -r requirements/base.txt
@@ -387,7 +388,7 @@ notebook-shim==0.2.3
     # via
     #   jupyterlab
     #   notebook
-numpy==1.26.0
+numpy==1.26.1
     # via
     #   -r requirements/base.txt
     #   contourpy
@@ -413,7 +414,7 @@ omegaconf==2.3.0
 onnx==1.14.1
     # via
     #   -r requirements/base.txt
-    #   unstructured-inference
+    #   unstructured
 onnxruntime==1.15.1
     # via
     #   -r requirements/base.txt
@@ -479,7 +480,7 @@ pexpect==4.8.0
     # via ipython
 pickleshare==0.7.5
     # via ipython
-pillow==10.0.1
+pillow==10.1.0
     # via
     #   -r requirements/base.txt
     #   layoutparser
@@ -511,7 +512,7 @@ protobuf==4.24.4
     #   -r requirements/base.txt
     #   onnx
     #   onnxruntime
-psutil==5.9.5
+psutil==5.9.6
     # via
     #   -r requirements/base.txt
     #   ipykernel
@@ -804,9 +805,9 @@ tzdata==2023.3
     # via
     #   -r requirements/base.txt
     #   pandas
-unstructured[local-inference]==0.10.22
+unstructured[local-inference]==0.10.23
     # via -r requirements/base.txt
-unstructured-inference==0.7.3
+unstructured-inference==0.7.5
     # via
     #   -r requirements/base.txt
     #   unstructured
@@ -842,7 +843,7 @@ xlrd==2.0.1
     # via
     #   -r requirements/base.txt
     #   unstructured
-xlsxwriter==3.1.7
+xlsxwriter==3.1.8
     # via
     #   -r requirements/base.txt
     #   python-pptx

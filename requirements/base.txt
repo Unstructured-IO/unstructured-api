@@ -115,10 +115,12 @@ msg-parser==1.2.0
 mypy-extensions==1.0.0
     # via typing-inspect
 networkx==3.1
-    # via torch
+    # via
+    #   torch
+    #   unstructured
 nltk==3.8.1
     # via unstructured
-numpy==1.26.0
+numpy==1.26.1
     # via
     #   contourpy
     #   layoutparser
@@ -137,7 +139,7 @@ olefile==0.46
 omegaconf==2.3.0
     # via effdet
 onnx==1.14.1
-    # via unstructured-inference
+    # via unstructured
 onnxruntime==1.15.1
     # via unstructured-inference
 opencv-python==4.8.1.78
@@ -169,7 +171,7 @@ pdfminer-six==20221105
     #   unstructured
 pdfplumber==0.10.2
     # via layoutparser
-pillow==10.0.1
+pillow==10.1.0
     # via
     #   layoutparser
     #   matplotlib
@@ -185,7 +187,7 @@ protobuf==4.24.4
     # via
     #   onnx
     #   onnxruntime
-psutil==5.9.5
+psutil==5.9.6
     # via -r requirements/base.in
 pycocotools==2.0.7
     # via effdet
@@ -310,9 +312,9 @@ typing-inspect==0.9.0
     # via dataclasses-json
 tzdata==2023.3
     # via pandas
-unstructured[local-inference]==0.10.22
+unstructured[local-inference]==0.10.23
     # via -r requirements/base.in
-unstructured-inference==0.7.3
+unstructured-inference==0.7.5
     # via unstructured
 unstructured-pytesseract==0.3.12
     # via unstructured
@@ -322,5 +324,5 @@ uvicorn==0.23.2
     # via -r requirements/base.in
 xlrd==2.0.1
     # via unstructured
-xlsxwriter==3.1.7
+xlsxwriter==3.1.8
     # via python-pptx
