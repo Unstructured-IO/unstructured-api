@@ -1,7 +1,7 @@
 ## 0.0.53
 
-* Simplify the error message for BadZipFile errors
 * Bump unstructured to 0.10.23
+* Simplify the error message for BadZipFile errors
 
 ## 0.0.52
 
