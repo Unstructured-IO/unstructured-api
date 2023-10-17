@@ -1,3 +1,7 @@
+## 0.0.54-dev0
+
+* Bump unstructured to 0.10.24
+
 ## 0.0.53
 
 * Bump unstructured to 0.10.23
