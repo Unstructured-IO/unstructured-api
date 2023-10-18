@@ -1,28 +1,51 @@
+# Standard Library Imports
 import io
 import os
 import gzip
 import mimetypes
-from typing import List, Union
-from fastapi import status, FastAPI, File, Form, Request, UploadFile, APIRouter, HTTPException
-from fastapi.responses import PlainTextResponse
+from typing import List, Union, Optional, Mapping
+from base64 import b64encode
+from typing import Optional
+from functools import partial
 import json
-from fastapi.responses import StreamingResponse
-from starlette.datastructures import Headers
-from starlette.types import Send
+import logging
+import zipfile
+
+# External Package Imports
+import pandas as pd
+from concurrent.futures import ThreadPoolExecutor
 from base64 import b64encode
 from typing import Optional, Mapping
-import secrets
-import pandas as pd
 from concurrent.futures import ThreadPoolExecutor
 from functools import partial
 import pypdf
 from pypdf import PdfReader, PdfWriter
-from unstructured.partition.auto import partition
-from unstructured.staging.base import convert_to_isd, convert_to_dataframe, elements_from_json
 import psutil
 import requests
 import backoff
-import logging
+from typing import Optional, Mapping
+from fastapi import (
+    status,
+    FastAPI,
+    File,
+    Form,
+    Request,
+    UploadFile,
+    APIRouter,
+    HTTPException,
+)
+from fastapi.responses import PlainTextResponse, StreamingResponse
+from starlette.datastructures import Headers
+from starlette.types import Send
+import secrets
+
+# Unstructured Imports
+from unstructured.partition.auto import partition
+from unstructured.staging.base import (
+    convert_to_isd,
+    convert_to_dataframe,
+    elements_from_json,
+)
 from unstructured_inference.models.chipper import MODEL_TYPES as CHIPPER_MODEL_TYPES
 
 
@@ -174,7 +197,7 @@ def partition_pdf_splits(
     # If it's small enough, just process locally
     # (Some kwargs need to be renamed for local partition)
     if len(pdf_pages) <= pages_per_pdf:
-        if "hi_res_model_name" in partition_kwargs:
+        if partition_kwargs.get("hi_res_model_name"):
             partition_kwargs["model_name"] = partition_kwargs.pop("hi_res_model_name")
 
         return partition(
@@ -214,12 +237,12 @@ def pipeline_api(
     m_encoding=[],
     m_hi_res_model_name=[],
     m_include_page_breaks=[],
-    m_ocr_languages=[],
+    m_ocr_languages=None,
     m_pdf_infer_table_structure=[],
     m_skip_infer_table_types=[],
     m_strategy=[],
     m_xml_keep_tags=[],
-    languages=["eng"],
+    languages=None,
     m_chunking_strategy=[],
     m_multipage_sections=[],
     m_combine_under_n_chars=[],
@@ -278,13 +301,13 @@ def pipeline_api(
 
             # This will raise if the file is encrypted
             pdf.metadata
-        except pypdf.errors.EmptyFileError:
-            raise HTTPException(status_code=400, detail="File does not appear to be a valid PDF")
         except pypdf.errors.FileNotDecryptedError:
             raise HTTPException(
                 status_code=400,
                 detail="File is encrypted. Please decrypt it with password.",
             )
+        except pypdf.errors.PdfReadError:
+            raise HTTPException(status_code=400, detail="File does not appear to be a valid PDF")
 
     strategy = (m_strategy[0] if len(m_strategy) else "auto").lower()
     strategies = ["fast", "hi_res", "auto", "ocr_only"]
@@ -383,6 +406,13 @@ def pipeline_api(
             )
         )
 
+        # TODO(austin) - Latest unstructured won't accept model_name=None
+        # Just pass if it's set until the fix is released
+        # https://github.com/Unstructured-IO/unstructured/issues/1754
+        kwargs = {}
+        if hi_res_model_name:
+            kwargs["model_name"] = hi_res_model_name
+
         # Be careful of naming differences in api params vs partition params!
         # These kwargs are going back into the api, not into partition
         # If there's a difference, remap the param in partition_pdf_splits
@@ -417,7 +447,6 @@ def pipeline_api(
                 # partition_kwargs
                 encoding=encoding,
                 include_page_breaks=include_page_breaks,
-                model_name=hi_res_model_name,
                 ocr_languages=ocr_languages,
                 pdf_infer_table_structure=pdf_infer_table_structure,
                 skip_infer_table_types=skip_infer_table_types,
@@ -428,13 +457,25 @@ def pipeline_api(
                 multipage_sections=multipage_sections,
                 combine_under_n_chars=combine_under_n_chars,
                 new_after_n_chars=new_after_n_chars,
+                **kwargs,
             )
     except ValueError as e:
         if "Invalid file" in e.args[0]:
             raise HTTPException(
                 status_code=400, detail=f"{file_content_type} not currently supported"
             )
+        if "Unstructured schema" in e.args[0]:
+            raise HTTPException(
+                status_code=400,
+                detail="Json schema does not match the Unstructured schema",
+            )
         raise e
+    except zipfile.BadZipFile as e:
+        if "File is not a zip file" in e.args[0]:
+            raise HTTPException(
+                status_code=400,
+                detail="File is not a valid docx",
+            )
 
     # Clean up returned elements
     # Note(austin): pydantic should control this sort of thing for us
@@ -569,7 +610,7 @@ def ungz_file(file: UploadFile, gz_uncompressed_content_type=None) -> UploadFile
 
 
 @router.post("/general/v0/general")
-@router.post("/general/v0.0.50/general")
+@router.post("/general/v0.0.54/general")
 def pipeline_1(
     request: Request,
     gz_uncompressed_content_type: Optional[str] = Form(default=None),
@@ -579,12 +620,12 @@ def pipeline_1(
     encoding: List[str] = Form(default=[]),
     hi_res_model_name: List[str] = Form(default=[]),
     include_page_breaks: List[str] = Form(default=[]),
-    ocr_languages: List[str] = Form(default=[]),
+    ocr_languages: List[str] = Form(default=None),
     pdf_infer_table_structure: List[str] = Form(default=[]),
     skip_infer_table_types: List[str] = Form(default=[]),
     strategy: List[str] = Form(default=[]),
     xml_keep_tags: List[str] = Form(default=[]),
-    languages: List[str] = ["eng"],
+    languages: List[str] = Form(default=None),
     chunking_strategy: List[str] = Form(default=[]),
     multipage_sections: List[str] = Form(default=[]),
     combine_under_n_chars: List[str] = Form(default=[]),

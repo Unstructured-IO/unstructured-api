@@ -1,3 +1,23 @@
+## 0.0.54-dev0
+
+* Bump unstructured to 0.10.24
+
+## 0.0.53
+
+* Bump unstructured to 0.10.23
+* Simplify the error message for BadZipFile errors
+
+## 0.0.52
+
+* Bump unstructured to 0.10.21
+* Fix an unhandled error when a non pdf file is sent with content-type pdf
+* Fix an unhandled error when a non docx file is sent with content-type docx
+* Fix an unhandled error when a non-Unstructured json schema is sent
+
+## 0.0.51
+
+* Bump unstructured to 0.10.19
+
 ## 0.0.50
 
 * Bump unstructured to 0.10.18

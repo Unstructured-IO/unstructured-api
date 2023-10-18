@@ -20,7 +20,7 @@ jobs:
       with:
         path: |
           .venv
-        key: ci-venv-${{ env.PIPELINE_FAMILY }}-${{ hashFiles('requirements/test.txt') }}
+        key: ci-venv-${{ env.PIPELINE_FAMILY }}-${{ hashFiles('requirements/base.txt') }}
     - name: Set up Python ${{ env.PYTHON_VERSION }}
       uses: actions/setup-python@v4
       with:
@@ -42,7 +42,7 @@ jobs:
       with:
         path: |
           .venv
-        key: ci-venv-${{ env.PIPELINE_FAMILY }}-${{ hashFiles('requirements/test.txt') }}
+        key: ci-venv-${{ env.PIPELINE_FAMILY }}-${{ hashFiles('requirements/base.txt') }}
     - name: Lint
       run: |
         source .venv/bin/activate
@@ -56,7 +56,7 @@ jobs:
         uses: ludeeus/action-shellcheck@master
 
   test:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest-m
     needs: [setup, lint]
     steps:
     - uses: actions/checkout@v4
@@ -65,7 +65,7 @@ jobs:
       with:
         path: |
           .venv
-        key: ci-venv-${{ env.PIPELINE_FAMILY }}-${{ hashFiles('requirements/test.txt') }}
+        key: ci-venv-${{ env.PIPELINE_FAMILY }}-${{ hashFiles('requirements/base.txt') }}
     - name: Run core tests
       run: |
         source .venv/bin/activate
@@ -97,7 +97,7 @@ jobs:
   # TODO - figure out best practice for caching docker images
   # (Using the virtualenv to get pytest)
   test_dockerfile:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest-m
     needs: [setup, lint]
     steps:
     - uses: actions/checkout@v4
@@ -106,7 +106,7 @@ jobs:
       with:
         path: |
           .venv
-        key: ci-venv-${{ env.PIPELINE_FAMILY }}-${{ hashFiles('requirements/test.txt') }}
+        key: ci-venv-${{ env.PIPELINE_FAMILY }}-${{ hashFiles('requirements/base.txt') }}
     - name: Test Dockerfile
       run: |
         source .venv/bin/activate
