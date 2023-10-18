@@ -1,6 +1,8 @@
-## 0.0.54-dev0
+## 0.0.54-dev1
 
 * Bump unstructured to 0.10.24
+* Use a generator when splitting pdfs in parallel mode
+* Add a default memory minimum for 503 check
 
 ## 0.0.53
 

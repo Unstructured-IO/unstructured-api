@@ -94,8 +94,6 @@ def get_pdf_splits(pdf_pages, split_size=1):
     Given a pdf (PdfReader) with n pages, split it into pdfs each with split_size # of pages
     Return the files with their page offset in the form [( BytesIO, int)]
     """
-    split_pdfs = []
-
     offset = 0
 
     while offset < len(pdf_pages):
@@ -109,10 +107,8 @@ def get_pdf_splits(pdf_pages, split_size=1):
         new_pdf.write(pdf_buffer)
         pdf_buffer.seek(0)
 
-        split_pdfs.append((pdf_buffer.read(), offset))
+        yield (pdf_buffer.read(), offset)
         offset += split_size
-
-    return split_pdfs
 
 
 # Do not retry with these status codes
@@ -208,7 +204,7 @@ def partition_pdf_splits(
         )
 
     results = []
-    page_tuples = get_pdf_splits(pdf_pages, split_size=pages_per_pdf)
+    page_iterator = get_pdf_splits(pdf_pages, split_size=pages_per_pdf)
 
     partition_func = partial(
         partition_file_via_api,
@@ -221,7 +217,7 @@ def partition_pdf_splits(
 
     thread_count = int(os.environ.get("UNSTRUCTURED_PARALLEL_MODE_THREADS", 3))
     with ThreadPoolExecutor(max_workers=thread_count) as executor:
-        for result in executor.map(partition_func, page_tuples):
+        for result in executor.map(partition_func, page_iterator):
             results.extend(result)
 
     return results
@@ -286,11 +282,12 @@ def pipeline_api(
 
         logger.debug(f"filetype: {file_content_type}")
 
-    # If this var is set, reject traffic when free memory is below minimum
+    # Reject traffic when free memory is below minimum
+    # Default to 2GB
     mem = psutil.virtual_memory()
-    memory_free_minimum = int(os.environ.get("UNSTRUCTURED_MEMORY_FREE_MINIMUM_MB", 0))
+    memory_free_minimum = int(os.environ.get("UNSTRUCTURED_MEMORY_FREE_MINIMUM_MB", 2048))
 
-    if memory_free_minimum > 0 and mem.available <= memory_free_minimum * 1024 * 1024:
+    if mem.available <= memory_free_minimum * 1024 * 1024:
         raise HTTPException(
             status_code=503, detail="Server is under heavy load. Please try again later."
         )
