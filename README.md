@@ -208,12 +208,16 @@ curl -X 'POST'
 #### Chunking Elements
 
 Set the `chunking_strategy` to chunk text into larger or smaller elements. Defaults to `None` with optional arg of `by_title`.
+
   Additional Parameters:
+
     `multipage_sections`
       If True, sections can span multiple pages. Defaults to True.
+
     `combine_under_n_chars`
       Combines elements (for example a series of titles) until a section
       reaches a length of n characters. Defaults to 500.
+
     `new_after_n_chars`
       Cuts off new sections once they reach a length of "n" characters. Defaults to 1500.
 
@@ -232,13 +236,13 @@ curl -X 'POST'
 * Using `pyenv` to manage virtualenv's is recommended
 	* Mac install instructions. See [here](https://github.com/Unstructured-IO/community#mac--homebrew) for more detailed instructions.
 		* `brew install pyenv-virtualenv`
-	  * `pyenv install 3.8.17`
+	  * `pyenv install 3.10.12`
   * Linux instructions are available [here](https://github.com/Unstructured-IO/community#linux).
 
   * Create a virtualenv to work in and activate it, e.g. for one named `document-processing`:
 
-	`pyenv  virtualenv 3.8.17 document-processing` <br />
-	`pyenv activate document-processing`
+	`pyenv  virtualenv 3.10.12 unstructured-api` <br />
+	`pyenv activate unstructured-api`
 
 See the [Unstructured Quick Start](https://github.com/Unstructured-IO/unstructured#eight_pointed_black_star-quick-start) for the many OS dependencies that are required, if the ability to process all file types is desired.
 
@@ -316,9 +320,8 @@ As mentioned above, processing a pdf using `hi_res` is currently a slow operatio
 * `UNSTRUCTURED_PARALLEL_MODE_SPLIT_SIZE` - the number of pages to be processed in one request, default is `1`.
 * `UNSTRUCTURED_PARALLEL_RETRY_ATTEMPTS` - the number of retry attempts on a retryable error, default is `2`. (i.e. 3 attempts are made in total)
 
-### Generating Python files from the pipeline notebooks
-
-You can generate the FastAPI APIs from your pipeline notebooks by running `make generate-api`.
+#### Controlling Server Load
+Some documents will use a lot of memory as they're being processed. To mitigate OOM errors, the server will return a 503 if the host's available memory drops below 2GB. This is configurable with `UNSTRUCTURED_MEMORY_FREE_MINIMUM_MB`.
 
 ## :dizzy: Instructions for using the Docker image
 
