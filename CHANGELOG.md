@@ -1,8 +1,20 @@
-## 0.0.52-dev1
+## 0.0.54-dev1
 
-* Fix an unhandled error when a non pdf file is sent with content-type pdf
+* Bump unstructured to 0.10.24
 * Use a generator when splitting pdfs in parallel mode
 * Add a default memory minimum for 503 check
+
+## 0.0.53
+
+* Bump unstructured to 0.10.23
+* Simplify the error message for BadZipFile errors
+
+## 0.0.52
+
+* Bump unstructured to 0.10.21
+* Fix an unhandled error when a non pdf file is sent with content-type pdf
+* Fix an unhandled error when a non docx file is sent with content-type docx
+* Fix an unhandled error when a non-Unstructured json schema is sent
 
 ## 0.0.51
 

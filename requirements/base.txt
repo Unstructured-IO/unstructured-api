@@ -11,7 +11,9 @@ anyio==3.7.1
     #   fastapi
     #   starlette
 backoff==2.2.1
-    # via -r requirements/base.in
+    # via
+    #   -r requirements/base.in
+    #   unstructured
 beautifulsoup4==4.12.2
     # via unstructured
 certifi==2023.7.22
@@ -35,7 +37,7 @@ contourpy==1.1.1
     # via matplotlib
 cryptography==41.0.4
     # via pdfminer-six
-cycler==0.12.0
+cycler==0.12.1
     # via matplotlib
 dataclasses-json==0.6.1
     # via unstructured
@@ -60,7 +62,7 @@ filetype==1.2.0
     # via unstructured
 flatbuffers==23.5.26
     # via onnxruntime
-fonttools==4.43.0
+fonttools==4.43.1
     # via matplotlib
 fsspec==2023.9.2
     # via
@@ -68,7 +70,7 @@ fsspec==2023.9.2
     #   torch
 h11==0.14.0
     # via uvicorn
-huggingface-hub==0.16.4
+huggingface-hub==0.17.3
     # via
     #   timm
     #   tokenizers
@@ -98,7 +100,7 @@ lxml==4.9.3
     #   python-docx
     #   python-pptx
     #   unstructured
-markdown==3.4.4
+markdown==3.5
     # via unstructured
 markupsafe==2.1.3
     # via jinja2
@@ -113,10 +115,12 @@ msg-parser==1.2.0
 mypy-extensions==1.0.0
     # via typing-inspect
 networkx==3.1
-    # via torch
+    # via
+    #   torch
+    #   unstructured
 nltk==3.8.1
     # via unstructured
-numpy==1.26.0
+numpy==1.26.1
     # via
     #   contourpy
     #   layoutparser
@@ -135,8 +139,8 @@ olefile==0.46
 omegaconf==2.3.0
     # via effdet
 onnx==1.14.1
-    # via unstructured-inference
-onnxruntime==1.16.0
+    # via unstructured
+onnxruntime==1.15.1
     # via unstructured-inference
 opencv-python==4.8.1.78
     # via
@@ -167,7 +171,7 @@ pdfminer-six==20221105
     #   unstructured
 pdfplumber==0.10.2
     # via layoutparser
-pillow==10.0.1
+pillow==10.1.0
     # via
     #   layoutparser
     #   matplotlib
@@ -183,7 +187,7 @@ protobuf==4.24.4
     # via
     #   onnx
     #   onnxruntime
-psutil==5.9.5
+psutil==5.9.6
     # via -r requirements/base.in
 pycocotools==2.0.7
     # via effdet
@@ -195,13 +199,13 @@ pydantic==1.10.13
     # via
     #   -r requirements/base.in
     #   fastapi
-pypandoc==1.11
+pypandoc==1.12
     # via unstructured
 pyparsing==3.1.1
     # via matplotlib
-pypdf==3.16.2
+pypdf==3.16.4
     # via -r requirements/base.in
-pypdfium2==4.20.0
+pypdfium2==4.21.0
     # via pdfplumber
 pytesseract==0.3.10
     # via layoutparser
@@ -209,7 +213,7 @@ python-dateutil==2.8.2
     # via
     #   matplotlib
     #   pandas
-python-docx==0.8.11
+python-docx==1.0.1
     # via unstructured
 python-iso639==2023.6.15
     # via unstructured
@@ -228,8 +232,10 @@ pyyaml==6.0.1
     #   omegaconf
     #   timm
     #   transformers
-rapidfuzz==3.3.1
-    # via unstructured-inference
+rapidfuzz==3.4.0
+    # via
+    #   unstructured
+    #   unstructured-inference
 ratelimit==2.2.1
     # via -r requirements/base.in
 regex==2023.10.3
@@ -269,7 +275,7 @@ tabulate==0.9.0
     # via unstructured
 timm==0.9.7
     # via effdet
-tokenizers==0.14.0
+tokenizers==0.14.1
     # via transformers
 torch==2.1.0
     # via
@@ -298,6 +304,7 @@ typing-extensions==4.8.0
     #   onnx
     #   pydantic
     #   pydantic-core
+    #   python-docx
     #   torch
     #   typing-inspect
     #   uvicorn
@@ -305,9 +312,9 @@ typing-inspect==0.9.0
     # via dataclasses-json
 tzdata==2023.3
     # via pandas
-unstructured[local-inference]==0.10.19
+unstructured[local-inference]==0.10.24
     # via -r requirements/base.in
-unstructured-inference==0.6.6
+unstructured-inference==0.7.7
     # via unstructured
 unstructured-pytesseract==0.3.12
     # via unstructured
@@ -317,5 +324,5 @@ uvicorn==0.23.2
     # via -r requirements/base.in
 xlrd==2.0.1
     # via unstructured
-xlsxwriter==3.1.6
+xlsxwriter==3.1.8
     # via python-pptx
