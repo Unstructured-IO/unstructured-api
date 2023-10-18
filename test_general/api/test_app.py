@@ -608,7 +608,7 @@ def test_partition_file_via_api_not_retryable_error_code(monkeypatch, mocker):
         remote_partition,
     )
     client = TestClient(app)
-    test_file = Path("sample-docs") / "layout-parser-paper.pdf"
+    test_file = Path("sample-docs") / "list-item-example.pdf"
 
     response = client.post(
         MAIN_API_ROUTE,
@@ -617,10 +617,7 @@ def test_partition_file_via_api_not_retryable_error_code(monkeypatch, mocker):
 
     assert response.status_code == 401
 
-    # Often page 2 will start processing before the page 1 exception is raised.
-    # So we can't assert called_once, but we can assert the count is less than it
-    # would have been if we used all retries.
-    assert remote_partition.call_count < 4
+    assert remote_partition.called_once()
 
 
 def test_chunking_strategy_param():
