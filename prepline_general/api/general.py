@@ -467,12 +467,11 @@ def pipeline_api(
                 detail="Json schema does not match the Unstructured schema",
             )
         raise e
-    except zipfile.BadZipFile as e:
-        if "File is not a zip file" in e.args[0]:
-            raise HTTPException(
-                status_code=400,
-                detail="File is not a valid docx",
-            )
+    except zipfile.BadZipFile:
+        raise HTTPException(
+            status_code=400,
+            detail="File is not a valid docx",
+        )
 
     # Clean up returned elements
     # Note(austin): pydantic should control this sort of thing for us
