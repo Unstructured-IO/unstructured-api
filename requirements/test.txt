@@ -50,7 +50,7 @@ beautifulsoup4==4.12.2
     #   -r requirements/base.txt
     #   nbconvert
     #   unstructured
-black==23.9.1
+black==23.10.0
     # via -r requirements/test.in
 bleach==6.1.0
     # via nbconvert
@@ -86,9 +86,7 @@ coloredlogs==15.0.1
     #   -r requirements/base.txt
     #   onnxruntime
 comm==0.1.4
-    # via
-    #   ipykernel
-    #   ipywidgets
+    # via ipykernel
 contourpy==1.1.1
     # via
     #   -r requirements/base.txt
@@ -139,7 +137,7 @@ execnb==0.1.5
     # via nbdev
 executing==2.0.0
     # via stack-data
-fastapi==0.103.2
+fastapi==0.104.0
     # via -r requirements/base.txt
 fastcore==1.5.29
     # via
@@ -212,6 +210,7 @@ iopath==0.1.10
     #   layoutparser
 ipykernel==6.25.2
     # via
+    #   ipywidgets
     #   jupyter
     #   jupyter-console
     #   jupyterlab
@@ -224,8 +223,10 @@ ipython==8.16.1
     #   jupyter-console
 ipython-genutils==0.2.0
     # via qtconsole
-ipywidgets==8.1.1
-    # via jupyter
+ipywidgets==8.0.4
+    # via
+    #   jupyter
+    #   nbdev
 isoduration==20.11.0
     # via jsonschema
 jedi==0.19.1
@@ -350,7 +351,7 @@ msg-parser==1.2.0
     # via
     #   -r requirements/base.txt
     #   unstructured
-mypy==1.6.0
+mypy==1.6.1
     # via -r requirements/test.in
 mypy-extensions==1.0.0
     # via
@@ -364,7 +365,7 @@ nbconvert==7.9.2
     # via
     #   jupyter
     #   jupyter-server
-nbdev==2.3.12
+nbdev==2.3.13
     # via -r requirements/test.in
 nbformat==5.9.2
     # via
@@ -373,7 +374,7 @@ nbformat==5.9.2
     #   nbconvert
 nest-asyncio==1.5.8
     # via ipykernel
-networkx==3.1
+networkx==3.2
     # via
     #   -r requirements/base.txt
     #   torch
@@ -415,6 +416,7 @@ onnx==1.14.1
     # via
     #   -r requirements/base.txt
     #   unstructured
+    #   unstructured-inference
 onnxruntime==1.15.1
     # via
     #   -r requirements/base.txt
@@ -556,7 +558,7 @@ pyparsing==3.1.1
     #   matplotlib
 pypdf==3.16.4
     # via -r requirements/base.txt
-pypdfium2==4.21.0
+pypdfium2==4.22.0
     # via
     #   -r requirements/base.txt
     #   pdfplumber
@@ -570,7 +572,7 @@ pytest==7.4.2
     #   pytest-mock
 pytest-cov==4.1.0
     # via -r requirements/test.in
-pytest-mock==3.11.1
+pytest-mock==3.12.0
     # via -r requirements/test.in
 python-dateutil==2.8.2
     # via
@@ -714,7 +716,7 @@ terminado==0.17.1
     # via
     #   jupyter-server
     #   jupyter-server-terminals
-timm==0.9.7
+timm==0.9.8
     # via
     #   -r requirements/base.txt
     #   effdet
@@ -776,7 +778,7 @@ traitlets==5.11.2
     #   nbconvert
     #   nbformat
     #   qtconsole
-transformers==4.34.0
+transformers==4.34.1
     # via
     #   -r requirements/base.txt
     #   unstructured-inference
@@ -805,9 +807,9 @@ tzdata==2023.3
     # via
     #   -r requirements/base.txt
     #   pandas
-unstructured[local-inference]==0.10.24
+unstructured[local-inference]==0.10.25
     # via -r requirements/base.txt
-unstructured-inference==0.7.7
+unstructured-inference==0.7.9
     # via
     #   -r requirements/base.txt
     #   unstructured
@@ -817,7 +819,7 @@ unstructured-pytesseract==0.3.12
     #   unstructured
 uri-template==1.3.0
     # via jsonschema
-urllib3==2.0.6
+urllib3==2.0.7
     # via
     #   -r requirements/base.txt
     #   requests
@@ -843,7 +845,7 @@ xlrd==2.0.1
     # via
     #   -r requirements/base.txt
     #   unstructured
-xlsxwriter==3.1.8
+xlsxwriter==3.1.9
     # via
     #   -r requirements/base.txt
     #   python-pptx
