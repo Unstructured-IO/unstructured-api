@@ -403,13 +403,6 @@ def pipeline_api(
             )
         )
 
-        # TODO(austin) - Latest unstructured won't accept model_name=None
-        # Just pass if it's set until the fix is released
-        # https://github.com/Unstructured-IO/unstructured/issues/1754
-        kwargs = {}
-        if hi_res_model_name:
-            kwargs["model_name"] = hi_res_model_name
-
         # Be careful of naming differences in api params vs partition params!
         # These kwargs are going back into the api, not into partition
         # If there's a difference, remap the param in partition_pdf_splits
@@ -444,6 +437,7 @@ def pipeline_api(
                 # partition_kwargs
                 encoding=encoding,
                 include_page_breaks=include_page_breaks,
+                model_name=hi_res_model_name,
                 ocr_languages=ocr_languages,
                 pdf_infer_table_structure=pdf_infer_table_structure,
                 skip_infer_table_types=skip_infer_table_types,
@@ -454,7 +448,6 @@ def pipeline_api(
                 multipage_sections=multipage_sections,
                 combine_under_n_chars=combine_under_n_chars,
                 new_after_n_chars=new_after_n_chars,
-                **kwargs,
             )
     except ValueError as e:
         if "Invalid file" in e.args[0]:

@@ -1,9 +1,9 @@
-## 0.0.54-dev2
+## 0.0.54
 
-* Bump unstructured to 0.10.24
+* Bump unstructured to 0.10.25
 * Use a generator when splitting pdfs in parallel mode
 * Add a default memory minimum for 503 check
-* Fix a UnboundLocalError when an invalid docx file is caught
+* Fix an UnboundLocalError when an invalid docx file is caught
 
 ## 0.0.53
 

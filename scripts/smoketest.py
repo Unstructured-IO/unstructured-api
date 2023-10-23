@@ -163,4 +163,6 @@ def test_table_support(strategy, pdf_infer_table_structure, expected_table_num):
     assert len(extracted_tables) == expected_table_num
     if expected_table_num > 0:
         # Test a text form a table is extracted
-        assert "Layouts of scanned modern magazines and scientific reports" in extracted_tables[0]
+        # Note(austin) - table output has changed - this line isn't returned
+        # assert "Layouts of scanned modern magazines and scientific reports" in extracted_tables[0]
+        assert "Layouts of history" in extracted_tables[0]
