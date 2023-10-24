@@ -1,3 +1,7 @@
+## 0.0.55-dev0
+
+* Temporary - disable Chipper in the API
+
 ## 0.0.54
 
 * Bump unstructured to 0.10.25
