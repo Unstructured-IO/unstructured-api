@@ -318,6 +318,12 @@ def pipeline_api(
 
     hi_res_model_name = m_hi_res_model_name[0] if len(m_hi_res_model_name) else None
 
+    if hi_res_model_name and hi_res_model_name in CHIPPER_MODEL_TYPES:
+        raise HTTPException(
+            status_code=400,
+            detail="Chipper is not yet supported in the hosted API",
+        )
+
     if hi_res_model_name and hi_res_model_name in CHIPPER_MODEL_TYPES and show_coordinates:
         raise HTTPException(
             status_code=400,
