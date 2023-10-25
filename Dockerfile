@@ -15,8 +15,6 @@ ENV HOME /home/${NB_USER}
 RUN groupadd --gid ${NB_UID} ${NB_USER}
 RUN useradd --uid ${NB_UID} --gid ${NB_UID} ${NB_USER}
 WORKDIR ${HOME}
-RUN mkdir ${HOME}/.ssh && chmod go-rwx ${HOME}/.ssh \
-  &&  ssh-keyscan -t rsa github.com >> /home/${NB_USER}/.ssh/known_hosts
 
 ENV PYTHONPATH="${PYTHONPATH}:${HOME}"
 ENV PATH="/home/${NB_USER}/.local/bin:${PATH}"
