@@ -37,7 +37,7 @@ attrs==23.1.0
     # via
     #   jsonschema
     #   referencing
-babel==2.13.0
+babel==2.13.1
     # via jupyterlab-server
 backcall==0.2.0
     # via ipython
@@ -50,7 +50,7 @@ beautifulsoup4==4.12.2
     #   -r requirements/base.txt
     #   nbconvert
     #   unstructured
-black==23.10.0
+black==23.10.1
     # via -r requirements/test.in
 bleach==6.1.0
     # via nbconvert
@@ -69,7 +69,7 @@ chardet==5.2.0
     # via
     #   -r requirements/base.txt
     #   unstructured
-charset-normalizer==3.3.0
+charset-normalizer==3.3.1
     # via
     #   -r requirements/base.txt
     #   pdfminer-six
@@ -93,7 +93,7 @@ contourpy==1.1.1
     #   matplotlib
 coverage[toml]==7.3.2
     # via pytest-cov
-cryptography==41.0.4
+cryptography==41.0.5
     # via
     #   -r requirements/base.txt
     #   pdfminer-six
@@ -168,7 +168,7 @@ fonttools==4.43.1
     #   matplotlib
 fqdn==1.5.1
     # via jsonschema
-fsspec==2023.9.2
+fsspec==2023.10.0
     # via
     #   -r requirements/base.txt
     #   huggingface-hub
@@ -208,7 +208,7 @@ iopath==0.1.10
     # via
     #   -r requirements/base.txt
     #   layoutparser
-ipykernel==6.25.2
+ipykernel==6.26.0
     # via
     #   ipywidgets
     #   jupyter
@@ -256,7 +256,7 @@ jsonschema-specifications==2023.7.1
     # via jsonschema
 jupyter==1.0.0
     # via -r requirements/test.in
-jupyter-client==8.4.0
+jupyter-client==8.5.0
     # via
     #   ipykernel
     #   jupyter-console
@@ -280,7 +280,7 @@ jupyter-events==0.8.0
     # via jupyter-server
 jupyter-lsp==2.2.0
     # via jupyterlab
-jupyter-server==2.8.0
+jupyter-server==2.9.1
     # via
     #   jupyter-lsp
     #   jupyterlab
@@ -566,7 +566,7 @@ pytesseract==0.3.10
     # via
     #   -r requirements/base.txt
     #   layoutparser
-pytest==7.4.2
+pytest==7.4.3
     # via
     #   pytest-cov
     #   pytest-mock
@@ -626,7 +626,7 @@ pyzmq==25.1.1
     #   qtconsole
 qtconsole==5.4.4
     # via jupyter
-qtpy==2.4.0
+qtpy==2.4.1
     # via qtconsole
 rapidfuzz==3.4.0
     # via
@@ -761,7 +761,7 @@ tqdm==4.66.1
     #   iopath
     #   nltk
     #   transformers
-traitlets==5.11.2
+traitlets==5.12.0
     # via
     #   comm
     #   ipykernel
@@ -798,6 +798,7 @@ typing-extensions==4.8.0
     #   python-docx
     #   torch
     #   typing-inspect
+    #   unstructured
     #   uvicorn
 typing-inspect==0.9.0
     # via
@@ -807,9 +808,9 @@ tzdata==2023.3
     # via
     #   -r requirements/base.txt
     #   pandas
-unstructured[local-inference]==0.10.25
+unstructured[local-inference]==0.10.26
     # via -r requirements/base.txt
-unstructured-inference==0.7.9
+unstructured-inference==0.7.10
     # via
     #   -r requirements/base.txt
     #   unstructured
