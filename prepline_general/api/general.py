@@ -483,11 +483,6 @@ def pipeline_api(
         if element.metadata.detection_class_prob:
             elements[i].metadata.detection_class_prob = None
 
-        # Remove this until new md fields aren't breaking users
-        # See https://github.com/Unstructured-IO/unstructured/pull/1526
-        if element.metadata.parent_id:
-            elements[i].metadata.parent_id = None
-
     if response_type == "text/csv":
         df = convert_to_dataframe(elements)
         return df.to_csv(index=False)
