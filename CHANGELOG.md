@@ -1,5 +1,6 @@
-## 0.0.55-dev0
+## 0.0.55-dev1
 
+* Bump unstructured to 0.0.26
 * Bring parent_id metadata field back after fixing a backwards compatibility bug
 
 ## 0.0.54
