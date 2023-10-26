@@ -1,7 +1,8 @@
-## 0.0.55-dev1
+## 0.0.55
 
-* Bump unstructured to 0.0.26
+* Bump unstructured to 0.10.26
 * Bring parent_id metadata field back after fixing a backwards compatibility bug
+* Restrict Chipper usage to one at a time. The model is very resource intense, and this will prevent issues while we improve it.
 
 ## 0.0.54
 
