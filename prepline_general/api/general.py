@@ -223,6 +223,29 @@ def partition_pdf_splits(
     return results
 
 
+IS_CHIPPER_PROCESSING = False
+
+
+class ChipperMemoryProtection:
+    '''
+    Chipper calls are expensive, and right now we can only do one call at a time.
+    If the model is in use, return a 503 error. The API should scale up and the user can try again
+    on a different server.
+    '''
+    def __enter__(self):
+        global IS_CHIPPER_PROCESSING
+        if IS_CHIPPER_PROCESSING:
+            # Log here so we can track how often it happens
+            logger.error("Chipper is already is use")
+            raise HTTPException(status_code=503, detail="Server is under heavy load. Please try again later.")
+
+        IS_CHIPPER_PROCESSING = True
+
+    def __exit__(self, exc_type, exc_value, exc_tb):
+        global IS_CHIPPER_PROCESSING
+        IS_CHIPPER_PROCESSING = False
+
+
 def pipeline_api(
     file,
     request=None,
@@ -403,52 +426,44 @@ def pipeline_api(
             )
         )
 
-        # Be careful of naming differences in api params vs partition params!
-        # These kwargs are going back into the api, not into partition
-        # If there's a difference, remap the param in partition_pdf_splits
+        partition_kwargs = {
+            "file": file,
+            "metadata_filename": filename,
+            "content_type": file_content_type,
+            "encoding": encoding,
+            "include_page_breaks": include_page_breaks,
+            "model_name": hi_res_model_name,
+            "ocr_languages": ocr_languages,
+            "pdf_infer_table_structure": pdf_infer_table_structure,
+            "skip_infer_table_types": skip_infer_table_types,
+            "strategy": strategy,
+            "xml_keep_tags": xml_keep_tags,
+            "languages": languages,
+            "chunking_strategy": chunking_strategy,
+            "multipage_sections": multipage_sections,
+            "combine_under_n_chars": combine_under_n_chars,
+            "new_after_n_chars": new_after_n_chars,
+        }
+
         if file_content_type == "application/pdf" and pdf_parallel_mode_enabled:
+            # Be careful of naming differences in api params vs partition params!
+            # These kwargs are going back into the api, not into partition
+            # They need to be switched back in partition_pdf_splits
+            if partition_kwargs.get("model_name"):
+                partition_kwargs["hi_res_model_name"] = partition_kwargs.pop("model_name")
+
             elements = partition_pdf_splits(
-                request,
+                request=request,
                 pdf_pages=pdf.pages,
-                file=file,
-                metadata_filename=filename,
-                content_type=file_content_type,
                 coordinates=show_coordinates,
-                # partition_kwargs
-                encoding=encoding,
-                include_page_breaks=include_page_breaks,
-                hi_res_model_name=hi_res_model_name,
-                ocr_languages=ocr_languages,
-                pdf_infer_table_structure=pdf_infer_table_structure,
-                skip_infer_table_types=skip_infer_table_types,
-                strategy=strategy,
-                xml_keep_tags=xml_keep_tags,
-                languages=languages,
-                chunking_strategy=chunking_strategy,
-                multipage_sections=multipage_sections,
-                combine_under_n_chars=combine_under_n_chars,
-                new_after_n_chars=new_after_n_chars,
+                **partition_kwargs,
             )
+        elif hi_res_model_name and hi_res_model_name in CHIPPER_MODEL_TYPES:
+            with ChipperMemoryProtection():
+                elements = partition(**partition_kwargs)
         else:
-            elements = partition(
-                file=file,
-                metadata_filename=filename,
-                content_type=file_content_type,
-                # partition_kwargs
-                encoding=encoding,
-                include_page_breaks=include_page_breaks,
-                model_name=hi_res_model_name,
-                ocr_languages=ocr_languages,
-                pdf_infer_table_structure=pdf_infer_table_structure,
-                skip_infer_table_types=skip_infer_table_types,
-                strategy=strategy,
-                xml_keep_tags=xml_keep_tags,
-                languages=languages,
-                chunking_strategy=chunking_strategy,
-                multipage_sections=multipage_sections,
-                combine_under_n_chars=combine_under_n_chars,
-                new_after_n_chars=new_after_n_chars,
-            )
+            elements = partition(**partition_kwargs)
+
     except ValueError as e:
         if "Invalid file" in e.args[0]:
             raise HTTPException(
