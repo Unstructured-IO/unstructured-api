@@ -467,6 +467,13 @@ def pipeline_api(
         else:
             elements = partition(**partition_kwargs)
 
+    except OSError as e:
+        if "chipper-fast-fine-tuning is not a local folder" in e.args[0]:
+            raise HTTPException(
+                status_code=400, detail="The Chipper model is not available for download. It can be accessed via the official hosted API."
+            )
+
+        raise e
     except ValueError as e:
         if "Invalid file" in e.args[0]:
             raise HTTPException(
@@ -477,6 +484,7 @@ def pipeline_api(
                 status_code=400,
                 detail="Json schema does not match the Unstructured schema",
             )
+
         raise e
     except zipfile.BadZipFile:
         raise HTTPException(
