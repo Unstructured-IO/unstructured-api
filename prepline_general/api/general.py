@@ -470,7 +470,8 @@ def pipeline_api(
     except OSError as e:
         if "chipper-fast-fine-tuning is not a local folder" in e.args[0]:
             raise HTTPException(
-                status_code=400, detail="The Chipper model is not available for download. It can be accessed via the official hosted API."
+                status_code=400,
+                detail="The Chipper model is not available for download. It can be accessed via the official hosted API.",
             )
 
         raise e
