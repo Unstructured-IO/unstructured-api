@@ -788,7 +788,6 @@ def test_general_api_returns_400_bad_json(tmpdir):
     assert response.status_code == 400
 
 
-@pytest.mark.only()
 def test_chipper_memory_protection(monkeypatch, mocker):
     """
     For now, only 1 Chipper call is allowed at a time.
