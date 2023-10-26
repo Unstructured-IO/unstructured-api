@@ -790,10 +790,10 @@ def test_general_api_returns_400_bad_json(tmpdir):
 
 @pytest.mark.only()
 def test_chipper_memory_protection(monkeypatch, mocker):
-    '''
+    """
     For now, only 1 Chipper call is allowed at a time.
     Assert that we return a 503 while it's in use.
-    '''
+    """
 
     def mock_partition(*args, **kwargs):
         time.sleep(2)

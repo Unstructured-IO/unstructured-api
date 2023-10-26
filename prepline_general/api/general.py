@@ -227,17 +227,20 @@ IS_CHIPPER_PROCESSING = False
 
 
 class ChipperMemoryProtection:
-    '''
+    """
     Chipper calls are expensive, and right now we can only do one call at a time.
     If the model is in use, return a 503 error. The API should scale up and the user can try again
     on a different server.
-    '''
+    """
+
     def __enter__(self):
         global IS_CHIPPER_PROCESSING
         if IS_CHIPPER_PROCESSING:
             # Log here so we can track how often it happens
             logger.error("Chipper is already is use")
-            raise HTTPException(status_code=503, detail="Server is under heavy load. Please try again later.")
+            raise HTTPException(
+                status_code=503, detail="Server is under heavy load. Please try again later."
+            )
 
         IS_CHIPPER_PROCESSING = True
 
