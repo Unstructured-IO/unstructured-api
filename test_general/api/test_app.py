@@ -652,7 +652,8 @@ def test_chunking_strategy_param():
 
 
 # Defaults:
-# multippage = True, combine_text_under_n_chars = None, new_after_n_chars = None, max_characters = 500
+# multippage = True, combine_text_under_n_chars = None, new_after_n_chars = None,
+# max_characters = 500
 @pytest.mark.parametrize(
     ("multipage_sections", "combine_under_n_chars", "new_after_n_chars", "max_characters"),
     [
