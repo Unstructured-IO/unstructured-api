@@ -41,8 +41,6 @@ cycler==0.12.1
     # via matplotlib
 dataclasses-json==0.6.1
     # via unstructured
-ebooklib==0.18
-    # via unstructured
 effdet==0.4.1
     # via layoutparser
 emoji==2.8.0
@@ -51,9 +49,9 @@ et-xmlfile==1.1.0
     # via openpyxl
 exceptiongroup==1.1.3
     # via anyio
-fastapi==0.104.0
+fastapi==0.104.1
     # via -r requirements/base.in
-filelock==3.12.4
+filelock==3.13.1
     # via
     #   huggingface-hub
     #   torch
@@ -96,11 +94,10 @@ layoutparser[layoutmodels,tesseract]==0.3.4
     # via unstructured-inference
 lxml==4.9.3
     # via
-    #   ebooklib
     #   python-docx
     #   python-pptx
     #   unstructured
-markdown==3.5
+markdown==3.5.1
     # via unstructured
 markupsafe==2.1.3
     # via jinja2
@@ -114,7 +111,7 @@ msg-parser==1.2.0
     # via unstructured
 mypy-extensions==1.0.0
     # via typing-inspect
-networkx==3.2
+networkx==3.2.1
     # via
     #   torch
     #   unstructured
@@ -138,7 +135,7 @@ olefile==0.46
     # via msg-parser
 omegaconf==2.3.0
     # via effdet
-onnx==1.14.1
+onnx==1.15.0
     # via
     #   unstructured
     #   unstructured-inference
@@ -159,7 +156,7 @@ packaging==23.2
     #   pytesseract
     #   transformers
     #   unstructured-pytesseract
-pandas==2.1.1
+pandas==2.1.2
     # via
     #   layoutparser
     #   unstructured
@@ -171,7 +168,7 @@ pdfminer-six==20221105
     # via
     #   pdfplumber
     #   unstructured
-pdfplumber==0.10.2
+pdfplumber==0.10.3
     # via layoutparser
 pillow==10.1.0
     # via
@@ -205,9 +202,9 @@ pypandoc==1.12
     # via unstructured
 pyparsing==3.1.1
     # via matplotlib
-pypdf==3.16.4
+pypdf==3.17.0
     # via -r requirements/base.in
-pypdfium2==4.22.0
+pypdfium2==4.23.1
     # via pdfplumber
 pytesseract==0.3.10
     # via layoutparser
@@ -260,7 +257,6 @@ scipy==1.11.3
     # via layoutparser
 six==1.16.0
     # via
-    #   ebooklib
     #   langdetect
     #   python-dateutil
 sniffio==1.3.0
@@ -303,7 +299,6 @@ typing-extensions==4.8.0
     #   fastapi
     #   huggingface-hub
     #   iopath
-    #   onnx
     #   pydantic
     #   pydantic-core
     #   python-docx
@@ -315,7 +310,7 @@ typing-inspect==0.9.0
     # via dataclasses-json
 tzdata==2023.3
     # via pandas
-unstructured[local-inference]==0.10.26
+unstructured[local-inference]==0.10.28
     # via -r requirements/base.in
 unstructured-inference==0.7.10
     # via unstructured
