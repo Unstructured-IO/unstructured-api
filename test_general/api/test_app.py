@@ -489,6 +489,7 @@ def test_parallel_mode_passes_params(monkeypatch):
             "multipage_sections": False,
             "combine_under_n_chars": 501,
             "new_after_n_chars": 1501,
+            "max_characters": 1502,
         },
     )
 
@@ -511,6 +512,7 @@ def test_parallel_mode_passes_params(monkeypatch):
         multipage_sections=False,
         combine_under_n_chars=501,
         new_after_n_chars=1501,
+        max_characters=1502,
     )
 
 
@@ -649,56 +651,45 @@ def test_chunking_strategy_param():
     assert "CompositeElement" in [element.get("type") for element in response_with_chunking]
 
 
-# def test_chunking_strategy_additional_params():
-#     client = TestClient(app)
-#     test_file = Path("sample-docs") / "layout-parser-paper-fast.pdf"
-#     res = client.post(
-#         MAIN_API_ROUTE,
-#         files=[("files", (str(test_file), open(test_file, "rb")))],
-#         data={
-#             "chunking_strategy": "by_title",
-#             "multipage_sections": "False",
-#             "combine_under_n_chars": "0",
-#         },
-#     )
-#     response_from_multipage_false_combine_chars_0  = res.json()
+# Defaults:
+# multippage = True, combine_text_under_n_chars = None, new_after_n_chars = None,
+# max_characters = 500
+@pytest.mark.parametrize(
+    ("multipage_sections", "combine_under_n_chars", "new_after_n_chars", "max_characters"),
+    [
+        (False, None, None, 500),  # test multipage_sections
+        (True, 1000, None, 5000),  # test combine_under_n_chars
+        (True, None, 10, 500),  # test new_after_n_chars
+        (True, None, None, 100),  # test max__characters
+    ],
+)
+def test_chunking_strategy_additional_params(
+    multipage_sections, combine_under_n_chars, new_after_n_chars, max_characters
+):
+    client = TestClient(app)
+    test_file = Path("sample-docs") / "layout-parser-paper-fast.pdf"
 
-#     res = client.post(
-#         MAIN_API_ROUTE,
-#         files=[("files", (str(test_file), open(test_file, "rb")))],
-#         data={
-#             "chunking_strategy": "by_title",
-#             "multipage_sections": "True",
-#             "combine_under_n_chars": "0",
-#         },
-#     )
-#     response_from_multipage_true_combine_chars_0 = res.json()
+    arg_resp = client.post(
+        MAIN_API_ROUTE,
+        files=[("files", (str(test_file), open(test_file, "rb")))],
+        data={
+            "chunking_strategy": "by_title",
+            "multipage_sections": multipage_sections,
+            "combine_under_n_chars": combine_under_n_chars,
+            "new_after_n_chars": new_after_n_chars,
+            "max_characters": max_characters,
+        },
+    )
+    arg_resp_json = arg_resp.json()
 
-#     res = client.post(
-#         MAIN_API_ROUTE,
-#         files=[("files", (str(test_file), open(test_file, "rb")))],
-#         data={
-#             "chunking_strategy": "by_title",
-#             "multipage_sections": "True",
-#             "combine_under_n_chars": "5000",
-#             # Defining new_after_n_chars since it has to be greater than combine_under_n_chars
-#             "new_after_n_chars": "50000",
-#         },
-#     )
-#     response_multipage_true_combine_chars_5000 = res.json()
+    default_resp = client.post(
+        MAIN_API_ROUTE,
+        files=[("files", (str(test_file), open(test_file, "rb")))],
+        data={"chunking_strategy": "by_title"},
+    )
+    default_resp_json = default_resp.json()
 
-#     assert (
-#         response_multipage_true_combine_chars_5000
-#         != response_from_multipage_true_combine_chars_0
-#     )
-#     assert (
-#         response_from_multipage_true_combine_chars_0
-#         != response_from_multipage_false_combine_chars_0
-#     )
-#     assert (
-#         response_multipage_true_combine_chars_5000
-#         != response_from_multipage_false_combine_chars_0
-#     )
+    assert arg_resp_json != default_resp_json
 
 
 def test_encrypted_pdf():

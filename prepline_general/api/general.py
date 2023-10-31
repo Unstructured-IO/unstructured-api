@@ -269,6 +269,7 @@ def pipeline_api(
     m_multipage_sections=[],
     m_combine_under_n_chars=[],
     m_new_after_n_chars=[],
+    m_max_characters=[],
 ):
     if filename.endswith(".msg"):
         # Note(yuming): convert file type for msg files
@@ -300,6 +301,7 @@ def pipeline_api(
                         "m_multipage_sections": m_multipage_sections,
                         "m_combine_under_n_chars": m_combine_under_n_chars,
                         "new_after_n_chars": m_new_after_n_chars,
+                        "m_max_characters": m_max_characters,
                     },
                     default=str,
                 )
@@ -403,6 +405,10 @@ def pipeline_api(
         else 1500
     )
 
+    max_characters = (
+        int(m_max_characters[0]) if m_max_characters and m_max_characters[0].isdigit() else 1500
+    )
+
     try:
         logger.debug(
             "partition input data: {}".format(
@@ -423,6 +429,7 @@ def pipeline_api(
                         "multipage_sections": multipage_sections,
                         "combine_under_n_chars": combine_under_n_chars,
                         "new_after_n_chars": new_after_n_chars,
+                        "max_characters": max_characters,
                     },
                     default=str,
                 )
@@ -446,6 +453,7 @@ def pipeline_api(
             "multipage_sections": multipage_sections,
             "combine_under_n_chars": combine_under_n_chars,
             "new_after_n_chars": new_after_n_chars,
+            "max_characters": max_characters,
         }
 
         if file_content_type == "application/pdf" and pdf_parallel_mode_enabled:
@@ -621,7 +629,7 @@ def ungz_file(file: UploadFile, gz_uncompressed_content_type=None) -> UploadFile
 
 
 @router.post("/general/v0/general")
-@router.post("/general/v0.0.55/general")
+@router.post("/general/v0.0.56/general")
 def pipeline_1(
     request: Request,
     gz_uncompressed_content_type: Optional[str] = Form(default=None),
@@ -641,6 +649,7 @@ def pipeline_1(
     multipage_sections: List[str] = Form(default=[]),
     combine_under_n_chars: List[str] = Form(default=[]),
     new_after_n_chars: List[str] = Form(default=[]),
+    max_characters: List[str] = Form(default=[]),
 ):
     if files:
         for file_index in range(len(files)):
@@ -697,6 +706,7 @@ def pipeline_1(
                     m_multipage_sections=multipage_sections,
                     m_combine_under_n_chars=combine_under_n_chars,
                     m_new_after_n_chars=new_after_n_chars,
+                    m_max_characters=max_characters,
                 )
 
                 if is_expected_response_type(media_type, type(response)):

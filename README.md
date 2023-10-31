@@ -219,7 +219,10 @@ Set the `chunking_strategy` to chunk text into larger or smaller elements. Defau
       reaches a length of n characters. Defaults to 500.
 
     `new_after_n_chars`
-      Cuts off new sections once they reach a length of "n" characters. Defaults to 1500.
+      Cuts off new sections once they reach a length of "n" characters (soft max). Defaults to 1500.
+
+    `max_characters`
+      Cuts off new sections once they reach a length of "n" characters (hard max). Defaults to 1500.
 
 ```
 curl -X 'POST' 
