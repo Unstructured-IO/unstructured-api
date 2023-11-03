@@ -346,6 +346,10 @@ def pipeline_api(
 
     hi_res_model_name = m_hi_res_model_name[0] if len(m_hi_res_model_name) else None
 
+    # Make sure chipper aliases to the latest model
+    if hi_res_model_name and hi_res_model_name == "chipper":
+        hi_res_model_name = "chipperv2"
+
     if hi_res_model_name and hi_res_model_name in CHIPPER_MODEL_TYPES and show_coordinates:
         raise HTTPException(
             status_code=400,
@@ -476,7 +480,10 @@ def pipeline_api(
             elements = partition(**partition_kwargs)
 
     except OSError as e:
-        if "chipper-fast-fine-tuning is not a local folder" in e.args[0]:
+        if (
+            "chipper-fast-fine-tuning is not a local folder" in e.args[0]
+            or "ved-fine-tuning is not a local folder" in e.args[0]
+        ):
             raise HTTPException(
                 status_code=400,
                 detail="The Chipper model is not available for download. It can be accessed via the official hosted API.",
