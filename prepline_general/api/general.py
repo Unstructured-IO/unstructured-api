@@ -393,7 +393,7 @@ def pipeline_api(
         )
 
     multipage_sections_str = (
-        m_multipage_sections[0] if len(m_multipage_sections) else "false"
+        m_multipage_sections[0] if len(m_multipage_sections) else "true"
     ).lower()
     multipage_sections = multipage_sections_str == "true"
 
