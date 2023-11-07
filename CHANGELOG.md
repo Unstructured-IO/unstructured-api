@@ -1,4 +1,4 @@
-## 0.0.57-dev0
+## 0.0.57
 
 * Bump unstructured to 0.10.29
 
