@@ -1,5 +1,5 @@
 ## 0.0.57
-
+* Make sure `multipage_sections` param defaults to `true` as per the readme
 * Bump unstructured to 0.10.29
 
 
