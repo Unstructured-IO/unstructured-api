@@ -1,3 +1,8 @@
+## 0.0.57-dev0
+
+* Bump unstructured to 0.10.29
+
+
 ## 0.0.56
 * **Add `max_characters` param for chunking** This param gives users additional control to "chunk" elements into larger or smaller `CompositeElement`s
 * Bump unstructured to 0.10.28
