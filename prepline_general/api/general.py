@@ -1,3 +1,8 @@
+from datetime import datetime
+from fastapi import BackgroundTasks, Header
+from unstructured_infra_tools.api_requests.api_quota_check import api_quota_check
+import unstructured_infra_tools.api_requests.record_api_request as record_api_request
+
 # Standard Library Imports
 import io
 import os
@@ -638,7 +643,9 @@ def ungz_file(file: UploadFile, gz_uncompressed_content_type=None) -> UploadFile
 @router.post("/general/v0/general")
 @router.post("/general/v0.0.57/general")
 def pipeline_1(
+    background_tasks: BackgroundTasks,
     request: Request,
+    unstructured_api_key: Union[str, None] = Header(default=None),
     gz_uncompressed_content_type: Optional[str] = Form(default=None),
     files: Union[List[UploadFile], None] = File(default=None),
     output_format: Union[str, None] = Form(default=None),
@@ -663,6 +670,11 @@ def pipeline_1(
             if files[file_index].content_type == "application/gzip":
                 files[file_index] = ungz_file(files[file_index], gz_uncompressed_content_type)
 
+    request.state.__dict__["bookkeeper"] = record_api_request.FileAccountingObj()
+    passed_quota_check = api_quota_check(request)
+    background_tasks.add_task(
+        record_api_request.send_api_info, datetime.utcnow(), passed_quota_check, request
+    )
     content_type = request.headers.get("Accept")
 
     default_response_type = output_format or "application/json"
@@ -694,6 +706,30 @@ def pipeline_1(
                 _file = file.file
 
                 response = pipeline_api(
+                    _file,
+                    request=request,
+                    m_coordinates=coordinates,
+                    m_encoding=encoding,
+                    m_hi_res_model_name=hi_res_model_name,
+                    m_include_page_breaks=include_page_breaks,
+                    m_ocr_languages=ocr_languages,
+                    m_pdf_infer_table_structure=pdf_infer_table_structure,
+                    m_skip_infer_table_types=skip_infer_table_types,
+                    m_strategy=strategy,
+                    m_xml_keep_tags=xml_keep_tags,
+                    response_type=media_type,
+                    filename=file.filename,
+                    file_content_type=file_content_type,
+                    languages=languages,
+                    m_chunking_strategy=chunking_strategy,
+                    m_multipage_sections=multipage_sections,
+                    m_combine_under_n_chars=combine_under_n_chars,
+                    m_new_after_n_chars=new_after_n_chars,
+                    m_max_characters=max_characters,
+                )
+                bookkeeper = request.state.__dict__["bookkeeper"]
+                record_api_request.update_num_pages(
+                    bookkeeper,
                     _file,
                     request=request,
                     m_coordinates=coordinates,

@@ -72,3 +72,12 @@ def healthcheck(request: Request):
 
 
 logger.info("Started Unstructured API")
+
+
+from unstructured_infra_tools.observability.metrics_exporter import add_metrics_route
+
+from unstructured_infra_tools.observability.sentry import add_sentry
+
+add_metrics_route(app)
+
+add_sentry(app, "unstructured-api")
