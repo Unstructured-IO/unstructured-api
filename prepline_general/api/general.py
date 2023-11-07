@@ -393,7 +393,7 @@ def pipeline_api(
         )
 
     multipage_sections_str = (
-        m_multipage_sections[0] if len(m_multipage_sections) else "false"
+        m_multipage_sections[0] if len(m_multipage_sections) else "true"
     ).lower()
     multipage_sections = multipage_sections_str == "true"
 
@@ -636,7 +636,7 @@ def ungz_file(file: UploadFile, gz_uncompressed_content_type=None) -> UploadFile
 
 
 @router.post("/general/v0/general")
-@router.post("/general/v0.0.56/general")
+@router.post("/general/v0.0.57/general")
 def pipeline_1(
     request: Request,
     gz_uncompressed_content_type: Optional[str] = Form(default=None),
