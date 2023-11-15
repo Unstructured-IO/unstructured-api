@@ -1,5 +1,8 @@
 from fastapi import FastAPI, Request, status, HTTPException
 from fastapi.responses import JSONResponse
+
+from fastapi.openapi.utils import get_openapi
+
 import logging
 import os
 
@@ -10,10 +13,22 @@ logger = logging.getLogger("unstructured_api")
 
 app = FastAPI(
     title="Unstructured Pipeline API",
-    description="""""",
+    description="API for the Unstructured Pipeline",
     version="0.0.57",
     docs_url="/general/docs",
     openapi_url="/general/openapi.json",
+    servers=[
+        {
+            "url": "https://api.unstructured.io",
+            "description": "Hosted API",
+            "x-speakeasy-server-id": "prod"
+        },
+        {
+            "url": "http://localhost:8000",
+            "description": "Development server",
+            "x-speakeasy-server-id": "local"
+        }
+    ],
 )
 
 # Note(austin) - This logger just dumps exceptions
@@ -70,5 +85,36 @@ logging.getLogger("uvicorn.access").addFilter(MetricsCheckFilter())
 def healthcheck(request: Request):
     return {"healthcheck": "HEALTHCHECK STATUS: EVERYTHING OK!"}
 
+def custom_openapi():
+    if app.openapi_schema:
+        return app.openapi_schema
+
+    openapi_schema = get_openapi(
+        title=app.title,
+        version=app.version,
+        summary=app.summary,
+        description=app.description,
+        routes=app.routes,
+    )
+
+    # Add retries
+    openapi_schema["x-speakeasy-retries"] = {
+        "strategy": "backoff",
+        "backoff": {
+            "initialInterval": 500,
+            "maxInterval": 60000,
+            "maxElapsedTime": 3600000,
+            "exponent": 1.5,
+        },
+        "statusCodes": [
+            "5XX",
+        ],
+        "retryConnectionErrors": True,
+    }
+
+    app.openapi_schema = openapi_schema
+    return app.openapi_schema
+
+app.openapi = custom_openapi
 
 logger.info("Started Unstructured API")
