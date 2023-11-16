@@ -69,7 +69,6 @@ docker-start-api:
 	docker run -p 8000:8000 \
 	-it --rm  \
 	--mount type=bind,source=$(realpath .),target=/home/notebook-user/local \
-	-e UNSTRUCTURED_HF_TOKEN=${UNSTRUCTURED_HF_TOKEN} \
 	pipeline-family-${PIPELINE_FAMILY}-dev:latest scripts/app-start.sh
 
 .PHONY: docker-start-bash
