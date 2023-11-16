@@ -32,6 +32,8 @@ RUN python3.10 -m pip install pip==${PIP_VERSION} \
 USER ${NB_USER}
 
 FROM python-deps as model-deps
+# Note(yuming): quick workaround for ingest import error
+# should import initialize within unstructured but out of ingest dir
 COPY --chown=${NB_USER}:${NB_USER} scripts/hi_res_model_initialize.py  hi_res_model_initialize.py 
 RUN python3.10 -c "import nltk; nltk.download('punkt')" && \
   python3.10 -c "import nltk; nltk.download('averaged_perceptron_tagger')" && \
