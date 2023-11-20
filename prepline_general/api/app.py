@@ -11,7 +11,7 @@ logger = logging.getLogger("unstructured_api")
 app = FastAPI(
     title="Unstructured Pipeline API",
     description="""""",
-    version="0.0.58",
+    version="0.0.59",
     docs_url="/general/docs",
     openapi_url="/general/openapi.json",
 )
