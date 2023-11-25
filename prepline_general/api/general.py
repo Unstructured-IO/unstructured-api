@@ -310,12 +310,12 @@ def pipeline_api(
 
         logger.debug(f"filetype: {file_content_type}")
 
-    check_free_memory()
+    _check_free_memory()
 
     if file_content_type == "application/pdf":
-        pdf = check_pdf(file)
+        pdf = _check_pdf(file)
 
-    strategy = check_strategy(m_strategy)
+    strategy = _check_strategy(m_strategy)
 
     show_coordinates_str = (m_coordinates[0] if len(m_coordinates) else "false").lower()
     show_coordinates = show_coordinates_str == "true"
@@ -510,7 +510,7 @@ def pipeline_api(
     return result
 
 
-def check_free_memory():
+def _check_free_memory():
     """Reject traffic when free memory is below minimum.
     Default to 2GB."""
     mem = psutil.virtual_memory()
@@ -522,7 +522,7 @@ def check_free_memory():
         )
     
 
-def check_pdf(file):
+def _check_pdf(file):
     """Check if the PDF file is encrypted, otherwise assume it is not a valid PDF."""
     try:
         pdf = PdfReader(file)
@@ -539,7 +539,7 @@ def check_pdf(file):
         raise HTTPException(status_code=400, detail="File does not appear to be a valid PDF")
 
 
-def check_strategy(m_strategy):
+def _check_strategy(m_strategy):
     """Check if the strategy argument is valid."""
     strategy = (m_strategy[0] if len(m_strategy) else "auto").lower()
     strategies = ["fast", "hi_res", "auto", "ocr_only"]
