@@ -310,36 +310,12 @@ def pipeline_api(
 
         logger.debug(f"filetype: {file_content_type}")
 
-    # Reject traffic when free memory is below minimum
-    # Default to 2GB
-    mem = psutil.virtual_memory()
-    memory_free_minimum = int(os.environ.get("UNSTRUCTURED_MEMORY_FREE_MINIMUM_MB", 2048))
-
-    if mem.available <= memory_free_minimum * 1024 * 1024:
-        raise HTTPException(
-            status_code=503, detail="Server is under heavy load. Please try again later."
-        )
+    check_free_memory()
 
     if file_content_type == "application/pdf":
-        try:
-            pdf = PdfReader(file)
+        pdf = check_pdf(file)
 
-            # This will raise if the file is encrypted
-            pdf.metadata
-        except pypdf.errors.FileNotDecryptedError:
-            raise HTTPException(
-                status_code=400,
-                detail="File is encrypted. Please decrypt it with password.",
-            )
-        except pypdf.errors.PdfReadError:
-            raise HTTPException(status_code=400, detail="File does not appear to be a valid PDF")
-
-    strategy = (m_strategy[0] if len(m_strategy) else "auto").lower()
-    strategies = ["fast", "hi_res", "auto", "ocr_only"]
-    if strategy not in strategies:
-        raise HTTPException(
-            status_code=400, detail=f"Invalid strategy: {strategy}. Must be one of {strategies}"
-        )
+    strategy = check_strategy(m_strategy)
 
     show_coordinates_str = (m_coordinates[0] if len(m_coordinates) else "false").lower()
     show_coordinates = show_coordinates_str == "true"
@@ -532,6 +508,44 @@ def pipeline_api(
     result = convert_to_isd(elements)
 
     return result
+
+
+def check_free_memory():
+    """Reject traffic when free memory is below minimum.
+    Default to 2GB."""
+    mem = psutil.virtual_memory()
+    memory_free_minimum = int(os.environ.get("UNSTRUCTURED_MEMORY_FREE_MINIMUM_MB", 2048))
+
+    if mem.available <= memory_free_minimum * 1024 * 1024:
+        raise HTTPException(
+            status_code=503, detail="Server is under heavy load. Please try again later."
+        )
+    
+
+def check_pdf(file):
+    try:
+        pdf = PdfReader(file)
+
+        # This will raise if the file is encrypted
+        pdf.metadata
+        return pdf
+    except pypdf.errors.FileNotDecryptedError:
+        raise HTTPException(
+            status_code=400,
+            detail="File is encrypted. Please decrypt it with password.",
+        )
+    except pypdf.errors.PdfReadError:
+        raise HTTPException(status_code=400, detail="File does not appear to be a valid PDF")
+
+
+def check_strategy(m_strategy):
+    strategy = (m_strategy[0] if len(m_strategy) else "auto").lower()
+    strategies = ["fast", "hi_res", "auto", "ocr_only"]
+    if strategy not in strategies:
+        raise HTTPException(
+            status_code=400, detail=f"Invalid strategy: {strategy}. Must be one of {strategies}"
+        )
+    return strategy
 
 
 def get_validated_mimetype(file):
