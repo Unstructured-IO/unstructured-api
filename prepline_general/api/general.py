@@ -523,6 +523,7 @@ def check_free_memory():
     
 
 def check_pdf(file):
+    """Check if the PDF file is encrypted, otherwise assume it is not a valid PDF."""
     try:
         pdf = PdfReader(file)
 
@@ -539,6 +540,7 @@ def check_pdf(file):
 
 
 def check_strategy(m_strategy):
+    """Check if the strategy argument is valid."""
     strategy = (m_strategy[0] if len(m_strategy) else "auto").lower()
     strategies = ["fast", "hi_res", "auto", "ocr_only"]
     if strategy not in strategies:
