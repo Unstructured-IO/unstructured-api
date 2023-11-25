@@ -310,51 +310,20 @@ def pipeline_api(
 
         logger.debug(f"filetype: {file_content_type}")
 
-    # Reject traffic when free memory is below minimum
-    # Default to 2GB
-    mem = psutil.virtual_memory()
-    memory_free_minimum = int(os.environ.get("UNSTRUCTURED_MEMORY_FREE_MINIMUM_MB", 2048))
-
-    if mem.available <= memory_free_minimum * 1024 * 1024:
-        raise HTTPException(
-            status_code=503, detail="Server is under heavy load. Please try again later."
-        )
+    _check_free_memory()
 
     if file_content_type == "application/pdf":
-        try:
-            pdf = PdfReader(file)
-
-            # This will raise if the file is encrypted
-            pdf.metadata
-        except pypdf.errors.FileNotDecryptedError:
-            raise HTTPException(
-                status_code=400,
-                detail="File is encrypted. Please decrypt it with password.",
-            )
-        except pypdf.errors.PdfReadError:
-            raise HTTPException(status_code=400, detail="File does not appear to be a valid PDF")
-
-    strategy = (m_strategy[0] if len(m_strategy) else "auto").lower()
-    strategies = ["fast", "hi_res", "auto", "ocr_only"]
-    if strategy not in strategies:
-        raise HTTPException(
-            status_code=400, detail=f"Invalid strategy: {strategy}. Must be one of {strategies}"
-        )
+        pdf = _check_pdf(file)
 
     show_coordinates_str = (m_coordinates[0] if len(m_coordinates) else "false").lower()
     show_coordinates = show_coordinates_str == "true"
 
-    hi_res_model_name = m_hi_res_model_name[0] if len(m_hi_res_model_name) else None
-
-    # Make sure chipper aliases to the latest model
-    if hi_res_model_name and hi_res_model_name == "chipper":
-        hi_res_model_name = "chipperv2"
-
-    if hi_res_model_name and hi_res_model_name in CHIPPER_MODEL_TYPES and show_coordinates:
-        raise HTTPException(
-            status_code=400,
-            detail=f"coordinates aren't available when using the {hi_res_model_name} model type",
-        )
+    hi_res_model_name = _validate_hi_res_model_name(m_hi_res_model_name, show_coordinates)
+    strategy = _validate_strategy(m_strategy)
+    chunking_strategy = _validate_chunking_strategy(m_chunking_strategy)
+    pdf_infer_table_structure = _set_pdf_infer_table_structure(
+        m_pdf_infer_table_structure, strategy
+    )
 
     # Parallel mode is set by env variable
     enable_parallel_mode = os.environ.get("UNSTRUCTURED_PARALLEL_MODE_ENABLED", "false")
@@ -372,25 +341,9 @@ def pipeline_api(
     xml_keep_tags_str = (m_xml_keep_tags[0] if len(m_xml_keep_tags) else "false").lower()
     xml_keep_tags = xml_keep_tags_str == "true"
 
-    pdf_infer_table_structure = (
-        m_pdf_infer_table_structure[0] if len(m_pdf_infer_table_structure) else "false"
-    ).lower()
-    if strategy == "hi_res" and pdf_infer_table_structure == "true":
-        pdf_infer_table_structure = True
-    else:
-        pdf_infer_table_structure = False
-
     skip_infer_table_types = (
         m_skip_infer_table_types[0] if len(m_skip_infer_table_types) else ["pdf", "jpg", "png"]
     )
-
-    chunking_strategy = m_chunking_strategy[0].lower() if len(m_chunking_strategy) else None
-    chunk_strategies = ["by_title"]
-    if chunking_strategy and (chunking_strategy not in chunk_strategies):
-        raise HTTPException(
-            status_code=400,
-            detail=f"Invalid chunking strategy: {chunking_strategy}. Must be one of {chunk_strategies}",
-        )
 
     multipage_sections_str = (
         m_multipage_sections[0] if len(m_multipage_sections) else "true"
@@ -532,6 +485,82 @@ def pipeline_api(
     result = convert_to_isd(elements)
 
     return result
+
+
+def _check_free_memory():
+    """Reject traffic when free memory is below minimum.
+    Default to 2GB."""
+    mem = psutil.virtual_memory()
+    memory_free_minimum = int(os.environ.get("UNSTRUCTURED_MEMORY_FREE_MINIMUM_MB", 2048))
+
+    if mem.available <= memory_free_minimum * 1024 * 1024:
+        raise HTTPException(
+            status_code=503, detail="Server is under heavy load. Please try again later."
+        )
+    
+
+def _check_pdf(file):
+    """Check if the PDF file is encrypted, otherwise assume it is not a valid PDF."""
+    try:
+        pdf = PdfReader(file)
+
+        # This will raise if the file is encrypted
+        pdf.metadata
+        return pdf
+    except pypdf.errors.FileNotDecryptedError:
+        raise HTTPException(
+            status_code=400,
+            detail="File is encrypted. Please decrypt it with password.",
+        )
+    except pypdf.errors.PdfReadError:
+        raise HTTPException(status_code=400, detail="File does not appear to be a valid PDF")
+
+
+def _validate_strategy(m_strategy):
+    strategy = (m_strategy[0] if len(m_strategy) else "auto").lower()
+    strategies = ["fast", "hi_res", "auto", "ocr_only"]
+    if strategy not in strategies:
+        raise HTTPException(
+            status_code=400, detail=f"Invalid strategy: {strategy}. Must be one of {strategies}"
+        )
+    return strategy
+
+
+def _validate_hi_res_model_name(m_hi_res_model_name, show_coordinates):
+    hi_res_model_name = m_hi_res_model_name[0] if len(m_hi_res_model_name) else None
+
+    # Make sure chipper aliases to the latest model
+    if hi_res_model_name and hi_res_model_name == "chipper":
+        hi_res_model_name = "chipperv2"
+    
+    if hi_res_model_name and hi_res_model_name in CHIPPER_MODEL_TYPES and show_coordinates:
+        raise HTTPException(
+            status_code=400,
+            detail=f"coordinates aren't available when using the {hi_res_model_name} model type",
+        )
+    return hi_res_model_name
+
+
+def _validate_chunking_strategy(m_chunking_strategy):
+    chunking_strategy = m_chunking_strategy[0].lower() if len(m_chunking_strategy) else None
+    chunk_strategies = ["by_title"]
+    if chunking_strategy and (chunking_strategy not in chunk_strategies):
+        raise HTTPException(
+            status_code=400,
+            detail=f"Invalid chunking strategy: {chunking_strategy}. Must be one of {chunk_strategies}",
+        )
+    return chunking_strategy
+
+
+def _set_pdf_infer_table_structure(m_pdf_infer_table_structure, strategy):
+    pdf_infer_table_structure = (
+        m_pdf_infer_table_structure[0] if len(m_pdf_infer_table_structure) else "false"
+    ).lower()
+    if strategy == "hi_res" and pdf_infer_table_structure == "true":
+        pdf_infer_table_structure = True
+    else:
+        pdf_infer_table_structure = False
+    return pdf_infer_table_structure
 
 
 def get_validated_mimetype(file):
