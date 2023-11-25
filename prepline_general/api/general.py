@@ -321,7 +321,9 @@ def pipeline_api(
     hi_res_model_name = _check_hi_res_model_name(m_hi_res_model_name, show_coordinates)
     strategy = _check_strategy(m_strategy)
     chunking_strategy = _check_chunking_strategy(m_chunking_strategy)
-    pdf_infer_table_structure = _set_pdf_infer_table_structure(m_pdf_infer_table_structure, strategy)
+    pdf_infer_table_structure = _set_pdf_infer_table_structure(
+        m_pdf_infer_table_structure, strategy
+    )
 
     # Parallel mode is set by env variable
     enable_parallel_mode = os.environ.get("UNSTRUCTURED_PARALLEL_MODE_ENABLED", "false")
@@ -444,8 +446,7 @@ def pipeline_api(
     except ValueError as e:
         if "Invalid file" in e.args[0]:
             raise HTTPException(
-                status_code=400, 
-                detail=f"{file_content_type} not currently supported"
+                status_code=400, detail=f"{file_content_type} not currently supported"
             )
         if "Unstructured schema" in e.args[0]:
             raise HTTPException(
@@ -454,7 +455,7 @@ def pipeline_api(
             )
         if "fast strategy is not available for image files" in e.args[0]:
             raise HTTPException(
-                status_code=400, 
+                status_code=400,
                 detail="The fast strategy is not available for image files",
             )
 
@@ -501,7 +502,7 @@ def _check_free_memory():
         raise HTTPException(
             status_code=503, detail="Server is under heavy load. Please try again later."
         )
-    
+
 
 def _check_pdf(file):
     """Check if the PDF file is encrypted, otherwise assume it is not a valid PDF."""
@@ -538,7 +539,7 @@ def _check_hi_res_model_name(m_hi_res_model_name, show_coordinates):
     # Make sure chipper aliases to the latest model
     if hi_res_model_name and hi_res_model_name == "chipper":
         hi_res_model_name = "chipperv2"
-    
+
     if hi_res_model_name and hi_res_model_name in CHIPPER_MODEL_TYPES and show_coordinates:
         raise HTTPException(
             status_code=400,
