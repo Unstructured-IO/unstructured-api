@@ -446,12 +446,18 @@ def pipeline_api(
     except ValueError as e:
         if "Invalid file" in e.args[0]:
             raise HTTPException(
-                status_code=400, detail=f"{file_content_type} not currently supported"
+                status_code=400, 
+                detail=f"{file_content_type} not currently supported"
             )
         if "Unstructured schema" in e.args[0]:
             raise HTTPException(
                 status_code=400,
                 detail="Json schema does not match the Unstructured schema",
+            )
+        if "fast strategy is not available for image files" in e.args[0]:
+            raise HTTPException(
+                status_code=400, 
+                detail="The fast strategy is not available for image files",
             )
 
         raise e
