@@ -320,17 +320,7 @@ def pipeline_api(
     show_coordinates_str = (m_coordinates[0] if len(m_coordinates) else "false").lower()
     show_coordinates = show_coordinates_str == "true"
 
-    hi_res_model_name = m_hi_res_model_name[0] if len(m_hi_res_model_name) else None
-
-    # Make sure chipper aliases to the latest model
-    if hi_res_model_name and hi_res_model_name == "chipper":
-        hi_res_model_name = "chipperv2"
-
-    if hi_res_model_name and hi_res_model_name in CHIPPER_MODEL_TYPES and show_coordinates:
-        raise HTTPException(
-            status_code=400,
-            detail=f"coordinates aren't available when using the {hi_res_model_name} model type",
-        )
+    hi_res_model_name = _check_hi_res_model_name(m_hi_res_model_name, show_coordinates)
 
     # Parallel mode is set by env variable
     enable_parallel_mode = os.environ.get("UNSTRUCTURED_PARALLEL_MODE_ENABLED", "false")
@@ -360,13 +350,7 @@ def pipeline_api(
         m_skip_infer_table_types[0] if len(m_skip_infer_table_types) else ["pdf", "jpg", "png"]
     )
 
-    chunking_strategy = m_chunking_strategy[0].lower() if len(m_chunking_strategy) else None
-    chunk_strategies = ["by_title"]
-    if chunking_strategy and (chunking_strategy not in chunk_strategies):
-        raise HTTPException(
-            status_code=400,
-            detail=f"Invalid chunking strategy: {chunking_strategy}. Must be one of {chunk_strategies}",
-        )
+    chunking_strategy = _check_chunking_strategy(m_chunking_strategy)
 
     multipage_sections_str = (
         m_multipage_sections[0] if len(m_multipage_sections) else "true"
@@ -548,6 +532,34 @@ def _check_strategy(m_strategy):
             status_code=400, detail=f"Invalid strategy: {strategy}. Must be one of {strategies}"
         )
     return strategy
+
+
+def _check_hi_res_model_name(m_hi_res_model_name, show_coordinates):
+    """Check if hi_res_model_name is valid."""
+    hi_res_model_name = m_hi_res_model_name[0] if len(m_hi_res_model_name) else None
+
+    # Make sure chipper aliases to the latest model
+    if hi_res_model_name and hi_res_model_name == "chipper":
+        hi_res_model_name = "chipperv2"
+    
+    if hi_res_model_name and hi_res_model_name in CHIPPER_MODEL_TYPES and show_coordinates:
+        raise HTTPException(
+            status_code=400,
+            detail=f"coordinates aren't available when using the {hi_res_model_name} model type",
+        )
+    return hi_res_model_name
+
+
+def _check_chunking_strategy(m_chunking_strategy):
+    """Check chunking strategy is valid."""
+    chunking_strategy = m_chunking_strategy[0].lower() if len(m_chunking_strategy) else None
+    chunk_strategies = ["by_title"]
+    if chunking_strategy and (chunking_strategy not in chunk_strategies):
+        raise HTTPException(
+            status_code=400,
+            detail=f"Invalid chunking strategy: {chunking_strategy}. Must be one of {chunk_strategies}",
+        )
+    return chunking_strategy
 
 
 def get_validated_mimetype(file):
