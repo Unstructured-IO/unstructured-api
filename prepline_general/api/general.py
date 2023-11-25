@@ -315,12 +315,12 @@ def pipeline_api(
     if file_content_type == "application/pdf":
         pdf = _check_pdf(file)
 
-    strategy = _check_strategy(m_strategy)
-
     show_coordinates_str = (m_coordinates[0] if len(m_coordinates) else "false").lower()
     show_coordinates = show_coordinates_str == "true"
 
     hi_res_model_name = _check_hi_res_model_name(m_hi_res_model_name, show_coordinates)
+    strategy = _check_strategy(m_strategy)
+    chunking_strategy = _check_chunking_strategy(m_chunking_strategy)
 
     # Parallel mode is set by env variable
     enable_parallel_mode = os.environ.get("UNSTRUCTURED_PARALLEL_MODE_ENABLED", "false")
@@ -349,8 +349,6 @@ def pipeline_api(
     skip_infer_table_types = (
         m_skip_infer_table_types[0] if len(m_skip_infer_table_types) else ["pdf", "jpg", "png"]
     )
-
-    chunking_strategy = _check_chunking_strategy(m_chunking_strategy)
 
     multipage_sections_str = (
         m_multipage_sections[0] if len(m_multipage_sections) else "true"
