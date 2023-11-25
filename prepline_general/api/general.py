@@ -321,6 +321,7 @@ def pipeline_api(
     hi_res_model_name = _check_hi_res_model_name(m_hi_res_model_name, show_coordinates)
     strategy = _check_strategy(m_strategy)
     chunking_strategy = _check_chunking_strategy(m_chunking_strategy)
+    pdf_infer_table_structure = _set_pdf_infer_table_structure(m_pdf_infer_table_structure, strategy)
 
     # Parallel mode is set by env variable
     enable_parallel_mode = os.environ.get("UNSTRUCTURED_PARALLEL_MODE_ENABLED", "false")
@@ -337,14 +338,6 @@ def pipeline_api(
 
     xml_keep_tags_str = (m_xml_keep_tags[0] if len(m_xml_keep_tags) else "false").lower()
     xml_keep_tags = xml_keep_tags_str == "true"
-
-    pdf_infer_table_structure = (
-        m_pdf_infer_table_structure[0] if len(m_pdf_infer_table_structure) else "false"
-    ).lower()
-    if strategy == "hi_res" and pdf_infer_table_structure == "true":
-        pdf_infer_table_structure = True
-    else:
-        pdf_infer_table_structure = False
 
     skip_infer_table_types = (
         m_skip_infer_table_types[0] if len(m_skip_infer_table_types) else ["pdf", "jpg", "png"]
@@ -558,6 +551,17 @@ def _check_chunking_strategy(m_chunking_strategy):
             detail=f"Invalid chunking strategy: {chunking_strategy}. Must be one of {chunk_strategies}",
         )
     return chunking_strategy
+
+
+def _set_pdf_infer_table_structure(m_pdf_infer_table_structure, strategy):
+    pdf_infer_table_structure = (
+        m_pdf_infer_table_structure[0] if len(m_pdf_infer_table_structure) else "false"
+    ).lower()
+    if strategy == "hi_res" and pdf_infer_table_structure == "true":
+        pdf_infer_table_structure = True
+    else:
+        pdf_infer_table_structure = False
+    return pdf_infer_table_structure
 
 
 def get_validated_mimetype(file):
