@@ -318,9 +318,9 @@ def pipeline_api(
     show_coordinates_str = (m_coordinates[0] if len(m_coordinates) else "false").lower()
     show_coordinates = show_coordinates_str == "true"
 
-    hi_res_model_name = _check_hi_res_model_name(m_hi_res_model_name, show_coordinates)
-    strategy = _check_strategy(m_strategy)
-    chunking_strategy = _check_chunking_strategy(m_chunking_strategy)
+    hi_res_model_name = _validate_hi_res_model_name(m_hi_res_model_name, show_coordinates)
+    strategy = _validate_strategy(m_strategy)
+    chunking_strategy = _validate_chunking_strategy(m_chunking_strategy)
     pdf_infer_table_structure = _set_pdf_infer_table_structure(
         m_pdf_infer_table_structure, strategy
     )
@@ -521,8 +521,7 @@ def _check_pdf(file):
         raise HTTPException(status_code=400, detail="File does not appear to be a valid PDF")
 
 
-def _check_strategy(m_strategy):
-    """Check if the strategy argument is valid."""
+def _validate_strategy(m_strategy):
     strategy = (m_strategy[0] if len(m_strategy) else "auto").lower()
     strategies = ["fast", "hi_res", "auto", "ocr_only"]
     if strategy not in strategies:
@@ -532,8 +531,7 @@ def _check_strategy(m_strategy):
     return strategy
 
 
-def _check_hi_res_model_name(m_hi_res_model_name, show_coordinates):
-    """Check if hi_res_model_name is valid."""
+def _validate_hi_res_model_name(m_hi_res_model_name, show_coordinates):
     hi_res_model_name = m_hi_res_model_name[0] if len(m_hi_res_model_name) else None
 
     # Make sure chipper aliases to the latest model
@@ -548,8 +546,7 @@ def _check_hi_res_model_name(m_hi_res_model_name, show_coordinates):
     return hi_res_model_name
 
 
-def _check_chunking_strategy(m_chunking_strategy):
-    """Check chunking strategy is valid."""
+def _validate_chunking_strategy(m_chunking_strategy):
     chunking_strategy = m_chunking_strategy[0].lower() if len(m_chunking_strategy) else None
     chunk_strategies = ["by_title"]
     if chunking_strategy and (chunking_strategy not in chunk_strategies):
