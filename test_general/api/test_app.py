@@ -813,3 +813,18 @@ def test_chipper_memory_protection(monkeypatch, mocker):
         # Assert only one call got through
         assert status_codes.count(200) == 1
         assert status_codes.count(503) == 2
+
+
+def test_invalid_strategy_for_image_file():
+    """
+    Verify that we get a 400 error if we use "strategy=fast" with an image file
+    """
+    client = TestClient(app)
+    test_file = Path("sample-docs") / "layout-parser-paper-fast.jpg"
+    resp = client.post(
+        MAIN_API_ROUTE,
+        files=[("files", (str(test_file), open(test_file, "rb")))],
+        data={"strategy": "fast"},
+    )
+    assert resp.status_code == 400
+    assert "fast strategy is not available for image files" in resp.text
