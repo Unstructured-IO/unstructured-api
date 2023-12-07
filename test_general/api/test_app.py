@@ -833,8 +833,16 @@ def test_invalid_strategy_for_image_file():
 @pytest.mark.parametrize(
     ("exception", "status_code", "message"),
     [
-        (OSError("chipper-fast-fine-tuning is not a local folder"), 400,  "The Chipper model is not available for download. It can be accessed via the official hosted API."),
-        (OSError("ved-fine-tuning is not a local folder"), 400,  "The Chipper model is not available for download. It can be accessed via the official hosted API."),
+        (
+            OSError("chipper-fast-fine-tuning is not a local folder"),
+            400,
+            "The Chipper model is not available for download. It can be accessed via the official hosted API.",
+        ),
+        (
+            OSError("ved-fine-tuning is not a local folder"),
+            400,
+            "The Chipper model is not available for download. It can be accessed via the official hosted API.",
+        ),
         (OSError(1, "An error happened"), 500, "[Errno 1] An error happened"),
     ],
 )
@@ -862,4 +870,4 @@ def test_chipper_not_available_errors(monkeypatch, mocker, exception, status_cod
     )
 
     assert resp.status_code == status_code
-    assert resp.json().get('detail') == message
+    assert resp.json().get("detail") == message
