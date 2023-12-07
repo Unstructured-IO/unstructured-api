@@ -433,7 +433,7 @@ def pipeline_api(
             elements = partition(**partition_kwargs)
 
     except OSError as e:
-        if (
+        if isinstance(e.args[0], str) and (
             "chipper-fast-fine-tuning is not a local folder" in e.args[0]
             or "ved-fine-tuning is not a local folder" in e.args[0]
         ):
@@ -442,7 +442,11 @@ def pipeline_api(
                 detail="The Chipper model is not available for download. It can be accessed via the official hosted API.",
             )
 
-        raise e
+        # OSError isn't caught by our top level handler, so convert it here
+        raise HTTPException(
+            status_code=500,
+            detail=str(e),
+        )
     except ValueError as e:
         if "Invalid file" in e.args[0]:
             raise HTTPException(
