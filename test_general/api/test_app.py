@@ -836,12 +836,14 @@ def test_invalid_strategy_for_image_file():
         (
             OSError("chipper-fast-fine-tuning is not a local folder"),
             400,
-            "The Chipper model is not available for download. It can be accessed via the official hosted API.",
+            "The Chipper model is not available for download. "
+            "It can be accessed via the official hosted API.",
         ),
         (
             OSError("ved-fine-tuning is not a local folder"),
             400,
-            "The Chipper model is not available for download. It can be accessed via the official hosted API.",
+            "The Chipper model is not available for download. "
+            "It can be accessed via the official hosted API.",
         ),
         (OSError(1, "An error happened"), 500, "[Errno 1] An error happened"),
     ],
