@@ -499,7 +499,7 @@ def _check_free_memory():
     memory_free_minimum = int(os.environ.get("UNSTRUCTURED_MEMORY_FREE_MINIMUM_MB", 2048))
 
     if mem.available <= memory_free_minimum * 1024 * 1024:
-        logger.warn(f"Rejecting because free memory is below {memory_free_minimum} MB")
+        logger.warning(f"Rejecting because free memory is below {memory_free_minimum} MB")
         raise HTTPException(
             status_code=503, detail="Server is under heavy load. Please try again later."
         )
