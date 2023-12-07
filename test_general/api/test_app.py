@@ -828,3 +828,38 @@ def test_invalid_strategy_for_image_file():
     )
     assert resp.status_code == 400
     assert "fast strategy is not available for image files" in resp.text
+
+
+@pytest.mark.parametrize(
+    ("exception", "status_code", "message"),
+    [
+        (OSError("chipper-fast-fine-tuning is not a local folder"), 400,  "The Chipper model is not available for download. It can be accessed via the official hosted API."),
+        (OSError("ved-fine-tuning is not a local folder"), 400,  "The Chipper model is not available for download. It can be accessed via the official hosted API."),
+        (OSError(1, "An error happened"), 500, "[Errno 1] An error happened"),
+    ],
+)
+def test_chipper_not_available_errors(monkeypatch, mocker, exception, status_code, message):
+    """
+    Assert that we return the right error if Chipper is not downloaded.
+    OSError can have an int as the first arg, do not blow up if that happens.
+    """
+
+    mock_partition = Mock(side_effect=exception)
+
+    monkeypatch.setattr(
+        general,
+        "partition",
+        mock_partition,
+    )
+
+    client = TestClient(app)
+    test_file = Path("sample-docs") / "layout-parser-paper-fast.pdf"
+
+    resp = client.post(
+        MAIN_API_ROUTE,
+        files=[("files", (str(test_file), open(test_file, "rb"), "application/pdf"))],
+        data={"strategy": "hi_res", "hi_res_model_name": "chipper"},
+    )
+
+    assert resp.status_code == status_code
+    assert resp.json().get('detail') == message
