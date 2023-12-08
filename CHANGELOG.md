@@ -1,3 +1,7 @@
+## 0.0.60
+
+* Add lightweight api key check for self hosted users
+
 ## 0.0.59
 
 * Bump unstructured to 0.11.0
