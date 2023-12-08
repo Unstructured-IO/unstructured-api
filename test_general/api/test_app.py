@@ -450,7 +450,7 @@ def test_general_api_returns_401(monkeypatch):
     response = client.post(
         MAIN_API_ROUTE,
         files=[("files", (str(test_file), open(test_file, "rb")))],
-        headers={"unstructured-api-key": "foobar"}
+        headers={"unstructured-api-key": "foobar"},
     )
 
     assert response.status_code == 200
@@ -460,7 +460,7 @@ def test_general_api_returns_401(monkeypatch):
     response = client.post(
         MAIN_API_ROUTE,
         files=[("files", (str(test_file), open(test_file, "rb")))],
-        headers={"unstructured-api-key": "helloworld"}
+        headers={"unstructured-api-key": "helloworld"},
     )
 
     assert response.status_code == 401
