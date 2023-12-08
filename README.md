@@ -323,6 +323,9 @@ As mentioned above, processing a pdf using `hi_res` is currently a slow operatio
 * `UNSTRUCTURED_PARALLEL_MODE_SPLIT_SIZE` - the number of pages to be processed in one request, default is `1`.
 * `UNSTRUCTURED_PARALLEL_RETRY_ATTEMPTS` - the number of retry attempts on a retryable error, default is `2`. (i.e. 3 attempts are made in total)
 
+#### Security
+You may also set the optional `UNSTRUCTURED_API_KEY` env variable to enable request validation for your self-hosted instance of Unstructured. If set, only requests including an `unstructured-api-key` header with the same value will be fulfilled. Otherwise, the server will return a 401 indicating that the request is unauthorized.
+
 #### Controlling Server Load
 Some documents will use a lot of memory as they're being processed. To mitigate OOM errors, the server will return a 503 if the host's available memory drops below 2GB. This is configurable with `UNSTRUCTURED_MEMORY_FREE_MINIMUM_MB`.
 

@@ -675,7 +675,7 @@ def ungz_file(file: UploadFile, gz_uncompressed_content_type=None) -> UploadFile
 
 
 @router.post("/general/v0/general")
-@router.post("/general/v0.0.59/general")
+@router.post("/general/v0.0.60/general")
 def pipeline_1(
     request: Request,
     gz_uncompressed_content_type: Optional[str] = Form(default=None),
@@ -697,6 +697,13 @@ def pipeline_1(
     new_after_n_chars: List[str] = Form(default=[]),
     max_characters: List[str] = Form(default=[]),
 ):
+    if api_key_env := os.environ.get("UNSTRUCTURED_API_KEY"):
+        api_key = request.headers.get("unstructured-api-key")
+        if api_key != api_key_env:
+            raise HTTPException(
+                detail=f"API key {api_key} is invalid", status_code=status.HTTP_401_UNAUTHORIZED
+            )
+
     if files:
         for file_index in range(len(files)):
             if files[file_index].content_type == "application/gzip":

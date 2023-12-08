@@ -1,3 +1,7 @@
+## 0.0.60
+
+* Enable self-hosted authorization using UNSTRUCTURED_API_KEY env variable
+
 ## 0.0.59
 
 * Bump unstructured to 0.11.0

@@ -439,6 +439,33 @@ def test_general_api_returns_503(monkeypatch):
     assert response.status_code == 503
 
 
+def test_general_api_returns_401(monkeypatch):
+    """
+    When UNSTRUCTURED_API_KEY is set, return a 401 if the unstructured-api-key header does not match
+    """
+    monkeypatch.setenv("UNSTRUCTURED_API_KEY", "foobar")
+
+    client = TestClient(app)
+    test_file = Path("sample-docs") / "fake-xml.xml"
+    response = client.post(
+        MAIN_API_ROUTE,
+        files=[("files", (str(test_file), open(test_file, "rb")))],
+        headers={"unstructured-api-key": "foobar"},
+    )
+
+    assert response.status_code == 200
+
+    client = TestClient(app)
+    test_file = Path("sample-docs") / "fake-xml.xml"
+    response = client.post(
+        MAIN_API_ROUTE,
+        files=[("files", (str(test_file), open(test_file, "rb")))],
+        headers={"unstructured-api-key": "helloworld"},
+    )
+
+    assert response.status_code == 401
+
+
 class MockResponse:
     def __init__(self, status_code):
         self.status_code = status_code
