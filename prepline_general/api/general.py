@@ -692,9 +692,10 @@ def pipeline_1(
     new_after_n_chars: List[str] = Form(default=[]),
     max_characters: List[str] = Form(default=[]),
 ):
-    api_key = request.headers.get("unstructured-api-key")
-    if api_key != os.environ.get("UNSTRUCTURED_API_KEY"):
-        raise HTTPException(detail=f"API key {api_key} is invalid", status_code=status.HTTP_401_UNAUTHORIZED)
+    if api_key_env := os.environ.get("UNSTRUCTURED_API_KEY"):
+        api_key = request.headers.get("unstructured-api-key")
+        if api_key != api_key_env:
+            raise HTTPException(detail=f"API key {api_key} is invalid", status_code=status.HTTP_401_UNAUTHORIZED)
 
     if files:
         for file_index in range(len(files)):
