@@ -433,7 +433,7 @@ def pipeline_api(
             elements = partition(**partition_kwargs)
 
     except OSError as e:
-        if (
+        if isinstance(e.args[0], str) and (
             "chipper-fast-fine-tuning is not a local folder" in e.args[0]
             or "ved-fine-tuning is not a local folder" in e.args[0]
         ):
@@ -442,7 +442,11 @@ def pipeline_api(
                 detail="The Chipper model is not available for download. It can be accessed via the official hosted API.",
             )
 
-        raise e
+        # OSError isn't caught by our top level handler, so convert it here
+        raise HTTPException(
+            status_code=500,
+            detail=str(e),
+        )
     except ValueError as e:
         if "Invalid file" in e.args[0]:
             raise HTTPException(
@@ -499,6 +503,7 @@ def _check_free_memory():
     memory_free_minimum = int(os.environ.get("UNSTRUCTURED_MEMORY_FREE_MINIMUM_MB", 2048))
 
     if mem.available <= memory_free_minimum * 1024 * 1024:
+        logger.warning(f"Rejecting because free memory is below {memory_free_minimum} MB")
         raise HTTPException(
             status_code=503, detail="Server is under heavy load. Please try again later."
         )
@@ -670,7 +675,7 @@ def ungz_file(file: UploadFile, gz_uncompressed_content_type=None) -> UploadFile
 
 
 @router.post("/general/v0/general")
-@router.post("/general/v0.0.59/general")
+@router.post("/general/v0.0.60/general")
 def pipeline_1(
     request: Request,
     gz_uncompressed_content_type: Optional[str] = Form(default=None),
@@ -692,6 +697,13 @@ def pipeline_1(
     new_after_n_chars: List[str] = Form(default=[]),
     max_characters: List[str] = Form(default=[]),
 ):
+    if api_key_env := os.environ.get("UNSTRUCTURED_API_KEY"):
+        api_key = request.headers.get("unstructured-api-key")
+        if api_key != api_key_env:
+            raise HTTPException(
+                detail=f"API key {api_key} is invalid", status_code=status.HTTP_401_UNAUTHORIZED
+            )
+
     if files:
         for file_index in range(len(files)):
             if files[file_index].content_type == "application/gzip":
