@@ -466,7 +466,7 @@ def pipeline_api(
         raise e
     except zipfile.BadZipFile:
         raise HTTPException(
-            status_code=400,
+            status_code=422,
             detail="File is not a valid docx",
         )
 
@@ -523,7 +523,7 @@ def _check_pdf(file):
             detail="File is encrypted. Please decrypt it with password.",
         )
     except pypdf.errors.PdfReadError:
-        raise HTTPException(status_code=400, detail="File does not appear to be a valid PDF")
+        raise HTTPException(status_code=422, detail="File does not appear to be a valid PDF")
 
 
 def _validate_strategy(m_strategy):
@@ -807,7 +807,7 @@ def pipeline_1(
             )
     else:
         raise HTTPException(
-            detail='Request parameter "files" is required.\n',
+            detail='Request parameter "files" is required.',
             status_code=status.HTTP_400_BAD_REQUEST,
         )
 

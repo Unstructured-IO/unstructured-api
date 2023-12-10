@@ -398,9 +398,9 @@ def test_general_api_returns_400_unsupported_file(example_filename):
     assert response.status_code == 400
 
 
-def test_general_api_returns_400_bad_pdf():
+def test_general_api_returns_422_bad_pdf():
     """
-    Verify that we get a 400 for invalid PDF files
+    Verify that we get a 422 for invalid PDF files
     """
     tmp = tempfile.NamedTemporaryFile(suffix=".pdf")
     tmp.write(b"This is not a valid PDF")
@@ -409,7 +409,7 @@ def test_general_api_returns_400_bad_pdf():
         MAIN_API_ROUTE, files=[("files", (str(tmp.name), open(tmp.name, "rb"), "application/pdf"))]
     )
     assert response.json() == {"detail": "File does not appear to be a valid PDF"}
-    assert response.status_code == 400
+    assert response.status_code == 422
     tmp.close()
 
     # Don't blow up if this isn't actually a pdf
@@ -420,7 +420,7 @@ def test_general_api_returns_400_bad_pdf():
     )
 
     assert response.json() == {"detail": "File does not appear to be a valid PDF"}
-    assert response.status_code == 400
+    assert response.status_code == 422
 
 
 def test_general_api_returns_503(monkeypatch):
@@ -757,7 +757,7 @@ def test_encrypted_pdf():
         assert response.status_code == 200
 
 
-def test_general_api_returns_400_bad_docx():
+def test_general_api_returns_422_bad_docx():
     """
     Verify that we get a 400 for invalid docx files
     """
@@ -777,7 +777,7 @@ def test_general_api_returns_400_bad_docx():
         ],
     )
     assert response.json().get("detail") == "File is not a valid docx"
-    assert response.status_code == 400
+    assert response.status_code == 422
 
 
 def test_general_api_returns_400_bad_json(tmpdir):
