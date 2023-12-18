@@ -191,11 +191,7 @@ def partition_pdf_splits(
     pages_per_pdf = int(os.environ.get("UNSTRUCTURED_PARALLEL_MODE_SPLIT_SIZE", 1))
 
     # If it's small enough, just process locally
-    # (Some kwargs need to be renamed for local partition)
     if len(pdf_pages) <= pages_per_pdf:
-        if partition_kwargs.get("hi_res_model_name"):
-            partition_kwargs["model_name"] = partition_kwargs.pop("hi_res_model_name")
-
         return partition(
             file=file,
             metadata_filename=metadata_filename,
@@ -378,7 +374,7 @@ def pipeline_api(
                         "pdf_infer_table_structure": pdf_infer_table_structure,
                         "include_page_breaks": include_page_breaks,
                         "encoding": encoding,
-                        "model_name": hi_res_model_name,
+                        "hi_res_model_name": hi_res_model_name,
                         "xml_keep_tags": xml_keep_tags,
                         "skip_infer_table_types": skip_infer_table_types,
                         "languages": languages,
@@ -399,7 +395,7 @@ def pipeline_api(
             "content_type": file_content_type,
             "encoding": encoding,
             "include_page_breaks": include_page_breaks,
-            "model_name": hi_res_model_name,
+            "hi_res_model_name": hi_res_model_name,
             "ocr_languages": ocr_languages,
             "pdf_infer_table_structure": pdf_infer_table_structure,
             "skip_infer_table_types": skip_infer_table_types,
@@ -414,12 +410,6 @@ def pipeline_api(
         }
 
         if file_content_type == "application/pdf" and pdf_parallel_mode_enabled:
-            # Be careful of naming differences in api params vs partition params!
-            # These kwargs are going back into the api, not into partition
-            # They need to be switched back in partition_pdf_splits
-            if partition_kwargs.get("model_name"):
-                partition_kwargs["hi_res_model_name"] = partition_kwargs.pop("model_name")
-
             elements = partition_pdf_splits(
                 request=request,
                 pdf_pages=pdf.pages,
