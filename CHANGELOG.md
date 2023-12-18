@@ -1,3 +1,7 @@
+## 0.0.61-dev0
+
+* Add hi_res_model_name to partition and deprecate model_name
+
 ## 0.0.60
 
 * Enable self-hosted authorization using UNSTRUCTURED_API_KEY env variable
