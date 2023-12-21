@@ -910,8 +910,8 @@ def test_invalid_hi_res_model_name_returns_400():
         MAIN_API_ROUTE,
         files=[("files", (str(test_file), open(test_file, "rb")))],
         data={
-            "strategy": "hi_res", 
-            "hi_res_model_name": "invalid_model", 
+            "strategy": "hi_res",
+            "hi_res_model_name": "invalid_model",
         },
     )
     assert response.status_code == 400
