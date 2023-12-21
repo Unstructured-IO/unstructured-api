@@ -1,3 +1,7 @@
+## 0.0.61-dev0
+
+* Handle invalid hi_res_model_name kwarg
+
 ## 0.0.60
 
 * Enable self-hosted authorization using UNSTRUCTURED_API_KEY env variable
