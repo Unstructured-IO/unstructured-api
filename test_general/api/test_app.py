@@ -900,3 +900,19 @@ def test_chipper_not_available_errors(monkeypatch, mocker, exception, status_cod
 
     assert resp.status_code == status_code
     assert resp.json().get("detail") == message
+
+
+def test_invalid_hi_res_model_name_returns_400():
+    """Verify that we get a 400 if we pass in a bad model_name"""
+    client = TestClient(app)
+    test_file = Path("sample-docs") / "layout-parser-paper-fast.pdf"
+    response = client.post(
+        MAIN_API_ROUTE,
+        files=[("files", (str(test_file), open(test_file, "rb")))],
+        data={
+            "strategy": "hi_res", 
+            "hi_res_model_name": "invalid_model", 
+        },
+    )
+    assert response.status_code == 400
+    assert "Unknown model type" in response.text
