@@ -47,6 +47,7 @@ from unstructured.staging.base import (
     elements_from_json,
 )
 from unstructured_inference.models.chipper import MODEL_TYPES as CHIPPER_MODEL_TYPES
+from unstructured_inference.models.base import UnknownModelException
 
 
 app = FastAPI()
@@ -470,6 +471,12 @@ def pipeline_api(
             detail="File is not a valid docx",
         )
 
+    except UnknownModelException:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Unknown model type: {hi_res_model_name}",
+        )
+
     # Clean up returned elements
     # Note(austin): pydantic should control this sort of thing for us
     for i, element in enumerate(elements):
@@ -675,7 +682,7 @@ def ungz_file(file: UploadFile, gz_uncompressed_content_type=None) -> UploadFile
 
 
 @router.post("/general/v0/general")
-@router.post("/general/v0.0.60/general")
+@router.post("/general/v0.0.61/general")
 def pipeline_1(
     request: Request,
     gz_uncompressed_content_type: Optional[str] = Form(default=None),
