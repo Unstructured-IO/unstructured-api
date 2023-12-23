@@ -16,9 +16,7 @@ anyio==3.7.1
     #   jupyter-server
     #   starlette
 appnope==0.1.3
-    # via
-    #   ipykernel
-    #   ipython
+    # via ipykernel
 argon2-cffi==23.1.0
     # via jupyter-server
 argon2-cffi-bindings==21.2.0
@@ -37,7 +35,7 @@ attrs==23.1.0
     # via
     #   jsonschema
     #   referencing
-babel==2.13.1
+babel==2.14.0
     # via jupyterlab-server
 backoff==2.2.1
     # via
@@ -48,7 +46,7 @@ beautifulsoup4==4.12.2
     #   -r requirements/base.txt
     #   nbconvert
     #   unstructured
-black==23.11.0
+black==23.12.1
     # via -r requirements/test.in
 bleach==6.1.0
     # via nbconvert
@@ -58,6 +56,7 @@ certifi==2023.11.17
     #   httpcore
     #   httpx
     #   requests
+    #   unstructured-client
 cffi==1.16.0
     # via
     #   -r requirements/base.txt
@@ -72,6 +71,7 @@ charset-normalizer==3.3.2
     #   -r requirements/base.txt
     #   pdfminer-six
     #   requests
+    #   unstructured-client
 click==8.1.3
     # via
     #   -r requirements/base.txt
@@ -89,9 +89,9 @@ contourpy==1.2.0
     # via
     #   -r requirements/base.txt
     #   matplotlib
-coverage[toml]==7.3.2
+coverage[toml]==7.3.4
     # via pytest-cov
-cryptography==41.0.5
+cryptography==41.0.7
     # via
     #   -r requirements/base.txt
     #   pdfminer-six
@@ -99,21 +99,26 @@ cycler==0.12.1
     # via
     #   -r requirements/base.txt
     #   matplotlib
-dataclasses-json==0.6.2
+dataclasses-json==0.6.3
     # via
     #   -r requirements/base.txt
     #   unstructured
+    #   unstructured-client
 debugpy==1.8.0
     # via ipykernel
 decorator==5.1.1
     # via ipython
 defusedxml==0.7.1
     # via nbconvert
+deprecated==1.2.14
+    # via
+    #   -r requirements/base.txt
+    #   pikepdf
 effdet==0.4.1
     # via
     #   -r requirements/base.txt
     #   layoutparser
-emoji==2.8.0
+emoji==2.9.0
     # via
     #   -r requirements/base.txt
     #   unstructured
@@ -121,7 +126,7 @@ et-xmlfile==1.1.0
     # via
     #   -r requirements/base.txt
     #   openpyxl
-exceptiongroup==1.1.3
+exceptiongroup==1.2.0
     # via
     #   -r requirements/base.txt
     #   anyio
@@ -131,7 +136,7 @@ execnb==0.1.5
     # via nbdev
 executing==2.0.1
     # via stack-data
-fastapi==0.104.1
+fastapi==0.105.0
     # via -r requirements/base.txt
 fastcore==1.5.29
     # via
@@ -156,13 +161,13 @@ flatbuffers==23.5.26
     # via
     #   -r requirements/base.txt
     #   onnxruntime
-fonttools==4.45.0
+fonttools==4.47.0
     # via
     #   -r requirements/base.txt
     #   matplotlib
 fqdn==1.5.1
     # via jsonschema
-fsspec==2023.10.0
+fsspec==2023.12.2
     # via
     #   -r requirements/base.txt
     #   huggingface-hub
@@ -176,9 +181,9 @@ h11==0.14.0
     #   uvicorn
 httpcore==1.0.2
     # via httpx
-httpx==0.25.1
+httpx==0.26.0
     # via -r requirements/test.in
-huggingface-hub==0.19.4
+huggingface-hub==0.20.1
     # via
     #   -r requirements/base.txt
     #   timm
@@ -189,27 +194,28 @@ humanfriendly==10.0
     # via
     #   -r requirements/base.txt
     #   coloredlogs
-idna==3.4
+idna==3.6
     # via
     #   -r requirements/base.txt
     #   anyio
     #   httpx
     #   jsonschema
     #   requests
+    #   unstructured-client
 iniconfig==2.0.0
     # via pytest
 iopath==0.1.10
     # via
     #   -r requirements/base.txt
     #   layoutparser
-ipykernel==6.26.0
+ipykernel==6.27.1
     # via
     #   ipywidgets
     #   jupyter
     #   jupyter-console
     #   jupyterlab
     #   qtconsole
-ipython==8.17.2
+ipython==8.19.0
     # via
     #   execnb
     #   ipykernel
@@ -237,6 +243,10 @@ joblib==1.3.2
     #   nltk
 json5==0.9.14
     # via jupyterlab-server
+jsonpath-python==1.0.6
+    # via
+    #   -r requirements/base.txt
+    #   unstructured-client
 jsonpointer==2.4
     # via jsonschema
 jsonschema[format-nongpl]==4.20.0
@@ -244,7 +254,7 @@ jsonschema[format-nongpl]==4.20.0
     #   jupyter-events
     #   jupyterlab-server
     #   nbformat
-jsonschema-specifications==2023.11.1
+jsonschema-specifications==2023.11.2
     # via jsonschema
 jupyter==1.0.0
     # via -r requirements/test.in
@@ -257,7 +267,7 @@ jupyter-client==8.6.0
     #   qtconsole
 jupyter-console==6.6.3
     # via jupyter
-jupyter-core==5.5.0
+jupyter-core==5.5.1
     # via
     #   ipykernel
     #   jupyter-client
@@ -270,20 +280,20 @@ jupyter-core==5.5.0
     #   qtconsole
 jupyter-events==0.9.0
     # via jupyter-server
-jupyter-lsp==2.2.0
+jupyter-lsp==2.2.1
     # via jupyterlab
-jupyter-server==2.10.1
+jupyter-server==2.12.1
     # via
     #   jupyter-lsp
     #   jupyterlab
     #   jupyterlab-server
     #   notebook
     #   notebook-shim
-jupyter-server-terminals==0.4.4
+jupyter-server-terminals==0.5.0
     # via jupyter-server
 jupyterlab==4.0.9
     # via notebook
-jupyterlab-pygments==0.2.2
+jupyterlab-pygments==0.3.0
     # via nbconvert
 jupyterlab-server==2.25.2
     # via
@@ -303,9 +313,10 @@ layoutparser[layoutmodels,tesseract]==0.3.4
     # via
     #   -r requirements/base.txt
     #   unstructured-inference
-lxml==4.9.3
+lxml==4.9.4
     # via
     #   -r requirements/base.txt
+    #   pikepdf
     #   python-docx
     #   python-pptx
     #   unstructured
@@ -322,6 +333,7 @@ marshmallow==3.20.1
     # via
     #   -r requirements/base.txt
     #   dataclasses-json
+    #   unstructured-client
 matplotlib==3.8.2
     # via
     #   -r requirements/base.txt
@@ -342,7 +354,7 @@ msg-parser==1.2.0
     # via
     #   -r requirements/base.txt
     #   unstructured
-mypy==1.7.0
+mypy==1.8.0
     # via -r requirements/test.in
 mypy-extensions==1.0.0
     # via
@@ -350,9 +362,10 @@ mypy-extensions==1.0.0
     #   black
     #   mypy
     #   typing-inspect
+    #   unstructured-client
 nbclient==0.9.0
     # via nbconvert
-nbconvert==7.11.0
+nbconvert==7.13.1
     # via
     #   jupyter
     #   jupyter-server
@@ -395,7 +408,7 @@ numpy==1.26.2
     #   torchvision
     #   transformers
     #   unstructured
-olefile==0.46
+olefile==0.47
     # via
     #   -r requirements/base.txt
     #   msg-parser
@@ -438,13 +451,15 @@ packaging==23.2
     #   matplotlib
     #   nbconvert
     #   onnxruntime
+    #   pikepdf
     #   pytesseract
     #   pytest
     #   qtconsole
     #   qtpy
     #   transformers
+    #   unstructured-client
     #   unstructured-pytesseract
-pandas==2.1.3
+pandas==2.1.4
     # via
     #   -r requirements/base.txt
     #   layoutparser
@@ -453,7 +468,7 @@ pandocfilters==1.5.0
     # via nbconvert
 parso==0.8.3
     # via jedi
-pathspec==0.11.2
+pathspec==0.12.1
     # via black
 pdf2image==1.16.3
     # via
@@ -469,8 +484,12 @@ pdfplumber==0.10.3
     # via
     #   -r requirements/base.txt
     #   layoutparser
-pexpect==4.8.0
+pexpect==4.9.0
     # via ipython
+pikepdf==8.10.1
+    # via
+    #   -r requirements/base.txt
+    #   unstructured
 pillow==10.1.0
     # via
     #   -r requirements/base.txt
@@ -478,11 +497,12 @@ pillow==10.1.0
     #   matplotlib
     #   pdf2image
     #   pdfplumber
+    #   pikepdf
     #   pytesseract
     #   python-pptx
     #   torchvision
     #   unstructured-pytesseract
-platformdirs==4.0.0
+platformdirs==4.1.0
     # via
     #   black
     #   jupyter-core
@@ -492,9 +512,9 @@ portalocker==2.8.2
     # via
     #   -r requirements/base.txt
     #   iopath
-prometheus-client==0.18.0
+prometheus-client==0.19.0
     # via jupyter-server
-prompt-toolkit==3.0.41
+prompt-toolkit==3.0.43
     # via
     #   ipython
     #   jupyter-console
@@ -503,7 +523,7 @@ protobuf==4.25.1
     #   -r requirements/base.txt
     #   onnx
     #   onnxruntime
-psutil==5.9.6
+psutil==5.9.7
     # via
     #   -r requirements/base.txt
     #   ipykernel
@@ -531,7 +551,7 @@ pydantic==1.10.13
     #   fastapi
 pyflakes==3.1.0
     # via flake8
-pygments==2.17.1
+pygments==2.17.2
     # via
     #   ipython
     #   jupyter-console
@@ -545,9 +565,11 @@ pyparsing==3.1.1
     # via
     #   -r requirements/base.txt
     #   matplotlib
-pypdf==3.17.1
-    # via -r requirements/base.txt
-pypdfium2==4.24.0
+pypdf==3.17.3
+    # via
+    #   -r requirements/base.txt
+    #   unstructured
+pypdfium2==4.25.0
     # via
     #   -r requirements/base.txt
     #   pdfplumber
@@ -570,11 +592,12 @@ python-dateutil==2.8.2
     #   jupyter-client
     #   matplotlib
     #   pandas
+    #   unstructured-client
 python-docx==1.1.0
     # via
     #   -r requirements/base.txt
     #   unstructured
-python-iso639==2023.6.15
+python-iso639==2023.12.11
     # via
     #   -r requirements/base.txt
     #   unstructured
@@ -606,7 +629,7 @@ pyyaml==6.0.1
     #   omegaconf
     #   timm
     #   transformers
-pyzmq==25.1.1
+pyzmq==25.1.2
     # via
     #   ipykernel
     #   jupyter-client
@@ -624,7 +647,7 @@ rapidfuzz==3.5.2
     #   unstructured-inference
 ratelimit==2.2.1
     # via -r requirements/base.txt
-referencing==0.31.0
+referencing==0.32.0
     # via
     #   jsonschema
     #   jsonschema-specifications
@@ -642,6 +665,7 @@ requests==2.31.0
     #   torchvision
     #   transformers
     #   unstructured
+    #   unstructured-client
 rfc3339-validator==0.1.4
     # via
     #   jsonschema
@@ -650,7 +674,7 @@ rfc3986-validator==0.1.1
     # via
     #   jsonschema
     #   jupyter-events
-rpds-py==0.13.1
+rpds-py==0.15.2
     # via
     #   jsonschema
     #   referencing
@@ -675,6 +699,7 @@ six==1.16.0
     #   langdetect
     #   python-dateutil
     #   rfc3339-validator
+    #   unstructured-client
 sniffio==1.3.0
     # via
     #   -r requirements/base.txt
@@ -703,7 +728,7 @@ terminado==0.18.0
     # via
     #   jupyter-server
     #   jupyter-server-terminals
-timm==0.9.10
+timm==0.9.12
     # via
     #   -r requirements/base.txt
     #   effdet
@@ -720,20 +745,20 @@ tomli==2.0.1
     #   jupyterlab
     #   mypy
     #   pytest
-torch==2.1.1
+torch==2.1.2
     # via
     #   -r requirements/base.txt
     #   effdet
     #   layoutparser
     #   timm
     #   torchvision
-torchvision==0.16.1
+torchvision==0.16.2
     # via
     #   -r requirements/base.txt
     #   effdet
     #   layoutparser
     #   timm
-tornado==6.3.3
+tornado==6.4
     # via
     #   ipykernel
     #   jupyter-client
@@ -748,7 +773,7 @@ tqdm==4.66.1
     #   iopath
     #   nltk
     #   transformers
-traitlets==5.13.0
+traitlets==5.14.0
     # via
     #   comm
     #   ipykernel
@@ -765,13 +790,13 @@ traitlets==5.13.0
     #   nbconvert
     #   nbformat
     #   qtconsole
-transformers==4.35.2
+transformers==4.36.2
     # via
     #   -r requirements/base.txt
     #   unstructured-inference
 types-python-dateutil==2.8.19.14
     # via arrow
-typing-extensions==4.8.0
+typing-extensions==4.9.0
     # via
     #   -r requirements/base.txt
     #   async-lru
@@ -785,18 +810,24 @@ typing-extensions==4.8.0
     #   torch
     #   typing-inspect
     #   unstructured
+    #   unstructured-client
     #   uvicorn
 typing-inspect==0.9.0
     # via
     #   -r requirements/base.txt
     #   dataclasses-json
+    #   unstructured-client
 tzdata==2023.3
     # via
     #   -r requirements/base.txt
     #   pandas
-unstructured[local-inference]==0.11.0
+unstructured[local-inference]==0.11.6
     # via -r requirements/base.txt
-unstructured-inference==0.7.15
+unstructured-client==0.15.1
+    # via
+    #   -r requirements/base.txt
+    #   unstructured
+unstructured-inference==0.7.18
     # via
     #   -r requirements/base.txt
     #   unstructured
@@ -810,11 +841,12 @@ urllib3==2.1.0
     # via
     #   -r requirements/base.txt
     #   requests
-uvicorn==0.24.0.post1
+    #   unstructured-client
+uvicorn==0.25.0
     # via -r requirements/base.txt
 watchdog==3.0.0
     # via nbdev
-wcwidth==0.2.10
+wcwidth==0.2.12
     # via prompt-toolkit
 webcolors==1.13
     # via jsonschema
@@ -822,15 +854,16 @@ webencodings==0.5.1
     # via
     #   bleach
     #   tinycss2
-websocket-client==1.6.4
+websocket-client==1.7.0
     # via jupyter-server
-wheel==0.41.3
+wheel==0.42.0
     # via astunparse
 widgetsnbextension==4.0.9
     # via ipywidgets
 wrapt==1.16.0
     # via
     #   -r requirements/base.txt
+    #   deprecated
     #   unstructured
 xlrd==2.0.1
     # via

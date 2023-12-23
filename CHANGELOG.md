@@ -1,5 +1,6 @@
-## 0.0.61-dev0
+## 0.0.61
 
+* Bump unstructured to 0.11.6
 * Handle invalid hi_res_model_name kwarg
 
 ## 0.0.60
