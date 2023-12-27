@@ -109,7 +109,7 @@ def get_pdf_splits(pdf_pages: List[PageObject], split_size: int = 1):
         for page in pdf_pages[offset:end]:
             new_pdf.add_page(page)
 
-        new_pdf.write(pdf_buffer) # type: ignore
+        new_pdf.write(pdf_buffer)  # type: ignore
         pdf_buffer.seek(0)
 
         yield (pdf_buffer.read(), offset)
@@ -196,7 +196,7 @@ def partition_pdf_splits(
     request: Request,
     pdf_pages: List[PageObject],
     file: IO[bytes],
-    metadata_filename: str,
+    metadata_filename: Optional[str],
     content_type: str,
     coordinates: bool,
     **partition_kwargs: Dict[str, Any],
@@ -265,7 +265,7 @@ class ChipperMemoryProtection:
 
         Is_Chipper_Processing = True
 
-    def __exit__(self, exc_type, exc_value, exc_tb):
+    def __exit__(self, exc_type, exc_value, exc_tb):  # type: ignore
         global Is_Chipper_Processing
         Is_Chipper_Processing = False
 
@@ -500,7 +500,7 @@ def pipeline_api(
     # Clean up returned elements
     # Note(austin): pydantic should control this sort of thing for us
     for i, element in enumerate(elements):
-        elements[i].metadata.filename = os.path.basename(filename)
+        elements[i].metadata.filename = os.path.basename(filename)  # type: ignore
 
         if not show_coordinates and element.metadata.coordinates:
             elements[i].metadata.coordinates = None
@@ -591,15 +591,14 @@ def _validate_chunking_strategy(m_chunking_strategy: List[str]) -> Union[str, No
     return chunking_strategy
 
 
-def _set_pdf_infer_table_structure(m_pdf_infer_table_structure: List[str], strategy: str):
+def _set_pdf_infer_table_structure(m_pdf_infer_table_structure: List[str], strategy: str) -> bool:
     pdf_infer_table_structure = (
         m_pdf_infer_table_structure[0] if len(m_pdf_infer_table_structure) else "false"
     ).lower()
     if strategy == "hi_res" and pdf_infer_table_structure == "true":
-        pdf_infer_table_structure = True
+        return True
     else:
-        pdf_infer_table_structure = False
-    return pdf_infer_table_structure
+        return False
 
 
 def get_validated_mimetype(file: UploadFile):
@@ -635,7 +634,12 @@ def get_validated_mimetype(file: UploadFile):
 class MultipartMixedResponse(StreamingResponse):
     CRLF = b"\r\n"
 
-    def __init__(self, *args: Any, content_type: Union[str, None] = None, **kwargs: Dict[str, Any]):
+    def __init__(
+        self,
+        *args: Any,
+        content_type: Union[str, None] = None,
+        **kwargs, # type: ignore
+    ):
         super().__init__(*args, **kwargs)
         self.content_type = content_type
 
@@ -821,11 +825,11 @@ def pipeline_1(
         def join_responses(responses: List[Any]):
             if media_type != "text/csv":
                 return responses
-            data = pd.read_csv(io.BytesIO(responses[0].body))
+            data = pd.read_csv(io.BytesIO(responses[0].body))  # type: ignore
             if len(responses) > 1:
                 for resp in responses[1:]:
-                    resp_data = pd.read_csv(io.BytesIO(resp.body))
-                    data = data.merge(resp_data, how="outer")
+                    resp_data = pd.read_csv(io.BytesIO(resp.body))  # type: ignore
+                    data = data.merge(resp_data, how="outer")  # type: ignore
             return PlainTextResponse(data.to_csv())
 
         if content_type == "multipart/mixed":
