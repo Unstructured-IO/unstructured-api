@@ -54,7 +54,7 @@ from unstructured_inference.models.base import UnknownModelException
 app = FastAPI()
 router = APIRouter()
 
-IS_CHIPPER_PROCESSING = False
+Is_Chipper_Processing = False
 
 DEFAULT_MIMETYPES = (
     "application/pdf,application/msword,image/jpeg,image/png,text/markdown,"
@@ -109,7 +109,7 @@ def get_pdf_splits(pdf_pages: List[PageObject], split_size: int = 1):
         for page in pdf_pages[offset:end]:
             new_pdf.add_page(page)
 
-        new_pdf.write(pdf_buffer)
+        new_pdf.write(pdf_buffer) # type: ignore
         pdf_buffer.seek(0)
 
         yield (pdf_buffer.read(), offset)
@@ -255,19 +255,19 @@ class ChipperMemoryProtection:
     """
 
     def __enter__(self):
-        global IS_CHIPPER_PROCESSING
-        if IS_CHIPPER_PROCESSING:
+        global Is_Chipper_Processing
+        if Is_Chipper_Processing:
             # Log here so we can track how often it happens
             logger.error("Chipper is already is use")
             raise HTTPException(
                 status_code=503, detail="Server is under heavy load. Please try again later."
             )
 
-        IS_CHIPPER_PROCESSING = True
+        Is_Chipper_Processing = True
 
     def __exit__(self, exc_type, exc_value, exc_tb):
-        global IS_CHIPPER_PROCESSING
-        IS_CHIPPER_PROCESSING = False
+        global Is_Chipper_Processing
+        Is_Chipper_Processing = False
 
 
 def pipeline_api(
