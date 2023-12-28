@@ -47,6 +47,7 @@ from unstructured.staging.base import (
     elements_from_json,
 )
 from unstructured_inference.models.chipper import MODEL_TYPES as CHIPPER_MODEL_TYPES
+from unstructured_inference.models.base import UnknownModelException
 
 
 app = FastAPI()
@@ -458,6 +459,12 @@ def pipeline_api(
         raise HTTPException(
             status_code=422,
             detail="File is not a valid docx",
+        )
+
+    except UnknownModelException:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Unknown model type: {hi_res_model_name}",
         )
 
     # Clean up returned elements
