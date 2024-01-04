@@ -370,7 +370,9 @@ def pipeline_api(
     )
 
     extract_image_block_types = (
-        json.loads(m_extract_image_block_types[0]) if len(m_extract_image_block_types) else None
+        json.loads(m_extract_image_block_types[0])
+        if m_extract_image_block_types and len(m_extract_image_block_types)
+        else None
     )
 
     extract_image_block_to_payload = bool(extract_image_block_types)
