@@ -373,6 +373,10 @@ def pipeline_api(
         json.loads(m_extract_image_block_types[0]) if len(m_extract_image_block_types) else None
     )
 
+    extract_image_block_to_payload = (
+        True if extract_image_block_types and len(extract_image_block_types) else False
+    )
+
     try:
         logger.debug(
             "partition input data: {}".format(
@@ -395,6 +399,7 @@ def pipeline_api(
                         "new_after_n_chars": new_after_n_chars,
                         "max_characters": max_characters,
                         "extract_image_block_types": extract_image_block_types,
+                        "extract_image_block_to_payload": extract_image_block_to_payload,
                     },
                     default=str,
                 )
@@ -420,6 +425,7 @@ def pipeline_api(
             "new_after_n_chars": new_after_n_chars,
             "max_characters": max_characters,
             "extract_image_block_types": extract_image_block_types,
+            "extract_image_block_to_payload": extract_image_block_to_payload,
         }
 
         if file_content_type == "application/pdf" and pdf_parallel_mode_enabled:
