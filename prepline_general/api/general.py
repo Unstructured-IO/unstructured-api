@@ -271,6 +271,7 @@ def pipeline_api(
     m_combine_under_n_chars=[],
     m_new_after_n_chars=[],
     m_max_characters=[],
+    m_extract_image_block_types=None,
 ):
     if filename.endswith(".msg"):
         # Note(yuming): convert file type for msg files
@@ -303,6 +304,7 @@ def pipeline_api(
                         "m_combine_under_n_chars": m_combine_under_n_chars,
                         "new_after_n_chars": m_new_after_n_chars,
                         "m_max_characters": m_max_characters,
+                        "m_extract_image_block_types": m_extract_image_block_types,
                     },
                     default=str,
                 )
@@ -367,6 +369,10 @@ def pipeline_api(
         int(m_max_characters[0]) if m_max_characters and m_max_characters[0].isdigit() else 1500
     )
 
+    extract_image_block_types = (
+        json.loads(m_extract_image_block_types[0]) if len(m_extract_image_block_types) else None
+    )
+
     try:
         logger.debug(
             "partition input data: {}".format(
@@ -388,6 +394,7 @@ def pipeline_api(
                         "combine_under_n_chars": combine_under_n_chars,
                         "new_after_n_chars": new_after_n_chars,
                         "max_characters": max_characters,
+                        "extract_image_block_types": extract_image_block_types,
                     },
                     default=str,
                 )
@@ -412,6 +419,7 @@ def pipeline_api(
             "combine_under_n_chars": combine_under_n_chars,
             "new_after_n_chars": new_after_n_chars,
             "max_characters": max_characters,
+            "extract_image_block_types": extract_image_block_types,
         }
 
         if file_content_type == "application/pdf" and pdf_parallel_mode_enabled:
@@ -703,6 +711,7 @@ def pipeline_1(
     combine_under_n_chars: List[str] = Form(default=[]),
     new_after_n_chars: List[str] = Form(default=[]),
     max_characters: List[str] = Form(default=[]),
+    extract_image_block_types: List[str] = Form(default=None),
 ):
     if api_key_env := os.environ.get("UNSTRUCTURED_API_KEY"):
         api_key = request.headers.get("unstructured-api-key")
@@ -767,6 +776,7 @@ def pipeline_1(
                     m_combine_under_n_chars=combine_under_n_chars,
                     m_new_after_n_chars=new_after_n_chars,
                     m_max_characters=max_characters,
+                    m_extract_image_block_types=extract_image_block_types,
                 )
 
                 if is_expected_response_type(media_type, type(response)):
