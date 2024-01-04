@@ -373,9 +373,7 @@ def pipeline_api(
         json.loads(m_extract_image_block_types[0]) if len(m_extract_image_block_types) else None
     )
 
-    extract_image_block_to_payload = (
-        True if extract_image_block_types and len(extract_image_block_types) else False
-    )
+    extract_image_block_to_payload = bool(extract_image_block_types)
 
     try:
         logger.debug(
