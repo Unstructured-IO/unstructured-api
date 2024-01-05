@@ -1,3 +1,7 @@
+## 0.0.62-dev0
+
+* Add support for returning extracted image blocks as base64 encoded data stored in metadata fields
+
 ## 0.0.61
 
 * Bump unstructured to 0.11.6
