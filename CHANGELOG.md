@@ -1,6 +1,7 @@
 ## 0.0.62-dev0
 
 * Add hi_res_model_name to partition and deprecate model_name
+* Add support for returning extracted image blocks as base64 encoded data stored in metadata fields
 
 ## 0.0.61
 

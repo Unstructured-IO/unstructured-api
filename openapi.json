@@ -213,6 +213,17 @@
                         "title": "Max Characters",
                         "description": "If chunking strategy is set, cut off new sections after reaching a length of n chars (hard max). Default: 1500",
                         "example": 1500
+                    },
+                    "extract_image_block_types": {
+                        "items": {
+                            "type": "string",
+                            "example": "image"
+                        },
+                        "type": "array",
+                        "title": "Image block types to extract",
+                        "default": [],
+                        "description": "The types of elements to extract, for use in extracting image blocks as base64 encoded data stored in metadata fields",
+                        "example": ["image", "table"]
                     }
                 },
                 "type": "object",

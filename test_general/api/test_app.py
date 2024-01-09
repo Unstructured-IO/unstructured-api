@@ -540,6 +540,8 @@ def test_parallel_mode_passes_params(monkeypatch):
         combine_under_n_chars=501,
         new_after_n_chars=1501,
         max_characters=1502,
+        extract_image_block_types=None,
+        extract_image_block_to_payload=False,
     )
 
 
