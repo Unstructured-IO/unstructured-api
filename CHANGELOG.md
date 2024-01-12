@@ -1,5 +1,6 @@
 ## 0.0.62
 
+* Add hi_res_model_name to partition and deprecate model_name
 * Bump unstructured to 0.12.0
 * Add support for returning extracted image blocks as base64 encoded data stored in metadata fields
 

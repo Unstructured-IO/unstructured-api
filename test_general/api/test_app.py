@@ -526,7 +526,7 @@ def test_parallel_mode_passes_params(monkeypatch):
         file=ANY,
         metadata_filename=str(test_file),
         content_type="application/pdf",
-        model_name="yolox",
+        hi_res_model_name="yolox",
         encoding="foo",
         include_page_breaks=True,
         ocr_languages=None,
