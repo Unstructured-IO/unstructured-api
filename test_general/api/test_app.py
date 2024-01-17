@@ -918,3 +918,10 @@ def test_invalid_hi_res_model_name_returns_400():
     )
     assert response.status_code == 400
     assert "Unknown model type" in response.text
+
+
+def test_get_request():
+    client = TestClient(app)
+    response = client.get("/general/v0/general")
+    assert response.status_code == 405
+    assert response.json() == {"detail": "Only POST requests are supported."}
