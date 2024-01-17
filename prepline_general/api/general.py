@@ -685,6 +685,14 @@ def ungz_file(file: UploadFile, gz_uncompressed_content_type=None) -> UploadFile
     )
 
 
+@router.get("/general/v0/general")
+@router.get("/general/v0.0.62/general")
+async def handle_invalid_get_request():
+    raise HTTPException(
+        status_code=status.HTTP_405_METHOD_NOT_ALLOWED, detail="Only POST requests are supported."
+    )
+
+
 @router.post("/general/v0/general")
 @router.post("/general/v0.0.62/general")
 def pipeline_1(
