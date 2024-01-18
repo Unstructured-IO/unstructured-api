@@ -279,6 +279,8 @@ def pipeline_api(
     max_characters: int,
     multipage_sections: bool,
     new_after_n_chars: Optional[int],
+    overlap: int,
+    overlap_all: bool,
     # ----------------------
     filename: str = "",
     file_content_type: Optional[str] = None,
@@ -333,6 +335,8 @@ def pipeline_api(
                         "max_characters": max_characters,
                         "multipage_sections": multipage_sections,
                         "new_after_n_chars": new_after_n_chars,
+                        "overlap": overlap,
+                        "overlap_all": overlap_all,
                     },
                     default=str,
                 )
@@ -404,6 +408,8 @@ def pipeline_api(
                         "combine_under_n_chars": combine_under_n_chars,
                         "new_after_n_chars": new_after_n_chars,
                         "max_characters": max_characters,
+                        "overlap": overlap,
+                        "overlap_all": overlap_all,
                         "extract_image_block_types": extract_image_block_types,
                         "extract_image_block_to_payload": extract_image_block_to_payload,
                     },
@@ -430,6 +436,8 @@ def pipeline_api(
             "combine_text_under_n_chars": combine_under_n_chars,
             "new_after_n_chars": new_after_n_chars,
             "max_characters": max_characters,
+            "overlap": overlap,
+            "overlap_all": overlap_all,
             "extract_image_block_types": extract_image_block_types,
             "extract_image_block_to_payload": extract_image_block_to_payload,
         }
@@ -742,6 +750,8 @@ def pipeline_1(
     max_characters: Annotated[int, Form()] = 500,
     multipage_sections: Annotated[bool, Form()] = True,
     new_after_n_chars: Annotated[Optional[int], Form()] = None,
+    overlap: Annotated[int, Form()] = 0,
+    overlap_all: Annotated[bool, Form()] = False,
 ):
     # -- must have a valid API key --
     if api_key_env := os.environ.get("UNSTRUCTURED_API_KEY"):
@@ -820,6 +830,8 @@ def pipeline_1(
                 max_characters=max_characters,
                 multipage_sections=multipage_sections,
                 new_after_n_chars=new_after_n_chars,
+                overlap=overlap,
+                overlap_all=overlap_all,
             )
 
             if not is_compatible_response_type(media_type, type(response)):
