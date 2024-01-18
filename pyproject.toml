@@ -24,3 +24,8 @@ ignore = [
     "PT012",    # -- pytest.raises() block should contain a single simple statement --
     "SIM117",   # -- merge `with` statements for context managers that have same scope --
 ]
+[tool.ruff.lint.isort]
+known-first-party = [
+    "unstructured",
+    "unstructured_inference",
+]

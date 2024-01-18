@@ -1,54 +1,44 @@
-# Standard Library Imports
-import io
-import os
 import gzip
-import mimetypes
-from typing import List, Union, Optional, Mapping
-from base64 import b64encode
-from typing import Optional
-from functools import partial
+import io
 import json
 import logging
+import mimetypes
+import os
+import secrets
 import zipfile
-
-# External Package Imports
-import pandas as pd
-from concurrent.futures import ThreadPoolExecutor
 from base64 import b64encode
-from typing import Optional, Mapping
 from concurrent.futures import ThreadPoolExecutor
 from functools import partial
-import pypdf
-from pypdf import PdfReader, PdfWriter
-import psutil
-import requests
+from typing import List, Mapping, Optional, Union
+
 import backoff
-from typing import Optional, Mapping
+import pandas as pd
+import psutil
+import pypdf
+import requests
 from fastapi import (
-    status,
+    APIRouter,
     FastAPI,
     File,
     Form,
+    HTTPException,
     Request,
     UploadFile,
-    APIRouter,
-    HTTPException,
+    status,
 )
 from fastapi.responses import PlainTextResponse, StreamingResponse
+from pypdf import PdfReader, PdfWriter
 from starlette.datastructures import Headers
 from starlette.types import Send
-import secrets
 
-# Unstructured Imports
 from unstructured.partition.auto import partition
 from unstructured.staging.base import (
-    convert_to_isd,
     convert_to_dataframe,
+    convert_to_isd,
     elements_from_json,
 )
-from unstructured_inference.models.chipper import MODEL_TYPES as CHIPPER_MODEL_TYPES
 from unstructured_inference.models.base import UnknownModelException
-
+from unstructured_inference.models.chipper import MODEL_TYPES as CHIPPER_MODEL_TYPES
 
 app = FastAPI()
 router = APIRouter()
