@@ -85,9 +85,9 @@ if not os.environ.get("UNSTRUCTURED_ALLOWED_MIMETYPES", None):
 
 
 def get_pdf_splits(pdf_pages, split_size=1):
-    """
-    Given a pdf (PdfReader) with n pages, split it into pdfs each with split_size # of pages
-    Return the files with their page offset in the form [( BytesIO, int)]
+    """Given a pdf (PdfReader) with n pages, split it into pdfs each with split_size # of pages.
+
+    Return the files with their page offset in the form [(BytesIO, int)]
     """
     offset = 0
 
@@ -119,9 +119,7 @@ def is_non_retryable(e):
     logger=logger,
 )
 def call_api(request_url, api_key, filename, file, content_type, **partition_kwargs):
-    """
-    Call the api with the given request_url.
-    """
+    """Call the api with the given request_url."""
     headers = {"unstructured-api-key": api_key}
 
     response = requests.post(
@@ -139,15 +137,15 @@ def call_api(request_url, api_key, filename, file, content_type, **partition_kwa
 
 
 def partition_file_via_api(file_tuple, request, filename, content_type, **partition_kwargs):
-    """
-    Send the given file to be partitioned remotely with retry logic,
-    where the remote url is set by env var.
+    """Send the given file to be partitioned remotely with retry logic.
+
+    The remote url is set by the `UNSTRUCTURED_PARALLEL_MODE_URL` environment variable.
 
     Args:
-    file_tuple is in the form (file, page_offest)
-    request is used to forward the api key header
-    filename and content_type are passed in the file form data
-    partition_kwargs holds any form parameters to be sent on
+    `file_tuple` is a file-like object and byte offset of a page (file, page_offest)
+    `request` is used to forward the api key header
+    `filename` and `content_type` are passed in the file form data
+    `partition_kwargs` holds any form parameters to be sent on
     """
     file, page_offset = file_tuple
 
@@ -172,9 +170,9 @@ def partition_file_via_api(file_tuple, request, filename, content_type, **partit
 def partition_pdf_splits(
     request, pdf_pages, file, metadata_filename, content_type, coordinates, **partition_kwargs
 ):
-    """
-    Split a pdf into chunks and process in parallel with more api calls, or partition
-    locally if the chunk is small enough. As soon as any remote call fails, bubble up
+    """Split a pdf into chunks and process in parallel with more api calls.
+
+    Or partition locally if the chunk is small enough. As soon as any remote call fails, bubble up
     the error.
 
     Arguments:
@@ -218,8 +216,8 @@ IS_CHIPPER_PROCESSING = False
 
 
 class ChipperMemoryProtection:
-    """
-    Chipper calls are expensive, and right now we can only do one call at a time.
+    """Chipper calls are expensive, and right now we can only do one call at a time.
+
     If the model is in use, return a 503 error. The API should scale up and the user can try again
     on a different server.
     """
@@ -508,8 +506,7 @@ def pipeline_api(
 
 
 def _check_free_memory():
-    """Reject traffic when free memory is below minimum.
-    Default to 2GB."""
+    """Reject traffic when free memory is below minimum (default 2GB)."""
     mem = psutil.virtual_memory()
     memory_free_minimum = int(os.environ.get("UNSTRUCTURED_MEMORY_FREE_MINIMUM_MB", 2048))
 
@@ -563,6 +560,10 @@ def _validate_hi_res_model_name(m_hi_res_model_name, show_coordinates):
 
 
 def _validate_chunking_strategy(m_chunking_strategy):
+    """Raise on `m_chunking_strategy` is not a valid chunking strategy name.
+
+    Also provides case-insensitivity.
+    """
     chunking_strategy = m_chunking_strategy[0].lower() if len(m_chunking_strategy) else None
     chunk_strategies = ["by_title"]
     if chunking_strategy and (chunking_strategy not in chunk_strategies):
@@ -585,8 +586,9 @@ def _set_pdf_infer_table_structure(m_pdf_infer_table_structure, strategy):
 
 
 def get_validated_mimetype(file):
-    """
-    Return a file's mimetype, either via the file.content_type or the mimetypes lib if that's too
+    """The MIME-type of `file`.
+
+    The mimetype is computed based on `file.content_type`, or the mimetypes lib if that's too
     generic. If the user has set UNSTRUCTURED_ALLOWED_MIMETYPES, validate against this list and
     return HTTP 400 for an invalid type.
     """
@@ -807,6 +809,7 @@ def pipeline_1(
                     )
 
         def join_responses(responses):
+            """Consolidate partitionings from multiple documents into single response payload."""
             if media_type != "text/csv":
                 return responses
             data = pd.read_csv(io.BytesIO(responses[0].body))
