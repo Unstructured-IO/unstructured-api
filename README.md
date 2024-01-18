@@ -40,7 +40,7 @@ Try our hosted API! It's freely available to use with any of the filetypes liste
   'https://api.unstructured.io/general/v0/general' \
   -H 'accept: application/json' \
   -H 'Content-Type: multipart/form-data' \
-  -H 'unstructured-api-key: <YOUR API KEY>'
+  -H 'unstructured-api-key: <YOUR API KEY>' \
   -F 'files=@sample-docs/family-day.eml' \
   | jq -C . | less -R
 ```
@@ -207,22 +207,40 @@ curl -X 'POST'
 
 #### Chunking Elements
 
-Set the `chunking_strategy` to chunk text into larger or smaller elements. Defaults to `None` with optional arg of `by_title`.
+Use the `chunking_strategy` form-field to chunk text into larger or smaller elements. Defaults to `None` which performs no chunking. The available chunking strategies are `basic` and `by_title`.
 
-  Additional Parameters:
+The `basic` strategy combines whole consecutive document elements to maximally fill chunks of `max_characters` length. A single element that by itself exceeds `max_characters` is divided into two or more chunks by text-splitting (on a word boundary).
 
-    `multipage_sections`
-      If True, sections can span multiple pages. Defaults to True.
+The `by_title` strategy has the same behaviors except document section boundaries are respected, meaning elements from two different sections never occur in the same chunk. A `Title` (section heading) element introduces a new section, hence the name.
 
-    `combine_under_n_chars`
-      Combines elements (for example a series of titles) until a section
-      reaches a length of n characters. Defaults to 500.
-
-    `new_after_n_chars`
-      Cuts off new sections once they reach a length of "n" characters (soft max). Defaults to 1500.
+  Additional Parameters (all optional):
 
     `max_characters`
-      Cuts off new sections once they reach a length of "n" characters (hard max). Defaults to 1500.
+      The hard maximum chunk size. No chunk will exceed this length. Defaults to 500.
+
+    `new_after_n_chars`
+      A chunk of this length or greater is considered "full" and will not receive an additional element, even if it would fit within `max_characters`.
+      This "soft-maximum" defaults to `max_characters`.
+
+    `overlap`
+      Specifies the length of a string ("tail") to be drawn from each chunk and prefixed to the
+      next chunk as a context-preserving mechanism. By default, this only applies to split-chunks
+      where an oversized element is divided into multiple chunks by text-splitting.
+
+    `overlap_all`
+      Default: `False`. When `True`, apply overlap between "normal" chunks formed from whole
+      elements and not subject to text-splitting. Use this with caution as it entails a certain
+      level of "pollution" of otherwise clean semantic chunk boundaries.
+
+    `combine_under_n_chars`
+      Combines elements (for example a series of titles) until a section reaches a
+      length of n characters. Defaults to 500. Only operative for the "by_title"
+      strategy.
+
+    `multipage_sections`
+      If True, sections can span multiple pages. Defaults to True. Only operative for
+      the "by_title" strategy.
+
 
 ```
 curl -X 'POST' 
