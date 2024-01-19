@@ -537,7 +537,7 @@ def test_parallel_mode_passes_params(monkeypatch):
         skip_infer_table_types="foo",
         chunking_strategy="by_title",
         multipage_sections=False,
-        combine_under_n_chars=501,
+        combine_text_under_n_chars=501,
         new_after_n_chars=1501,
         max_characters=1502,
         extract_image_block_types=None,

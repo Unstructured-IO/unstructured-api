@@ -423,7 +423,7 @@ def pipeline_api(
             "languages": languages,
             "chunking_strategy": chunking_strategy,
             "multipage_sections": multipage_sections,
-            "combine_under_n_chars": combine_under_n_chars,
+            "combine_text_under_n_chars": combine_under_n_chars,
             "new_after_n_chars": new_after_n_chars,
             "max_characters": max_characters,
             "extract_image_block_types": extract_image_block_types,
@@ -692,7 +692,7 @@ def ungz_file(file: UploadFile, gz_uncompressed_content_type=None) -> UploadFile
 
 
 @router.get("/general/v0/general")
-@router.get("/general/v0.0.62/general")
+@router.get("/general/v0.0.63/general")
 async def handle_invalid_get_request():
     raise HTTPException(
         status_code=status.HTTP_405_METHOD_NOT_ALLOWED, detail="Only POST requests are supported."
@@ -700,7 +700,7 @@ async def handle_invalid_get_request():
 
 
 @router.post("/general/v0/general")
-@router.post("/general/v0.0.62/general")
+@router.post("/general/v0.0.63/general")
 def pipeline_1(
     request: Request,
     gz_uncompressed_content_type: Optional[str] = Form(default=None),
