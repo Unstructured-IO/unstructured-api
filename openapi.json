@@ -22,7 +22,7 @@
         "backoff": {
             "initialInterval": 500,
             "maxInterval": 60000,
-            "maxElapsedTime": 3600000,
+            "maxElapsedTime": 900000
             "exponent": 1.5
         },
         "statusCodes": ["5xx"],
