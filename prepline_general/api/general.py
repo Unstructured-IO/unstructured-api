@@ -248,7 +248,7 @@ class ChipperMemoryProtection:
 
 def pipeline_api(
     file,
-    request=None,
+    request: Request,
     filename="",
     file_content_type=None,
     response_type="application/json",
@@ -275,8 +275,14 @@ def pipeline_api(
         file_content_type = "application/x-ole-storage"
 
     # We don't want to keep logging the same params for every parallel call
-    origin_ip = request.headers.get("X-Forwarded-For") or request.client.host
-    is_internal_request = origin_ip.startswith("10.")
+    is_internal_request = (
+        (
+            request.headers.get("X-Forwarded-For")
+            and str(request.headers.get("X-Forwarded-For")).startswith("10.")
+        )
+        # -- NOTE(scanny): request.client is None in certain testing environments --
+        or (request.client and request.client.host.startswith("10."))
+    )
 
     if not is_internal_request:
         logger.debug(

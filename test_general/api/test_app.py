@@ -427,7 +427,7 @@ def test_general_api_returns_503(monkeypatch):
     """
     When available memory is below the minimum. return a 503, unless our origin ip is 10.{4,5}.x.x
     """
-    monkeypatch.setenv("UNSTRUCTURED_MEMORY_FREE_MINIMUM_MB", "30000")
+    monkeypatch.setenv("UNSTRUCTURED_MEMORY_FREE_MINIMUM_MB", "300000")
 
     client = TestClient(app)
     test_file = Path("sample-docs") / "fake-xml.xml"
