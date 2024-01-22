@@ -248,7 +248,7 @@ class ChipperMemoryProtection:
 
 def pipeline_api(
     file,
-    request=None,
+    request: Request,
     filename="",
     file_content_type=None,
     response_type="application/json",
@@ -275,8 +275,14 @@ def pipeline_api(
         file_content_type = "application/x-ole-storage"
 
     # We don't want to keep logging the same params for every parallel call
-    origin_ip = request.headers.get("X-Forwarded-For") or request.client.host
-    is_internal_request = origin_ip.startswith("10.")
+    is_internal_request = (
+        (
+            request.headers.get("X-Forwarded-For")
+            and str(request.headers.get("X-Forwarded-For")).startswith("10.")
+        )
+        # -- NOTE(scanny): request.client is None in certain testing environments --
+        or (request.client and request.client.host.startswith("10."))
+    )
 
     if not is_internal_request:
         logger.debug(
@@ -417,7 +423,7 @@ def pipeline_api(
             "languages": languages,
             "chunking_strategy": chunking_strategy,
             "multipage_sections": multipage_sections,
-            "combine_under_n_chars": combine_under_n_chars,
+            "combine_text_under_n_chars": combine_under_n_chars,
             "new_after_n_chars": new_after_n_chars,
             "max_characters": max_characters,
             "extract_image_block_types": extract_image_block_types,
@@ -686,7 +692,7 @@ def ungz_file(file: UploadFile, gz_uncompressed_content_type=None) -> UploadFile
 
 
 @router.get("/general/v0/general")
-@router.get("/general/v0.0.62/general")
+@router.get("/general/v0.0.63/general")
 async def handle_invalid_get_request():
     raise HTTPException(
         status_code=status.HTTP_405_METHOD_NOT_ALLOWED, detail="Only POST requests are supported."
@@ -694,7 +700,7 @@ async def handle_invalid_get_request():
 
 
 @router.post("/general/v0/general")
-@router.post("/general/v0.0.62/general")
+@router.post("/general/v0.0.63/general")
 def pipeline_1(
     request: Request,
     gz_uncompressed_content_type: Optional[str] = Form(default=None),

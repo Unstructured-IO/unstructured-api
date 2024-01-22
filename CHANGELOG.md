@@ -1,3 +1,7 @@
+## 0.0.63-dev0
+
+* Fix bug that ignored `combine_under_n_chars` chunking option argument.
+
 ## 0.0.62
 
 * Add hi_res_model_name to partition and deprecate model_name
