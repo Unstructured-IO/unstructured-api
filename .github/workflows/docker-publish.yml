@@ -18,7 +18,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
-    - uses: actions/cache@v3
+    - uses: actions/cache@v4
       id: virtualenv-cache
       with:
         path: |
@@ -78,7 +78,7 @@ jobs:
           --cache-from $DOCKER_BUILD_REPOSITORY:$ARCH \
           -t $DOCKER_BUILD_REPOSITORY:$ARCH-$SHORT_SHA .
     - name: Set virtualenv cache
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       id: virtualenv-cache
       with:
         path: |
