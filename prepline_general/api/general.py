@@ -12,7 +12,7 @@ from base64 import b64encode
 from concurrent.futures import ThreadPoolExecutor
 from functools import partial
 from types import TracebackType
-from typing import IO, Any, Dict, List, Mapping, Optional, Sequence, Tuple, Union, cast
+from typing import IO, Annotated, Any, Dict, List, Mapping, Optional, Sequence, Tuple, Union, cast
 
 import backoff
 import pandas as pd
@@ -275,6 +275,13 @@ class ChipperMemoryProtection:
 def pipeline_api(
     file: IO[bytes],
     request: Request,
+    # -- chunking options --
+    chunking_strategy: Optional[str],
+    combine_under_n_chars: Optional[int],
+    max_characters: int,
+    multipage_sections: bool,
+    new_after_n_chars: Optional[int],
+    # ----------------------
     filename: str = "",
     file_content_type: Optional[str] = None,
     response_type: str = "application/json",
@@ -288,11 +295,6 @@ def pipeline_api(
     m_strategy: List[str] = [],
     m_xml_keep_tags: List[str] = [],
     languages: Optional[List[str]] = None,
-    m_chunking_strategy: List[str] = [],
-    m_multipage_sections: List[str] = [],
-    m_combine_under_n_chars: List[str] = [],
-    m_new_after_n_chars: List[str] = [],
-    m_max_characters: List[str] = [],
     m_extract_image_block_types: Optional[List[str]] = None,
 ) -> List[Dict[str, Any]] | str:
     if filename.endswith(".msg"):
@@ -327,12 +329,12 @@ def pipeline_api(
                         "m_strategy": m_strategy,
                         "m_xml_keep_tags": m_xml_keep_tags,
                         "languages": languages,
-                        "m_chunking_strategy": m_chunking_strategy,
-                        "m_multipage_sections": m_multipage_sections,
-                        "m_combine_under_n_chars": m_combine_under_n_chars,
-                        "new_after_n_chars": m_new_after_n_chars,
-                        "m_max_characters": m_max_characters,
                         "m_extract_image_block_types": m_extract_image_block_types,
+                        "chunking_strategy": chunking_strategy,
+                        "combine_under_n_chars": combine_under_n_chars,
+                        "max_characters": max_characters,
+                        "multipage_sections": multipage_sections,
+                        "new_after_n_chars": new_after_n_chars,
                     },
                     default=str,
                 )
@@ -351,7 +353,6 @@ def pipeline_api(
 
     hi_res_model_name = _validate_hi_res_model_name(m_hi_res_model_name, show_coordinates)
     strategy = _validate_strategy(m_strategy)
-    chunking_strategy = _validate_chunking_strategy(m_chunking_strategy)
     pdf_infer_table_structure = _set_pdf_infer_table_structure(
         m_pdf_infer_table_structure, strategy
     )
@@ -374,27 +375,6 @@ def pipeline_api(
 
     skip_infer_table_types = (
         m_skip_infer_table_types[0] if len(m_skip_infer_table_types) else ["pdf", "jpg", "png"]
-    )
-
-    multipage_sections_str = (
-        m_multipage_sections[0] if len(m_multipage_sections) else "true"
-    ).lower()
-    multipage_sections = multipage_sections_str == "true"
-
-    combine_under_n_chars = (
-        int(m_combine_under_n_chars[0])
-        if m_combine_under_n_chars and m_combine_under_n_chars[0].isdigit()
-        else 500
-    )
-
-    new_after_n_chars = (
-        int(m_new_after_n_chars[0])
-        if m_new_after_n_chars and m_new_after_n_chars[0].isdigit()
-        else 1500
-    )
-
-    max_characters = (
-        int(m_max_characters[0]) if m_max_characters and m_max_characters[0].isdigit() else 1500
     )
 
     extract_image_block_types = (
@@ -599,20 +579,26 @@ def _validate_hi_res_model_name(
     return hi_res_model_name
 
 
-def _validate_chunking_strategy(m_chunking_strategy: List[str]) -> Optional[str]:
-    """Raise on `m_chunking_strategy` is not a valid chunking strategy name.
+def _validate_chunking_strategy(chunking_strategy: Optional[str]) -> Optional[str]:
+    """Raise on `chunking_strategy` is not a valid chunking strategy name.
 
     Also provides case-insensitivity.
     """
-    chunking_strategy = m_chunking_strategy[0].lower() if len(m_chunking_strategy) else None
-    chunk_strategies = ["by_title"]
-    if chunking_strategy and (chunking_strategy not in chunk_strategies):
+    if chunking_strategy is None:
+        return None
+
+    chunking_strategy = chunking_strategy.lower()
+    available_strategies = ["basic", "by_title"]
+
+    if chunking_strategy not in available_strategies:
         raise HTTPException(
             status_code=400,
             detail=(
-                f"Invalid chunking strategy: {chunking_strategy}. Must be one of {chunk_strategies}"
+                f"Invalid chunking strategy: {chunking_strategy}. Must be one of"
+                f" {available_strategies}"
             ),
         )
+
     return chunking_strategy
 
 
@@ -751,12 +737,13 @@ def pipeline_1(
     strategy: List[str] = Form(default=[]),
     xml_keep_tags: List[str] = Form(default=[]),
     languages: Optional[List[str]] = Form(default=None),
-    chunking_strategy: List[str] = Form(default=[]),
-    multipage_sections: List[str] = Form(default=[]),
-    combine_under_n_chars: List[str] = Form(default=[]),
-    new_after_n_chars: List[str] = Form(default=[]),
-    max_characters: List[str] = Form(default=[]),
     extract_image_block_types: List[str] = Form(default=None),
+    # -- chunking options --
+    chunking_strategy: Annotated[Optional[str], Form()] = None,
+    combine_under_n_chars: Annotated[Optional[int], Form()] = None,
+    max_characters: Annotated[int, Form()] = 500,
+    multipage_sections: Annotated[bool, Form()] = True,
+    new_after_n_chars: Annotated[Optional[int], Form()] = None,
 ):
     # -- must have a valid API key --
     if api_key_env := os.environ.get("UNSTRUCTURED_API_KEY"):
@@ -792,6 +779,9 @@ def pipeline_1(
             status_code=status.HTTP_406_NOT_ACCEPTABLE,
         )
 
+    # -- validate other arguments --
+    chunking_strategy = _validate_chunking_strategy(chunking_strategy)
+
     # -- unzip any uploaded files that need it --
     for file_index in range(len(files)):
         if files[file_index].content_type == "application/gzip":
@@ -825,12 +815,13 @@ def pipeline_1(
                 filename=str(file.filename),
                 file_content_type=file_content_type,
                 languages=languages,
-                m_chunking_strategy=chunking_strategy,
-                m_multipage_sections=multipage_sections,
-                m_combine_under_n_chars=combine_under_n_chars,
-                m_new_after_n_chars=new_after_n_chars,
-                m_max_characters=max_characters,
                 m_extract_image_block_types=extract_image_block_types,
+                # -- chunking options --
+                chunking_strategy=chunking_strategy,
+                combine_under_n_chars=combine_under_n_chars,
+                max_characters=max_characters,
+                multipage_sections=multipage_sections,
+                new_after_n_chars=new_after_n_chars,
             )
 
             if not is_compatible_response_type(media_type, type(response)):
