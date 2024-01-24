@@ -48,13 +48,15 @@ app = FastAPI()
 router = APIRouter()
 
 
-def is_expected_response_type(media_type: str, response_type: type):
-    if media_type == "application/json" and response_type not in [dict, list]:
-        return True
-    elif media_type == "text/csv" and response_type != str:
-        return True
-    else:
-        return False
+def is_compatible_response_type(media_type: str, response_type: type) -> bool:
+    """True when `response_type` can be converted to `media_type` for HTTP Response."""
+    return (
+        False
+        if media_type == "application/json" and response_type not in [dict, list]
+        else False
+        if media_type == "text/csv" and response_type != str
+        else True
+    )
 
 
 logger = logging.getLogger("unstructured_api")
@@ -756,6 +758,7 @@ def pipeline_1(
     max_characters: List[str] = Form(default=[]),
     extract_image_block_types: List[str] = Form(default=None),
 ):
+    # -- must have a valid API key --
     if api_key_env := os.environ.get("UNSTRUCTURED_API_KEY"):
         api_key = request.headers.get("unstructured-api-key")
         if api_key != api_key_env:
@@ -763,12 +766,29 @@ def pipeline_1(
                 detail=f"API key {api_key} is invalid", status_code=status.HTTP_401_UNAUTHORIZED
             )
 
-    if files:
-        for file_index in range(len(files)):
-            if files[file_index].content_type == "application/gzip":
-                files[file_index] = ungz_file(files[file_index], gz_uncompressed_content_type)
-
     content_type = request.headers.get("Accept")
+
+    # -- detect response content-type conflict when multiple files are uploaded --
+    if (
+        len(files) > 1
+        and content_type
+        and content_type
+        not in [
+            "*/*",
+            "multipart/mixed",
+            "application/json",
+            "text/csv",
+        ]
+    ):
+        raise HTTPException(
+            detail=f"Conflict in media type {content_type} with response type 'multipart/mixed'.\n",
+            status_code=status.HTTP_406_NOT_ACCEPTABLE,
+        )
+
+    # -- unzip any uploaded files that need it --
+    for file_index in range(len(files)):
+        if files[file_index].content_type == "application/gzip":
+            files[file_index] = ungz_file(files[file_index], gz_uncompressed_content_type)
 
     default_response_type = output_format or "application/json"
     if not content_type or content_type == "*/*" or content_type == "multipart/mixed":
@@ -777,20 +797,6 @@ def pipeline_1(
         media_type = content_type
 
     if isinstance(files, list) and len(files):
-        if len(files) > 1:
-            if content_type and content_type not in [
-                "*/*",
-                "multipart/mixed",
-                "application/json",
-                "text/csv",
-            ]:
-                raise HTTPException(
-                    detail=(
-                        f"Conflict in media type {content_type}"
-                        ' with response type "multipart/mixed".\n'
-                    ),
-                    status_code=status.HTTP_406_NOT_ACCEPTABLE,
-                )
 
         def response_generator(is_multipart: bool):
             for file in files:
@@ -822,7 +828,7 @@ def pipeline_1(
                     m_extract_image_block_types=extract_image_block_types,
                 )
 
-                if is_expected_response_type(media_type, type(response)):
+                if not is_compatible_response_type(media_type, type(response)):
                     raise HTTPException(
                         detail=(
                             f"Conflict in media type {media_type}"
