@@ -766,6 +766,13 @@ def pipeline_1(
                 detail=f"API key {api_key} is invalid", status_code=status.HTTP_401_UNAUTHORIZED
             )
 
+    # -- must upload at least one file to process --
+    if not isinstance(files, list) or not files:
+        raise HTTPException(
+            detail='Request parameter "files" is required.',
+            status_code=status.HTTP_400_BAD_REQUEST,
+        )
+
     content_type = request.headers.get("Accept")
 
     # -- detect response content-type conflict when multiple files are uploaded --
@@ -796,95 +803,88 @@ def pipeline_1(
     else:
         media_type = content_type
 
-    if isinstance(files, list) and len(files):
+    def response_generator(is_multipart: bool):
+        for file in files:
+            file_content_type = get_validated_mimetype(file)
 
-        def response_generator(is_multipart: bool):
-            for file in files:
-                file_content_type = get_validated_mimetype(file)
+            _file = file.file
 
-                _file = file.file
+            response = pipeline_api(
+                _file,
+                request=request,
+                m_coordinates=coordinates,
+                m_encoding=encoding,
+                m_hi_res_model_name=hi_res_model_name,
+                m_include_page_breaks=include_page_breaks,
+                m_ocr_languages=ocr_languages,
+                m_pdf_infer_table_structure=pdf_infer_table_structure,
+                m_skip_infer_table_types=skip_infer_table_types,
+                m_strategy=strategy,
+                m_xml_keep_tags=xml_keep_tags,
+                response_type=media_type,
+                filename=str(file.filename),
+                file_content_type=file_content_type,
+                languages=languages,
+                m_chunking_strategy=chunking_strategy,
+                m_multipage_sections=multipage_sections,
+                m_combine_under_n_chars=combine_under_n_chars,
+                m_new_after_n_chars=new_after_n_chars,
+                m_max_characters=max_characters,
+                m_extract_image_block_types=extract_image_block_types,
+            )
 
-                response = pipeline_api(
-                    _file,
-                    request=request,
-                    m_coordinates=coordinates,
-                    m_encoding=encoding,
-                    m_hi_res_model_name=hi_res_model_name,
-                    m_include_page_breaks=include_page_breaks,
-                    m_ocr_languages=ocr_languages,
-                    m_pdf_infer_table_structure=pdf_infer_table_structure,
-                    m_skip_infer_table_types=skip_infer_table_types,
-                    m_strategy=strategy,
-                    m_xml_keep_tags=xml_keep_tags,
-                    response_type=media_type,
-                    filename=str(file.filename),
-                    file_content_type=file_content_type,
-                    languages=languages,
-                    m_chunking_strategy=chunking_strategy,
-                    m_multipage_sections=multipage_sections,
-                    m_combine_under_n_chars=combine_under_n_chars,
-                    m_new_after_n_chars=new_after_n_chars,
-                    m_max_characters=max_characters,
-                    m_extract_image_block_types=extract_image_block_types,
+            if not is_compatible_response_type(media_type, type(response)):
+                raise HTTPException(
+                    detail=(
+                        f"Conflict in media type {media_type}"
+                        f" with response type {type(response)}.\n"
+                    ),
+                    status_code=status.HTTP_406_NOT_ACCEPTABLE,
                 )
 
-                if not is_compatible_response_type(media_type, type(response)):
-                    raise HTTPException(
-                        detail=(
-                            f"Conflict in media type {media_type}"
-                            f" with response type {type(response)}.\n"
-                        ),
-                        status_code=status.HTTP_406_NOT_ACCEPTABLE,
-                    )
-
-                if media_type not in ["application/json", "text/csv", "*/*", "multipart/mixed"]:
-                    raise HTTPException(
-                        detail=f"Unsupported media type {media_type}.\n",
-                        status_code=status.HTTP_406_NOT_ACCEPTABLE,
-                    )
-
-                yield (
-                    json.dumps(response)
-                    if is_multipart and type(response) not in [str, bytes]
-                    else PlainTextResponse(response)
-                    if not is_multipart and media_type == "text/csv"
-                    else response
+            if media_type not in ["application/json", "text/csv", "*/*", "multipart/mixed"]:
+                raise HTTPException(
+                    detail=f"Unsupported media type {media_type}.\n",
+                    status_code=status.HTTP_406_NOT_ACCEPTABLE,
                 )
 
-        def join_responses(
-            responses: Sequence[str | List[Dict[str, Any]] | PlainTextResponse]
-        ) -> List[str | List[Dict[str, Any]]] | PlainTextResponse:
-            """Consolidate partitionings from multiple documents into single response payload."""
-            if media_type != "text/csv":
-                return cast(List[Union[str, List[Dict[str, Any]]]], responses)
-            responses = cast(List[PlainTextResponse], responses)
-            data = pd.read_csv(  # pyright: ignore[reportUnknownMemberType]
-                io.BytesIO(responses[0].body)
+            yield (
+                json.dumps(response)
+                if is_multipart and type(response) not in [str, bytes]
+                else PlainTextResponse(response)
+                if not is_multipart and media_type == "text/csv"
+                else response
             )
-            if len(responses) > 1:
-                for resp in responses[1:]:
-                    resp_data = pd.read_csv(  # pyright: ignore[reportUnknownMemberType]
-                        io.BytesIO(resp.body)
-                    )
-                    data = data.merge(  # pyright: ignore[reportUnknownMemberType]
-                        resp_data, how="outer"
-                    )
-            return PlainTextResponse(data.to_csv())
 
-        if content_type == "multipart/mixed":
-            return MultipartMixedResponse(
-                response_generator(is_multipart=True), content_type=media_type
-            )
-        else:
-            return (
-                list(response_generator(is_multipart=False))[0]
-                if len(files) == 1
-                else join_responses(list(response_generator(is_multipart=False)))
-            )
+    def join_responses(
+        responses: Sequence[str | List[Dict[str, Any]] | PlainTextResponse]
+    ) -> List[str | List[Dict[str, Any]]] | PlainTextResponse:
+        """Consolidate partitionings from multiple documents into single response payload."""
+        if media_type != "text/csv":
+            return cast(List[Union[str, List[Dict[str, Any]]]], responses)
+        responses = cast(List[PlainTextResponse], responses)
+        data = pd.read_csv(  # pyright: ignore[reportUnknownMemberType]
+            io.BytesIO(responses[0].body)
+        )
+        if len(responses) > 1:
+            for resp in responses[1:]:
+                resp_data = pd.read_csv(  # pyright: ignore[reportUnknownMemberType]
+                    io.BytesIO(resp.body)
+                )
+                data = data.merge(  # pyright: ignore[reportUnknownMemberType]
+                    resp_data, how="outer"
+                )
+        return PlainTextResponse(data.to_csv())
+
+    if content_type == "multipart/mixed":
+        return MultipartMixedResponse(
+            response_generator(is_multipart=True), content_type=media_type
+        )
     else:
-        raise HTTPException(
-            detail='Request parameter "files" is required.',
-            status_code=status.HTTP_400_BAD_REQUEST,
+        return (
+            list(response_generator(is_multipart=False))[0]
+            if len(files) == 1
+            else join_responses(list(response_generator(is_multipart=False)))
         )
 
 
