@@ -84,10 +84,10 @@ DEFAULT_MIMETYPES = (
     "application/xml,text/xml,text/x-rst,text/prs.fallenstein.rst,"
     "text/tsv,text/tab-separated-values,"
     "application/x-ole-storage,application/vnd.ms-outlook,"
-    "application/yaml",
-    "application/x-yaml",
-    "text/x-yaml",
-    "text/yaml",
+    "application/yaml,"
+    "application/x-yaml,"
+    "text/x-yaml,"
+    "text/yaml,"
 )
 
 if not os.environ.get("UNSTRUCTURED_ALLOWED_MIMETYPES", None):
