@@ -876,16 +876,13 @@ def pipeline_1(
                 )
         return PlainTextResponse(data.to_csv())
 
-    if content_type == "multipart/mixed":
-        return MultipartMixedResponse(
-            response_generator(is_multipart=True), content_type=media_type
-        )
-    else:
-        return (
-            list(response_generator(is_multipart=False))[0]
-            if len(files) == 1
-            else join_responses(list(response_generator(is_multipart=False)))
-        )
+    return (
+        MultipartMixedResponse(response_generator(is_multipart=True), content_type=media_type)
+        if content_type == "multipart/mixed"
+        else list(response_generator(is_multipart=False))[0]
+        if len(files) == 1
+        else join_responses(list(response_generator(is_multipart=False)))
+    )
 
 
 app.include_router(router)
