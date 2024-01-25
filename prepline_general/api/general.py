@@ -721,7 +721,7 @@ async def handle_invalid_get_request():
 
 
 @router.post("/general/v0/general")
-@router.post("/general/v0.0.63/general")
+@router.post("/general/v0.0.63/general", include_in_schema=False)
 def pipeline_1(
     request: Request,
     gz_uncompressed_content_type: Optional[str] = Form(default=None),
