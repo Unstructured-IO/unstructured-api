@@ -63,7 +63,7 @@ logger = logging.getLogger("unstructured_api")
 
 
 DEFAULT_MIMETYPES = (
-    "application/pdf,application/msword,image/jpeg,image/png,text/markdown,"
+    "application/pdf,application/msword,image/jpeg,image/png,image/heic,text/markdown,"
     "text/x-markdown,text/html,"
     "application/vnd.openxmlformats-officedocument.wordprocessingml.document,"
     "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,"
