@@ -3,7 +3,7 @@ from typing import TypeVar, Union, List, Optional, Generic, get_origin, get_args
 T = TypeVar("T")
 
 
-def _return_casted_first_element(value: list[str], origin_class: type) -> T | None:
+def _return_cast_first_element(value: list[str], origin_class: type) -> T | None:
     """Return the first element of a list cast to a type T, or None if the list is empty
 
     Args:
@@ -59,7 +59,7 @@ class SmartValueParser(Generic[T]):
         """
         origin_class, container_elems_class = self._get_origin_container_classes()
         if isinstance(value, list) and not isinstance(value, origin_class):
-            return _return_casted_first_element(value, origin_class)
+            return _return_cast_first_element(value, origin_class)
         elif isinstance(value, list) and origin_class == list:
             return _extract_inner_list_casted_to_specific_type(value, container_elems_class)
         return value

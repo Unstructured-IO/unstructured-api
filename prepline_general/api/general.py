@@ -702,7 +702,6 @@ async def handle_invalid_get_request():
 
 @router.post(
     "/general/v0/general",
-    # operation_id="general_partition",
     openapi_extra={"x-speakeasy-name-override": "partition"},
     tags=["general"],
     summary="Summary",
@@ -716,16 +715,6 @@ def general_partition(
     # The openapi metadata must be added separately in openapi.py file.
     # TODO: Check if the bug is fixed and change the declaration to use Annoteted[List[UploadFile], File(...)]
     files: List[UploadFile],
-    # Annotated[
-    #     Optional[],
-    #     File(
-    #         format="binary",
-    #         description="The file to extract",
-    #         example={
-    #             "summary": "File to be partitioned",
-    #             "externalValue": "https://github.com/Unstructured-IO/unstructured/blob/98d3541909f64290b5efb65a226fc3ee8a7cc5ee/example-docs/layout-parser-paper.pdf"
-    #         },
-    #     )],
     form_params: GeneralFormParams = Depends(GeneralFormParams.as_form),
 ):
     # -- must have a valid API key --
