@@ -427,7 +427,7 @@ def pipeline_api(
                 request=request,
                 pdf_pages=pdf.pages,
                 coordinates=coordinates,
-                **partition_kwargs, # type: ignore # pyright: ignore[reportGeneralTypeIssues]
+                **partition_kwargs,  # type: ignore # pyright: ignore[reportGeneralTypeIssues]
             )
         elif hi_res_model_name and hi_res_model_name in CHIPPER_MODEL_TYPES:
             with ChipperMemoryProtection():

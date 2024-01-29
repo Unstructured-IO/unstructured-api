@@ -17,7 +17,7 @@ def _return_cast_first_element(values: list[E], origin_class: type) -> E | None:
     value = next(iter(values), None)
     if value is not None:
         if origin_class == int or origin_class == float or origin_class == bool:
-            return origin_class(value) # noqa
+            return origin_class(value)  # noqa
     return value
 
 
@@ -51,7 +51,7 @@ class SmartValueParser(Generic[T]):
         Returns:
             tuple[type, type | None]: class and container class of the type hint
         """
-        type_info = self.__orig_class__.__args__[0] # type: ignore
+        type_info = self.__orig_class__.__args__[0]  # type: ignore
         origin_class = get_origin(type_info)
         if origin_class is None:
             # it's a basic type like int or bool - return it and no container class

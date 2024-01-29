@@ -24,7 +24,7 @@ def set_custom_openapi(app: FastAPI) -> None:
         app.openapi_schema = openapi_schema
         return app.openapi_schema
 
-    app.openapi = custom_openapi # type: ignore
+    app.openapi = custom_openapi  # type: ignore
 
 
 def _apply_customizations(openapi_schema: dict[str, Any]) -> None:
