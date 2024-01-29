@@ -12,7 +12,7 @@ from base64 import b64encode
 from concurrent.futures import ThreadPoolExecutor
 from functools import partial
 from types import TracebackType
-from typing import IO, Annotated, Any, Dict, List, Mapping, Optional, Sequence, Tuple, Union, cast
+from typing import IO, Any, Dict, List, Mapping, Optional, Sequence, Tuple, Union, cast
 
 import backoff
 import pandas as pd
@@ -22,12 +22,10 @@ from fastapi import (
     APIRouter,
     Depends,
     FastAPI,
-    File,
     HTTPException,
     Request,
     UploadFile,
     status,
-    Form,
 )
 from fastapi.responses import PlainTextResponse, StreamingResponse
 from pypdf import PageObject, PdfReader, PdfWriter
@@ -44,7 +42,6 @@ from unstructured.staging.base import (
 from unstructured_inference.models.base import UnknownModelException
 from unstructured_inference.models.chipper import MODEL_TYPES as CHIPPER_MODEL_TYPES
 
-from prepline_general.api.models.elements import Element as ResponseElement
 from prepline_general.api.models.form_params import GeneralFormParams
 
 app = FastAPI()
