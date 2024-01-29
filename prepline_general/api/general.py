@@ -356,7 +356,7 @@ def pipeline_api(
     enable_parallel_mode = os.environ.get("UNSTRUCTURED_PARALLEL_MODE_ENABLED", "false")
     pdf_parallel_mode_enabled = enable_parallel_mode == "true"
 
-    ocr_languages = "+".join(ocr_languages) if ocr_languages and len(ocr_languages) else None
+    ocr_languages_str = "+".join(ocr_languages) if ocr_languages and len(ocr_languages) else None
 
     if extract_image_block_types:
         try:
@@ -377,7 +377,7 @@ def pipeline_api(
                     {
                         "content_type": file_content_type,
                         "strategy": strategy,
-                        "ocr_languages": ocr_languages,
+                        "ocr_languages": ocr_languages_str,
                         "coordinates": coordinates,
                         "pdf_infer_table_structure": pdf_infer_table_structure,
                         "include_page_breaks": include_page_breaks,
@@ -406,7 +406,7 @@ def pipeline_api(
             "encoding": encoding,
             "include_page_breaks": include_page_breaks,
             "hi_res_model_name": hi_res_model_name,
-            "ocr_languages": ocr_languages,
+            "ocr_languages": ocr_languages_str,
             "pdf_infer_table_structure": pdf_infer_table_structure,
             "skip_infer_table_types": skip_infer_table_types,
             "strategy": strategy,
@@ -427,7 +427,7 @@ def pipeline_api(
                 request=request,
                 pdf_pages=pdf.pages,
                 coordinates=coordinates,
-                **partition_kwargs,  # pyright: ignore[reportGeneralTypeIssues]
+                **partition_kwargs, # type: ignore # pyright: ignore[reportGeneralTypeIssues]
             )
         elif hi_res_model_name and hi_res_model_name in CHIPPER_MODEL_TYPES:
             with ChipperMemoryProtection():

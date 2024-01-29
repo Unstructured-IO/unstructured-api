@@ -16,8 +16,8 @@ from prepline_general.api.utils import SmartValueParser
         (int, 1500, 1500),
         (float, 1500, 1500.0),
         (str, "1500", "1500"),
-        (list[str], [["one", "two", "three"]], ["one", "two", "three"]),
-        (list[int], [[1000]], [1000]),
+        (list[str], ["one", "two", "three"], ["one", "two", "three"]),
+        (list[int], [1000], [1000]),
     ],
 )
 def test_smart_value_parser(desired_type: type, value_to_parse: Any, expected_result: Any):

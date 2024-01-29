@@ -4,7 +4,7 @@ from fastapi import FastAPI
 from fastapi.openapi.utils import get_openapi
 
 
-def set_custom_openapi(app: FastAPI) -> dict[str, Any]:
+def set_custom_openapi(app: FastAPI) -> None:
     """Generate a custom OpenAPI schema for the app"""
 
     def custom_openapi() -> dict[str, Any]:
@@ -24,7 +24,7 @@ def set_custom_openapi(app: FastAPI) -> dict[str, Any]:
         app.openapi_schema = openapi_schema
         return app.openapi_schema
 
-    app.openapi = custom_openapi
+    app.openapi = custom_openapi # type: ignore
 
 
 def _apply_customizations(openapi_schema: dict[str, Any]) -> None:
