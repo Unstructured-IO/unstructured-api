@@ -52,4 +52,4 @@ def test_form_params_passed_as_first_element_of_array_are_properly_handled(
     )
 
     assert response.status_code == 200
-    response_without_coords = response.json()
+    assert response.json()
