@@ -19,13 +19,13 @@ app = FastAPI(
         {
             "url": "https://api.unstructured.io",
             "description": "Hosted API",
-            "x-speakeasy-server-id": "prod"
+            "x-speakeasy-server-id": "prod",
         },
         {
             "url": "http://localhost:8000",
             "description": "Development server",
-            "x-speakeasy-server-id": "local"
-        }
+            "x-speakeasy-server-id": "local",
+        },
     ],
     openapi_tags=[{"name": "general"}],
 )

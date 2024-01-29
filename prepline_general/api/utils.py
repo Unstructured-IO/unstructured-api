@@ -3,10 +3,7 @@ from typing import TypeVar, Union, List, Optional, Generic, get_origin, get_args
 T = TypeVar("T")
 
 
-def _return_casted_first_element(
-        value: list[str],
-        origin_class: type
-) -> T | None:
+def _return_casted_first_element(value: list[str], origin_class: type) -> T | None:
     """Return the first element of a list cast to a type T, or None if the list is empty
 
     Args:
@@ -24,8 +21,7 @@ def _return_casted_first_element(
 
 
 def _extract_inner_list_casted_to_specific_type(
-        value: list[list],
-        container_elems_class: type[T]
+    value: list[list], container_elems_class: type[T]
 ) -> list[T]:
     """If a list contains inner list - extract it and cast its elements to a specific type
     Returns the original list if it doesn't contain inner list.

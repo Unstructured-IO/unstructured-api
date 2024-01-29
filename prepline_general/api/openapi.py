@@ -49,10 +49,12 @@ def _apply_customizations(openapi_schema: dict[str, Any]) -> None:
     }
     # Path changes
     # Update the $ref in paths
-    openapi_schema["paths"]["/general/v0/general"]["post"]["requestBody"]["content"]["multipart/form-data"]["schema"][
-        "$ref"] = "#/components/schemas/partition_parameters"
-    openapi_schema["paths"]["/general/v0/general"]["post"]["responses"]["200"]["content"]["application/json"][
-        "schema"] = {"$ref": "#/components/schemas/Elements"}
+    openapi_schema["paths"]["/general/v0/general"]["post"]["requestBody"]["content"][
+        "multipart/form-data"
+    ]["schema"]["$ref"] = "#/components/schemas/partition_parameters"
+    openapi_schema["paths"]["/general/v0/general"]["post"]["responses"]["200"]["content"][
+        "application/json"
+    ]["schema"] = {"$ref": "#/components/schemas/Elements"}
 
     # Schema changes
 
@@ -64,7 +66,9 @@ def _apply_customizations(openapi_schema: dict[str, Any]) -> None:
             "type": "apiKey",
             "name": "unstructured-api-key",
             "in": "header",
-            "x-speakeasy-example": "YOUR_API_KEY"}}
+            "x-speakeasy-example": "YOUR_API_KEY",
+        }
+    }
 
     # TODO: Instead of a list of paramaters, crete a PartitionParameters model
     # and declare schema keys (type, format, description) as attributes
@@ -85,10 +89,12 @@ def _apply_customizations(openapi_schema: dict[str, Any]) -> None:
         "format": "binary",
         "description": "The file to extract",
         "required": "true",
-        "examples": [{
-            "summary": "File to be partitioned",
-            "externalValue": "https://github.com/Unstructured-IO/unstructured/blob/98d3541909f64290b5efb65a226fc3ee8a7cc5ee/example-docs/layout-parser-paper.pdf"
-        }]
+        "examples": [
+            {
+                "summary": "File to be partitioned",
+                "externalValue": "https://github.com/Unstructured-IO/unstructured/blob/98d3541909f64290b5efb65a226fc3ee8a7cc5ee/example-docs/layout-parser-paper.pdf",
+            }
+        ],
     }
 
     # TODO: Similarly, create an Elements model
@@ -99,8 +105,7 @@ def _apply_customizations(openapi_schema: dict[str, Any]) -> None:
         "items": {
             "Element": {
                 "type": "object",
-                "properties": {
-                    "type": {},
-                    "element_id": {},
-                    "metadata": {},
-                    "text": {}}}}}
+                "properties": {"type": {}, "element_id": {}, "metadata": {}, "text": {}},
+            }
+        },
+    }

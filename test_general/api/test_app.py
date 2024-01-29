@@ -50,16 +50,16 @@ def test_general_api_health_check():
         ("layout-parser-paper.pdf", "application/pdf"),
         ("fake-power-point.ppt", "application/vnd.ms-powerpoint"),
         (
-                "fake-power-point.pptx",
-                "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+            "fake-power-point.pptx",
+            "application/vnd.openxmlformats-officedocument.presentationml.presentation",
         ),
         ("README.rst", "text/x-rst"),
         ("fake-doc.rtf", "application/rtf"),
         ("fake-text.txt", "text/plain"),
         ("stanley-cups.tsv", "text/tsv"),
         (
-                "stanley-cups.xlsx",
-                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            "stanley-cups.xlsx",
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
         ),
         ("fake-xml.xml", "application/xml"),
     ],
@@ -367,8 +367,8 @@ def test_include_page_breaks_param():
             response_with_page_breaks_index += 1
         else:
             assert (
-                    curr_response_without_page_breaks_element["text"]
-                    == curr_response_with_page_breaks_element["text"]
+                curr_response_without_page_breaks_element["text"]
+                == curr_response_with_page_breaks_element["text"]
             )
 
             response_with_page_breaks_index += 1
@@ -693,7 +693,7 @@ def test_chunking_strategy_param():
     ],
 )
 def test_chunking_strategy_additional_params(
-        multipage_sections, combine_under_n_chars, new_after_n_chars, max_characters
+    multipage_sections, combine_under_n_chars, new_after_n_chars, max_characters
 ):
     client = TestClient(app)
     test_file = Path("sample-docs") / "layout-parser-paper-fast.pdf"
@@ -863,16 +863,16 @@ def test_invalid_strategy_for_image_file():
     ("exception", "status_code", "message"),
     [
         (
-                OSError("chipper-fast-fine-tuning is not a local folder"),
-                400,
-                "The Chipper model is not available for download. "
-                "It can be accessed via the official hosted API.",
+            OSError("chipper-fast-fine-tuning is not a local folder"),
+            400,
+            "The Chipper model is not available for download. "
+            "It can be accessed via the official hosted API.",
         ),
         (
-                OSError("ved-fine-tuning is not a local folder"),
-                400,
-                "The Chipper model is not available for download. "
-                "It can be accessed via the official hosted API.",
+            OSError("ved-fine-tuning is not a local folder"),
+            400,
+            "The Chipper model is not available for download. "
+            "It can be accessed via the official hosted API.",
         ),
         (OSError(1, "An error happened"), 500, "[Errno 1] An error happened"),
     ],

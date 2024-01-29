@@ -27,7 +27,7 @@ from fastapi import (
     Request,
     UploadFile,
     status,
-    Form
+    Form,
 )
 from fastapi.responses import PlainTextResponse, StreamingResponse
 from pypdf import PageObject, PdfReader, PdfWriter
@@ -56,9 +56,7 @@ def is_compatible_response_type(media_type: str, response_type: type) -> bool:
     return (
         False
         if media_type == "application/json" and response_type not in [dict, list]
-        else False
-        if media_type == "text/csv" and response_type != str
-        else True
+        else False if media_type == "text/csv" and response_type != str else True
     )
 
 
@@ -131,12 +129,12 @@ def is_non_retryable(e: Exception) -> bool:
     logger=logger,
 )
 def call_api(
-        request_url: str,
-        api_key: str,
-        filename: str,
-        file: IO[bytes],
-        content_type: str,
-        **partition_kwargs: Any,
+    request_url: str,
+    api_key: str,
+    filename: str,
+    file: IO[bytes],
+    content_type: str,
+    **partition_kwargs: Any,
 ) -> str:
     """Call the api with the given request_url."""
     headers = {"unstructured-api-key": api_key}
@@ -156,11 +154,11 @@ def call_api(
 
 
 def partition_file_via_api(
-        file_tuple: Tuple[IO[bytes], int],
-        request: Request,
-        filename: str,
-        content_type: str,
-        **partition_kwargs: Any,
+    file_tuple: Tuple[IO[bytes], int],
+    request: Request,
+    filename: str,
+    content_type: str,
+    **partition_kwargs: Any,
 ) -> List[Element]:
     """Send the given file to be partitioned remotely with retry logic.
 
@@ -193,13 +191,13 @@ def partition_file_via_api(
 
 
 def partition_pdf_splits(
-        request: Request,
-        pdf_pages: Sequence[PageObject],
-        file: IO[bytes],
-        metadata_filename: str,
-        content_type: str,
-        coordinates: bool,
-        **partition_kwargs: Any,
+    request: Request,
+    pdf_pages: Sequence[PageObject],
+    file: IO[bytes],
+    metadata_filename: str,
+    content_type: str,
+    coordinates: bool,
+    **partition_kwargs: Any,
 ) -> List[Element]:
     """Split a pdf into chunks and process in parallel with more api calls.
 
@@ -265,39 +263,39 @@ class ChipperMemoryProtection:
         is_chipper_processing = True
 
     def __exit__(
-            self,
-            exc_type: Optional[type[BaseException]],
-            exc_value: Optional[BaseException],
-            exc_tb: Optional[TracebackType],
+        self,
+        exc_type: Optional[type[BaseException]],
+        exc_value: Optional[BaseException],
+        exc_tb: Optional[TracebackType],
     ):
         global is_chipper_processing
         is_chipper_processing = False
 
 
 def pipeline_api(
-        file: IO[bytes],
-        request: Request,
-        # -- chunking options --
-        chunking_strategy: Optional[str],
-        combine_under_n_chars: Optional[int],
-        max_characters: int,
-        multipage_sections: bool,
-        new_after_n_chars: Optional[int],
-        # ----------------------
-        filename: str = "",
-        file_content_type: Optional[str] = None,
-        response_type: str = "application/json",
-        coordinates: bool = False,
-        encoding: str = "utf-8",
-        hi_res_model_name: Optional[str] = None,
-        include_page_breaks: bool = False,
-        ocr_languages: Optional[List[str]] = None,
-        pdf_infer_table_structure: bool = False,
-        skip_infer_table_types: Optional[List[str]] = None,
-        strategy: str = "auto",
-        xml_keep_tags: bool = False,
-        languages: Optional[List[str]] = None,
-        extract_image_block_types: Optional[List[str]] = None,
+    file: IO[bytes],
+    request: Request,
+    # -- chunking options --
+    chunking_strategy: Optional[str],
+    combine_under_n_chars: Optional[int],
+    max_characters: int,
+    multipage_sections: bool,
+    new_after_n_chars: Optional[int],
+    # ----------------------
+    filename: str = "",
+    file_content_type: Optional[str] = None,
+    response_type: str = "application/json",
+    coordinates: bool = False,
+    encoding: str = "utf-8",
+    hi_res_model_name: Optional[str] = None,
+    include_page_breaks: bool = False,
+    ocr_languages: Optional[List[str]] = None,
+    pdf_infer_table_structure: bool = False,
+    skip_infer_table_types: Optional[List[str]] = None,
+    strategy: str = "auto",
+    xml_keep_tags: bool = False,
+    languages: Optional[List[str]] = None,
+    extract_image_block_types: Optional[List[str]] = None,
 ) -> List[Dict[str, Any]] | str:
     if filename.endswith(".msg"):
         # Note(yuming): convert file type for msg files
@@ -306,12 +304,12 @@ def pipeline_api(
 
     # We don't want to keep logging the same params for every parallel call
     is_internal_request = (
-            (
-                    request.headers.get("X-Forwarded-For")
-                    and str(request.headers.get("X-Forwarded-For")).startswith("10.")
-            )
-            # -- NOTE(scanny): request.client is None in certain testing environments --
-            or (request.client and request.client.host.startswith("10."))
+        (
+            request.headers.get("X-Forwarded-For")
+            and str(request.headers.get("X-Forwarded-For")).startswith("10.")
+        )
+        # -- NOTE(scanny): request.client is None in certain testing environments --
+        or (request.client and request.client.host.startswith("10."))
     )
 
     if not is_internal_request:
@@ -352,9 +350,7 @@ def pipeline_api(
 
     hi_res_model_name = _validate_hi_res_model_name(hi_res_model_name, coordinates)
     strategy = _validate_strategy(strategy)
-    pdf_infer_table_structure = _set_pdf_infer_table_structure(
-        pdf_infer_table_structure, strategy
-    )
+    pdf_infer_table_structure = _set_pdf_infer_table_structure(pdf_infer_table_structure, strategy)
 
     # Parallel mode is set by env variable
     enable_parallel_mode = os.environ.get("UNSTRUCTURED_PARALLEL_MODE_ENABLED", "false")
@@ -370,7 +366,7 @@ def pipeline_api(
             if isinstance(loaded_array, list):
                 extract_image_block_types = loaded_array
         except (json.JSONDecodeError, IndexError):
-            pass # noqa
+            pass  # noqa
 
     extract_image_block_to_payload = bool(extract_image_block_types)
 
@@ -441,8 +437,8 @@ def pipeline_api(
 
     except OSError as e:
         if isinstance(e.args[0], str) and (
-                "chipper-fast-fine-tuning is not a local folder" in e.args[0]
-                or "ved-fine-tuning is not a local folder" in e.args[0]
+            "chipper-fast-fine-tuning is not a local folder" in e.args[0]
+            or "ved-fine-tuning is not a local folder" in e.args[0]
         ):
             raise HTTPException(
                 status_code=400,
@@ -552,7 +548,7 @@ def _validate_strategy(strategy: str) -> str:
 
 
 def _validate_hi_res_model_name(
-        hi_res_model_name: Optional[str], show_coordinates: bool
+    hi_res_model_name: Optional[str], show_coordinates: bool
 ) -> Optional[str]:
     # Make sure chipper aliases to the latest model
     if hi_res_model_name and hi_res_model_name == "chipper":
@@ -714,23 +710,23 @@ async def handle_invalid_get_request():
 )
 @router.post("/general/v0.0.63/general", include_in_schema=False)
 def general_partition(
-        request: Request,
-        # cannot use annotated type here because of a bug described here:
-        # https://github.com/tiangolo/fastapi/discussions/10280
-        # The openapi metadata must be added separately in openapi.py file.
-        # TODO: Check if the bug is fixed and change the declaration to use Annoteted[List[UploadFile], File(...)]
-        files: List[UploadFile],
-        # Annotated[
-        #     Optional[],
-        #     File(
-        #         format="binary",
-        #         description="The file to extract",
-        #         example={
-        #             "summary": "File to be partitioned",
-        #             "externalValue": "https://github.com/Unstructured-IO/unstructured/blob/98d3541909f64290b5efb65a226fc3ee8a7cc5ee/example-docs/layout-parser-paper.pdf"
-        #         },
-        #     )],
-        form_params: GeneralFormParams = Depends(GeneralFormParams.as_form),
+    request: Request,
+    # cannot use annotated type here because of a bug described here:
+    # https://github.com/tiangolo/fastapi/discussions/10280
+    # The openapi metadata must be added separately in openapi.py file.
+    # TODO: Check if the bug is fixed and change the declaration to use Annoteted[List[UploadFile], File(...)]
+    files: List[UploadFile],
+    # Annotated[
+    #     Optional[],
+    #     File(
+    #         format="binary",
+    #         description="The file to extract",
+    #         example={
+    #             "summary": "File to be partitioned",
+    #             "externalValue": "https://github.com/Unstructured-IO/unstructured/blob/98d3541909f64290b5efb65a226fc3ee8a7cc5ee/example-docs/layout-parser-paper.pdf"
+    #         },
+    #     )],
+    form_params: GeneralFormParams = Depends(GeneralFormParams.as_form),
 ):
     # -- must have a valid API key --
     if api_key_env := os.environ.get("UNSTRUCTURED_API_KEY"):
@@ -744,15 +740,15 @@ def general_partition(
 
     # -- detect response content-type conflict when multiple files are uploaded --
     if (
-            len(files) > 1
-            and content_type
-            and content_type
-            not in [
-        "*/*",
-        "multipart/mixed",
-        "application/json",
-        "text/csv",
-    ]
+        len(files) > 1
+        and content_type
+        and content_type
+        not in [
+            "*/*",
+            "multipart/mixed",
+            "application/json",
+            "text/csv",
+        ]
     ):
         raise HTTPException(
             detail=f"Conflict in media type {content_type} with response type 'multipart/mixed'.\n",
@@ -765,7 +761,9 @@ def general_partition(
     # -- unzip any uploaded files that need it --
     for file_index in range(len(files)):
         if files[file_index].content_type == "application/gzip":
-            files[file_index] = ungz_file(files[file_index], form_params.gz_uncompressed_content_type)
+            files[file_index] = ungz_file(
+                files[file_index], form_params.gz_uncompressed_content_type
+            )
 
     default_response_type = form_params.output_format or "application/json"
     if not content_type or content_type == "*/*" or content_type == "multipart/mixed":
@@ -822,13 +820,15 @@ def general_partition(
             yield (
                 json.dumps(response)
                 if is_multipart and type(response) not in [str, bytes]
-                else PlainTextResponse(response)
-                if not is_multipart and media_type == "text/csv"
-                else response
+                else (
+                    PlainTextResponse(response)
+                    if not is_multipart and media_type == "text/csv"
+                    else response
+                )
             )
 
     def join_responses(
-            responses: Sequence[str | List[Dict[str, Any]] | PlainTextResponse]
+        responses: Sequence[str | List[Dict[str, Any]] | PlainTextResponse]
     ) -> List[str | List[Dict[str, Any]]] | PlainTextResponse:
         """Consolidate partitionings from multiple documents into single response payload."""
         if media_type != "text/csv":
@@ -847,12 +847,14 @@ def general_partition(
                 )
         return PlainTextResponse(data.to_csv())
 
-    return  (
+    return (
         MultipartMixedResponse(response_generator(is_multipart=True), content_type=media_type)
         if content_type == "multipart/mixed"
-        else list(response_generator(is_multipart=False))[0]
-        if len(files) == 1
-        else join_responses(list(response_generator(is_multipart=False)))
+        else (
+            list(response_generator(is_multipart=False))[0]
+            if len(files) == 1
+            else join_responses(list(response_generator(is_multipart=False)))
+        )
     )
 
 
