@@ -4,6 +4,23 @@ T = TypeVar("T")
 E = TypeVar("E")
 
 
+def _cast_to_type(value: Any, origin_class: type) -> Any:
+    """Cast a value to a type E
+
+    Args:
+        value (Any): value to cast to a type T
+        origin_class (type): type to cast the value to. Should be one of simple types
+
+    Returns:
+        T: value cast to a type T
+    """
+    if isinstance(value, str) and (origin_class == int or origin_class == float):
+        return origin_class(value)  # noqa
+    if origin_class == bool and isinstance(value, str):
+        return value.lower() == "true"
+    return value
+
+
 def _return_cast_first_element(values: list[E], origin_class: type) -> E | None:
     """Return the first element of a list cast to a type T, or None if the list is empty
 
@@ -16,8 +33,7 @@ def _return_cast_first_element(values: list[E], origin_class: type) -> E | None:
     """
     value = next(iter(values), None)
     if value is not None:
-        if origin_class == int or origin_class == float or origin_class == bool:
-            return origin_class(value)  # noqa
+        return _cast_to_type(value, origin_class)  # noqa
     return value
 
 
@@ -42,8 +58,8 @@ class SmartValueParser(Generic[T]):
             extracted_value: T | None = _return_cast_first_element(value, origin_class)
             return extracted_value
         elif isinstance(value, list) and origin_class == list and container_elems_class:
-            return [container_elems_class(elem) for elem in value]
-        return origin_class(value)
+            return [_cast_to_type(elem, container_elems_class) for elem in value]
+        return _cast_to_type(value, origin_class)  # noqa
 
     def _get_origin_container_classes(self) -> tuple[type, type | None]:
         """Extracts class (and container class if it's a list) from a type hint
