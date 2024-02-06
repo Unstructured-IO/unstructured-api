@@ -1,5 +1,6 @@
-## 0.0.63-dev0
+## 0.0.63
 
+* Bump unstructured to 0.12.2
 * Fix bug that ignored `combine_under_n_chars` chunking option argument.
 
 ## 0.0.62

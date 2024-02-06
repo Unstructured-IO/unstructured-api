@@ -53,9 +53,7 @@ def is_compatible_response_type(media_type: str, response_type: type) -> bool:
     return (
         False
         if media_type == "application/json" and response_type not in [dict, list]
-        else False
-        if media_type == "text/csv" and response_type != str
-        else True
+        else False if media_type == "text/csv" and response_type != str else True
     )
 
 
@@ -842,9 +840,11 @@ def pipeline_1(
             yield (
                 json.dumps(response)
                 if is_multipart and type(response) not in [str, bytes]
-                else PlainTextResponse(response)
-                if not is_multipart and media_type == "text/csv"
-                else response
+                else (
+                    PlainTextResponse(response)
+                    if not is_multipart and media_type == "text/csv"
+                    else response
+                )
             )
 
     def join_responses(
@@ -870,9 +870,11 @@ def pipeline_1(
     return (
         MultipartMixedResponse(response_generator(is_multipart=True), content_type=media_type)
         if content_type == "multipart/mixed"
-        else list(response_generator(is_multipart=False))[0]
-        if len(files) == 1
-        else join_responses(list(response_generator(is_multipart=False)))
+        else (
+            list(response_generator(is_multipart=False))[0]
+            if len(files) == 1
+            else join_responses(list(response_generator(is_multipart=False)))
+        )
     )
 
 
