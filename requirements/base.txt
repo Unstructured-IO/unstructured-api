@@ -67,7 +67,7 @@ filetype==1.2.0
     # via unstructured
 flatbuffers==23.5.26
     # via onnxruntime
-fonttools==4.47.2
+fonttools==4.48.1
     # via matplotlib
 fsspec==2024.2.0
     # via
@@ -133,7 +133,7 @@ networkx==3.2.1
     #   unstructured
 nltk==3.8.1
     # via unstructured
-numpy==1.26.3
+numpy==1.26.4
     # via
     #   contourpy
     #   layoutparser
@@ -215,9 +215,9 @@ pycparser==2.21
     # via cffi
 pycryptodome==3.20.0
     # via -r requirements/base.in
-pydantic==2.5.3
+pydantic==2.6.1
     # via fastapi
-pydantic-core==2.14.6
+pydantic-core==2.16.2
     # via pydantic
 pypandoc==1.12
     # via unstructured
