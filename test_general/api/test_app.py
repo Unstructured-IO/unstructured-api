@@ -381,6 +381,44 @@ def test_include_page_breaks_param():
     assert response_without_page_breaks[-1]["type"] != "PageBreak"
 
 
+def test_include_extract_image_block_types_param():
+    """
+    Verify that responses do not include base64 image in Table/Image metadata unless requested.
+    """
+    client = TestClient(app)
+    test_file = Path("sample-docs") / "embedded-images-tables.pdf"
+    with open(test_file, "rb") as file:
+        response = client.post(
+            MAIN_API_ROUTE,
+            files=[("files", (str(test_file), file))],
+            data={"strategy": "hi_res"},
+        )
+
+    assert response.status_code == 200
+    response_without_image = response.json()
+
+    with open(test_file, "rb") as file:
+        response = client.post(
+            MAIN_API_ROUTE,
+            files=[("files", (str(test_file), file))],
+            data={"strategy": "hi_res", "extract_image_block_types": '["Image", "Table"]'},
+        )
+
+    assert response.status_code == 200
+    response_with_image = response.json()
+
+    # Each element should be the same except for the image_base64 and image_mime_type fields
+    # in metadata
+    assert len(response_without_image) == len(response_with_image)
+    for element, element_with_image in zip(response_without_image, response_with_image):
+        if element["type"] in ["Image", "Table"]:
+            assert "image_base64" in element_with_image["metadata"]
+            assert "image_mime_type" in element_with_image["metadata"]
+            del element_with_image["metadata"]["image_base64"]
+            del element_with_image["metadata"]["image_mime_type"]
+            assert element == element_with_image
+
+
 @pytest.mark.parametrize(
     "example_filename",
     [
