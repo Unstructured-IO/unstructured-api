@@ -47,14 +47,15 @@ def _apply_customizations(openapi_schema: dict[str, Any]) -> None:
         ],
         "retryConnectionErrors": True,
     }
-    # Path changes
-    # Update the $ref in paths
-    openapi_schema["paths"]["/general/v0/general"]["post"]["requestBody"]["content"][
-        "multipart/form-data"
-    ]["schema"]["$ref"] = "#/components/schemas/partition_parameters"
+
+    # Response changes
     openapi_schema["paths"]["/general/v0/general"]["post"]["responses"]["200"]["content"][
         "application/json"
-    ]["schema"] = {"$ref": "#/components/schemas/Elements"}
+    ]["schema"] = {
+        "items": {"$ref": "#/components/schemas/Element"},
+        "title": "Response Partition Parameters",
+        "type": "array",
+    }
 
     # Schema changes
 
@@ -75,14 +76,32 @@ def _apply_customizations(openapi_schema: dict[str, Any]) -> None:
     # https://fastapi.tiangolo.com/reference/openapi/models/?h=model
     # Update the schema key from `Body_partition` to `partition_paramaters`
 
+    # TODO: Similarly, create an Element model
+    # https://fastapi.tiangolo.com/reference/openapi/models/?h=model
+    # Add Elements schema
+    openapi_schema["components"]["schemas"]["Element"] = {
+        "properties": {
+            "type": {"type": "string", "title": "Type"},
+            "element_id": {"type": "string", "title": "Element Id"},
+            "metadata": {"type": "object", "title": "Metadata"},
+            "text": {"type": "string", "title": "Text"},
+        },
+        "type": "object",
+        "required": ["type", "element_id", "metadata", "text"],
+        "title": "Element",
+    }
+
     # Must manually correct the schema for the files parameter as due to a bug
     # described here: https://github.com/tiangolo/fastapi/discussions/10280
     # files parameter cannot be described with an annotation.
     # TODO: Check if the bug is fixed and remove this workaround
     for key in openapi_schema["components"]["schemas"]:
-        if "Body_general_partition_general_v0_general_post" in key:
+        if "partition_parameters" in key:
             general_pipeline_schema = openapi_schema["components"]["schemas"][key]
             break
+    else:
+        # Could not find the schema to update, returning
+        return
 
     general_pipeline_schema["properties"]["files"] = {
         "type": "string",
@@ -95,17 +114,4 @@ def _apply_customizations(openapi_schema: dict[str, Any]) -> None:
                 "externalValue": "https://github.com/Unstructured-IO/unstructured/blob/98d3541909f64290b5efb65a226fc3ee8a7cc5ee/example-docs/layout-parser-paper.pdf",
             }
         ],
-    }
-
-    # TODO: Similarly, create an Elements model
-    # https://fastapi.tiangolo.com/reference/openapi/models/?h=model
-    # Add Elements schema
-    openapi_schema["components"]["schemas"]["Elements"] = {
-        "type": "array",
-        "items": {
-            "Element": {
-                "type": "object",
-                "properties": {"type": {}, "element_id": {}, "metadata": {}, "text": {}},
-            }
-        },
     }

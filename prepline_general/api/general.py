@@ -703,6 +703,7 @@ async def handle_invalid_get_request():
     tags=["general"],
     summary="Summary",
     description="Description",
+    operation_id="partition_parameters",
 )
 @router.post("/general/v0.0.63/general", include_in_schema=False)
 def general_partition(
