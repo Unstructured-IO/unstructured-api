@@ -12,6 +12,7 @@ class GeneralFormParams(BaseModel):
     To add a new parameter, add it here and in the as_form classmethod.
     Use Annotated to add a description and example for the parameter.
     """
+
     xml_keep_tags: bool
     languages: Optional[List[str]]
     ocr_languages: Optional[List[str]]
