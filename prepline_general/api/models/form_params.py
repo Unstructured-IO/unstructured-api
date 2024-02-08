@@ -26,6 +26,8 @@ class GeneralFormParams(BaseModel):
     max_characters: int
     multipage_sections: bool
     new_after_n_chars: Optional[int]
+    overlap: int
+    overlap_all: bool
 
     @classmethod
     def as_form(
@@ -183,6 +185,26 @@ class GeneralFormParams(BaseModel):
                 example=1500,
             ),
         ] = None,
+        overlap: Annotated[
+            int,
+            Form(
+                title="Overlap",
+                description="""Specifies the length of a string ("tail") to be drawn from each chunk and prefixed to the
+next chunk as a context-preserving mechanism. By default, this only applies to split-chunks
+where an oversized element is divided into multiple chunks by text-splitting. Default: 0""",
+                example=20,
+            ),
+        ] = 0,
+        overlap_all: Annotated[
+            bool,
+            Form(
+                title="Overlap all",
+                description="""When `True`, apply overlap between "normal" chunks formed from whole
+elements and not subject to text-splitting. Use this with caution as it entails a certain
+level of "pollution" of otherwise clean semantic chunk boundaries. Default: False""",
+                example=True,
+            ),
+        ] = False,
     ) -> "GeneralFormParams":
         return cls(
             xml_keep_tags=xml_keep_tags,
@@ -205,4 +227,6 @@ class GeneralFormParams(BaseModel):
             max_characters=max_characters,
             multipage_sections=multipage_sections,
             new_after_n_chars=new_after_n_chars,
+            overlap=overlap,
+            overlap_all=overlap_all,
         )
