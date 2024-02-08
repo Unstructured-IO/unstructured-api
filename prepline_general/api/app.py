@@ -1,19 +1,33 @@
 from fastapi import FastAPI, Request, status, HTTPException
 from fastapi.responses import JSONResponse
+from fastapi.security import APIKeyHeader
 import logging
 import os
 
 from .general import router as general_router
+from .openapi import set_custom_openapi
 
 logger = logging.getLogger("unstructured_api")
 
-
 app = FastAPI(
     title="Unstructured Pipeline API",
-    description="""""",
-    version="0.0.63",
+    summary="Partition documents with the Unstructured library",
+    version="0.0.64",
     docs_url="/general/docs",
     openapi_url="/general/openapi.json",
+    servers=[
+        {
+            "url": "https://api.unstructured.io",
+            "description": "Hosted API",
+            "x-speakeasy-server-id": "prod",
+        },
+        {
+            "url": "http://localhost:8000",
+            "description": "Development server",
+            "x-speakeasy-server-id": "local",
+        },
+    ],
+    openapi_tags=[{"name": "general"}],
 )
 
 # Note(austin) - This logger just dumps exceptions
@@ -48,6 +62,8 @@ if allowed_origins:
     )
 
 app.include_router(general_router)
+
+set_custom_openapi(app)
 
 
 # Filter out /healthcheck noise

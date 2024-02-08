@@ -12,7 +12,7 @@ from base64 import b64encode
 from concurrent.futures import ThreadPoolExecutor
 from functools import partial
 from types import TracebackType
-from typing import IO, Annotated, Any, Dict, List, Mapping, Optional, Sequence, Tuple, Union, cast
+from typing import IO, Any, Dict, List, Mapping, Optional, Sequence, Tuple, Union, cast
 
 import backoff
 import pandas as pd
@@ -20,9 +20,8 @@ import psutil
 import requests
 from fastapi import (
     APIRouter,
+    Depends,
     FastAPI,
-    File,
-    Form,
     HTTPException,
     Request,
     UploadFile,
@@ -33,7 +32,6 @@ from pypdf import PageObject, PdfReader, PdfWriter
 from pypdf.errors import FileNotDecryptedError, PdfReadError
 from starlette.datastructures import Headers
 from starlette.types import Send
-
 from unstructured.documents.elements import Element
 from unstructured.partition.auto import partition
 from unstructured.staging.base import (
@@ -43,6 +41,8 @@ from unstructured.staging.base import (
 )
 from unstructured_inference.models.base import UnknownModelException
 from unstructured_inference.models.chipper import MODEL_TYPES as CHIPPER_MODEL_TYPES
+
+from prepline_general.api.models.form_params import GeneralFormParams
 
 app = FastAPI()
 router = APIRouter()
@@ -58,7 +58,6 @@ def is_compatible_response_type(media_type: str, response_type: type) -> bool:
 
 
 logger = logging.getLogger("unstructured_api")
-
 
 DEFAULT_MIMETYPES = (
     "application/pdf,application/msword,image/jpeg,image/png,text/markdown,"
@@ -285,17 +284,17 @@ def pipeline_api(
     filename: str = "",
     file_content_type: Optional[str] = None,
     response_type: str = "application/json",
-    m_coordinates: List[str] = [],
-    m_encoding: List[str] = [],
-    m_hi_res_model_name: List[str] = [],
-    m_include_page_breaks: List[str] = [],
-    m_ocr_languages: Optional[List[str]] = None,
-    m_pdf_infer_table_structure: List[str] = [],
-    m_skip_infer_table_types: List[str] = [],
-    m_strategy: List[str] = [],
-    m_xml_keep_tags: List[str] = [],
+    coordinates: bool = False,
+    encoding: str = "utf-8",
+    hi_res_model_name: Optional[str] = None,
+    include_page_breaks: bool = False,
+    ocr_languages: Optional[List[str]] = None,
+    pdf_infer_table_structure: bool = False,
+    skip_infer_table_types: Optional[List[str]] = None,
+    strategy: str = "auto",
+    xml_keep_tags: bool = False,
     languages: Optional[List[str]] = None,
-    m_extract_image_block_types: Optional[List[str]] = None,
+    extract_image_block_types: Optional[List[str]] = None,
 ) -> List[Dict[str, Any]] | str:
     if filename.endswith(".msg"):
         # Note(yuming): convert file type for msg files
@@ -319,17 +318,17 @@ def pipeline_api(
                     {
                         "filename": filename,
                         "response_type": response_type,
-                        "m_coordinates": m_coordinates,
-                        "m_encoding": m_encoding,
-                        "m_hi_res_model_name": m_hi_res_model_name,
-                        "m_include_page_breaks": m_include_page_breaks,
-                        "m_ocr_languages": m_ocr_languages,
-                        "m_pdf_infer_table_structure": m_pdf_infer_table_structure,
-                        "m_skip_infer_table_types": m_skip_infer_table_types,
-                        "m_strategy": m_strategy,
-                        "m_xml_keep_tags": m_xml_keep_tags,
+                        "coordinates": coordinates,
+                        "encoding": encoding,
+                        "hi_res_model_name": hi_res_model_name,
+                        "include_page_breaks": include_page_breaks,
+                        "ocr_languages": ocr_languages,
+                        "pdf_infer_table_structure": pdf_infer_table_structure,
+                        "skip_infer_table_types": skip_infer_table_types,
+                        "strategy": strategy,
+                        "xml_keep_tags": xml_keep_tags,
                         "languages": languages,
-                        "m_extract_image_block_types": m_extract_image_block_types,
+                        "extract_image_block_types": extract_image_block_types,
                         "chunking_strategy": chunking_strategy,
                         "combine_under_n_chars": combine_under_n_chars,
                         "max_characters": max_characters,
@@ -350,40 +349,25 @@ def pipeline_api(
     if file_content_type == "application/pdf":
         _check_pdf(file)
 
-    show_coordinates_str = (m_coordinates[0] if len(m_coordinates) else "false").lower()
-    show_coordinates = show_coordinates_str == "true"
-
-    hi_res_model_name = _validate_hi_res_model_name(m_hi_res_model_name, show_coordinates)
-    strategy = _validate_strategy(m_strategy)
-    pdf_infer_table_structure = _set_pdf_infer_table_structure(
-        m_pdf_infer_table_structure, strategy
-    )
+    hi_res_model_name = _validate_hi_res_model_name(hi_res_model_name, coordinates)
+    strategy = _validate_strategy(strategy)
+    pdf_infer_table_structure = _set_pdf_infer_table_structure(pdf_infer_table_structure, strategy)
 
     # Parallel mode is set by env variable
     enable_parallel_mode = os.environ.get("UNSTRUCTURED_PARALLEL_MODE_ENABLED", "false")
     pdf_parallel_mode_enabled = enable_parallel_mode == "true"
 
-    ocr_languages = "+".join(m_ocr_languages) if m_ocr_languages and len(m_ocr_languages) else None
+    ocr_languages_str = "+".join(ocr_languages) if ocr_languages and len(ocr_languages) else None
 
-    include_page_breaks_str = (
-        m_include_page_breaks[0] if len(m_include_page_breaks) else "false"
-    ).lower()
-    include_page_breaks = include_page_breaks_str == "true"
-
-    encoding = m_encoding[0] if len(m_encoding) else None
-
-    xml_keep_tags_str = (m_xml_keep_tags[0] if len(m_xml_keep_tags) else "false").lower()
-    xml_keep_tags = xml_keep_tags_str == "true"
-
-    skip_infer_table_types = (
-        m_skip_infer_table_types[0] if len(m_skip_infer_table_types) else ["pdf", "jpg", "png"]
-    )
-
-    extract_image_block_types = (
-        json.loads(m_extract_image_block_types[0])
-        if m_extract_image_block_types and len(m_extract_image_block_types)
-        else None
-    )
+    if extract_image_block_types:
+        try:
+            # Handle the case when the user passes the table of strings as a json inside the
+            # first element of the array
+            loaded_array = json.loads(extract_image_block_types[0])
+            if isinstance(loaded_array, list):
+                extract_image_block_types = loaded_array
+        except (json.JSONDecodeError, IndexError):
+            pass  # noqa
 
     extract_image_block_to_payload = bool(extract_image_block_types)
 
@@ -394,8 +378,8 @@ def pipeline_api(
                     {
                         "content_type": file_content_type,
                         "strategy": strategy,
-                        "ocr_languages": ocr_languages,
-                        "coordinates": show_coordinates,
+                        "ocr_languages": ocr_languages_str,
+                        "coordinates": coordinates,
                         "pdf_infer_table_structure": pdf_infer_table_structure,
                         "include_page_breaks": include_page_breaks,
                         "encoding": encoding,
@@ -425,7 +409,7 @@ def pipeline_api(
             "encoding": encoding,
             "include_page_breaks": include_page_breaks,
             "hi_res_model_name": hi_res_model_name,
-            "ocr_languages": ocr_languages,
+            "ocr_languages": ocr_languages_str,
             "pdf_infer_table_structure": pdf_infer_table_structure,
             "skip_infer_table_types": skip_infer_table_types,
             "strategy": strategy,
@@ -447,8 +431,8 @@ def pipeline_api(
             elements = partition_pdf_splits(
                 request=request,
                 pdf_pages=pdf.pages,
-                coordinates=show_coordinates,
-                **partition_kwargs,  # pyright: ignore[reportGeneralTypeIssues]
+                coordinates=coordinates,
+                **partition_kwargs,  # type: ignore # pyright: ignore[reportGeneralTypeIssues]
             )
         elif hi_res_model_name and hi_res_model_name in CHIPPER_MODEL_TYPES:
             with ChipperMemoryProtection():
@@ -508,7 +492,7 @@ def pipeline_api(
     for i, element in enumerate(elements):
         elements[i].metadata.filename = os.path.basename(filename)
 
-        if not show_coordinates and element.metadata.coordinates:
+        if not coordinates and element.metadata.coordinates:
             elements[i].metadata.coordinates = None
 
         if element.metadata.last_modified:
@@ -558,8 +542,8 @@ def _check_pdf(file: IO[bytes]):
         raise HTTPException(status_code=422, detail="File does not appear to be a valid PDF")
 
 
-def _validate_strategy(m_strategy: List[str]) -> str:
-    strategy = (m_strategy[0] if len(m_strategy) else "auto").lower()
+def _validate_strategy(strategy: str) -> str:
+    strategy = strategy.lower()
     strategies = ["fast", "hi_res", "auto", "ocr_only"]
     if strategy not in strategies:
         raise HTTPException(
@@ -569,10 +553,8 @@ def _validate_strategy(m_strategy: List[str]) -> str:
 
 
 def _validate_hi_res_model_name(
-    m_hi_res_model_name: List[str], show_coordinates: bool
+    hi_res_model_name: Optional[str], show_coordinates: bool
 ) -> Optional[str]:
-    hi_res_model_name = m_hi_res_model_name[0] if len(m_hi_res_model_name) else None
-
     # Make sure chipper aliases to the latest model
     if hi_res_model_name and hi_res_model_name == "chipper":
         hi_res_model_name = "chipperv2"
@@ -608,11 +590,8 @@ def _validate_chunking_strategy(chunking_strategy: Optional[str]) -> Optional[st
     return chunking_strategy
 
 
-def _set_pdf_infer_table_structure(m_pdf_infer_table_structure: List[str], strategy: str) -> bool:
-    pdf_infer_table_structure = (
-        m_pdf_infer_table_structure[0] if len(m_pdf_infer_table_structure) else "false"
-    ).lower()
-    return strategy == "hi_res" and pdf_infer_table_structure == "true"
+def _set_pdf_infer_table_structure(pdf_infer_table_structure: bool, strategy: str) -> bool:
+    return strategy == "hi_res" and pdf_infer_table_structure
 
 
 def get_validated_mimetype(file: UploadFile) -> Optional[str]:
@@ -719,39 +698,31 @@ def ungz_file(file: UploadFile, gz_uncompressed_content_type: Optional[str] = No
 
 
 @router.get("/general/v0/general", include_in_schema=False)
-@router.get("/general/v0.0.63/general", include_in_schema=False)
+@router.get("/general/v0.0.64/general", include_in_schema=False)
 async def handle_invalid_get_request():
     raise HTTPException(
         status_code=status.HTTP_405_METHOD_NOT_ALLOWED, detail="Only POST requests are supported."
     )
 
 
-@router.post("/general/v0/general")
-@router.post("/general/v0.0.63/general", include_in_schema=False)
-def pipeline_1(
+@router.post(
+    "/general/v0/general",
+    openapi_extra={"x-speakeasy-name-override": "partition"},
+    tags=["general"],
+    summary="Summary",
+    description="Description",
+    operation_id="partition_parameters",
+)
+@router.post("/general/v0.0.64/general", include_in_schema=False)
+def general_partition(
     request: Request,
-    gz_uncompressed_content_type: Optional[str] = Form(default=None),
-    files: Union[List[UploadFile], None] = File(default=None),
-    output_format: Union[str, None] = Form(default=None),
-    coordinates: List[str] = Form(default=[]),
-    encoding: List[str] = Form(default=[]),
-    hi_res_model_name: List[str] = Form(default=[]),
-    include_page_breaks: List[str] = Form(default=[]),
-    ocr_languages: List[str] = Form(default=None),
-    pdf_infer_table_structure: List[str] = Form(default=[]),
-    skip_infer_table_types: List[str] = Form(default=[]),
-    strategy: List[str] = Form(default=[]),
-    xml_keep_tags: List[str] = Form(default=[]),
-    languages: Optional[List[str]] = Form(default=None),
-    extract_image_block_types: List[str] = Form(default=None),
-    # -- chunking options --
-    chunking_strategy: Annotated[Optional[str], Form()] = None,
-    combine_under_n_chars: Annotated[Optional[int], Form()] = None,
-    max_characters: Annotated[int, Form()] = 500,
-    multipage_sections: Annotated[bool, Form()] = True,
-    new_after_n_chars: Annotated[Optional[int], Form()] = None,
-    overlap: Annotated[int, Form()] = 0,
-    overlap_all: Annotated[bool, Form()] = False,
+    # cannot use annotated type here because of a bug described here:
+    # https://github.com/tiangolo/fastapi/discussions/10280
+    # The openapi metadata must be added separately in openapi.py file.
+    # TODO: Check if the bug is fixed and change the declaration to use Annoteted[List[UploadFile], File(...)]
+    # For new parameters - add them in models/form_params.py
+    files: List[UploadFile],
+    form_params: GeneralFormParams = Depends(GeneralFormParams.as_form),
 ):
     # -- must have a valid API key --
     if api_key_env := os.environ.get("UNSTRUCTURED_API_KEY"):
@@ -760,13 +731,6 @@ def pipeline_1(
             raise HTTPException(
                 detail=f"API key {api_key} is invalid", status_code=status.HTTP_401_UNAUTHORIZED
             )
-
-    # -- must upload at least one file to process --
-    if not isinstance(files, list) or not files:
-        raise HTTPException(
-            detail='Request parameter "files" is required.',
-            status_code=status.HTTP_400_BAD_REQUEST,
-        )
 
     content_type = request.headers.get("Accept")
 
@@ -788,14 +752,16 @@ def pipeline_1(
         )
 
     # -- validate other arguments --
-    chunking_strategy = _validate_chunking_strategy(chunking_strategy)
+    chunking_strategy = _validate_chunking_strategy(form_params.chunking_strategy)
 
     # -- unzip any uploaded files that need it --
     for file_index in range(len(files)):
         if files[file_index].content_type == "application/gzip":
-            files[file_index] = ungz_file(files[file_index], gz_uncompressed_content_type)
+            files[file_index] = ungz_file(
+                files[file_index], form_params.gz_uncompressed_content_type
+            )
 
-    default_response_type = output_format or "application/json"
+    default_response_type = form_params.output_format or "application/json"
     if not content_type or content_type == "*/*" or content_type == "multipart/mixed":
         media_type = default_response_type
     else:
@@ -810,28 +776,28 @@ def pipeline_1(
             response = pipeline_api(
                 _file,
                 request=request,
-                m_coordinates=coordinates,
-                m_encoding=encoding,
-                m_hi_res_model_name=hi_res_model_name,
-                m_include_page_breaks=include_page_breaks,
-                m_ocr_languages=ocr_languages,
-                m_pdf_infer_table_structure=pdf_infer_table_structure,
-                m_skip_infer_table_types=skip_infer_table_types,
-                m_strategy=strategy,
-                m_xml_keep_tags=xml_keep_tags,
+                coordinates=form_params.coordinates,
+                encoding=form_params.encoding,
+                hi_res_model_name=form_params.hi_res_model_name,
+                include_page_breaks=form_params.include_page_breaks,
+                ocr_languages=form_params.ocr_languages,
+                pdf_infer_table_structure=form_params.pdf_infer_table_structure,
+                skip_infer_table_types=form_params.skip_infer_table_types,
+                strategy=form_params.strategy,
+                xml_keep_tags=form_params.xml_keep_tags,
                 response_type=media_type,
                 filename=str(file.filename),
                 file_content_type=file_content_type,
-                languages=languages,
-                m_extract_image_block_types=extract_image_block_types,
+                languages=form_params.languages,
+                extract_image_block_types=form_params.extract_image_block_types,
                 # -- chunking options --
                 chunking_strategy=chunking_strategy,
-                combine_under_n_chars=combine_under_n_chars,
-                max_characters=max_characters,
-                multipage_sections=multipage_sections,
-                new_after_n_chars=new_after_n_chars,
-                overlap=overlap,
-                overlap_all=overlap_all,
+                combine_under_n_chars=form_params.combine_under_n_chars,
+                max_characters=form_params.max_characters,
+                multipage_sections=form_params.multipage_sections,
+                new_after_n_chars=form_params.new_after_n_chars,
+                overlap=form_params.overlap,
+                overlap_all=form_params.overlap_all,
             )
 
             if not is_compatible_response_type(media_type, type(response)):

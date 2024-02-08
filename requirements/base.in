@@ -1,6 +1,5 @@
 -c constraints.in
 unstructured[local-inference]>=0.8.1
-pydantic<2.0.2
 # Pinning click due to a unicode issue in black
 # can remove after black drops support for Python 3.6
 # ref: https://github.com/psf/black/issues/2964
