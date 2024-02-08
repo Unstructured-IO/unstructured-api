@@ -45,7 +45,6 @@ class GeneralFormParams(BaseModel):
                 description="The languages present in the document, for use in partitioning and/or OCR",
                 example="[eng]",
             ),
-            # BeforeValidator(SmartValueParser[List[str]]().value_or_first_element),
         ] = [],  # noqa
         ocr_languages: Annotated[
             List[str],
