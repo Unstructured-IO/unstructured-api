@@ -1,3 +1,9 @@
+## 0.0.64
+* Bump Pydantic to 2.5.x and remove it from explicit dependencies list (will be managed by fastapi)
+* Introduce Form params description in the code, which will form openapi and swagger documentation
+* Roll back some openapi customizations
+* Keep backward compatibility for passing parameters in form of `list[str]` (will not be shown in the documentation)
+
 ## 0.0.63
 
 * Bump unstructured to 0.12.2
