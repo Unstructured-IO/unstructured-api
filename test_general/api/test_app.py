@@ -574,7 +574,7 @@ def test_parallel_mode_passes_params(monkeypatch):
         pdf_infer_table_structure=True,
         strategy="hi_res",
         xml_keep_tags=True,
-        skip_infer_table_types="foo",
+        skip_infer_table_types=["foo"],
         extract_image_block_types=None,
         extract_image_block_to_payload=False,
         # -- chunking options --
