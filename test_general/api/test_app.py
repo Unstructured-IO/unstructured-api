@@ -543,18 +543,20 @@ def test_parallel_mode_passes_params(monkeypatch):
         data={
             "encoding": "foo",
             "hi_res_model_name": "yolox",
-            "include_page_breaks": True,
-            # "ocr_languages": "foo",
+            "include_page_breaks": "True",
             "languages": "foo",
-            "pdf_infer_table_structure": True,
+            "pdf_infer_table_structure": "True",
             "strategy": "hi_res",
-            "xml_keep_tags": True,
-            "skip_infer_table_types": ["foo"],
+            "xml_keep_tags": "True",
+            "skip_infer_table_types": "foo",
+            # -- chunking options --
             "chunking_strategy": "by_title",
-            "multipage_sections": False,
-            "combine_under_n_chars": 501,
-            "new_after_n_chars": 1501,
-            "max_characters": 1502,
+            "combine_under_n_chars": "501",
+            "max_characters": "1502",
+            "multipage_sections": "False",
+            "new_after_n_chars": "1501",
+            "overlap": "25",
+            "overlap_all": "true",
         },
     )
 
@@ -572,14 +574,17 @@ def test_parallel_mode_passes_params(monkeypatch):
         pdf_infer_table_structure=True,
         strategy="hi_res",
         xml_keep_tags=True,
-        skip_infer_table_types=["foo"],
-        chunking_strategy="by_title",
-        multipage_sections=False,
-        combine_text_under_n_chars=501,
-        new_after_n_chars=1501,
-        max_characters=1502,
+        skip_infer_table_types="foo",
         extract_image_block_types=None,
         extract_image_block_to_payload=False,
+        # -- chunking options --
+        chunking_strategy="by_title",
+        combine_text_under_n_chars=501,
+        max_characters=1502,
+        multipage_sections=False,
+        new_after_n_chars=1501,
+        overlap=25,
+        overlap_all=True,
     )
 
 
