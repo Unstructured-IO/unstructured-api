@@ -345,7 +345,7 @@ As mentioned above, processing a pdf using `hi_res` is currently a slow operatio
 You may also set the optional `UNSTRUCTURED_API_KEY` env variable to enable request validation for your self-hosted instance of Unstructured. If set, only requests including an `unstructured-api-key` header with the same value will be fulfilled. Otherwise, the server will return a 401 indicating that the request is unauthorized.
 
 #### Controlling Server Load
-Some documents will use a lot of memory as they're being processed. To mitigate OOM errors, the server will return a 503 if the host's available memory drops below 2GB. This is configurable with `UNSTRUCTURED_MEMORY_FREE_MINIMUM_MB`.
+Some documents will use a lot of memory as they're being processed. To mitigate OOM errors, the server will return a 503 if the host's available memory drops below 2GB. This is configured with the environment variable `UNSTRUCTURED_MEMORY_FREE_MINIMUM_MB`, which defaults to 2048. You can lower this value to reduce these messages, that is, allow the server to use more memory. Otherwise, you can set to 0 to fully remove this check.
 
 ## :dizzy: Instructions for using the Docker image
 
