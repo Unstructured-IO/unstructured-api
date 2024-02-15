@@ -72,7 +72,11 @@ class SmartValueParser(Generic[T]):
             extracted_value: T | None = _return_cast_first_element(value, origin_class)
             return extracted_value
         elif isinstance(value, list) and origin_class == list and container_elems_class:
-            return [_cast_to_type(elem, container_elems_class) for elem in value]
+            if len(value) > 1:
+                return [_cast_to_type(elem, container_elems_class) for elem in value]
+            is_list, result = is_convertible_to_list(value[0])
+            new_value = result if is_list else value
+            return [_cast_to_type(elem, container_elems_class) for elem in new_value]
         return _cast_to_type(value, origin_class)  # noqa
 
     def _get_origin_container_classes(self) -> tuple[type, type | None]:
