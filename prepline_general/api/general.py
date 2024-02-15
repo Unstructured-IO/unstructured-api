@@ -359,16 +359,6 @@ def pipeline_api(
 
     ocr_languages_str = "+".join(ocr_languages) if ocr_languages and len(ocr_languages) else None
 
-    if extract_image_block_types:
-        try:
-            # Handle the case when the user passes the table of strings as a json inside the
-            # first element of the array
-            loaded_array = json.loads(extract_image_block_types[0])
-            if isinstance(loaded_array, list):
-                extract_image_block_types = loaded_array
-        except (json.JSONDecodeError, IndexError):
-            pass  # noqa
-
     extract_image_block_to_payload = bool(extract_image_block_types)
 
     try:
