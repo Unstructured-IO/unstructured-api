@@ -1,4 +1,5 @@
-from typing import TypeVar, Union, List, Optional, Generic, get_origin, get_args, Type, Any
+import json
+from typing import TypeVar, Union, List, Optional, Generic, get_origin, get_args, Type, Any, Tuple
 
 T = TypeVar("T")
 E = TypeVar("E")
@@ -35,6 +36,19 @@ def _return_cast_first_element(values: list[E], origin_class: type) -> E | None:
     if value is not None:
         return _cast_to_type(value, origin_class)  # noqa
     return value
+
+
+def is_convertible_to_list(s: str) -> Tuple[bool, Union[List, str]]:
+    """Determines if a given string is convertible to a list by attempting to parse it as JSON."""
+
+    try:
+        result = json.loads(s)
+        if isinstance(result, list):
+            return True, result  # Return the list if conversion is successful
+        else:
+            return False, "Input is valid JSON but not a list."  # Valid JSON but not a list
+    except json.JSONDecodeError:
+        return False, "Input is not valid JSON."  # Invalid JSON
 
 
 class SmartValueParser(Generic[T]):
