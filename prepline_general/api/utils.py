@@ -74,7 +74,7 @@ class SmartValueParser(Generic[T]):
         elif isinstance(value, list) and origin_class == list and container_elems_class:
             if len(value) > 1:
                 return [_cast_to_type(elem, container_elems_class) for elem in value]
-            is_list, result = is_convertible_to_list(value[0])
+            is_list, result = is_convertible_to_list(str(value[0]))
             new_value = result if is_list else value
             return [_cast_to_type(elem, container_elems_class) for elem in new_value]
         return _cast_to_type(value, origin_class)  # noqa
