@@ -135,7 +135,7 @@ class GeneralFormParams(BaseModel):
                 description="If True and strategy=hi_res, any Table Elements extracted from a PDF will include an additional metadata field, 'text_as_html', where the value (string) is a just a transformation of the data into an HTML <table>.",
             ),
             BeforeValidator(SmartValueParser[bool]().value_or_first_element),
-        ] = False,
+        ] = True,
         strategy: Annotated[
             Literal["fast", "hi_res", "auto", "ocr_only"],
             Form(
