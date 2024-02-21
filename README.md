@@ -141,21 +141,6 @@ When elements are extracted from PDFs or images, it may be useful to get their b
   | jq -C . | less -R
 ```
 
-#### PDF Table Extraction
-
-To extract the table structure from PDF files using the `hi_res` strategy, ensure that the `pdf_infer_table_structure` parameter is set to `true`. This setting includes the table's text content in the response. By default, this parameter is set to `false` to avoid the expensive reading process.
-
-```
- curl -X 'POST' \
-  'https://api.unstructured.io/general/v0/general' \
-  -H 'accept: application/json' \
-  -H 'Content-Type: multipart/form-data' \
-  -F 'files=@sample-docs/layout-parser-paper.pdf' \
-  -F 'strategy=hi_res' \
-  -F 'pdf_infer_table_structure=true' \
-  | jq -C . | less -R
-```
-
 #### Skip Table Extraction
 
 Currently, we provide support for enabling and disabling table extraction for file types other than PDF files. Set parameter `skip_infer_table_types` to specify the document types that you want to skip table extraction with. By default, we skip table extraction
@@ -171,6 +156,8 @@ for PDFs and Images, which are `pdf`, `jpg` and `png`. Again, please note that t
   -F 'skip_infer_table_types=[]' \
   | jq -C . | less -R
 ```
+
+For `pdf` files, if `pdf_infer_table_structure` is set to `true` (default), tables will be extracted regardless of `skip_infer_table_types` value.
 
 #### Encoding
 
