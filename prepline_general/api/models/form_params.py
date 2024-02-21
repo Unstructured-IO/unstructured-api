@@ -52,6 +52,7 @@ class GeneralFormParams(BaseModel):
                 description="The languages present in the document, for use in partitioning and/or OCR",
                 example="[eng]",
             ),
+            BeforeValidator(SmartValueParser[List[str]]().value_or_first_element),
         ] = [],  # noqa
         ocr_languages: Annotated[
             List[str],
@@ -149,6 +150,7 @@ class GeneralFormParams(BaseModel):
                 description="The types of elements to extract, for use in extracting image blocks as base64 encoded data stored in metadata fields",
                 example="""["image", "table"]""",
             ),
+            BeforeValidator(SmartValueParser[List[str]]().value_or_first_element),
         ] = [],  # noqa
         # -- chunking options --
         chunking_strategy: Annotated[
