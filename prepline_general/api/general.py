@@ -357,8 +357,6 @@ def pipeline_api(
     enable_parallel_mode = os.environ.get("UNSTRUCTURED_PARALLEL_MODE_ENABLED", "false")
     pdf_parallel_mode_enabled = enable_parallel_mode == "true"
 
-    ocr_languages_str = "+".join(ocr_languages) if ocr_languages and len(ocr_languages) else None
-
     extract_image_block_to_payload = bool(extract_image_block_types)
 
     try:
@@ -368,7 +366,7 @@ def pipeline_api(
                     {
                         "content_type": file_content_type,
                         "strategy": strategy,
-                        "ocr_languages": ocr_languages_str,
+                        "ocr_languages": ocr_languages,
                         "coordinates": coordinates,
                         "pdf_infer_table_structure": pdf_infer_table_structure,
                         "include_page_breaks": include_page_breaks,
@@ -399,7 +397,7 @@ def pipeline_api(
             "encoding": encoding,
             "include_page_breaks": include_page_breaks,
             "hi_res_model_name": hi_res_model_name,
-            "ocr_languages": ocr_languages_str,
+            "ocr_languages": ocr_languages,
             "pdf_infer_table_structure": pdf_infer_table_structure,
             "skip_infer_table_types": skip_infer_table_types,
             "strategy": strategy,
