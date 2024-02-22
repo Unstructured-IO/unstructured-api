@@ -149,7 +149,7 @@ def test_ocr_languages_param():  # will eventually be depricated
     response = client.post(
         MAIN_API_ROUTE,
         files=[("files", (str(test_file), open(test_file, "rb")))],
-        data={"strategy": "ocr_only", "ocr_languages": ["eng", "kor"]},
+        data={"strategy": "ocr_only", "ocr_languages": "eng+kor"},
     )
 
     assert response.status_code == 200
