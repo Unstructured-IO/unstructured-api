@@ -1,3 +1,6 @@
+## 0.0.65-dev0
+* Fix `ocr_languages` parameter type from `List[str]` to `str`
+
 ## 0.0.64
 * Bump Pydantic to 2.5.x and remove it from explicit dependencies list (will be managed by fastapi)
 * Introduce Form params description in the code, which will form openapi and swagger documentation
