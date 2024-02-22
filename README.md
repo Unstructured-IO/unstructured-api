@@ -96,8 +96,7 @@ curl -X 'POST' \
   -H 'Content-Type: multipart/form-data' \
   -F 'files=@sample-docs/english-and-korean.png' \
   -F 'strategy=ocr_only' \
-  -F 'ocr_languages=eng'  \
-  -F 'ocr_languages=kor'  \
+  -F 'ocr_languages=eng+kor' \
   | jq -C . | less -R
 ```
 
