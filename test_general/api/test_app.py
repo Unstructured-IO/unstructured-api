@@ -968,3 +968,30 @@ def test_get_request():
     response = client.get("/general/v0/general")
     assert response.status_code == 405
     assert response.json() == {"detail": "Only POST requests are supported."}
+
+
+def test_output_type_csv():
+    client = TestClient(app)
+    test_file = Path("sample-docs") / "family-day.eml"
+    response = client.post(
+        MAIN_API_ROUTE,
+        files=[("files", (str(test_file), open(test_file, "rb")))],
+        data={"output_format": "text/csv"},
+    )
+    assert response.status_code == 200
+    assert len(response.text.splitlines()) == 9
+    assert ",Make sure to RSVP!,family-day.eml," in response.text.splitlines()[4]
+
+
+def test_output_type_csv_ignore_specified_accept_header():
+    client = TestClient(app)
+    test_file = Path("sample-docs") / "family-day.eml"
+    response = client.post(
+        MAIN_API_ROUTE,
+        files=[("files", (str(test_file), open(test_file, "rb")))],
+        data={"output_format": "text/csv"},
+        headers={"accept": "application/json"},
+    )
+    assert response.status_code == 200
+    assert len(response.text.splitlines()) == 9
+    assert ",Make sure to RSVP!,family-day.eml," in response.text.splitlines()[4]
