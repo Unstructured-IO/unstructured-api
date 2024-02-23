@@ -214,6 +214,18 @@
                         "description": "If chunking strategy is set, cut off new sections after reaching a length of n chars (hard max). Default: 1500",
                         "example": 1500
                     },
+                    "overlap": {
+                        "type": "integer",
+                        "title": "Intra-chunk overlap",
+                        "description": "A prefix of this many trailing characters from prior text-split chunk is applied to second and later chunks formed from oversized elements by text-splitting. Default: None",
+                        "example": 25
+                    },
+                    "overlap_all": {
+                        "type": "bool",
+                        "title": "Inter-chunk overlap",
+                        "description": "When True, overlap is also applied to 'normal' chunks formed by combining whole elements. Use with caution as this can introduce noise into otherwise clean semantic units. Default: None",
+                        "example": 1500
+                    },
                     "extract_image_block_types": {
                         "items": {
                             "type": "string",
