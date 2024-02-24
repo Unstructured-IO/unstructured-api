@@ -1,4 +1,5 @@
-from typing import TypeVar, Union, List, Optional, Generic, get_origin, get_args, Type, Any
+import json
+from typing import TypeVar, Union, List, Optional, Generic, get_origin, get_args, Type, Any, Tuple
 
 T = TypeVar("T")
 E = TypeVar("E")
@@ -37,6 +38,19 @@ def _return_cast_first_element(values: list[E], origin_class: type) -> E | None:
     return value
 
 
+def is_convertible_to_list(s: str) -> Tuple[bool, Union[List, str]]:
+    """Determines if a given string is convertible to a list by attempting to parse it as JSON."""
+
+    try:
+        result = json.loads(s)
+        if isinstance(result, list):
+            return True, result  # Return the list if conversion is successful
+        else:
+            return False, "Input is valid JSON but not a list."  # Valid JSON but not a list
+    except json.JSONDecodeError:
+        return False, "Input is not valid JSON."  # Invalid JSON
+
+
 class SmartValueParser(Generic[T]):
     """Class handle api parameters that are passed in form of a specific value or as a list of strings from which
     the first element is used, cast to a proper type
@@ -58,6 +72,10 @@ class SmartValueParser(Generic[T]):
             extracted_value: T | None = _return_cast_first_element(value, origin_class)
             return extracted_value
         elif isinstance(value, list) and origin_class == list and container_elems_class:
+            if len(value) == 1:
+                is_list, result = is_convertible_to_list(str(value[0]))
+                new_value = result if is_list else value
+                return [_cast_to_type(elem, container_elems_class) for elem in new_value]
             return [_cast_to_type(elem, container_elems_class) for elem in value]
         return _cast_to_type(value, origin_class)  # noqa
 
