@@ -22,7 +22,7 @@ def send_document(
     content_type: str = "",
     strategy: str = "auto",
     output_format: str = "application/json",
-    pdf_infer_table_structure: str = "false",
+    skip_infer_table_types=[],
     uncompressed_content_type: str = "",
 ):
     if filenames_gzipped is None:
@@ -36,7 +36,7 @@ def send_document(
     options = {
         "strategy": strategy,
         "output_format": output_format,
-        "pdf_infer_table_structure": pdf_infer_table_structure,
+        "skip_infer_table_types": skip_infer_table_types,
     }
     if uncompressed_content_type:
         options["gz_uncompressed_content_type"] = uncompressed_content_type
@@ -224,15 +224,15 @@ def test_strategy_performance():
 
 @pytest.mark.skipif(skip_inference_tests, reason="emulated architecture")
 @pytest.mark.parametrize(
-    "strategy, pdf_infer_table_structure, expected_table_num",
+    "strategy, skip_infer_table_types, expected_table_num",
     [
-        ("fast", "True", 0),
-        ("fast", "False", 0),
-        ("hi_res", "True", 2),
-        ("hi_res", "False", 0),
+        ("fast", [], 0),
+        ("fast", ["pdf"], 0),
+        ("hi_res", [], 2),
+        ("hi_res", ["pdf"], 0),
     ],
 )
-def test_table_support(strategy: str, pdf_infer_table_structure: str, expected_table_num: int):
+def test_table_support(strategy: str, skip_infer_table_types: list[str], expected_table_num: int):
     """
     Test that table extraction works on hi_res strategy
     """
@@ -241,7 +241,7 @@ def test_table_support(strategy: str, pdf_infer_table_structure: str, expected_t
         filenames=[test_file],
         content_type="application/pdf",
         strategy=strategy,
-        pdf_infer_table_structure=pdf_infer_table_structure,
+        skip_infer_table_types=skip_infer_table_types,
     )
 
     assert response.status_code == 200
