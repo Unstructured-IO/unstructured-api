@@ -73,11 +73,7 @@ class GeneralFormParams(BaseModel):
                 example="['pdf', 'jpg', 'png']",
             ),
             BeforeValidator(SmartValueParser[List[str]]().value_or_first_element),
-        ] = [
-            "pdf",
-            "jpg",
-            "png",
-        ],  # noqa
+        ] = [],  # noqa
         gz_uncompressed_content_type: Annotated[
             Optional[str],
             Form(
