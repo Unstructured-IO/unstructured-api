@@ -970,7 +970,7 @@ def test_get_request():
     assert response.json() == {"detail": "Only POST requests are supported."}
 
 
-def test_output_type_csv():
+def test_output_format_csv():
     client = TestClient(app)
     test_file = Path("sample-docs") / "family-day.eml"
     response = client.post(
@@ -979,11 +979,12 @@ def test_output_type_csv():
         data={"output_format": "text/csv"},
     )
     assert response.status_code == 200
-    assert len(response.text.splitlines()) == 9
-    assert ",Make sure to RSVP!,family-day.eml," in response.text.splitlines()[4]
+    df = pd.read_csv(io.StringIO(response.text))
+    assert len(df) == 8
+    assert df["text"][3] == "Make sure to RSVP!"
 
 
-def test_output_type_csv_ignore_specified_accept_header():
+def test_output_format_csv_ignore_specified_accept_header():
     client = TestClient(app)
     test_file = Path("sample-docs") / "family-day.eml"
     response = client.post(
@@ -993,5 +994,6 @@ def test_output_type_csv_ignore_specified_accept_header():
         headers={"accept": "application/json"},
     )
     assert response.status_code == 200
-    assert len(response.text.splitlines()) == 9
-    assert ",Make sure to RSVP!,family-day.eml," in response.text.splitlines()[4]
+    df = pd.read_csv(io.StringIO(response.text))
+    assert len(df) == 8
+    assert df["text"][3] == "Make sure to RSVP!"
