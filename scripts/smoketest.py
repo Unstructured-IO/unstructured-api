@@ -124,6 +124,9 @@ def test_happy_path(example_filename: str, content_type: str):
         # compressed and uncompressed
         (["layout-parser-paper-fast.pdf"], ["list-item-example.pdf"], "application/pdf"),
         (["fake-email.eml"], ["fake-email-image-embedded.eml"], "message/rfc822"),
+        # compressed and uncompressed, guess the content-type
+        (["layout-parser-paper-fast.pdf"], ["list-item-example.pdf"], ""),
+        (["fake-email.eml"], ["fake-email-image-embedded.eml"], ""),
     ],
 )
 def test_gzip_sending(
