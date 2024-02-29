@@ -18,7 +18,7 @@ MAIN_API_ROUTE = "general/v0/general"
 
 @pytest.mark.parametrize("output_format", ["application/json", "text/csv"])
 @pytest.mark.parametrize(
-    "filenames_to_gzip, filenames_no_gzip, uncompressed_content_type",
+    "filenames_to_gzip, filenames_verbatim, uncompressed_content_type",
     [
         # fmt: off
         (["fake-html.html"], [], "text/html"),
@@ -46,15 +46,14 @@ MAIN_API_ROUTE = "general/v0/general"
 def test_gzipped_files_are_parsed_like_original(
     output_format: str,
     filenames_to_gzip: List[str],
-    filenames_no_gzip: List[str],
+    filenames_verbatim: List[str],
     uncompressed_content_type: str,
 ):
     """
-    Verify that API supports unzipping gzip and correctly interprets gz_uncompressed_content_type
+    Verify that API supports un-gzipping and correctly interprets gz_uncompressed_content_type,
     by comparing response to directly parsing the same files.
     The one thing which changes is the filenames in metadata, which have to be ignored.
     """
-
     client = TestClient(app)
     gz_options = {
         "gz_uncompressed_content_type": (
@@ -63,17 +62,17 @@ def test_gzipped_files_are_parsed_like_original(
         "output_format": output_format,
     }
     response1 = get_gzipped_response(
-        client, filenames_to_gzip, filenames_no_gzip, gz_options, uncompressed_content_type
+        client, filenames_to_gzip, filenames_verbatim, gz_options, uncompressed_content_type
     )
     response2 = call_api(
         client,
         [],
-        filenames_to_gzip + filenames_no_gzip,
+        filenames_to_gzip + filenames_verbatim,
         uncompressed_content_type,
         {"output_format": output_format},
     )
     compare_responses(
-        response1, response2, output_format, len(filenames_to_gzip + filenames_no_gzip)
+        response1, response2, output_format, len(filenames_to_gzip + filenames_verbatim)
     )
 
 
@@ -103,17 +102,18 @@ def compare_responses(
 def call_api(
     client: TestClient,
     filenames_gzipped: List[str],
-    filenames: List[str],
+    filenames_verbatim: List[str],
     content_type: str,
     options: dict,
+    samples_dir: str = "sample-docs",
 ) -> httpx.Response:
     files = []
     for filename in filenames_gzipped:
-        full_path = Path("sample-docs") / filename
+        full_path = Path(samples_dir) / filename
         files.append(("files", (str(full_path), open(full_path, "rb"), "application/gzip")))
 
-    for filename in filenames:
-        full_path = Path("sample-docs") / filename
+    for filename in filenames_verbatim:
+        full_path = Path(samples_dir) / filename
         files.append(("files", (str(full_path), open(full_path, "rb"), content_type)))
 
     response = client.post(
@@ -129,27 +129,28 @@ def call_api(
 def get_gzipped_response(
     client: TestClient,
     filenames_to_gzip: List[str],
-    filenames_no_gzip: List[str],
+    filenames_verbatim: List[str],
     options: dict,
     content_type: str,
+    samples_dir: str = "sample-docs",
 ) -> httpx.Response:
     """
-    Gzips the filenames_to_gzip into temporary .gz file and sends to API, along with filenames_no_gzip.
+    G-zips the filenames_to_gzip into temporary .gz file and sends to API, along with filenames_no_gzip.
     """
-    tempfiles = {}
+    temp_files = {}
     for filename in filenames_to_gzip:
         gz_file_extension = f".{Path(filename).suffix}.gz"
         temp_file = tempfile.NamedTemporaryFile(suffix=gz_file_extension)
-        full_path = Path("sample-docs") / filename
+        full_path = Path(samples_dir) / filename
         gzip_file(str(full_path), temp_file.name)
-        tempfiles[filename] = temp_file
+        temp_files[filename] = temp_file
 
-    gzipped = [temp_file.name for temp_file in tempfiles.values()]
+    filenames_gzipped = [temp_file.name for temp_file in temp_files.values()]
 
-    response = call_api(client, gzipped, filenames_no_gzip, content_type, options)
+    response = call_api(client, filenames_gzipped, filenames_verbatim, content_type, options)
 
     for filename in filenames_to_gzip:
-        tempfiles[filename].close()
+        temp_files[filename].close()
 
     return response
 
