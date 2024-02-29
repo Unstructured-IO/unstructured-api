@@ -142,7 +142,7 @@ def get_gzipped_response(
     """
     temp_files = {}
     for filename in filenames_to_gzip:
-        gz_file_extension = f".{Path(filename).suffix}.gz"
+        gz_file_extension = f"{Path(filename).suffix}.gz"
         temp_file = tempfile.NamedTemporaryFile(suffix=gz_file_extension)
         full_path = Path(samples_dir) / filename
         gzip_file(str(full_path), temp_file.name)

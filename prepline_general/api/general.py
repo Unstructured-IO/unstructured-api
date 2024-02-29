@@ -53,9 +53,7 @@ def is_compatible_response_type(media_type: str, response_type: type) -> bool:
     return (
         False
         if media_type == "application/json" and response_type not in [dict, list]
-        else False
-        if media_type == "text/csv" and response_type != str
-        else True
+        else False if media_type == "text/csv" and response_type != str else True
     )
 
 
@@ -748,7 +746,9 @@ def general_partition(
 
     # -- unzip any uploaded files that need it --
     for file_index in range(len(files)):
-        if files[file_index].content_type == "application/gzip" or files[file_index].filename.endswith(".gz"):
+        if files[file_index].content_type == "application/gzip" or files[
+            file_index
+        ].filename.endswith(".gz"):
             files[file_index] = ungz_file(
                 files[file_index], form_params.gz_uncompressed_content_type
             )
