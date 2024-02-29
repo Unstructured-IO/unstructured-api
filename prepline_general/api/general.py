@@ -746,9 +746,10 @@ def general_partition(
 
     # -- unzip any uploaded files that need it --
     for file_index in range(len(files)):
-        if files[file_index].content_type == "application/gzip" or files[
-            file_index
-        ].filename.endswith(".gz"):
+        is_content_type_gz = files[file_index].content_type == "application/gzip"
+        filename = files[file_index].filename
+        is_extension_gz = filename and filename.endswith(".gz")
+        if is_content_type_gz or is_extension_gz:
             files[file_index] = ungz_file(
                 files[file_index], form_params.gz_uncompressed_content_type
             )
