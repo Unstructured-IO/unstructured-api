@@ -1,3 +1,4 @@
+import io
 import os
 import time
 from pathlib import Path
@@ -5,7 +6,6 @@ from pathlib import Path
 import pytest
 import requests
 import pandas as pd
-import io
 
 API_URL = "http://localhost:8000/general/v0/general"
 # NOTE(rniko): Skip inference tests if we're running on an emulated architecture
@@ -13,17 +13,13 @@ skip_inference_tests = os.getenv("SKIP_INFERENCE_TESTS", "").lower() in {"true",
 
 
 def send_document(
-    filename,
-    content_type,
-    strategy="auto",
-    output_format="application/json",
-    pdf_infer_table_structure="false",
+    filename: str,
+    content_type: str,
+    strategy: str = "auto",
+    output_format: str = "application/json",
+    pdf_infer_table_structure: str = "false",
 ):
-    # Note: `content_type` is not passed into request since fast API will overwrite it.
-    if str(filename).endswith(".gz"):
-        files = {"files": (str(filename), open(filename, "rb"), "application/gzip")}
-    else:
-        files = {"files": (str(filename), open(filename, "rb"))}
+    files = {"files": (str(filename), open(filename, "rb"), content_type)}
     return requests.post(
         API_URL,
         files=files,
@@ -84,7 +80,7 @@ def send_document(
         ("layout-parser-paper.pdf.gz", "application/gzip"),
     ],
 )
-def test_happy_path(example_filename, content_type):
+def test_happy_path(example_filename: str, content_type: str):
     """
     For the files in sample-docs, verify that we get a 200
     and some structured response
@@ -142,7 +138,7 @@ def test_strategy_performance():
         ("hi_res", "False", 0),
     ],
 )
-def test_table_support(strategy, pdf_infer_table_structure, expected_table_num):
+def test_table_support(strategy: str, pdf_infer_table_structure: str, expected_table_num: int):
     """
     Test that table extraction works on hi_res strategy
     """
