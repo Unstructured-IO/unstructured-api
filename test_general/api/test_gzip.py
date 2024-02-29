@@ -18,28 +18,36 @@ MAIN_API_ROUTE = "general/v0/general"
 
 @pytest.mark.parametrize("output_format", ["application/json", "text/csv"])
 @pytest.mark.parametrize(
-    "example_filenames, uncompressed_content_type",
+    "filenames_to_gzip, filenames_no_gzip, uncompressed_content_type",
     [
-        (["fake-html.html"], "text/html"),
-        (["stanley-cups.csv"], "application/csv"),
-        (["fake.doc"], "application/msword"),
-        (["layout-parser-paper-fast.pdf"], "application/pdf"),
-        (["fake-email-attachment.eml", "fake-email.eml"], "message/rfc822"),
-        (
-            ["fake-email-attachment.eml", "fake-email.eml", "fake-email-image-embedded.eml"],
-            "message/rfc822",
-        ),
-        (["layout-parser-paper-fast.pdf", "list-item-example.pdf"], "application/pdf"),
+        # fmt: off
+        (["fake-html.html"], [], "text/html"),
+        (["stanley-cups.csv"], [], "application/csv"),
+        (["fake.doc"], [], "application/msword"),
+        (["layout-parser-paper-fast.pdf"], [], "application/pdf"),
+        (["fake-email-attachment.eml", "fake-email.eml"], [], "message/rfc822"),
+        (["fake-email-attachment.eml", "fake-email.eml", "fake-email-image-embedded.eml"], [], "message/rfc822"),
+        (["layout-parser-paper-fast.pdf", "list-item-example.pdf"], [], "application/pdf"),
         # now the same but without explicit content type
         # to make the system guess the un-gzipped type based on content.
-        (["fake-html.html"], ""),
-        (["fake-email-attachment.eml", "fake-email.eml"], ""),
-        (["layout-parser-paper-fast.pdf", "list-item-example.pdf"], ""),
-        # case with already gzipped file
+        (["fake-html.html"], [], ""),
+        (["fake-email-attachment.eml", "fake-email.eml"], [], ""),
+        (["layout-parser-paper-fast.pdf", "list-item-example.pdf"], [], ""),
+        # mix of compressed and uncompressed
+        (["layout-parser-paper-fast.pdf"], ["list-item-example.pdf"], "application/pdf"),
+        # mix of compressed and uncompressed, and guessing of content type
+        (["layout-parser-paper-fast.pdf"], ["list-item-example.pdf"], ""),
+        # have to use OCR which is slow, so minimum cases
+        (["embedded-images-tables.jpg"], ["english-and-korean.png"], "image/png"),
+        (["embedded-images-tables.jpg"], ["english-and-korean.png"], ""),
+        # fmt: on
     ],
 )
-def test_multiple_gzipped_file_is_parsed_same_as_original_explicit_gz_type(
-    output_format: str, example_filenames: List[str], uncompressed_content_type: str
+def test_gzipped_files_are_parsed_like_original(
+    output_format: str,
+    filenames_to_gzip: List[str],
+    filenames_no_gzip: List[str],
+    uncompressed_content_type: str,
 ):
     """
     Verify that API supports unzipping gzip and correctly interprets gz_uncompressed_content_type
@@ -54,13 +62,19 @@ def test_multiple_gzipped_file_is_parsed_same_as_original_explicit_gz_type(
         ),
         "output_format": output_format,
     }
-    # Gzips the example_filenames into temporary file and sends to API
-    response1 = get_gzipped_response(client, example_filenames, gz_options)
-    # Sends original files to API
-    response2 = call_api(
-        client, example_filenames, uncompressed_content_type, {"output_format": output_format}
+    response1 = get_gzipped_response(
+        client, filenames_to_gzip, filenames_no_gzip, gz_options, uncompressed_content_type
     )
-    compare_responses(response1, response2, output_format, len(example_filenames))
+    response2 = call_api(
+        client,
+        [],
+        filenames_to_gzip + filenames_no_gzip,
+        uncompressed_content_type,
+        {"output_format": output_format},
+    )
+    compare_responses(
+        response1, response2, output_format, len(filenames_to_gzip + filenames_no_gzip)
+    )
 
 
 def compare_responses(
@@ -87,16 +101,24 @@ def compare_responses(
 
 
 def call_api(
-    client: TestClient, filenames: List[str], content_type: str, options: dict
+    client: TestClient,
+    filenames_gzipped: List[str],
+    filenames: List[str],
+    content_type: str,
+    options: dict,
 ) -> httpx.Response:
-    ff = []
+    files = []
+    for filename in filenames_gzipped:
+        full_path = Path("sample-docs") / filename
+        files.append(("files", (str(full_path), open(full_path, "rb"), "application/gzip")))
+
     for filename in filenames:
         full_path = Path("sample-docs") / filename
-        ff.append(("files", (str(full_path), open(full_path, "rb"), content_type)))
+        files.append(("files", (str(full_path), open(full_path, "rb"), content_type)))
 
     response = client.post(
         MAIN_API_ROUTE,
-        files=ff,
+        files=files,
         data=options,
     )
     assert response.status_code == 200, response.text
@@ -104,20 +126,29 @@ def call_api(
     return response
 
 
-def get_gzipped_response(client: TestClient, filenames: List[str], options: dict) -> httpx.Response:
+def get_gzipped_response(
+    client: TestClient,
+    filenames_to_gzip: List[str],
+    filenames_no_gzip: List[str],
+    options: dict,
+    content_type: str,
+) -> httpx.Response:
+    """
+    Gzips the filenames_to_gzip into temporary .gz file and sends to API, along with filenames_no_gzip.
+    """
     tempfiles = {}
-    for filename in filenames:
+    for filename in filenames_to_gzip:
         gz_file_extension = f".{Path(filename).suffix}.gz"
         temp_file = tempfile.NamedTemporaryFile(suffix=gz_file_extension)
         full_path = Path("sample-docs") / filename
         gzip_file(str(full_path), temp_file.name)
         tempfiles[filename] = temp_file
 
-    response = call_api(
-        client, [temp_file.name for temp_file in tempfiles.values()], "application/gzip", options
-    )
+    gzipped = [temp_file.name for temp_file in tempfiles.values()]
 
-    for filename in filenames:
+    response = call_api(client, gzipped, filenames_no_gzip, content_type, options)
+
+    for filename in filenames_to_gzip:
         tempfiles[filename].close()
 
     return response
