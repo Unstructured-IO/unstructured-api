@@ -20,13 +20,16 @@ MAIN_API_ROUTE = "general/v0/general"
 @pytest.mark.parametrize(
     "filenames_to_gzip, filenames_verbatim, uncompressed_content_type",
     [
-        # fmt: off
         (["fake-html.html"], [], "text/html"),
         (["stanley-cups.csv"], [], "application/csv"),
         (["fake.doc"], [], "application/msword"),
         (["layout-parser-paper-fast.pdf"], [], "application/pdf"),
         (["fake-email-attachment.eml", "fake-email.eml"], [], "message/rfc822"),
-        (["fake-email-attachment.eml", "fake-email.eml", "fake-email-image-embedded.eml"], [], "message/rfc822"),
+        (
+            ["fake-email-attachment.eml", "fake-email.eml", "fake-email-image-embedded.eml"],
+            [],
+            "message/rfc822",
+        ),
         (["layout-parser-paper-fast.pdf", "list-item-example.pdf"], [], "application/pdf"),
         # now the same but without explicit content type
         # to make the system guess the un-gzipped type based on content.
@@ -40,7 +43,6 @@ MAIN_API_ROUTE = "general/v0/general"
         # have to use OCR which is slow, so minimum cases
         (["embedded-images-tables.jpg"], ["english-and-korean.png"], "image/png"),
         (["embedded-images-tables.jpg"], ["english-and-korean.png"], ""),
-        # fmt: on
     ],
 )
 def test_gzipped_files_are_parsed_like_original(
@@ -135,7 +137,8 @@ def get_gzipped_response(
     samples_dir: str = "sample-docs",
 ) -> httpx.Response:
     """
-    G-zips the filenames_to_gzip into temporary .gz file and sends to API, along with filenames_no_gzip.
+    G-zips the filenames_to_gzip into temporary .gz file and sends to API,
+    along with filenames_no_gzip.
     """
     temp_files = {}
     for filename in filenames_to_gzip:
