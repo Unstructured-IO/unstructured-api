@@ -186,15 +186,12 @@ curl -X 'POST' \
  -H 'accept: application/json'  \
  -H 'Content-Type: multipart/form-data' \
  -F 'gz_uncompressed_content_type=application/pdf' \
- -F 'files=@sample-docs/layout-parser-paper.pdf.gz;type=application/gzip' 
+ -F 'files=@sample-docs/layout-parser-paper.pdf.gz' 
 ```
 
 If field `gz_uncompressed_content_type` is set, the API will use its value as content-type of all files
 after uncompressing the .gz files that are sent in single batch. If not set, the API will use
 various heuristics to detect the filetypes after uncompressing from .gz.
-
-Note when using curl: the `;type=application/gzip` at end of `files` field needs to be set, as curl 
-might not detect the correct type of gzip file.
 
 #### XML Tags
 
