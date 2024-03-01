@@ -381,7 +381,14 @@ def test_include_page_breaks_param():
     assert response_without_page_breaks[-1]["type"] != "PageBreak"
 
 
-def test_include_extract_image_block_types_param():
+@pytest.mark.parametrize(
+    "extract_image_block_types",
+    [
+        '["Image", "Table"]',
+        ["Image", "Table"],
+    ],
+)
+def test_include_extract_image_block_types_param(extract_image_block_types):
     """
     Verify that responses do not include base64 image in Table/Image metadata unless requested.
     """
@@ -401,7 +408,7 @@ def test_include_extract_image_block_types_param():
         response = client.post(
             MAIN_API_ROUTE,
             files=[("files", (str(test_file), file))],
-            data={"strategy": "hi_res", "extract_image_block_types": '["Image", "Table"]'},
+            data={"strategy": "hi_res", "extract_image_block_types": extract_image_block_types},
         )
 
     assert response.status_code == 200
