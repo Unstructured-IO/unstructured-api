@@ -975,3 +975,32 @@ def test_get_request():
     response = client.get("/general/v0/general")
     assert response.status_code == 405
     assert response.json() == {"detail": "Only POST requests are supported."}
+
+
+def test_output_format_csv():
+    client = TestClient(app)
+    test_file = Path("sample-docs") / "family-day.eml"
+    response = client.post(
+        MAIN_API_ROUTE,
+        files=[("files", (str(test_file), open(test_file, "rb")))],
+        data={"output_format": "text/csv"},
+    )
+    assert response.status_code == 200
+    df = pd.read_csv(io.StringIO(response.text))
+    assert len(df) == 8
+    assert df["text"][3] == "Make sure to RSVP!"
+
+
+def test_output_format_csv_ignore_specified_accept_header():
+    client = TestClient(app)
+    test_file = Path("sample-docs") / "family-day.eml"
+    response = client.post(
+        MAIN_API_ROUTE,
+        files=[("files", (str(test_file), open(test_file, "rb")))],
+        data={"output_format": "text/csv"},
+        headers={"accept": "application/json"},
+    )
+    assert response.status_code == 200
+    df = pd.read_csv(io.StringIO(response.text))
+    assert len(df) == 8
+    assert df["text"][3] == "Make sure to RSVP!"

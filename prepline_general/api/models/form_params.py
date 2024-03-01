@@ -85,7 +85,7 @@ class GeneralFormParams(BaseModel):
             ),
         ] = None,
         output_format: Annotated[
-            str,
+            Literal["application/json", "text/csv"],
             Form(
                 title="Output Format",
                 description="The format of the response. Supported formats are application/json and text/csv. Default: application/json.",
