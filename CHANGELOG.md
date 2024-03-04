@@ -1,5 +1,5 @@
 ## 0.0.65-dev0
-* Fix `ocr_languages` parameter type from `List[str]` to `str`
+* Add support for both `list[str]` and `str` input formats for `ocr_languages` parameter
 
 ## 0.0.64
 * Bump Pydantic to 2.5.x and remove it from explicit dependencies list (will be managed by fastapi)
