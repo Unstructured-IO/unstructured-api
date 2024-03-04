@@ -140,7 +140,8 @@ def test_metadata_fields_removed():
         assert "detection_class_prob" not in response_without_coords[i]["metadata"]
 
 
-def test_ocr_languages_param():  # will eventually be depricated
+@pytest.mark.parametrize("ocr_languages", [["eng", "kor"], ["eng+kor"]])
+def test_ocr_languages_param(ocr_languages):  # will eventually be deprecated
     """
     Verify that we get the corresponding languages from the response with ocr_languages
     """
@@ -149,7 +150,7 @@ def test_ocr_languages_param():  # will eventually be depricated
     response = client.post(
         MAIN_API_ROUTE,
         files=[("files", (str(test_file), open(test_file, "rb")))],
-        data={"strategy": "ocr_only", "ocr_languages": ["eng", "kor"]},
+        data={"strategy": "ocr_only", "ocr_languages": ocr_languages},
     )
 
     assert response.status_code == 200
