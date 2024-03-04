@@ -15,7 +15,7 @@ class GeneralFormParams(BaseModel):
 
     xml_keep_tags: bool
     languages: Optional[List[str]]
-    ocr_languages: Optional[str]
+    ocr_languages: Optional[List[str]]
     skip_infer_table_types: Optional[List[str]]
     gz_uncompressed_content_type: Optional[str]
     output_format: str
@@ -55,14 +55,14 @@ class GeneralFormParams(BaseModel):
             BeforeValidator(SmartValueParser[List[str]]().value_or_first_element),
         ] = [],  # noqa
         ocr_languages: Annotated[
-            Optional[str],
+            List[str],
             Form(
                 title="OCR Languages",
                 description="The languages present in the document, for use in partitioning and/or OCR",
-                example="eng",
+                example="[eng]",
             ),
-            BeforeValidator(SmartValueParser[str]().value_or_first_element),
-        ] = None,
+            # BeforeValidator(SmartValueParser[List[str]]().value_or_first_element),
+        ] = [],
         skip_infer_table_types: Annotated[
             List[str],
             Form(
@@ -216,7 +216,7 @@ level of "pollution" of otherwise clean semantic chunk boundaries. Default: Fals
         return cls(
             xml_keep_tags=xml_keep_tags,
             languages=languages if languages else None,
-            ocr_languages=ocr_languages,
+            ocr_languages=ocr_languages if ocr_languages else None,
             skip_infer_table_types=skip_infer_table_types,
             gz_uncompressed_content_type=gz_uncompressed_content_type,
             output_format=output_format,
