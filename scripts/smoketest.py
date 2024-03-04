@@ -4,7 +4,7 @@ import time
 import gzip
 import shutil
 from pathlib import Path
-from typing import List
+from typing import List, Optional
 import tempfile
 
 import pytest
@@ -18,13 +18,15 @@ skip_inference_tests = os.getenv("SKIP_INFERENCE_TESTS", "").lower() in {"true",
 
 def send_document(
     filenames: List[str],
-    filenames_gzipped: List[str],
-    content_type: str,
+    filenames_gzipped: Optional[List[str]] = None,
+    content_type: str = "",
     strategy: str = "auto",
     output_format: str = "application/json",
     pdf_infer_table_structure: str = "false",
     uncompressed_content_type: str = "",
 ):
+    if filenames_gzipped is None:
+        filenames_gzipped = []
     files = []
     for filename in filenames:
         files.append(("files", (str(filename), open(filename, "rb"), content_type)))
@@ -102,12 +104,14 @@ def test_happy_path(example_filename: str, content_type: str):
     """
     test_file = str(Path("sample-docs") / example_filename)
     print(f"sending {content_type}")
-    json_response = send_document([test_file], [], content_type)
+    json_response = send_document(filenames=[test_file], content_type=content_type)
     assert json_response.status_code == 200
     assert len(json_response.json()) > 0
     assert len("".join(elem["text"] for elem in json_response.json())) > 20
 
-    csv_response = send_document([test_file], [], content_type, output_format="text/csv")
+    csv_response = send_document(
+        filenames=[test_file], content_type=content_type, output_format="text/csv"
+    )
     assert csv_response.status_code == 200
     assert len(csv_response.text) > 0
     df = pd.read_csv(io.StringIO(csv_response.text))
@@ -124,7 +128,8 @@ def test_happy_path(example_filename: str, content_type: str):
         # compressed and uncompressed
         (["layout-parser-paper-fast.pdf"], ["list-item-example.pdf"], "application/pdf"),
         (["fake-email.eml"], ["fake-email-image-embedded.eml"], "message/rfc822"),
-        # compressed and uncompressed, guess the content-type
+        # compressed and uncompressed
+        # empty content-type means that API should detect filetype after decompressing.
         (["layout-parser-paper-fast.pdf"], ["list-item-example.pdf"], ""),
         (["fake-email.eml"], ["fake-email-image-embedded.eml"], ""),
     ],
@@ -152,7 +157,7 @@ def test_gzip_sending(
     json_response = send_document(
         filenames,
         filenames_gzipped,
-        uncompressed_content_type,
+        content_type=uncompressed_content_type,
         uncompressed_content_type=uncompressed_content_type,
     )
     assert json_response.status_code == 200, json_response.text
@@ -167,7 +172,7 @@ def test_gzip_sending(
     csv_response = send_document(
         filenames,
         filenames_gzipped,
-        uncompressed_content_type,
+        content_type=uncompressed_content_type,
         uncompressed_content_type=uncompressed_content_type,
         output_format="text/csv",
     )
@@ -196,19 +201,21 @@ def test_strategy_performance():
     test_file = str(Path("sample-docs") / "layout-parser-paper.pdf")
 
     start_time = time.monotonic()
-    response = send_document([test_file], [], content_type="application/pdf", strategy="hi_res")
+    response = send_document(
+        filenames=[test_file], content_type="application/pdf", strategy="hi_res"
+    )
     hi_res_time = time.monotonic() - start_time
     assert response.status_code == 200
 
     start_time = time.monotonic()
-    response = send_document([test_file], [], content_type="application/pdf", strategy="auto")
+    response = send_document(filenames=[test_file], content_type="application/pdf", strategy="auto")
     auto_time = time.monotonic() - start_time
     assert response.status_code == 200
 
     assert hi_res_time > performance_ratio * auto_time
 
     start_time = time.monotonic()
-    response = send_document([test_file], [], content_type="application/pdf", strategy="fast")
+    response = send_document(filenames=[test_file], content_type="application/pdf", strategy="fast")
     fast_time = time.monotonic() - start_time
     assert response.status_code == 200
 
@@ -231,9 +238,8 @@ def test_table_support(strategy: str, pdf_infer_table_structure: str, expected_t
     """
     test_file = str(Path("sample-docs") / "layout-parser-paper.pdf")
     response = send_document(
-        [test_file],
-        [],
-        "application/pdf",
+        filenames=[test_file],
+        content_type="application/pdf",
         strategy=strategy,
         pdf_infer_table_structure=pdf_infer_table_structure,
     )
