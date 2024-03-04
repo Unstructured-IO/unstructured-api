@@ -221,7 +221,7 @@
                         "example": 25
                     },
                     "overlap_all": {
-                        "type": "bool",
+                        "type": "boolean",
                         "title": "Inter-chunk overlap",
                         "description": "When True, overlap is also applied to 'normal' chunks formed by combining whole elements. Use with caution as this can introduce noise into otherwise clean semantic units. Default: None",
                         "example": 1500
