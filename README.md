@@ -178,7 +178,7 @@ curl -X 'POST' \
 
 #### Gzipped files
 
-You can send gzipped file, and api will ungzip it. 
+You can send gzipped file and api will un-gzip it. 
 
 ```
 curl -X 'POST' \
