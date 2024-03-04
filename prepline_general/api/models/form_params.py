@@ -61,7 +61,7 @@ class GeneralFormParams(BaseModel):
                 description="The languages present in the document, for use in partitioning and/or OCR",
                 example="[eng]",
             ),
-            # BeforeValidator(SmartValueParser[List[str]]().value_or_first_element),
+            BeforeValidator(SmartValueParser[List[str]]().value_or_first_element),
         ] = [],
         skip_infer_table_types: Annotated[
             List[str],
@@ -85,7 +85,7 @@ class GeneralFormParams(BaseModel):
             ),
         ] = None,
         output_format: Annotated[
-            str,
+            Literal["application/json", "text/csv"],
             Form(
                 title="Output Format",
                 description="The format of the response. Supported formats are application/json and text/csv. Default: application/json.",

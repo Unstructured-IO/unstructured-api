@@ -322,14 +322,15 @@ The output format can also be set to `text/csv` to get the data in csv format ra
 
 The response will be a list of the extracted elements in csv format:
 ```
-"type,text,element_id,filename,page_number,url,sent_from,sent_to,subject,sender\n
-UncategorizedText,\"Hi,\",bc50944723f014607ad612b6983944a7,alert.eml,1,,['Mallori Harrell <mallori@unstructured.io>'],['Mallori Harrell <mallori@unstructured.io>'],ALERT: Stolen Lunch,Mallori Harrell <mallori@unstructured.io>\n
-NarrativeText,\"It has come to our attention that as of 9:00am this morning, Harold's lunch is missing. If this was done in error please return the lunch immediately to the fridge on the 2nd floor by noon.\",51944d1f63f9472edb165fb3c9e5c525,alert.eml,1,,['Mallori Harrell <mallori@unstructured.io>'],['Mallori Harrell <mallori@unstructured.io>'],ALERT: Stolen Lunch,Mallori Harrell <mallori@unstructured.io>\n
-NarrativeText,\"If the lunch has not been returned by noon, we will be reviewing camera footage to determine who stole Harold's lunch.\",8e8f9e2e50e39e072fda08d277aa77b9,alert.eml,1,,['Mallori Harrell <mallori@unstructured.io>'],['Mallori Harrell <mallori@unstructured.io>'],ALERT: Stolen Lunch,Mallori Harrell <mallori@unstructured.io>\n
-NarrativeText,The perpetrators will be PUNISHED to the full extent of our employee code of conduct handbook.,736a826679b971f594103fd9751e5c8f,alert.eml,1,,['Mallori Harrell <mallori@unstructured.io>'],['Mallori Harrell <mallori@unstructured.io>'],ALERT: Stolen Lunch,Mallori Harrell <mallori@unstructured.io>\n
-UncategorizedText,\"Thank you for your time,\",3eeae5f64dab54c52dd5fff779808071,alert.eml,1,,['Mallori Harrell <mallori@unstructured.io>'],['Mallori Harrell <mallori@unstructured.io>'],ALERT: Stolen Lunch,Mallori Harrell <mallori@unstructured.io>\n
-Title,Unstructured Technologies,d5b612de8cd918addd9569b0255b65b2,alert.eml,1,,['Mallori Harrell <mallori@unstructured.io>'],['Mallori Harrell <mallori@unstructured.io>'],ALERT: Stolen Lunch,Mallori Harrell <mallori@unstructured.io>\n
-Title,Data Scientist,46b174f1ec7c25d23e5e50ffff0cc55b,alert.eml,1,,['Mallori Harrell <mallori@unstructured.io>'],['Mallori Harrell <mallori@unstructured.io>'],ALERT: Stolen Lunch,Mallori Harrell <mallori@unstructured.io>\n"
+type,element_id,text,filename,sent_from,sent_to,subject,languages,filetype
+UncategorizedText,db1ca22813f01feda8759ff04a844e56,"Hi All,",family-day.eml,['Mallori Harrell <mallori@unstructured.io>'],['Mallori Harrell <mallori@unstructured.io>'],Family Day,['eng'],message/rfc822
+NarrativeText,a663c393a5e143c01ef2bb5c98efa2c1,Get excited for our first annual family day! ,family-day.eml,['Mallori Harrell <mallori@unstructured.io>'],['Mallori Harrell <mallori@unstructured.io>'],Family Day,['eng'],message/rfc822
+NarrativeText,ce65ca3bef59957d3f1c2bab5725c82f,"There will be face painting, a petting zoo, funnel cake and more.",family-day.eml,['Mallori Harrell <mallori@unstructured.io>'],['Mallori Harrell <mallori@unstructured.io>'],Family Day,['eng'],message/rfc822
+NarrativeText,d7bcf988af9f06042d83e25c531e5744,Make sure to RSVP!,family-day.eml,['Mallori Harrell <mallori@unstructured.io>'],['Mallori Harrell <mallori@unstructured.io>'],Family Day,['eng'],message/rfc822
+Title,5550577db69c2c8aabcd90979698120a,Best.,family-day.eml,['Mallori Harrell <mallori@unstructured.io>'],['Mallori Harrell <mallori@unstructured.io>'],Family Day,['eng'],message/rfc822
+Title,ca1c571d993b6c1ed8ef56a06c16ba22,Mallori Harrell,family-day.eml,['Mallori Harrell <mallori@unstructured.io>'],['Mallori Harrell <mallori@unstructured.io>'],Family Day,['eng'],message/rfc822
+Title,d5b612de8cd918addd9569b0255b65b2,Unstructured Technologies,family-day.eml,['Mallori Harrell <mallori@unstructured.io>'],['Mallori Harrell <mallori@unstructured.io>'],Family Day,['eng'],message/rfc822
+Title,2e0b9e8ee04b9594a9c26d8535b818ff,Data Scientist,family-day.eml,['Mallori Harrell <mallori@unstructured.io>'],['Mallori Harrell <mallori@unstructured.io>'],Family Day,['eng'],message/rfc822
 ```
 
 #### Parallel Mode for PDFs
@@ -345,7 +346,7 @@ As mentioned above, processing a pdf using `hi_res` is currently a slow operatio
 You may also set the optional `UNSTRUCTURED_API_KEY` env variable to enable request validation for your self-hosted instance of Unstructured. If set, only requests including an `unstructured-api-key` header with the same value will be fulfilled. Otherwise, the server will return a 401 indicating that the request is unauthorized.
 
 #### Controlling Server Load
-Some documents will use a lot of memory as they're being processed. To mitigate OOM errors, the server will return a 503 if the host's available memory drops below 2GB. This is configurable with `UNSTRUCTURED_MEMORY_FREE_MINIMUM_MB`.
+Some documents will use a lot of memory as they're being processed. To mitigate OOM errors, the server will return a 503 if the host's available memory drops below 2GB. This is configured with the environment variable `UNSTRUCTURED_MEMORY_FREE_MINIMUM_MB`, which defaults to 2048. You can lower this value to reduce these messages, that is, allow the server to use more memory. Otherwise, you can set to 0 to fully remove this check.
 
 ## :dizzy: Instructions for using the Docker image
 

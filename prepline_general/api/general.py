@@ -688,7 +688,7 @@ def ungz_file(file: UploadFile, gz_uncompressed_content_type: Optional[str] = No
 
 
 @router.get("/general/v0/general", include_in_schema=False)
-@router.get("/general/v0.0.64/general", include_in_schema=False)
+@router.get("/general/v0.0.65/general", include_in_schema=False)
 async def handle_invalid_get_request():
     raise HTTPException(
         status_code=status.HTTP_405_METHOD_NOT_ALLOWED, detail="Only POST requests are supported."
@@ -703,7 +703,7 @@ async def handle_invalid_get_request():
     description="Description",
     operation_id="partition_parameters",
 )
-@router.post("/general/v0.0.64/general", include_in_schema=False)
+@router.post("/general/v0.0.65/general", include_in_schema=False)
 def general_partition(
     request: Request,
     # cannot use annotated type here because of a bug described here:
@@ -751,12 +751,6 @@ def general_partition(
                 files[file_index], form_params.gz_uncompressed_content_type
             )
 
-    default_response_type = form_params.output_format or "application/json"
-    if not content_type or content_type == "*/*" or content_type == "multipart/mixed":
-        media_type = default_response_type
-    else:
-        media_type = content_type
-
     def response_generator(is_multipart: bool):
         for file in files:
             file_content_type = get_validated_mimetype(file)
@@ -775,7 +769,7 @@ def general_partition(
                 skip_infer_table_types=form_params.skip_infer_table_types,
                 strategy=form_params.strategy,
                 xml_keep_tags=form_params.xml_keep_tags,
-                response_type=media_type,
+                response_type=form_params.output_format,
                 filename=str(file.filename),
                 file_content_type=file_content_type,
                 languages=form_params.languages,
@@ -790,27 +784,12 @@ def general_partition(
                 overlap_all=form_params.overlap_all,
             )
 
-            if not is_compatible_response_type(media_type, type(response)):
-                raise HTTPException(
-                    detail=(
-                        f"Conflict in media type {media_type}"
-                        f" with response type {type(response)}.\n"
-                    ),
-                    status_code=status.HTTP_406_NOT_ACCEPTABLE,
-                )
-
-            if media_type not in ["application/json", "text/csv", "*/*", "multipart/mixed"]:
-                raise HTTPException(
-                    detail=f"Unsupported media type {media_type}.\n",
-                    status_code=status.HTTP_406_NOT_ACCEPTABLE,
-                )
-
             yield (
                 json.dumps(response)
                 if is_multipart and type(response) not in [str, bytes]
                 else (
                     PlainTextResponse(response)
-                    if not is_multipart and media_type == "text/csv"
+                    if not is_multipart and form_params.output_format == "text/csv"
                     else response
                 )
             )
@@ -819,7 +798,7 @@ def general_partition(
         responses: Sequence[str | List[Dict[str, Any]] | PlainTextResponse]
     ) -> List[str | List[Dict[str, Any]]] | PlainTextResponse:
         """Consolidate partitionings from multiple documents into single response payload."""
-        if media_type != "text/csv":
+        if form_params.output_format != "text/csv":
             return cast(List[Union[str, List[Dict[str, Any]]]], responses)
         responses = cast(List[PlainTextResponse], responses)
         data = pd.read_csv(  # pyright: ignore[reportUnknownMemberType]
@@ -836,7 +815,9 @@ def general_partition(
         return PlainTextResponse(data.to_csv())
 
     return (
-        MultipartMixedResponse(response_generator(is_multipart=True), content_type=media_type)
+        MultipartMixedResponse(
+            response_generator(is_multipart=True), content_type=form_params.output_format
+        )
         if content_type == "multipart/mixed"
         else (
             list(response_generator(is_multipart=False))[0]

@@ -1,7 +1,10 @@
 ## 0.0.65-dev1
+
 * Bump unstructured to 0.12.4
+* Add support for both `list[str]` and `str` input formats for `ocr_languages` parameter
 
 ## 0.0.64
+
 * Bump Pydantic to 2.5.x and remove it from explicit dependencies list (will be managed by fastapi)
 * Introduce Form params description in the code, which will form openapi and swagger documentation
 * Roll back some openapi customizations
