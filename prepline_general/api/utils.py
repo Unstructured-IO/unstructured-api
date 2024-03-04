@@ -56,7 +56,7 @@ def is_convertible_to_list(s: str) -> Tuple[bool, Union[List, str]]:
         else:
             return False, "Input is valid JSON but not a list."  # Valid JSON but not a list
     except json.JSONDecodeError:
-        pass    # proceed to check using delimiters if JSON parsing fails
+        pass  # proceed to check using delimiters if JSON parsing fails
 
     delimiters = ["+", ","]
     for delimiter in delimiters:
