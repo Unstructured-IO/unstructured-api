@@ -39,7 +39,15 @@ def _return_cast_first_element(values: list[E], origin_class: type) -> E | None:
 
 
 def is_convertible_to_list(s: str) -> Tuple[bool, Union[List, str]]:
-    """Determines if a given string is convertible to a list by attempting to parse it as JSON."""
+    """
+    Determines if a given string is convertible to a list.
+
+    This function first tries to parse the string as JSON. If the parsed JSON is a list, it returns
+    True along with the list. If parsing as JSON fails, it then checks if the string can be split
+    into a list using predefined delimiters ("," or "+"). If so, it returns True and the resulting list.
+    If neither condition is met, it returns False and a message indicating the string cannot
+    be converted to a list.
+    """
 
     try:
         result = json.loads(s)
@@ -48,7 +56,14 @@ def is_convertible_to_list(s: str) -> Tuple[bool, Union[List, str]]:
         else:
             return False, "Input is valid JSON but not a list."  # Valid JSON but not a list
     except json.JSONDecodeError:
-        return False, "Input is not valid JSON."  # Invalid JSON
+        pass    # proceed to check using delimiters if JSON parsing fails
+
+    delimiters = ["+", ","]
+    for delimiter in delimiters:
+        if delimiter in delimiters:
+            return True, s.split(delimiter)
+
+    return False, "Input is not valid JSON."  # Invalid JSON
 
 
 class SmartValueParser(Generic[T]):
