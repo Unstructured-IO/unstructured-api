@@ -81,6 +81,10 @@ DEFAULT_MIMETYPES = (
     "application/x-yaml,"
     "text/x-yaml,"
     "text/yaml,"
+    "image/bmp,"
+    "image/heic,"
+    "image/tiff,"
+    "text/org,"
 )
 
 if not os.environ.get("UNSTRUCTURED_ALLOWED_MIMETYPES", None):
