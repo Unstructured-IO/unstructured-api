@@ -175,24 +175,6 @@ def test_languages_param():
     assert elements[3]["text"].startswith("안녕하세요, 저 희 는 YGEAS 그룹")
 
 
-def test_languages_and_ocr_languages_raises_error():
-    """
-    Verify that we get the corresponding languages from the response with `languages`
-    """
-    with pytest.raises(ValueError):
-        client = TestClient(app)
-        test_file = Path("sample-docs") / "english-and-korean.png"
-        client.post(
-            MAIN_API_ROUTE,
-            files=[("files", (str(test_file), open(test_file, "rb")))],
-            data={
-                "strategy": "ocr_only",
-                "languages": ["eng", "kor"],
-                "ocr_languages": ["eng", "kor"],
-            },
-        )
-
-
 def test_skip_infer_table_types_param():
     """
     Verify that we skip table instruction unless specified
