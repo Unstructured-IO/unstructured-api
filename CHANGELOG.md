@@ -1,7 +1,8 @@
-## 0.0.65-dev1
+## 0.0.65-dev2
 
 * Bump unstructured to 0.12.4
 * Add support for both `list[str]` and `str` input formats for `ocr_languages` parameter
+* Adds support for additional MIME types from `unstructured`
 
 ## 0.0.64
 
@@ -88,7 +89,7 @@
 
 ## 0.0.48
 
-* **Adds `languages` kwarg** `ocr_languages` will eventually be deprecated and replaced by `lanugages` to specify what languages to use for OCR 
+* **Adds `languages` kwarg** `ocr_languages` will eventually be deprecated and replaced by `lanugages` to specify what languages to use for OCR
 * Adds a startup log and other minor cleanups
 
 ## 0.0.47
@@ -168,7 +169,7 @@
 * Bump unstructured library to 0.9.0
 * Add table support for image with parameter `skip_infer_table_types`
 * Add support for gzipped files
-  
+
 ## 0.0.33
 
 * Image tweak, move application entrypoint to scripts/app-start.sh
@@ -217,7 +218,7 @@
 
 ## 0.0.25
 
-* Bump image to use python 3.8.17 instead of 3.8.15 
+* Bump image to use python 3.8.17 instead of 3.8.15
 
 ## 0.0.24
 
@@ -255,12 +256,12 @@
 ## 0.0.16
 
 * Fix image build steps to support detectron2 install from Mac M1/M2
-* Upgrade to openssl 1.1.1 to accomodate the latest urllib3 
+* Upgrade to openssl 1.1.1 to accomodate the latest urllib3
 * Bump unstructured for SpooledTemporaryFile fix
 
 ## 0.0.15
 
-* Add msg and json types to supported 
+* Add msg and json types to supported
 
 ## 0.0.14
 
@@ -307,7 +308,7 @@
 * Updated Dockerfile for public release
 * Remove rate limiting in the API
 * Add file type validation via UNSTRUCTURED_ALLOWED_MIMETYPES
-* Major semver route also supported: /general/v0/general 
+* Major semver route also supported: /general/v0/general
 
 ## 0.0.4
 
