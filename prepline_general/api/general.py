@@ -81,6 +81,10 @@ DEFAULT_MIMETYPES = (
     "application/x-yaml,"
     "text/x-yaml,"
     "text/yaml,"
+    "image/bmp,"
+    "image/heic,"
+    "image/tiff,"
+    "text/org,"
 )
 
 if not os.environ.get("UNSTRUCTURED_ALLOWED_MIMETYPES", None):
@@ -688,7 +692,7 @@ def ungz_file(file: UploadFile, gz_uncompressed_content_type: Optional[str] = No
 
 
 @router.get("/general/v0/general", include_in_schema=False)
-@router.get("/general/v0.0.64/general", include_in_schema=False)
+@router.get("/general/v0.0.65/general", include_in_schema=False)
 async def handle_invalid_get_request():
     raise HTTPException(
         status_code=status.HTTP_405_METHOD_NOT_ALLOWED, detail="Only POST requests are supported."
@@ -703,7 +707,7 @@ async def handle_invalid_get_request():
     description="Description",
     operation_id="partition_parameters",
 )
-@router.post("/general/v0.0.64/general", include_in_schema=False)
+@router.post("/general/v0.0.65/general", include_in_schema=False)
 def general_partition(
     request: Request,
     # cannot use annotated type here because of a bug described here:

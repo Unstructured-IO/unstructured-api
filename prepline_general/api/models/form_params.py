@@ -61,7 +61,7 @@ class GeneralFormParams(BaseModel):
                 description="The languages present in the document, for use in partitioning and/or OCR",
                 example="[eng]",
             ),
-            # BeforeValidator(SmartValueParser[List[str]]().value_or_first_element),
+            BeforeValidator(SmartValueParser[List[str]]().value_or_first_element),
         ] = [],
         skip_infer_table_types: Annotated[
             List[str],
