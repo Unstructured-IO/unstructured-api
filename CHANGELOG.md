@@ -1,8 +1,9 @@
-## 0.0.65-dev2
+## 0.0.65
 
 * Bump unstructured to 0.12.4
 * Add support for both `list[str]` and `str` input formats for `ocr_languages` parameter
 * Adds support for additional MIME types from `unstructured`
+* Document the support for gzip files and add additional testing 
 
 ## 0.0.64
 
