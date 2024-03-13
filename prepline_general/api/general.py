@@ -749,11 +749,11 @@ def general_partition(
     chunking_strategy = _validate_chunking_strategy(form_params.chunking_strategy)
 
     # -- unzip any uploaded files that need it --
-    for file_index in range(len(files)):
-        if files[file_index].content_type == "application/gzip":
-            files[file_index] = ungz_file(
-                files[file_index], form_params.gz_uncompressed_content_type
-            )
+    for idx, file in enumerate(files):
+        is_content_type_gz = file.content_type == "application/gzip"
+        is_extension_gz = file.filename and file.filename.endswith(".gz")
+        if is_content_type_gz or is_extension_gz:
+            files[idx] = ungz_file(file, form_params.gz_uncompressed_content_type)
 
     def response_generator(is_multipart: bool):
         for file in files:

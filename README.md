@@ -167,7 +167,7 @@ for PDFs and Images, which are `pdf`, `jpg` and `png`. Again, please note that t
 You can specify the encoding to use to decode the text input. If no value is provided, utf-8 will be used.
 
 ```
-curl -X 'POST' 
+curl -X 'POST' \
  'https://api.unstructured.io/general/v0/general' \
  -H 'accept: application/json'  \
  -H 'Content-Type: multipart/form-data' \
@@ -175,6 +175,23 @@ curl -X 'POST'
  -F 'encoding=utf_8' \
  | jq -C . | less -R
 ```
+
+#### Gzipped files
+
+You can send gzipped file and api will un-gzip it. 
+
+```
+curl -X 'POST' \
+ 'https://api.unstructured.io/general/v0/general' \
+ -H 'accept: application/json'  \
+ -H 'Content-Type: multipart/form-data' \
+ -F 'gz_uncompressed_content_type=application/pdf' \
+ -F 'files=@sample-docs/layout-parser-paper.pdf.gz' 
+```
+
+If field `gz_uncompressed_content_type` is set, the API will use its value as content-type of all files
+after uncompressing the .gz files that are sent in single batch. If not set, the API will use
+various heuristics to detect the filetypes after uncompressing from .gz.
 
 #### XML Tags
 
