@@ -26,7 +26,7 @@ MAIN_API_ROUTE = "general/v0/general"
         (["layout-parser-paper-fast.pdf"], [], "application/pdf"),
         (["fake-email-attachment.eml", "fake-email.eml"], [], "message/rfc822"),
         (
-            ["fake-email-attachment.eml", "fake-email.eml", "fake-email-image-embedded.eml"],
+            ["fake-email-attachment.eml", "fake-email.eml", "announcement.eml"],
             [],
             "message/rfc822",
         ),
