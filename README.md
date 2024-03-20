@@ -369,6 +369,8 @@ As mentioned above, processing a pdf using `hi_res` is currently a slow operatio
 * `UNSTRUCTURED_PARALLEL_MODE_SPLIT_SIZE` - the number of pages to be processed in one request, default is `1`.
 * `UNSTRUCTURED_PARALLEL_RETRY_ATTEMPTS` - the number of retry attempts on a retryable error, default is `2`. (i.e. 3 attempts are made in total)
 
+Due to the overhead associated with file splitting, parallel processing mode is only recommended for the `hi_res` strategy. Additionally users of the official [Python client](https://github.com/Unstructured-IO/unstructured-python-client?tab=readme-ov-file#splitting-pdf-by-pages) can enable client-side splitting by setting `split_pdf_page=True`.
+
 #### Security
 You may also set the optional `UNSTRUCTURED_API_KEY` env variable to enable request validation for your self-hosted instance of Unstructured. If set, only requests including an `unstructured-api-key` header with the same value will be fulfilled. Otherwise, the server will return a 401 indicating that the request is unauthorized.
 
