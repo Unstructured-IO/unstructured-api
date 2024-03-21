@@ -191,27 +191,27 @@
                         "description": "Use one of the supported strategies to chunk the returned elements. Currently supports: by_title",
                         "example": "by_title"
                     },
-                    "multipage_sections": {
-                        "type": "boolean",
-                        "title": "Multipage Sections",
-                        "description": "If chunking strategy is set, determines if sections can span multiple sections. Default: true"
-                    },
                     "combine_under_n_chars": {
                         "type": "integer",
                         "title": "Combine Under N Chars",
                         "description": "If chunking strategy is set, combine elements until a section reaches a length of n chars. Default: 500",
                         "example": 500
                     },
-                    "new_after_n_chars": {
-                        "type": "integer",
-                        "title": "New after n chars",
-                        "description": "If chunking strategy is set, cut off new sections after reaching a length of n chars (soft max). Default: 1500",
-                        "example": 1500
-                    },
                     "max_characters": {
                         "type": "integer",
                         "title": "Max Characters",
                         "description": "If chunking strategy is set, cut off new sections after reaching a length of n chars (hard max). Default: 1500",
+                        "example": 1500
+                    },
+                    "multipage_sections": {
+                        "type": "boolean",
+                        "title": "Multipage Sections",
+                        "description": "If chunking strategy is set, determines if sections can span multiple sections. Default: true"
+                    },
+                    "new_after_n_chars": {
+                        "type": "integer",
+                        "title": "New after n chars",
+                        "description": "If chunking strategy is set, cut off new sections after reaching a length of n chars (soft max). Default: 1500",
                         "example": 1500
                     },
                     "overlap": {
