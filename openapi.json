@@ -197,6 +197,11 @@
                         "description": "If chunking strategy is set, combine elements until a section reaches a length of n chars. Default: max_characters",
                         "example": 500
                     },
+                    "include_orig_elements": {
+                        "type": "boolean",
+                        "title": "Original-elements flag",
+                        "description": "When True (the default), the elements used to form a chunk appear in `.metadata.orig_elements` for that chunk. Only applies when chunking is specified using the `chunking_strategy` argument."
+                    },
                     "max_characters": {
                         "type": "integer",
                         "title": "Max Characters",
