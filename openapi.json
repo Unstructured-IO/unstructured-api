@@ -240,6 +240,11 @@
                         "default": [],
                         "description": "The types of elements to extract, for use in extracting image blocks as base64 encoded data stored in metadata fields",
                         "example": ["image", "table"]
+                    },
+                    "unique_element_ids": {
+                        "type": "boolean",
+                        "title": "Unique element IDs",
+                        "description": "When True, assign UUIDs to element IDs, which guarantees their uniqueness (useful when using them as primary keys in database). Otherwise a SHA-256 of element text is used. Default: False"
                     }
                 },
                 "type": "object",

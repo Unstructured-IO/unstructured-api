@@ -232,6 +232,25 @@ curl -X 'POST'
 ```
 
 
+#### Unique element IDs
+
+By default, the element ID is a SHA-256 hash of the element text. This is to ensure that
+the ID is deterministic. One downside is that the ID is not guaranteed to be unique.
+Different elements with the same text will have the same ID, and there could also be hash collisions.
+To use UUIDs in the output instead, set ``unique_element_ids=true``.
+This can be helpful if you'd like to use the IDs as a primary key in a database, for example.
+
+```
+curl -X 'POST' 
+ 'https://api.unstructured.io/general/v0/general' \
+ -H 'accept: application/json'  \
+ -H 'Content-Type: multipart/form-data' \
+ -F 'files=@sample-docs/layout-parser-paper-fast.pdf' \
+ -F 'unique_element_ids=true' \
+ | jq -C . | less -R
+```
+
+
 #### Chunking Elements
 
 Use the `chunking_strategy` form-field to chunk text into larger or smaller elements. Defaults to `None` which performs no chunking. The available chunking strategies are `basic` and `by_title`.

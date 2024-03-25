@@ -33,6 +33,7 @@ class GeneralFormParams(BaseModel):
     new_after_n_chars: Optional[int]
     overlap: int
     overlap_all: bool
+    unique_element_ids: bool
 
     @classmethod
     def as_form(
@@ -212,6 +213,15 @@ level of "pollution" of otherwise clean semantic chunk boundaries. Default: Fals
                 example=True,
             ),
         ] = False,
+        unique_element_ids: Annotated[
+            bool,
+            Form(
+                title="unique_element_ids",
+                description="""When `True`, assign UUIDs to element IDs, which guarantees their uniqueness 
+(useful when using them as primary keys in database). Otherwise a SHA-256 of element text is used. Default: False""",
+                example=True,
+            ),
+        ] = False,
     ) -> "GeneralFormParams":
         return cls(
             xml_keep_tags=xml_keep_tags,
@@ -236,4 +246,5 @@ level of "pollution" of otherwise clean semantic chunk boundaries. Default: Fals
             new_after_n_chars=new_after_n_chars,
             overlap=overlap,
             overlap_all=overlap_all,
+            unique_element_ids=unique_element_ids,
         )
