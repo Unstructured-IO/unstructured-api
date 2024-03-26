@@ -208,7 +208,7 @@ various heuristics to detect the filetypes after uncompressing from .gz.
 When processing XML documents, set the `xml_keep_tags` parameter to `true` to retain the XML tags in the output. If not specified, it will simply extract the text from within the tags.
 
 ```
-curl -X 'POST' 
+curl -X 'POST' \
  'https://api.unstructured.io/general/v0/general' \
  -H 'accept: application/json'  \
  -H 'Content-Type: multipart/form-data' \
@@ -222,7 +222,7 @@ curl -X 'POST'
 For supported filetypes, set the `include_page_breaks` parameter to `true` to include `PageBreak` elements in the output.
 
 ```
-curl -X 'POST' 
+curl -X 'POST' \
  'https://api.unstructured.io/general/v0/general' \
  -H 'accept: application/json'  \
  -H 'Content-Type: multipart/form-data' \
@@ -241,7 +241,7 @@ To use UUIDs in the output instead, set ``unique_element_ids=true``.
 This can be helpful if you'd like to use the IDs as a primary key in a database, for example.
 
 ```
-curl -X 'POST' 
+curl -X 'POST' \ 
  'https://api.unstructured.io/general/v0/general' \
  -H 'accept: application/json'  \
  -H 'Content-Type: multipart/form-data' \

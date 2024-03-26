@@ -346,7 +346,9 @@ def test_unique_element_ids_param():
     response = client.post(
         MAIN_API_ROUTE,
         files=[("files", (str(test_file), open(test_file, "rb")))],
-        data={"unique_element_ids": "True",},
+        data={
+            "unique_element_ids": "True",
+        },
     )
     assert response.status_code == 200
     elements = response.json()

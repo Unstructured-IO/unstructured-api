@@ -4,6 +4,7 @@
 * Add support for both `list[str]` and `str` input formats for `ocr_languages` parameter
 * Adds support for additional MIME types from `unstructured`
 * Document the support for gzip files and add additional testing 
+* Add support for `unique_element_ids` parameter.
 
 ## 0.0.64
 
