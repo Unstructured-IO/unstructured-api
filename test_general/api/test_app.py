@@ -1,3 +1,4 @@
+import uuid
 from pathlib import Path
 import os
 
@@ -313,6 +314,56 @@ def test_xml_keep_tags_param():
         assert element["text"].replace("&", "&amp;") in response_with_xml_tags["text"]
 
 
+def test_element_ids_by_default_non_unique():
+    """
+    Verify that by default the element_ids aren't unique.
+    """
+    client = TestClient(app)
+    test_file = Path("sample-docs") / "fake-xml.xml"
+    response = client.post(
+        MAIN_API_ROUTE,
+        files=[("files", (str(test_file), open(test_file, "rb")))],
+        data={},
+    )
+    assert response.status_code == 200
+    elements = response.json()
+
+    # Check that there are not unique ids by default, because this xml file has a
+    # duplicated last element.
+    ids = [element["element_id"] for element in elements]
+    # If there are duplicate ids in the ids list, the count of resulting
+    # set will be lower than the count of ids - which is expected here.
+    assert len(ids) != len(set(ids)), "Elements have unique ids"
+
+
+def test_unique_element_ids_param():
+    """
+    Verify that when requested, the element_ids are unique.
+    """
+    client = TestClient(app)
+    test_file = Path("sample-docs") / "fake-xml.xml"
+
+    response = client.post(
+        MAIN_API_ROUTE,
+        files=[("files", (str(test_file), open(test_file, "rb")))],
+        data={
+            "unique_element_ids": "True",
+        },
+    )
+    assert response.status_code == 200
+    elements = response.json()
+
+    ids = [element["element_id"] for element in elements]
+    # If all ids are unique, the count of resulting set
+    # will be same as the count of ids - which is expected here.
+    assert len(ids) == len(set(ids)), "Elements have non-unique ids"
+
+    try:
+        uuid.UUID(ids[0], version=4)
+    except ValueError:
+        raise AssertionError("Element ID is not in UUID format.")
+
+
 def test_include_page_breaks_param():
     """
     Verify that responses do not include page breaks unless requested
@@ -539,6 +590,7 @@ def test_parallel_mode_passes_params(monkeypatch):
             "strategy": "hi_res",
             "xml_keep_tags": "True",
             "skip_infer_table_types": "foo",
+            "unique_element_ids": "True",
             # -- chunking options --
             "chunking_strategy": "by_title",
             "combine_under_n_chars": "501",
@@ -567,6 +619,7 @@ def test_parallel_mode_passes_params(monkeypatch):
         skip_infer_table_types=["foo"],
         extract_image_block_types=None,
         extract_image_block_to_payload=False,
+        unique_element_ids=True,
         # -- chunking options --
         chunking_strategy="by_title",
         combine_text_under_n_chars=501,

@@ -208,7 +208,7 @@ various heuristics to detect the filetypes after uncompressing from .gz.
 When processing XML documents, set the `xml_keep_tags` parameter to `true` to retain the XML tags in the output. If not specified, it will simply extract the text from within the tags.
 
 ```
-curl -X 'POST' 
+curl -X 'POST' \
  'https://api.unstructured.io/general/v0/general' \
  -H 'accept: application/json'  \
  -H 'Content-Type: multipart/form-data' \
@@ -222,12 +222,32 @@ curl -X 'POST'
 For supported filetypes, set the `include_page_breaks` parameter to `true` to include `PageBreak` elements in the output.
 
 ```
-curl -X 'POST' 
+curl -X 'POST' \
  'https://api.unstructured.io/general/v0/general' \
  -H 'accept: application/json'  \
  -H 'Content-Type: multipart/form-data' \
  -F 'files=@sample-docs/layout-parser-paper-fast.pdf' \
  -F 'include_page_breaks=true' \
+ | jq -C . | less -R
+```
+
+
+#### Unique element IDs
+
+By default, the element ID is a SHA-256 hash of the element text. This is to ensure that
+the ID is deterministic. One downside is that the ID is not guaranteed to be unique.
+Different elements with the same text will have the same ID, and there could also be hash collisions.
+To use UUIDs in the output instead, set ``unique_element_ids=true``. Note: this means that the element IDs
+will be random, so with every partition of the same file, you will get different IDs. 
+This can be helpful if you'd like to use the IDs as a primary key in a database, for example.
+
+```
+curl -X 'POST' \ 
+ 'https://api.unstructured.io/general/v0/general' \
+ -H 'accept: application/json'  \
+ -H 'Content-Type: multipart/form-data' \
+ -F 'files=@sample-docs/layout-parser-paper-fast.pdf' \
+ -F 'unique_element_ids=true' \
  | jq -C . | less -R
 ```
 

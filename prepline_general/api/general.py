@@ -299,6 +299,7 @@ def pipeline_api(
     xml_keep_tags: bool = False,
     languages: Optional[List[str]] = None,
     extract_image_block_types: Optional[List[str]] = None,
+    unique_element_ids: Optional[bool] = False,
 ) -> List[Dict[str, Any]] | str:
     if filename.endswith(".msg"):
         # Note(yuming): convert file type for msg files
@@ -340,6 +341,7 @@ def pipeline_api(
                         "new_after_n_chars": new_after_n_chars,
                         "overlap": overlap,
                         "overlap_all": overlap_all,
+                        "unique_element_ids": unique_element_ids,
                     },
                     default=str,
                 )
@@ -390,6 +392,7 @@ def pipeline_api(
                         "overlap_all": overlap_all,
                         "extract_image_block_types": extract_image_block_types,
                         "extract_image_block_to_payload": extract_image_block_to_payload,
+                        "unique_element_ids": unique_element_ids,
                     },
                     default=str,
                 )
@@ -418,6 +421,7 @@ def pipeline_api(
             "overlap_all": overlap_all,
             "extract_image_block_types": extract_image_block_types,
             "extract_image_block_to_payload": extract_image_block_to_payload,
+            "unique_element_ids": unique_element_ids,
         }
 
         if file_content_type == "application/pdf" and pdf_parallel_mode_enabled:
@@ -692,7 +696,7 @@ def ungz_file(file: UploadFile, gz_uncompressed_content_type: Optional[str] = No
 
 
 @router.get("/general/v0/general", include_in_schema=False)
-@router.get("/general/v0.0.65/general", include_in_schema=False)
+@router.get("/general/v0.0.66/general", include_in_schema=False)
 async def handle_invalid_get_request():
     raise HTTPException(
         status_code=status.HTTP_405_METHOD_NOT_ALLOWED, detail="Only POST requests are supported."
@@ -707,7 +711,7 @@ async def handle_invalid_get_request():
     description="Description",
     operation_id="partition_parameters",
 )
-@router.post("/general/v0.0.65/general", include_in_schema=False)
+@router.post("/general/v0.0.66/general", include_in_schema=False)
 def general_partition(
     request: Request,
     # cannot use annotated type here because of a bug described here:
@@ -786,6 +790,7 @@ def general_partition(
                 new_after_n_chars=form_params.new_after_n_chars,
                 overlap=form_params.overlap,
                 overlap_all=form_params.overlap_all,
+                unique_element_ids=form_params.unique_element_ids,
             )
 
             yield (
