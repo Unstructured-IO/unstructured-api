@@ -237,7 +237,8 @@ curl -X 'POST' \
 By default, the element ID is a SHA-256 hash of the element text. This is to ensure that
 the ID is deterministic. One downside is that the ID is not guaranteed to be unique.
 Different elements with the same text will have the same ID, and there could also be hash collisions.
-To use UUIDs in the output instead, set ``unique_element_ids=true``.
+To use UUIDs in the output instead, set ``unique_element_ids=true``. Note: this means that the element IDs
+will be random, so with every partition of the same file, you will get different IDs. 
 This can be helpful if you'd like to use the IDs as a primary key in a database, for example.
 
 ```
