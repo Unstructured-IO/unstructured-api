@@ -1,3 +1,7 @@
+## 0.0.66-dev0
+
+* Add support for `unique_element_ids` parameter.
+
 ## 0.0.65
 
 * Bump unstructured to 0.12.4

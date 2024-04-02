@@ -299,6 +299,7 @@ def pipeline_api(
     xml_keep_tags: bool = False,
     languages: Optional[List[str]] = None,
     extract_image_block_types: Optional[List[str]] = None,
+    unique_element_ids: Optional[bool] = False,
 ) -> List[Dict[str, Any]] | str:
     if filename.endswith(".msg"):
         # Note(yuming): convert file type for msg files
@@ -333,6 +334,7 @@ def pipeline_api(
                         "xml_keep_tags": xml_keep_tags,
                         "languages": languages,
                         "extract_image_block_types": extract_image_block_types,
+                        "unique_element_ids": unique_element_ids,
                         "chunking_strategy": chunking_strategy,
                         "combine_under_n_chars": combine_under_n_chars,
                         "max_characters": max_characters,
@@ -390,6 +392,7 @@ def pipeline_api(
                         "overlap_all": overlap_all,
                         "extract_image_block_types": extract_image_block_types,
                         "extract_image_block_to_payload": extract_image_block_to_payload,
+                        "unique_element_ids": unique_element_ids,
                     },
                     default=str,
                 )
@@ -418,6 +421,7 @@ def pipeline_api(
             "overlap_all": overlap_all,
             "extract_image_block_types": extract_image_block_types,
             "extract_image_block_to_payload": extract_image_block_to_payload,
+            "unique_element_ids": unique_element_ids,
         }
 
         if file_content_type == "application/pdf" and pdf_parallel_mode_enabled:
@@ -692,7 +696,7 @@ def ungz_file(file: UploadFile, gz_uncompressed_content_type: Optional[str] = No
 
 
 @router.get("/general/v0/general", include_in_schema=False)
-@router.get("/general/v0.0.65/general", include_in_schema=False)
+@router.get("/general/v0.0.66/general", include_in_schema=False)
 async def handle_invalid_get_request():
     raise HTTPException(
         status_code=status.HTTP_405_METHOD_NOT_ALLOWED, detail="Only POST requests are supported."
@@ -707,7 +711,7 @@ async def handle_invalid_get_request():
     description="Description",
     operation_id="partition_parameters",
 )
-@router.post("/general/v0.0.65/general", include_in_schema=False)
+@router.post("/general/v0.0.66/general", include_in_schema=False)
 def general_partition(
     request: Request,
     # cannot use annotated type here because of a bug described here:
@@ -778,6 +782,7 @@ def general_partition(
                 file_content_type=file_content_type,
                 languages=form_params.languages,
                 extract_image_block_types=form_params.extract_image_block_types,
+                unique_element_ids=form_params.unique_element_ids,
                 # -- chunking options --
                 chunking_strategy=chunking_strategy,
                 combine_under_n_chars=form_params.combine_under_n_chars,

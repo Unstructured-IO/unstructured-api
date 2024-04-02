@@ -26,6 +26,8 @@ class GeneralFormParams(BaseModel):
     pdf_infer_table_structure: bool
     strategy: str
     extract_image_block_types: Optional[List[str]]
+    unique_element_ids: bool
+    # -- chunking options --
     chunking_strategy: Optional[str]
     combine_under_n_chars: Optional[int]
     max_characters: int
@@ -152,6 +154,15 @@ class GeneralFormParams(BaseModel):
             ),
             BeforeValidator(SmartValueParser[List[str]]().value_or_first_element),
         ] = [],  # noqa
+        unique_element_ids: Annotated[
+            bool,
+            Form(
+                title="unique_element_ids",
+                description="""When `True`, assign UUIDs to element IDs, which guarantees their uniqueness 
+(useful when using them as primary keys in database). Otherwise a SHA-256 of element text is used. Default: False""",
+                example=True,
+            ),
+        ] = False,
         # -- chunking options --
         chunking_strategy: Annotated[
             Optional[Literal["by_title"]],
@@ -236,4 +247,5 @@ level of "pollution" of otherwise clean semantic chunk boundaries. Default: Fals
             new_after_n_chars=new_after_n_chars,
             overlap=overlap,
             overlap_all=overlap_all,
+            unique_element_ids=unique_element_ids,
         )
