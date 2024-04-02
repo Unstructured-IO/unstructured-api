@@ -334,6 +334,7 @@ def pipeline_api(
                         "xml_keep_tags": xml_keep_tags,
                         "languages": languages,
                         "extract_image_block_types": extract_image_block_types,
+                        "unique_element_ids": unique_element_ids,
                         "chunking_strategy": chunking_strategy,
                         "combine_under_n_chars": combine_under_n_chars,
                         "max_characters": max_characters,
@@ -341,7 +342,6 @@ def pipeline_api(
                         "new_after_n_chars": new_after_n_chars,
                         "overlap": overlap,
                         "overlap_all": overlap_all,
-                        "unique_element_ids": unique_element_ids,
                     },
                     default=str,
                 )
@@ -782,6 +782,7 @@ def general_partition(
                 file_content_type=file_content_type,
                 languages=form_params.languages,
                 extract_image_block_types=form_params.extract_image_block_types,
+                unique_element_ids=form_params.unique_element_ids,
                 # -- chunking options --
                 chunking_strategy=chunking_strategy,
                 combine_under_n_chars=form_params.combine_under_n_chars,
@@ -790,7 +791,6 @@ def general_partition(
                 new_after_n_chars=form_params.new_after_n_chars,
                 overlap=form_params.overlap,
                 overlap_all=form_params.overlap_all,
-                unique_element_ids=form_params.unique_element_ids,
             )
 
             yield (

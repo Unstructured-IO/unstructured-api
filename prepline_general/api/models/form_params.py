@@ -26,6 +26,8 @@ class GeneralFormParams(BaseModel):
     pdf_infer_table_structure: bool
     strategy: str
     extract_image_block_types: Optional[List[str]]
+    unique_element_ids: bool
+    # -- chunking options --
     chunking_strategy: Optional[str]
     combine_under_n_chars: Optional[int]
     max_characters: int
@@ -33,7 +35,6 @@ class GeneralFormParams(BaseModel):
     new_after_n_chars: Optional[int]
     overlap: int
     overlap_all: bool
-    unique_element_ids: bool
 
     @classmethod
     def as_form(
@@ -153,6 +154,15 @@ class GeneralFormParams(BaseModel):
             ),
             BeforeValidator(SmartValueParser[List[str]]().value_or_first_element),
         ] = [],  # noqa
+        unique_element_ids: Annotated[
+            bool,
+            Form(
+                title="unique_element_ids",
+                description="""When `True`, assign UUIDs to element IDs, which guarantees their uniqueness 
+(useful when using them as primary keys in database). Otherwise a SHA-256 of element text is used. Default: False""",
+                example=True,
+            ),
+        ] = False,
         # -- chunking options --
         chunking_strategy: Annotated[
             Optional[Literal["by_title"]],
@@ -210,15 +220,6 @@ where an oversized element is divided into multiple chunks by text-splitting. De
                 description="""When `True`, apply overlap between "normal" chunks formed from whole
 elements and not subject to text-splitting. Use this with caution as it entails a certain
 level of "pollution" of otherwise clean semantic chunk boundaries. Default: False""",
-                example=True,
-            ),
-        ] = False,
-        unique_element_ids: Annotated[
-            bool,
-            Form(
-                title="unique_element_ids",
-                description="""When `True`, assign UUIDs to element IDs, which guarantees their uniqueness 
-(useful when using them as primary keys in database). Otherwise a SHA-256 of element text is used. Default: False""",
                 example=True,
             ),
         ] = False,
