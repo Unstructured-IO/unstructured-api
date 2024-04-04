@@ -32,17 +32,19 @@ from pypdf import PageObject, PdfReader, PdfWriter
 from pypdf.errors import FileNotDecryptedError, PdfReadError
 from starlette.datastructures import Headers
 from starlette.types import Send
+
+from prepline_general.api.models.form_params import GeneralFormParams
 from unstructured.documents.elements import Element
 from unstructured.partition.auto import partition
+from unstructured.partition.json import partition_json
 from unstructured.staging.base import (
     convert_to_dataframe,
     convert_to_isd,
     elements_from_json,
+    elements_to_json,
 )
 from unstructured_inference.models.base import UnknownModelException
 from unstructured_inference.models.chipper import MODEL_TYPES as CHIPPER_MODEL_TYPES
-
-from prepline_general.api.models.form_params import GeneralFormParams
 
 app = FastAPI()
 router = APIRouter()
@@ -225,12 +227,16 @@ def partition_pdf_splits(
     results: List[Element] = []
     page_iterator = get_pdf_splits(pdf_pages, split_size=pages_per_pdf)
 
+    # -- retain the original value for the next step of assembling page splits. --
+    unique_element_ids = partition_kwargs.pop("unique_element_ids")
+
     partition_func = partial(
         partition_file_via_api,
         request=request,
         filename=metadata_filename,
         content_type=content_type,
         coordinates=coordinates,
+        unique_element_ids=True,  # -- enforce uniqueness of element ids across all pdf splits --
         **partition_kwargs,
     )
 
@@ -238,6 +244,12 @@ def partition_pdf_splits(
     with ThreadPoolExecutor(max_workers=thread_count) as executor:
         for result in executor.map(partition_func, page_iterator):
             results.extend(result)
+
+    # -- convert UUIDs to hashes if unique_element_ids were originally set to False --
+    if unique_element_ids is False:
+        results_json = elements_to_json(results)
+        f = io.BytesIO(results_json.encode("utf-8"))
+        results = partition_json(file=f, unique_element_ids=False)
 
     return results
 
