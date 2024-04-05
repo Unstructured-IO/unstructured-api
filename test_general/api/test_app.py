@@ -314,11 +314,10 @@ def test_xml_keep_tags_param():
         assert element["text"].replace("&", "&amp;") in response_with_xml_tags["text"]
 
 
-def test_element_ids_by_default_non_unique():
-    """
-    Verify that by default the element_ids aren't unique.
-    """
+def test_element_ids_unique_and_deterministic_by_default():
     client = TestClient(app)
+
+    # This xml file contains duplicate text elements
     test_file = Path("sample-docs") / "fake-xml.xml"
     response = client.post(
         MAIN_API_ROUTE,
@@ -326,14 +325,37 @@ def test_element_ids_by_default_non_unique():
         data={},
     )
     assert response.status_code == 200
-    elements = response.json()
 
-    # Check that there are not unique ids by default, because this xml file has a
-    # duplicated last element.
+    elements = response.json()
     ids = [element["element_id"] for element in elements]
+
     # If there are duplicate ids in the ids list, the count of resulting
-    # set will be lower than the count of ids - which is expected here.
-    assert len(ids) != len(set(ids)), "Elements have unique ids"
+    # set will be lower than the count of ids
+    assert len(ids) == len(set(ids)), "Elements do not have unique ids"
+
+    expected_hashes = [
+        "c4ddecd0c5e22d2958ce3fbbc3ad0373",
+        "8da32a8be3a1817efe0ccd642bb9a98b",
+        "5c05e9750a245281448209b5ecd56078",
+        "e39f63d97e0d648efd1c5679c4f656e6",
+        "2758b56aca89c96751e060c6bd3d9a02",
+        "8601fbb2c37559ee7c92c6d9d0f260f2",
+        "5c0ac89d360385b33f31c48f76a3c3c6",
+        "2c8ac985fdd34ac79a4787350a48e170",
+        "654715f089d77fb42a02278f30df7f16",
+        "e25e395ebf5063eeb2ed2af099ae5ac8",
+        "1b65c3a4dbc77c3e527b45f32f48f611",
+        "56e34c8c41b8a9979edc6a664ad48b1d",
+        "b5c330f07ad8eb8cf98d291e13f824d3",
+        "3ff178e03dc1695364efb06f4298b375",
+        "90985f185cadd7232ed3d700cf8709c1",
+        "f6bf051df0c52d238b32f771f1fb2bae",
+        "4ceb3fc1f4ab5f273acb649f69008bcc",
+        "fb269297372674648501b9d00d1650ef",
+        "bd00ea66e54eb2ab64a106006b33cdd0",
+        "3a0a6b7d28136594eadc507c150c5235",
+    ]
+    assert ids == expected_hashes, "Element hashes are not deterministic"
 
 
 def test_unique_element_ids_param():
