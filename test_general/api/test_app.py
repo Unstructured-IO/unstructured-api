@@ -626,15 +626,17 @@ def test_parallel_mode_preserves_uniqueness_of_hashes_when_assembling_pages_spli
     assert response.status_code == 200
 
     elements = response.json()
+    texts = [element.get("text") for element in elements]
 
     num_pages = 3
-    texts = [element.get("text") for element in elements]
-    num_elements_per_page = len(texts) // num_pages
-    pages = [
-        texts[idx * num_elements_per_page : (idx + 1) * num_elements_per_page]
-        for idx in range(num_pages)
-    ]
+    num_elements_per_page = len(elements) // num_pages
 
+    def get_texts_on_page(texts, page_num):
+        start = page_num * num_elements_per_page
+        end = start + num_elements_per_page
+        return texts[start:end]
+
+    pages = [get_texts_on_page(texts, idx) for idx in range(num_pages)]
     assert all(page == pages[0] for page in pages), "Texts on all pages should be identical."
 
     ids = [element.get("element_id") for element in elements]
