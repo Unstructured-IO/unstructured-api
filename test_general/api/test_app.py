@@ -577,6 +577,70 @@ class MockResponse:
         return self.body
 
 
+def call_api_using_test_client(
+    request_url: str,
+    api_key: str,
+    filename: str,
+    file,
+    content_type: str,
+    client: TestClient,
+    **partition_kwargs,
+) -> str:
+    """Exact copy of call_api from call_api.py, but with the test client parameter added."""
+    headers = {"unstructured-api-key": api_key}
+
+    response = client.post(
+        MAIN_API_ROUTE,
+        files={"files": (filename, file, content_type)},
+        data=partition_kwargs,
+        headers=headers,
+    )
+
+    if response.status_code != 200:
+        detail = response.json().get("detail") or response.text
+        raise HTTPException(status_code=response.status_code, detail=detail)
+
+    return response.text
+
+
+def test_parallel_mode_preserves_uniqueness_of_hashes_when_assembling_pages_splits(monkeypatch):
+    monkeypatch.setenv("UNSTRUCTURED_PARALLEL_MODE_URL", "unused")
+    monkeypatch.setenv("UNSTRUCTURED_PARALLEL_MODE_ENABLED", "true")
+    monkeypatch.setenv("UNSTRUCTURED_PARALLEL_MODE_SPLIT_SIZE", "1")
+
+    client = TestClient(app)
+    monkeypatch.setattr(
+        general,
+        "call_api",
+        lambda *args, **kwargs: call_api_using_test_client(*args, client=client, **kwargs),
+    )
+
+    # -- there are 3 pages identical pages in this pdf --
+    test_file = Path("sample-docs") / "DA-1p-with-duplicate-pages.pdf"
+    response = client.post(
+        MAIN_API_ROUTE,
+        files=[("files", (str(test_file), open(test_file, "rb"), "application/pdf"))],
+        data={},
+    )
+
+    assert response.status_code == 200
+
+    elements = response.json()
+
+    num_pages = 3
+    texts = [element.get("text") for element in elements]
+    num_elements_per_page = len(texts) // num_pages
+    pages = [
+        texts[idx * num_elements_per_page : (idx + 1) * num_elements_per_page]
+        for idx in range(num_pages)
+    ]
+
+    assert all(page == pages[0] for page in pages), "Texts on all pages should be identical."
+
+    ids = [element.get("element_id") for element in elements]
+    assert len(set(ids)) == len(ids), "Element IDs across all pages should be unique."
+
+
 def test_parallel_mode_passes_params(monkeypatch):
     """
     Verify that parallel mode passes all params correctly into local partition.
