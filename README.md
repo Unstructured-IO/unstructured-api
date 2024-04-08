@@ -397,6 +397,15 @@ You may also set the optional `UNSTRUCTURED_API_KEY` env variable to enable requ
 #### Controlling Server Load
 Some documents will use a lot of memory as they're being processed. To mitigate OOM errors, the server will return a 503 if the host's available memory drops below 2GB. This is configured with the environment variable `UNSTRUCTURED_MEMORY_FREE_MINIMUM_MB`, which defaults to 2048. You can lower this value to reduce these messages, that is, allow the server to use more memory. Otherwise, you can set to 0 to fully remove this check.
 
+#### Controlling server life time
+By default server will run for indefinitely. To change that the `MAX_LIFETIME_SECONDS` environmental variable can be set. If server is run with this variable set, it will enter a graceful shutdown period after `MAX_LIFETIME_SECONDS` from its initialization. Graceful shutdown period lasts for up to 3600 seconds and during it:
+- server denies any new requests - they're met with an empty response,
+- server continues processing active requests and shuts down (ending graceful period) if all of them are processed.
+
+After the graceful period is over if server is still running, it is shutdown forcefully, cancelling all active requests and sending empty responses to each of them.
+
+*Max lifetime requires gnu [timeout](https://www.gnu.org/software/coreutils/manual/html_node/timeout-invocation.html#timeout-invocation) to be installed, available by default on most linux systems. Downloadable on MacOS as gtimeout with gnu coreutils.*
+
 ## :dizzy: Instructions for using the Docker image
 
 The following instructions are intended to help you get up and running using Docker to interact with `unstructured-api`.
