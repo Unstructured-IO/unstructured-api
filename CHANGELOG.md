@@ -1,6 +1,7 @@
-## 0.0.66-dev0
+## 0.0.66-dev1
 
 * Add support for `unique_element_ids` parameter.
+* Add max lifetime, via MAX_LIFETIME_SECONDS env-var, to API containers
 
 ## 0.0.65
 
