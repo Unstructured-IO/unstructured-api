@@ -155,7 +155,7 @@ for all file types (`skip_infer_table_types=[]`). Again, please note that table 
   -F 'strategy=hi_res' \
   -F 'skip_infer_table_types=["jpg"]' \
   | jq -C . | less -R
-``
+```
 
 #### Encoding
 
