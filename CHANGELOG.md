@@ -1,8 +1,9 @@
-## 0.0.66-dev2
+## 0.0.66-dev3
 
 * Add support for `unique_element_ids` parameter.
 * Add max lifetime, via MAX_LIFETIME_SECONDS env-var, to API containers
 * Bump unstructured to 0.13.2
+* Change default values for `pdf_infer_table_structure` and `skip_infer_table_types`. Mark `pdf_infer_table_structure` deprecated.
 
 ## 0.0.65
 

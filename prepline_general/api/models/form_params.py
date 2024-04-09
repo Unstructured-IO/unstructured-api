@@ -69,7 +69,9 @@ class GeneralFormParams(BaseModel):
             List[str],
             Form(
                 title="Skip Infer Table Types",
-                description="The document types that you want to skip table extraction with. Default: ['pdf', 'jpg', 'png']",
+                description=(
+                    "The document types that you want to skip table extraction with. Default: []"
+                ),
                 example="['pdf', 'jpg', 'png']",
             ),
             BeforeValidator(SmartValueParser[List[str]]().value_or_first_element),
@@ -128,7 +130,11 @@ class GeneralFormParams(BaseModel):
             bool,
             Form(
                 title="Pdf Infer Table Structure",
-                description="If True and strategy=hi_res, any Table Elements extracted from a PDF will include an additional metadata field, 'text_as_html', where the value (string) is a just a transformation of the data into an HTML <table>.",
+                description=(
+                    "Deprecated! Use skip_infer_table_types to opt out of table extraction for any "
+                    "file type. If False and strategy=hi_res, no Table Elements will be extracted "
+                    "from pdf files regardless of skip_infer_table_types contents."
+                ),
             ),
             BeforeValidator(SmartValueParser[bool]().value_or_first_element),
         ] = True,
