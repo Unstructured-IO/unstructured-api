@@ -1,7 +1,8 @@
-## 0.0.66-dev1
+## 0.0.66-dev2
 
 * Add support for `unique_element_ids` parameter.
 * Add max lifetime, via MAX_LIFETIME_SECONDS env-var, to API containers
+* Bump unstructured to 0.13.2
 
 ## 0.0.65
 
