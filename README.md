@@ -141,25 +141,10 @@ When elements are extracted from PDFs or images, it may be useful to get their b
   | jq -C . | less -R
 ```
 
-#### PDF Table Extraction
-
-To extract the table structure from PDF files using the `hi_res` strategy, ensure that the `pdf_infer_table_structure` parameter is set to `true`. This setting includes the table's text content in the response. By default, this parameter is set to `false` to avoid the expensive reading process.
-
-```
- curl -X 'POST' \
-  'https://api.unstructured.io/general/v0/general' \
-  -H 'accept: application/json' \
-  -H 'Content-Type: multipart/form-data' \
-  -F 'files=@sample-docs/layout-parser-paper.pdf' \
-  -F 'strategy=hi_res' \
-  -F 'pdf_infer_table_structure=true' \
-  | jq -C . | less -R
-```
-
 #### Skip Table Extraction
 
-Currently, we provide support for enabling and disabling table extraction for file types other than PDF files. Set parameter `skip_infer_table_types` to specify the document types that you want to skip table extraction with. By default, we skip table extraction
-for PDFs and Images, which are `pdf`, `jpg` and `png`. Again, please note that table extraction only works with `hi_res` strategy. For example, if you don't want to skip table extraction for images, you can pass an empty value to `skip_infer_table_types` with:
+Currently, we provide support for enabling and disabling table extraction for all file types. Set parameter `skip_infer_table_types` to specify the document types that you want to skip table extraction with. By default, we enable table extraction
+for all file types (`skip_infer_table_types=[]`). Again, please note that table extraction only works with `hi_res` strategy. For example, if you want to skip table extraction for images, you can pass a list with matching image file types:
 
 ```
  curl -X 'POST' \
@@ -168,7 +153,7 @@ for PDFs and Images, which are `pdf`, `jpg` and `png`. Again, please note that t
   -H 'Content-Type: multipart/form-data' \
   -F 'files=@sample-docs/layout-parser-paper-with-table.jpg' \
   -F 'strategy=hi_res' \
-  -F 'skip_infer_table_types=[]' \
+  -F 'skip_infer_table_types=["jpg"]' \
   | jq -C . | less -R
 ```
 
