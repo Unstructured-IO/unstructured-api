@@ -22,9 +22,8 @@ def send_document(
     content_type: str = "",
     strategy: str = "auto",
     output_format: str = "application/json",
-    skip_infer_table_types=[],
+    skip_infer_table_types: list[str] = [],
     uncompressed_content_type: str = "",
-    skip_infer_table_types: str = "['pdf', 'jpg', 'png']",
 ):
     if filenames_gzipped is None:
         filenames_gzipped = []
