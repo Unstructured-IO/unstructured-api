@@ -38,6 +38,7 @@ def send_document(
         "strategy": strategy,
         "output_format": output_format,
         "pdf_infer_table_structure": pdf_infer_table_structure,
+        "skip_infer_table_types": skip_infer_table_types,
     }
     if uncompressed_content_type:
         options["gz_uncompressed_content_type"] = uncompressed_content_type
