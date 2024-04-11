@@ -24,7 +24,7 @@ def send_document(
     output_format: str = "application/json",
     pdf_infer_table_structure: str = "false",
     uncompressed_content_type: str = "",
-    skip_infer_table_types: list = ['pdf', 'jpg', 'png'],
+    skip_infer_table_types: str = "['pdf', 'jpg', 'png']",
 ):
     if filenames_gzipped is None:
         filenames_gzipped = []
@@ -244,7 +244,7 @@ def test_table_support(strategy: str, pdf_infer_table_structure: str, expected_t
         content_type="application/pdf",
         strategy=strategy,
         pdf_infer_table_structure=pdf_infer_table_structure,
-        skip_infer_table_types=[],
+        skip_infer_table_types="[]",
     )
 
     assert response.status_code == 200
