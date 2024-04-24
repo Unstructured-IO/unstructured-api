@@ -177,9 +177,7 @@ def test_languages_param():
 
 
 def test_skip_infer_table_types_param():
-    """
-    Verify that we skip table instruction unless specified
-    """
+    """Verify that we extract table unless excluded by skip_infer_table_types"""
     client = TestClient(app)
     test_file = Path("sample-docs") / "layout-parser-paper-with-table.jpg"
     response = client.post(
@@ -191,19 +189,19 @@ def test_skip_infer_table_types_param():
     # test we skip table extraction by default
     elements = response.json()
     table = [el["metadata"]["text_as_html"] for el in elements if "text_as_html" in el["metadata"]]
-    assert len(table) == 0
+    assert len(table) == 1
 
     response = client.post(
         MAIN_API_ROUTE,
         files=[("files", (str(test_file), open(test_file, "rb")))],
-        data={"skip_infer_table_types": "['pdf']"},
+        data={"skip_infer_table_types": ["jpg"]},
     )
 
     assert response.status_code == 200
-    # test we didn't specify to skip table extration with image
+    # test we specified to skip extraction for jpg
     elements = response.json()
     table = [el["metadata"]["text_as_html"] for el in elements if "text_as_html" in el["metadata"]]
-    assert len(table) == 1
+    assert len(table) == 0
     # This text is not currently picked up
     # assert "Layouts of history Japanese documents" in table[0]
 

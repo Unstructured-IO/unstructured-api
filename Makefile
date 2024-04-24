@@ -69,6 +69,7 @@ docker-start-api:
 	docker run -p 8000:8000 \
 	-it --rm  \
 	--mount type=bind,source=$(realpath .),target=/home/notebook-user/local \
+	$(if $(MAX_LIFETIME_SECONDS),-e MAX_LIFETIME_SECONDS=$(MAX_LIFETIME_SECONDS)) \
 	pipeline-family-${PIPELINE_FAMILY}-dev:latest scripts/app-start.sh
 
 .PHONY: docker-start-bash
