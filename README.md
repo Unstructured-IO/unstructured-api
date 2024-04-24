@@ -141,25 +141,10 @@ When elements are extracted from PDFs or images, it may be useful to get their b
   | jq -C . | less -R
 ```
 
-#### PDF Table Extraction
-
-To extract the table structure from PDF files using the `hi_res` strategy, ensure that the `pdf_infer_table_structure` parameter is set to `true`. This setting includes the table's text content in the response. By default, this parameter is set to `false` to avoid the expensive reading process.
-
-```
- curl -X 'POST' \
-  'https://api.unstructured.io/general/v0/general' \
-  -H 'accept: application/json' \
-  -H 'Content-Type: multipart/form-data' \
-  -F 'files=@sample-docs/layout-parser-paper.pdf' \
-  -F 'strategy=hi_res' \
-  -F 'pdf_infer_table_structure=true' \
-  | jq -C . | less -R
-```
-
 #### Skip Table Extraction
 
-Currently, we provide support for enabling and disabling table extraction for file types other than PDF files. Set parameter `skip_infer_table_types` to specify the document types that you want to skip table extraction with. By default, we skip table extraction
-for PDFs and Images, which are `pdf`, `jpg` and `png`. Again, please note that table extraction only works with `hi_res` strategy. For example, if you don't want to skip table extraction for images, you can pass an empty value to `skip_infer_table_types` with:
+Currently, we provide support for enabling and disabling table extraction for all file types. Set parameter `skip_infer_table_types` to specify the document types that you want to skip table extraction with. By default, we enable table extraction
+for all file types (`skip_infer_table_types=[]`). Again, please note that table extraction only works with `hi_res` strategy. For example, if you want to skip table extraction for images, you can pass a list with matching image file types:
 
 ```
  curl -X 'POST' \
@@ -168,7 +153,7 @@ for PDFs and Images, which are `pdf`, `jpg` and `png`. Again, please note that t
   -H 'Content-Type: multipart/form-data' \
   -F 'files=@sample-docs/layout-parser-paper-with-table.jpg' \
   -F 'strategy=hi_res' \
-  -F 'skip_infer_table_types=[]' \
+  -F 'skip_infer_table_types=["jpg"]' \
   | jq -C . | less -R
 ```
 
@@ -396,6 +381,15 @@ You may also set the optional `UNSTRUCTURED_API_KEY` env variable to enable requ
 
 #### Controlling Server Load
 Some documents will use a lot of memory as they're being processed. To mitigate OOM errors, the server will return a 503 if the host's available memory drops below 2GB. This is configured with the environment variable `UNSTRUCTURED_MEMORY_FREE_MINIMUM_MB`, which defaults to 2048. You can lower this value to reduce these messages, that is, allow the server to use more memory. Otherwise, you can set to 0 to fully remove this check.
+
+#### Controlling server life time
+By default server will run for indefinitely. To change that the `MAX_LIFETIME_SECONDS` environmental variable can be set. If server is run with this variable set, it will enter a graceful shutdown period after `MAX_LIFETIME_SECONDS` from its initialization. Graceful shutdown period lasts for up to 3600 seconds and during it:
+- server denies any new requests - they're met with an empty response,
+- server continues processing active requests and shuts down (ending graceful period) if all of them are processed.
+
+After the graceful period is over if server is still running, it is shutdown forcefully, cancelling all active requests and sending empty responses to each of them.
+
+*Max lifetime requires gnu [timeout](https://www.gnu.org/software/coreutils/manual/html_node/timeout-invocation.html#timeout-invocation) to be installed, available by default on most linux systems. Downloadable on MacOS as gtimeout with gnu coreutils.*
 
 ## :dizzy: Instructions for using the Docker image
 
