@@ -1,7 +1,6 @@
-from typing import Annotated, Optional, List, Literal
+from typing import Annotated, List, Literal, Optional
 
 from fastapi import Form
-
 from pydantic import BaseModel, BeforeValidator
 
 from prepline_general.api.utils import SmartValueParser
@@ -35,6 +34,7 @@ class GeneralFormParams(BaseModel):
     new_after_n_chars: Optional[int]
     overlap: int
     overlap_all: bool
+    starting_page_number: Optional[int] = None
 
     @classmethod
     def as_form(
@@ -225,6 +225,17 @@ level of "pollution" of otherwise clean semantic chunk boundaries. Default: Fals
                 example=True,
             ),
         ] = False,
+        starting_page_number: Annotated[
+            Optional[int],
+            Form(
+                title="PDF Starting Page Number",
+                description=(
+                    "When PDF is split into pages before sending it into the API, providing "
+                    "this information will allow the page number to be assigned correctly."
+                ),
+                example=3,
+            ),
+        ] = None,
     ) -> "GeneralFormParams":
         return cls(
             xml_keep_tags=xml_keep_tags,
@@ -250,4 +261,5 @@ level of "pollution" of otherwise clean semantic chunk boundaries. Default: Fals
             overlap=overlap,
             overlap_all=overlap_all,
             unique_element_ids=unique_element_ids,
+            starting_page_number=starting_page_number,
         )
