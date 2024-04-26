@@ -32,6 +32,8 @@ from pypdf import PageObject, PdfReader, PdfWriter
 from pypdf.errors import FileNotDecryptedError, PdfReadError
 from starlette.datastructures import Headers
 from starlette.types import Send
+
+from prepline_general.api.models.form_params import GeneralFormParams
 from unstructured.documents.elements import Element
 from unstructured.partition.auto import partition
 from unstructured.staging.base import (
@@ -41,8 +43,6 @@ from unstructured.staging.base import (
 )
 from unstructured_inference.models.base import UnknownModelException
 from unstructured_inference.models.chipper import MODEL_TYPES as CHIPPER_MODEL_TYPES
-
-from prepline_general.api.models.form_params import GeneralFormParams
 
 app = FastAPI()
 router = APIRouter()
@@ -178,25 +178,16 @@ def partition_file_via_api(
         raise HTTPException(status_code=500, detail="Parallel mode enabled but no url set!")
 
     api_key = request.headers.get("unstructured-api-key", default="")
-
+    partition_kwargs["starting_page_number"] += page_offset
     result = call_api(
         request_url,
         api_key,
         filename,
         file,
         content_type,
-        starting_page_number=1 + page_offset,
         **partition_kwargs,
     )
-    elements = elements_from_json(text=result)
-
-    # We need to account for the original page numbers
-    for element in elements:
-        if element.metadata.page_number:
-            # Page number could be None if we include page breaks
-            element.metadata.page_number += page_offset
-
-    return elements
+    return elements_from_json(text=result)
 
 
 def partition_pdf_splits(
@@ -206,6 +197,7 @@ def partition_pdf_splits(
     metadata_filename: str,
     content_type: str,
     coordinates: bool,
+    starting_page_number: Optional[int] = None,
     **partition_kwargs: Any,
 ) -> List[Element]:
     """Split a pdf into chunks and process in parallel with more api calls.
@@ -220,6 +212,12 @@ def partition_pdf_splits(
     partition_kwargs holds any others parameters that will be forwarded, or passed to partition
     """
     pages_per_pdf = int(os.environ.get("UNSTRUCTURED_PARALLEL_MODE_SPLIT_SIZE", 1))
+
+    if starting_page_number is None:
+        # -- API client didn't want to split the PDF --
+        starting_page_number = 1
+
+    partition_kwargs["starting_page_number"] = starting_page_number
 
     # If it's small enough, just process locally
     if len(pdf_pages) <= pages_per_pdf:
@@ -308,6 +306,7 @@ def pipeline_api(
     languages: Optional[List[str]] = None,
     extract_image_block_types: Optional[List[str]] = None,
     unique_element_ids: Optional[bool] = False,
+    starting_page_number: Optional[int] = None,
 ) -> List[Dict[str, Any]] | str:
     if filename.endswith(".msg"):
         # Note(yuming): convert file type for msg files
@@ -350,6 +349,7 @@ def pipeline_api(
                         "new_after_n_chars": new_after_n_chars,
                         "overlap": overlap,
                         "overlap_all": overlap_all,
+                        "starting_page_number": starting_page_number,
                     },
                     default=str,
                 )
@@ -438,6 +438,7 @@ def pipeline_api(
                 request=request,
                 pdf_pages=pdf.pages,
                 coordinates=coordinates,
+                starting_page_number=starting_page_number,
                 **partition_kwargs,  # type: ignore # pyright: ignore[reportGeneralTypeIssues]
             )
         elif hi_res_model_name and hi_res_model_name in CHIPPER_MODEL_TYPES:
@@ -799,6 +800,7 @@ def general_partition(
                 new_after_n_chars=form_params.new_after_n_chars,
                 overlap=form_params.overlap,
                 overlap_all=form_params.overlap_all,
+                starting_page_number=form_params.starting_page_number,
             )
 
             yield (
