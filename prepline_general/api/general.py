@@ -213,12 +213,6 @@ def partition_pdf_splits(
     """
     pages_per_pdf = int(os.environ.get("UNSTRUCTURED_PARALLEL_MODE_SPLIT_SIZE", 1))
 
-    if starting_page_number is None:
-        # -- API client didn't want to split the PDF --
-        starting_page_number = 1
-
-    partition_kwargs["starting_page_number"] = starting_page_number
-
     # If it's small enough, just process locally
     if len(pdf_pages) <= pages_per_pdf:
         return partition(
@@ -370,6 +364,8 @@ def pipeline_api(
     # Parallel mode is set by env variable
     enable_parallel_mode = os.environ.get("UNSTRUCTURED_PARALLEL_MODE_ENABLED", "false")
     pdf_parallel_mode_enabled = enable_parallel_mode == "true"
+    if starting_page_number is None:
+        starting_page_number = 1
 
     ocr_languages_str = "+".join(ocr_languages) if ocr_languages and len(ocr_languages) else None
 
