@@ -430,6 +430,7 @@ def pipeline_api(
             "extract_image_block_types": extract_image_block_types,
             "extract_image_block_to_payload": extract_image_block_to_payload,
             "unique_element_ids": unique_element_ids,
+            "starting_page_number": starting_page_number,
         }
 
         if file_content_type == "application/pdf" and pdf_parallel_mode_enabled:
@@ -438,7 +439,6 @@ def pipeline_api(
                 request=request,
                 pdf_pages=pdf.pages,
                 coordinates=coordinates,
-                starting_page_number=starting_page_number,
                 **partition_kwargs,  # type: ignore # pyright: ignore[reportGeneralTypeIssues]
             )
         elif hi_res_model_name and hi_res_model_name in CHIPPER_MODEL_TYPES:
