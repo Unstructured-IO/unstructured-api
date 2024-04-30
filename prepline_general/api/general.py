@@ -200,7 +200,6 @@ def partition_pdf_splits(
     metadata_filename: str,
     content_type: str,
     coordinates: bool,
-    starting_page_number: Optional[int] = None,
     **partition_kwargs: Any,
 ) -> List[Element]:
     """Split a pdf into chunks and process in parallel with more api calls.

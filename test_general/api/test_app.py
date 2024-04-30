@@ -677,6 +677,7 @@ def test_parallel_mode_passes_params(monkeypatch):
             "xml_keep_tags": "True",
             "skip_infer_table_types": "foo",
             "unique_element_ids": "True",
+            "starting_page_number": 1,
             # -- chunking options --
             "chunking_strategy": "by_title",
             "combine_under_n_chars": "501",
@@ -706,6 +707,7 @@ def test_parallel_mode_passes_params(monkeypatch):
         extract_image_block_types=None,
         extract_image_block_to_payload=False,
         unique_element_ids=True,
+        starting_page_number=1,
         # -- chunking options --
         chunking_strategy="by_title",
         combine_text_under_n_chars=501,
@@ -1109,7 +1111,7 @@ def test_output_format_csv():
     )
     assert response.status_code == 200
     df = pd.read_csv(io.StringIO(response.text))
-    assert len(df) == 8
+    assert len(df) == 9
     assert df["text"][3] == "Make sure to RSVP!"
 
 
@@ -1124,5 +1126,5 @@ def test_output_format_csv_ignore_specified_accept_header():
     )
     assert response.status_code == 200
     df = pd.read_csv(io.StringIO(response.text))
-    assert len(df) == 8
+    assert len(df) == 9
     assert df["text"][3] == "Make sure to RSVP!"
