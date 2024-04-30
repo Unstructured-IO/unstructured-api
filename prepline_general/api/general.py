@@ -32,6 +32,8 @@ from pypdf import PageObject, PdfReader, PdfWriter
 from pypdf.errors import FileNotDecryptedError, PdfReadError
 from starlette.datastructures import Headers
 from starlette.types import Send
+
+from prepline_general.api.models.form_params import GeneralFormParams
 from unstructured.documents.elements import Element
 from unstructured.partition.auto import partition
 from unstructured.staging.base import (
@@ -41,8 +43,6 @@ from unstructured.staging.base import (
 )
 from unstructured_inference.models.base import UnknownModelException
 from unstructured_inference.models.chipper import MODEL_TYPES as CHIPPER_MODEL_TYPES
-
-from prepline_general.api.models.form_params import GeneralFormParams
 
 app = FastAPI()
 router = APIRouter()
@@ -178,17 +178,19 @@ def partition_file_via_api(
         raise HTTPException(status_code=500, detail="Parallel mode enabled but no url set!")
 
     api_key = request.headers.get("unstructured-api-key", default="")
+    partition_kwargs["starting_page_number"] = (
+        partition_kwargs.get("starting_page_number", 1) + page_offset
+    )
 
-    result = call_api(request_url, api_key, filename, file, content_type, **partition_kwargs)
-    elements = elements_from_json(text=result)
-
-    # We need to account for the original page numbers
-    for element in elements:
-        if element.metadata.page_number:
-            # Page number could be None if we include page breaks
-            element.metadata.page_number += page_offset
-
-    return elements
+    result = call_api(
+        request_url,
+        api_key,
+        filename,
+        file,
+        content_type,
+        **partition_kwargs,
+    )
+    return elements_from_json(text=result)
 
 
 def partition_pdf_splits(
@@ -300,6 +302,7 @@ def pipeline_api(
     languages: Optional[List[str]] = None,
     extract_image_block_types: Optional[List[str]] = None,
     unique_element_ids: Optional[bool] = False,
+    starting_page_number: Optional[int] = None,
 ) -> List[Dict[str, Any]] | str:
     if filename.endswith(".msg"):
         # Note(yuming): convert file type for msg files
@@ -342,6 +345,7 @@ def pipeline_api(
                         "new_after_n_chars": new_after_n_chars,
                         "overlap": overlap,
                         "overlap_all": overlap_all,
+                        "starting_page_number": starting_page_number,
                     },
                     default=str,
                 )
@@ -362,6 +366,8 @@ def pipeline_api(
     # Parallel mode is set by env variable
     enable_parallel_mode = os.environ.get("UNSTRUCTURED_PARALLEL_MODE_ENABLED", "false")
     pdf_parallel_mode_enabled = enable_parallel_mode == "true"
+    if starting_page_number is None:
+        starting_page_number = 1
 
     ocr_languages_str = "+".join(ocr_languages) if ocr_languages and len(ocr_languages) else None
 
@@ -422,6 +428,7 @@ def pipeline_api(
             "extract_image_block_types": extract_image_block_types,
             "extract_image_block_to_payload": extract_image_block_to_payload,
             "unique_element_ids": unique_element_ids,
+            "starting_page_number": starting_page_number,
         }
 
         if file_content_type == "application/pdf" and pdf_parallel_mode_enabled:
@@ -791,6 +798,7 @@ def general_partition(
                 new_after_n_chars=form_params.new_after_n_chars,
                 overlap=form_params.overlap,
                 overlap_all=form_params.overlap_all,
+                starting_page_number=form_params.starting_page_number,
             )
 
             yield (
