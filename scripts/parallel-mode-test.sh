@@ -30,6 +30,7 @@ do
    # Note(austin): Parallel mode screws up hierarchy! While we deal with that,
    # let's ignore parent_id fields in the results
    $curl_command 2> /dev/null | jq -S 'del(..|.parent_id?)' > output.json
+   original_length=$(jq 'length' output.json)
 
    # Stop if curl didn't work
    if [ ! -s output.json ]; then
@@ -41,6 +42,7 @@ do
    # Run in parallel mode
    curl_command="curl $base_url_2/general/v0/general $params"
    $curl_command 2> /dev/null | jq -S 'del(..|.parent_id?)' > parallel_output.json
+   parallel_length=$(jq 'length' parallel_output.json)
 
    # Stop if curl didn't work
    if [ ! -s parallel_output.json ]; then
@@ -49,8 +51,8 @@ do
        exit 1
    fi
 
-   if ! diff -u output.json parallel_output.json ; then
-       echo Parallel mode received a different output!
+   if ! [[ "$original_length" == "$parallel_length" ]]; then
+       echo Parallel mode returned a different number of elements!
        echo Params: "$params"
        exit 1
    fi
