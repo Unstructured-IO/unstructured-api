@@ -596,7 +596,8 @@ def _validate_chunking_strategy(chunking_strategy: Optional[str]) -> Optional[st
 
 
 def _set_pdf_infer_table_structure(pdf_infer_table_structure: bool, strategy: str) -> bool:
-    return strategy == "hi_res" and pdf_infer_table_structure
+    """Avoids table inference in "fast" and "ocr_only" runs."""
+    return strategy in ("hi_res", "auto") and pdf_infer_table_structure
 
 
 def get_validated_mimetype(file: UploadFile) -> Optional[str]:
@@ -703,7 +704,7 @@ def ungz_file(file: UploadFile, gz_uncompressed_content_type: Optional[str] = No
 
 
 @router.get("/general/v0/general", include_in_schema=False)
-@router.get("/general/v0.0.66/general", include_in_schema=False)
+@router.get("/general/v0.0.67/general", include_in_schema=False)
 async def handle_invalid_get_request():
     raise HTTPException(
         status_code=status.HTTP_405_METHOD_NOT_ALLOWED, detail="Only POST requests are supported."
@@ -718,7 +719,7 @@ async def handle_invalid_get_request():
     description="Description",
     operation_id="partition_parameters",
 )
-@router.post("/general/v0.0.66/general", include_in_schema=False)
+@router.post("/general/v0.0.67/general", include_in_schema=False)
 def general_partition(
     request: Request,
     # cannot use annotated type here because of a bug described here:

@@ -1,3 +1,7 @@
+## 0.0.67-dev1
+
+* Change pdf_infer_table_structure parameter from being disabled in auto strategy.
+
 ## 0.0.66
 
 * Add support for `unique_element_ids` parameter.

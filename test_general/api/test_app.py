@@ -860,14 +860,17 @@ def test_chunking_strategy_param():
 @pytest.mark.parametrize(
     ("multipage_sections", "combine_under_n_chars", "new_after_n_chars", "max_characters"),
     [
-        (False, None, None, 500),  # test multipage_sections
+        (False, None, None, 600),  # test multipage_sections
         (True, 1000, None, 5000),  # test combine_under_n_chars
         (True, None, 10, 500),  # test new_after_n_chars
         (True, None, None, 100),  # test max__characters
     ],
 )
 def test_chunking_strategy_additional_params(
-    multipage_sections, combine_under_n_chars, new_after_n_chars, max_characters
+    multipage_sections: bool,
+    combine_under_n_chars: int,
+    new_after_n_chars: int,
+    max_characters: int,
 ):
     client = TestClient(app)
     test_file = Path("sample-docs") / "layout-parser-paper-fast.pdf"
