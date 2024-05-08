@@ -1,5 +1,6 @@
-## 0.0.67-dev1
+## 0.0.67
 
+* Allow for a different server port with the PORT variable
 * Change pdf_infer_table_structure parameter from being disabled in auto strategy.
 
 ## 0.0.66

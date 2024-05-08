@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+export PORT=${PORT:-8000}
+
 NUMREGEX="^[0-9]+$"
 GRACEFUL_SHUTDOWN_PERIOD_SECONDS=3600
 TIMEOUT_COMMAND='timeout'
@@ -21,8 +23,9 @@ fi
 
 ${OPTIONAL_TIMEOUT} \
     uvicorn prepline_general.api.app:app \
-	    --log-config logger_config.yaml \
-        --host 0.0.0.0
+    --log-config logger_config.yaml \
+    --host 0.0.0.0 \
+    --port "$PORT"
 
 echo "Server was shutdown"
 [ -n "$MAX_LIFETIME_SECONDS" ] && echo "Reached timeout of $MAX_LIFETIME_SECONDS seconds"
