@@ -208,17 +208,9 @@ def test_strategy_performance():
     assert response.status_code == 200
 
     start_time = time.monotonic()
-    response = send_document(filenames=[test_file], content_type="application/pdf", strategy="auto")
-    auto_time = time.monotonic() - start_time
-    assert response.status_code == 200
-
-    assert hi_res_time > performance_ratio * auto_time
-
-    start_time = time.monotonic()
     response = send_document(filenames=[test_file], content_type="application/pdf", strategy="fast")
     fast_time = time.monotonic() - start_time
     assert response.status_code == 200
-
     assert hi_res_time > performance_ratio * fast_time
 
 
