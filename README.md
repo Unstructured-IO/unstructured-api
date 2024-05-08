@@ -410,7 +410,7 @@ Once pulled, you can launch the container as a web app on localhost:8000.
 docker run -p 8000:8000 -d --rm --name unstructured-api downloads.unstructured.io/unstructured-io/unstructured-api:latest
 ```
 
-You can pass in a PORT variable to run the server on a different port in the container. Don't forget to expose this new port via Docker.
+You can pass in a PORT variable to run the server on a different port in the container.
 
 ```bash
 docker run -p 9500:9500 -d --rm --name unstructured-api -e PORT=9500 downloads.unstructured.io/unstructured-io/unstructured-api:latest
