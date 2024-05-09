@@ -1,10 +1,9 @@
-from fastapi import FastAPI, Request, status, HTTPException
+from fastapi import FastAPI, APIRouter, Request, status, HTTPException
 from fastapi.responses import JSONResponse
-from fastapi.security import APIKeyHeader
 import logging
 import os
 
-from .general import router as general_router
+from .endpoints import router as general_router
 from .openapi import set_custom_openapi
 
 logger = logging.getLogger("unstructured_api")
@@ -29,6 +28,8 @@ app = FastAPI(
     ],
     openapi_tags=[{"name": "general"}],
 )
+
+router = APIRouter()
 
 # Note(austin) - This logger just dumps exceptions
 # We'd rather handle those below, so disable this in deployments
