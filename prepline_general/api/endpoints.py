@@ -6,7 +6,7 @@ import os
 from typing import List, Sequence, Dict, Any, cast, Union
 
 import pandas as pd
-from fastapi import FastAPI, APIRouter, UploadFile, Depends, HTTPException
+from fastapi import APIRouter, UploadFile, Depends, HTTPException
 from starlette import status
 from starlette.requests import Request
 from starlette.responses import PlainTextResponse
@@ -20,9 +20,7 @@ from prepline_general.api.general import (
 )
 from prepline_general.api.models.form_params import GeneralFormParams
 
-app = FastAPI()
 router = APIRouter()
-app.include_router(router)
 
 
 @router.post(

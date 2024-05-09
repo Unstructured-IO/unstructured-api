@@ -1,10 +1,10 @@
-from fastapi import FastAPI, APIRouter, Request, status, HTTPException
+from fastapi import FastAPI, Request, status, HTTPException
 from fastapi.responses import JSONResponse
 import logging
 import os
 
-from .endpoints import router as general_router
-from .openapi import set_custom_openapi
+from prepline_general.api.endpoints import router as general_router
+from prepline_general.api.openapi import set_custom_openapi
 
 logger = logging.getLogger("unstructured_api")
 
@@ -29,7 +29,7 @@ app = FastAPI(
     openapi_tags=[{"name": "general"}],
 )
 
-router = APIRouter()
+app.include_router(general_router)
 
 # Note(austin) - This logger just dumps exceptions
 # We'd rather handle those below, so disable this in deployments
@@ -62,7 +62,6 @@ if allowed_origins:
         allow_headers=["Content-Type"],
     )
 
-app.include_router(general_router)
 
 set_custom_openapi(app)
 
