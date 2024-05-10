@@ -664,6 +664,8 @@ def test_parallel_mode_passes_params(monkeypatch):
     client = TestClient(app)
     test_file = Path("sample-docs") / "layout-parser-paper.pdf"
 
+    # For list params, send the formdata keys with brackets
+    # This is how Speakeasy sends them
     response = client.post(
         MAIN_API_ROUTE,
         files=[("files", (str(test_file), open(test_file, "rb"), "application/pdf"))],
@@ -671,11 +673,12 @@ def test_parallel_mode_passes_params(monkeypatch):
             "encoding": "foo",
             "hi_res_model_name": "yolox",
             "include_page_breaks": "True",
-            "languages": "foo",
+            "languages": "eng",
             "pdf_infer_table_structure": "True",
             "strategy": "hi_res",
             "xml_keep_tags": "True",
-            "skip_infer_table_types": "foo",
+            "skip_infer_table_types[]": ["pdf"],
+            "extract_image_block_types[]": ["Image", "Table"],
             "unique_element_ids": "True",
             "starting_page_number": 1,
             # -- chunking options --
@@ -699,13 +702,13 @@ def test_parallel_mode_passes_params(monkeypatch):
         encoding="foo",
         include_page_breaks=True,
         ocr_languages=None,
-        languages=["foo"],
+        languages=["eng"],
         pdf_infer_table_structure=True,
         strategy="hi_res",
         xml_keep_tags=True,
-        skip_infer_table_types=["foo"],
-        extract_image_block_types=None,
-        extract_image_block_to_payload=False,
+        skip_infer_table_types=["pdf"],
+        extract_image_block_types=["Image", "Table"],
+        extract_image_block_to_payload=True,  # Set to true because block_types is non empty
         unique_element_ids=True,
         starting_page_number=1,
         # -- chunking options --

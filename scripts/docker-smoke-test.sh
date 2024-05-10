@@ -78,8 +78,8 @@ await_server_ready 8000
 #######################
 # Smoke Tests
 #######################
-echo Running smoke tests
-PYTHONPATH=. SKIP_INFERENCE_TESTS=$SKIP_INFERENCE_TESTS pytest scripts/smoketest.py
+echo Running smoke tests with SKIP_INFERENCE_TESTS: "$SKIP_INFERENCE_TESTS"
+PYTHONPATH=. SKIP_INFERENCE_TESTS=$SKIP_INFERENCE_TESTS pytest -vv scripts/smoketest.py
 
 #######################
 # Test parallel vs single mode
