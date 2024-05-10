@@ -108,8 +108,6 @@ async def patched_get_form(
 Request._get_form = patched_get_form  # type: ignore[assignment]
 
 
-
-
 # Filter out /healthcheck noise
 class HealthCheckFilter(logging.Filter):
     def filter(self, record: logging.LogRecord) -> bool:
