@@ -1,3 +1,7 @@
+## 0.0.68
+
+* Fix list params such as `extract_image_block_types` not working via the python/js clients
+
 ## 0.0.67
 
 * Allow for a different server port with the PORT variable

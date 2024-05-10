@@ -1,4 +1,5 @@
 from fastapi import FastAPI, Request, status, HTTPException
+from fastapi.datastructures import FormData
 from fastapi.responses import JSONResponse
 from fastapi.security import APIKeyHeader
 import logging
@@ -12,7 +13,7 @@ logger = logging.getLogger("unstructured_api")
 app = FastAPI(
     title="Unstructured Pipeline API",
     summary="Partition documents with the Unstructured library",
-    version="0.0.67",
+    version="0.0.68",
     docs_url="/general/docs",
     openapi_url="/general/openapi.json",
     servers=[
@@ -64,6 +65,49 @@ if allowed_origins:
 app.include_router(general_router)
 
 set_custom_openapi(app)
+
+
+# Note(austin) - When FastAPI parses our FormData params,
+# it builds lists out of duplicate keys, like so:
+# FormData([('key', 'value1'), ('key', 'value2')])
+#
+# The Speakeasy clients send a more explicit form:
+# FormData([('key[]', 'value1'), ('key[]', 'value2')])
+#
+# FastAPI doesn't understand these, so we need to transform them.
+# Can't do this in middleware before the data stream is read, nor in the endpoint
+# after the fields are parsed. Thus, we have to patch it into Request.form() on startup.
+get_form = Request._get_form
+
+
+async def patched_get_form(
+    self,
+    *,
+    max_files: int | float = 1000,
+    max_fields: int | float = 1000,
+) -> FormData:
+    """
+    Call the original get_form, and iterate the results
+    If a key has brackets at the end, remove them before returning the final FormData
+    Note the extra params here are unused, but needed to match the signature
+    """
+    form_params = await get_form(self)
+
+    fixed_params = []
+    for key, value in form_params.multi_items():
+        # Transform key[] into key
+        if key and key.endswith("[]"):
+            key = key[:-2]
+
+        fixed_params.append((key, value))
+
+    return FormData(fixed_params)
+
+
+# Replace the private method with our wrapper
+Request._get_form = patched_get_form  # type: ignore[assignment]
+
+
 
 
 # Filter out /healthcheck noise
