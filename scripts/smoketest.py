@@ -76,6 +76,11 @@ def send_document(
         # Note(austin) The two inference calls will hang on mac with unsupported hardware error
         # Skip these with SKIP_INFERENCE_TESTS=true make docker-test
         pytest.param(
+            "layout-parser-paper.pdf.gz",
+            "application/gzip",
+            marks=pytest.mark.skipif(skip_inference_tests, reason="emulated architecture"),
+        ),
+        pytest.param(
             "layout-parser-paper.pdf",
             "application/pdf",
             marks=pytest.mark.skipif(skip_inference_tests, reason="emulated architecture"),
@@ -94,7 +99,6 @@ def send_document(
             "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
         ),
         ("fake-xml.xml", "text/xml"),
-        ("layout-parser-paper.pdf.gz", "application/gzip"),
     ],
 )
 def test_happy_path(example_filename: str, content_type: str):
