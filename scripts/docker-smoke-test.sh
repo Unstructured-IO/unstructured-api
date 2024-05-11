@@ -84,11 +84,13 @@ PYTHONPATH=. SKIP_INFERENCE_TESTS=$SKIP_INFERENCE_TESTS pytest -vv scripts/smoke
 #######################
 # Test parallel vs single mode
 #######################
-start_container 9000 true
-await_server_ready 9000
+if ! $SKIP_INFERENCE_TESTS; then
+    start_container 9000 true
+    await_server_ready 9000
 
-echo Running parallel mode test
-./scripts/parallel-mode-test.sh localhost:8000 localhost:9000
+    echo Running parallel mode test
+    ./scripts/parallel-mode-test.sh localhost:8000 localhost:9000
+fi
 
 result=$?
 exit $result
