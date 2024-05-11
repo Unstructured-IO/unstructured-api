@@ -130,11 +130,21 @@ def test_happy_path(example_filename: str, content_type: str):
         (["stanley-cups.csv"], [], "application/csv"),
         (["fake.doc"], [], "application/msword"),
         # compressed and uncompressed
-        (["layout-parser-paper-fast.pdf"], ["list-item-example.pdf"], "application/pdf"),
+        pytest.param(
+            ["layout-parser-paper-fast.pdf"],
+            ["list-item-example.pdf"],
+            "application/pdf",
+            marks=pytest.mark.skipif(skip_inference_tests, reason="emulated architecture"),
+        ),
         (["fake-email.eml"], ["fake-email-image-embedded.eml"], "message/rfc822"),
         # compressed and uncompressed
         # empty content-type means that API should detect filetype after decompressing.
-        (["layout-parser-paper-fast.pdf"], ["list-item-example.pdf"], ""),
+        pytest.param(
+            ["layout-parser-paper-fast.pdf"],
+            ["list-item-example.pdf"],
+            "",
+            marks=pytest.mark.skipif(skip_inference_tests, reason="emulated architecture"),
+        ),
         (["fake-email.eml"], ["fake-email-image-embedded.eml"], ""),
     ],
 )
