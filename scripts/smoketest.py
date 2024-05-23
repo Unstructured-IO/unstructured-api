@@ -76,6 +76,11 @@ def send_document(
         # Note(austin) The two inference calls will hang on mac with unsupported hardware error
         # Skip these with SKIP_INFERENCE_TESTS=true make docker-test
         pytest.param(
+            "layout-parser-paper.pdf.gz",
+            "application/gzip",
+            marks=pytest.mark.skipif(skip_inference_tests, reason="emulated architecture"),
+        ),
+        pytest.param(
             "layout-parser-paper.pdf",
             "application/pdf",
             marks=pytest.mark.skipif(skip_inference_tests, reason="emulated architecture"),
@@ -94,7 +99,6 @@ def send_document(
             "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
         ),
         ("fake-xml.xml", "text/xml"),
-        ("layout-parser-paper.pdf.gz", "application/gzip"),
     ],
 )
 def test_happy_path(example_filename: str, content_type: str):
@@ -126,11 +130,21 @@ def test_happy_path(example_filename: str, content_type: str):
         (["stanley-cups.csv"], [], "application/csv"),
         (["fake.doc"], [], "application/msword"),
         # compressed and uncompressed
-        (["layout-parser-paper-fast.pdf"], ["list-item-example.pdf"], "application/pdf"),
+        pytest.param(
+            ["layout-parser-paper-fast.pdf"],
+            ["list-item-example.pdf"],
+            "application/pdf",
+            marks=pytest.mark.skipif(skip_inference_tests, reason="emulated architecture"),
+        ),
         (["fake-email.eml"], ["fake-email-image-embedded.eml"], "message/rfc822"),
         # compressed and uncompressed
         # empty content-type means that API should detect filetype after decompressing.
-        (["layout-parser-paper-fast.pdf"], ["list-item-example.pdf"], ""),
+        pytest.param(
+            ["layout-parser-paper-fast.pdf"],
+            ["list-item-example.pdf"],
+            "",
+            marks=pytest.mark.skipif(skip_inference_tests, reason="emulated architecture"),
+        ),
         (["fake-email.eml"], ["fake-email-image-embedded.eml"], ""),
     ],
 )

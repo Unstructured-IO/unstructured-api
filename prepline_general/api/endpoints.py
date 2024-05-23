@@ -29,16 +29,16 @@ router = APIRouter()
     description="Description",
     operation_id="partition_parameters",
 )
-@router.post("/general/v0.0.67/general", include_in_schema=False)
+@router.post("/general/v0.0.68/general", include_in_schema=False)
 def general_partition(
-    request: Request,
-    # cannot use annotated type here because of a bug described here:
-    # https://github.com/tiangolo/fastapi/discussions/10280
-    # The openapi metadata must be added separately in openapi.py file.
-    # TODO: Check if the bug is fixed and change the declaration to use Annoteted[List[UploadFile], File(...)]
-    # For new parameters - add them in models/form_params.py
-    files: List[UploadFile],
-    form_params: GeneralFormParams = Depends(GeneralFormParams.as_form),
+        request: Request,
+        # cannot use annotated type here because of a bug described here:
+        # https://github.com/tiangolo/fastapi/discussions/10280
+        # The openapi metadata must be added separately in openapi.py file.
+        # TODO: Check if the bug is fixed and change the declaration to use Annoteted[List[UploadFile], File(...)]
+        # For new parameters - add them in models/form_params.py
+        files: List[UploadFile],
+        form_params: GeneralFormParams = Depends(GeneralFormParams.as_form),
 ):
     # -- must have a valid API key --
     if api_key_env := os.environ.get("UNSTRUCTURED_API_KEY"):
@@ -52,15 +52,15 @@ def general_partition(
 
     # -- detect response content-type conflict when multiple files are uploaded --
     if (
-        len(files) > 1
-        and content_type
-        and content_type
-        not in [
-            "*/*",
-            "multipart/mixed",
-            "application/json",
-            "text/csv",
-        ]
+            len(files) > 1
+            and content_type
+            and content_type
+            not in [
+        "*/*",
+        "multipart/mixed",
+        "application/json",
+        "text/csv",
+    ]
     ):
         raise HTTPException(
             detail=f"Conflict in media type {content_type} with response type 'multipart/mixed'.\n",
@@ -123,7 +123,7 @@ def general_partition(
             )
 
     def join_responses(
-        responses: Sequence[str | List[Dict[str, Any]] | PlainTextResponse]
+            responses: Sequence[str | List[Dict[str, Any]] | PlainTextResponse]
     ) -> List[str | List[Dict[str, Any]]] | PlainTextResponse:
         """Consolidate partitionings from multiple documents into single response payload."""
         if form_params.output_format != "text/csv":
@@ -154,9 +154,8 @@ def general_partition(
         )
     )
 
-
 @router.get("/general/v0/general", include_in_schema=False)
-@router.get("/general/v0.0.67/general", include_in_schema=False)
+@router.get("/general/v0.0.68/general", include_in_schema=False)
 async def handle_invalid_get_request():
     raise HTTPException(
         status_code=status.HTTP_405_METHOD_NOT_ALLOWED, detail="Only POST requests are supported."
