@@ -32,7 +32,11 @@ from unstructured_inference.models.base import UnknownModelException
 from unstructured_inference.models.chipper import MODEL_TYPES as CHIPPER_MODEL_TYPES
 
 from prepline_general.api.memory_protection import ChipperMemoryProtection
-from prepline_general.api.validation import _check_pdf, _validate_hi_res_model_name, _validate_strategy
+from prepline_general.api.validation import (
+    _check_pdf,
+    _validate_hi_res_model_name,
+    _validate_strategy,
+)
 
 logger = logging.getLogger("unstructured_api")
 
