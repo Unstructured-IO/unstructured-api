@@ -65,26 +65,4 @@ if allowed_origins:
 
 set_custom_openapi(app)
 
-
-# Filter out /healthcheck noise
-class HealthCheckFilter(logging.Filter):
-    def filter(self, record: logging.LogRecord) -> bool:
-        return record.getMessage().find("/healthcheck") == -1
-
-
-# Filter out /metrics noise
-class MetricsCheckFilter(logging.Filter):
-    def filter(self, record: logging.LogRecord) -> bool:
-        return record.getMessage().find("/metrics") == -1
-
-
-logging.getLogger("uvicorn.access").addFilter(HealthCheckFilter())
-logging.getLogger("uvicorn.access").addFilter(MetricsCheckFilter())
-
-
-@app.get("/healthcheck", status_code=status.HTTP_200_OK, include_in_schema=False)
-def healthcheck(request: Request):
-    return {"healthcheck": "HEALTHCHECK STATUS: EVERYTHING OK!"}
-
-
 logger.info("Started Unstructured API")

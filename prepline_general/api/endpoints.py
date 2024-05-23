@@ -163,3 +163,8 @@ async def handle_invalid_get_request():
     raise HTTPException(
         status_code=status.HTTP_405_METHOD_NOT_ALLOWED, detail="Only POST requests are supported."
     )
+
+
+@router.get("/healthcheck", status_code=status.HTTP_200_OK, include_in_schema=False)
+def healthcheck(request: Request):
+    return {"healthcheck": "HEALTHCHECK STATUS: EVERYTHING OK!"}
