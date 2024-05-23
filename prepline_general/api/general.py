@@ -11,7 +11,6 @@ import zipfile
 from base64 import b64encode
 from concurrent.futures import ThreadPoolExecutor
 from functools import partial
-from types import TracebackType
 from typing import IO, Any, Dict, List, Mapping, Optional, Sequence, Tuple
 
 import backoff
@@ -19,34 +18,21 @@ import psutil
 import requests
 from fastapi import (
     HTTPException,
-    Request,
     UploadFile,
 )
 from fastapi.responses import StreamingResponse
-from pypdf import PageObject, PdfReader, PdfWriter
-from pypdf.errors import FileNotDecryptedError, PdfReadError
+from pypdf import PdfReader, PageObject, PdfWriter
 from starlette.datastructures import Headers
+from starlette.requests import Request
 from starlette.types import Send
-
 from unstructured.documents.elements import Element
 from unstructured.partition.auto import partition
-from unstructured.staging.base import (
-    convert_to_dataframe,
-    convert_to_isd,
-    elements_from_json,
-)
+from unstructured.staging.base import elements_from_json, convert_to_dataframe, convert_to_isd
 from unstructured_inference.models.base import UnknownModelException
 from unstructured_inference.models.chipper import MODEL_TYPES as CHIPPER_MODEL_TYPES
 
-
-def is_compatible_response_type(media_type: str, response_type: type) -> bool:
-    """True when `response_type` can be converted to `media_type` for HTTP Response."""
-    return (
-        False
-        if media_type == "application/json" and response_type not in [dict, list]
-        else False if media_type == "text/csv" and response_type != str else True
-    )
-
+from prepline_general.api.memory_protection import ChipperMemoryProtection
+from prepline_general.api.validation import _check_pdf, _validate_hi_res_model_name, _validate_strategy
 
 logger = logging.getLogger("unstructured_api")
 
@@ -233,37 +219,6 @@ def partition_pdf_splits(
             results.extend(result)
 
     return results
-
-
-is_chipper_processing = False
-
-
-class ChipperMemoryProtection:
-    """Chipper calls are expensive, and right now we can only do one call at a time.
-
-    If the model is in use, return a 503 error. The API should scale up and the user can try again
-    on a different server.
-    """
-
-    def __enter__(self):
-        global is_chipper_processing
-        if is_chipper_processing:
-            # Log here so we can track how often it happens
-            logger.error("Chipper is already is use")
-            raise HTTPException(
-                status_code=503, detail="Server is under heavy load. Please try again later."
-            )
-
-        is_chipper_processing = True
-
-    def __exit__(
-        self,
-        exc_type: Optional[type[BaseException]],
-        exc_value: Optional[BaseException],
-        exc_tb: Optional[TracebackType],
-    ):
-        global is_chipper_processing
-        is_chipper_processing = False
 
 
 def pipeline_api(
@@ -521,106 +476,9 @@ def _check_free_memory():
         )
 
 
-def _check_pdf(file: IO[bytes]):
-    """Check if the PDF file is encrypted, otherwise assume it is not a valid PDF."""
-    try:
-        pdf = PdfReader(file)
-
-        # This will raise if the file is encrypted
-        pdf.metadata
-        return pdf
-    except FileNotDecryptedError:
-        raise HTTPException(
-            status_code=400,
-            detail="File is encrypted. Please decrypt it with password.",
-        )
-    except PdfReadError:
-        raise HTTPException(status_code=422, detail="File does not appear to be a valid PDF")
-
-
-def _validate_strategy(strategy: str) -> str:
-    strategy = strategy.lower()
-    strategies = ["fast", "hi_res", "auto", "ocr_only"]
-    if strategy not in strategies:
-        raise HTTPException(
-            status_code=400, detail=f"Invalid strategy: {strategy}. Must be one of {strategies}"
-        )
-    return strategy
-
-
-def _validate_hi_res_model_name(
-    hi_res_model_name: Optional[str], show_coordinates: bool
-) -> Optional[str]:
-    # Make sure chipper aliases to the latest model
-    if hi_res_model_name and hi_res_model_name == "chipper":
-        hi_res_model_name = "chipperv2"
-
-    if hi_res_model_name and hi_res_model_name in CHIPPER_MODEL_TYPES and show_coordinates:
-        raise HTTPException(
-            status_code=400,
-            detail=f"coordinates aren't available when using the {hi_res_model_name} model type",
-        )
-    return hi_res_model_name
-
-
-def _validate_chunking_strategy(chunking_strategy: Optional[str]) -> Optional[str]:
-    """Raise on `chunking_strategy` is not a valid chunking strategy name.
-
-    Also provides case-insensitivity.
-    """
-    if chunking_strategy is None:
-        return None
-
-    chunking_strategy = chunking_strategy.lower()
-    available_strategies = ["basic", "by_title"]
-
-    if chunking_strategy not in available_strategies:
-        raise HTTPException(
-            status_code=400,
-            detail=(
-                f"Invalid chunking strategy: {chunking_strategy}. Must be one of"
-                f" {available_strategies}"
-            ),
-        )
-
-    return chunking_strategy
-
-
 def _set_pdf_infer_table_structure(pdf_infer_table_structure: bool, strategy: str) -> bool:
     """Avoids table inference in "fast" and "ocr_only" runs."""
     return strategy in ("hi_res", "auto") and pdf_infer_table_structure
-
-
-def get_validated_mimetype(file: UploadFile) -> Optional[str]:
-    """The MIME-type of `file`.
-
-    The mimetype is computed based on `file.content_type`, or the mimetypes lib if that's too
-    generic. If the user has set UNSTRUCTURED_ALLOWED_MIMETYPES, validate against this list and
-    return HTTP 400 for an invalid type.
-    """
-    content_type = file.content_type
-    filename = str(file.filename)  # -- "None" when file.filename is None --
-    if not content_type or content_type == "application/octet-stream":
-        content_type = mimetypes.guess_type(filename)[0]
-
-        # Some filetypes missing for this library, just hardcode them for now
-        if not content_type:
-            if filename.endswith(".md"):
-                content_type = "text/markdown"
-            elif filename.endswith(".msg"):
-                content_type = "message/rfc822"
-
-    allowed_mimetypes_str = os.environ.get("UNSTRUCTURED_ALLOWED_MIMETYPES")
-    if allowed_mimetypes_str is not None:
-        allowed_mimetypes = allowed_mimetypes_str.split(",")
-
-        if content_type not in allowed_mimetypes:
-            raise HTTPException(
-                status_code=400,
-                detail=(f"File type {content_type} is not supported."),
-            )
-
-    return content_type
 
 
 class MultipartMixedResponse(StreamingResponse):
