@@ -3,7 +3,7 @@ from __future__ import annotations
 import io
 import json
 import os
-from typing import List, Sequence, Dict, Any, cast, Union
+from typing import List, Sequence, Dict, Any, cast, Union, Optional
 
 import pandas as pd
 from fastapi import APIRouter, UploadFile, Depends, HTTPException
@@ -78,82 +78,98 @@ def general_partition(
         if is_content_type_gz or is_extension_gz:
             files[idx] = ungz_file(file, form_params.gz_uncompressed_content_type)
 
-    def response_generator(is_multipart: bool):
-        for file in files:
-            file_content_type = get_validated_mimetype(file)
-
-            _file = file.file
-
-            response = pipeline_api(
-                _file,
-                request=request,
-                coordinates=form_params.coordinates,
-                encoding=form_params.encoding,
-                hi_res_model_name=form_params.hi_res_model_name,
-                include_page_breaks=form_params.include_page_breaks,
-                ocr_languages=form_params.ocr_languages,
-                pdf_infer_table_structure=form_params.pdf_infer_table_structure,
-                skip_infer_table_types=form_params.skip_infer_table_types,
-                strategy=form_params.strategy,
-                xml_keep_tags=form_params.xml_keep_tags,
-                response_type=form_params.output_format,
-                filename=str(file.filename),
-                file_content_type=file_content_type,
-                languages=form_params.languages,
-                extract_image_block_types=form_params.extract_image_block_types,
-                unique_element_ids=form_params.unique_element_ids,
-                # -- chunking options --
-                chunking_strategy=chunking_strategy,
-                combine_under_n_chars=form_params.combine_under_n_chars,
-                max_characters=form_params.max_characters,
-                multipage_sections=form_params.multipage_sections,
-                new_after_n_chars=form_params.new_after_n_chars,
-                overlap=form_params.overlap,
-                overlap_all=form_params.overlap_all,
-                starting_page_number=form_params.starting_page_number,
-            )
-
-            yield (
-                json.dumps(response)
-                if is_multipart and type(response) not in [str, bytes]
-                else (
-                    PlainTextResponse(response)
-                    if not is_multipart and form_params.output_format == "text/csv"
-                    else response
-                )
-            )
-
-    def join_responses(
-        responses: Sequence[str | List[Dict[str, Any]] | PlainTextResponse]
-    ) -> List[str | List[Dict[str, Any]]] | PlainTextResponse:
-        """Consolidate partitionings from multiple documents into single response payload."""
-        if form_params.output_format != "text/csv":
-            return cast(List[Union[str, List[Dict[str, Any]]]], responses)
-        responses = cast(List[PlainTextResponse], responses)
-        data = pd.read_csv(  # pyright: ignore[reportUnknownMemberType]
-            io.BytesIO(responses[0].body)
-        )
-        if len(responses) > 1:
-            for resp in responses[1:]:
-                resp_data = pd.read_csv(  # pyright: ignore[reportUnknownMemberType]
-                    io.BytesIO(resp.body)
-                )
-                data = data.merge(  # pyright: ignore[reportUnknownMemberType]
-                    resp_data, how="outer"
-                )
-        return PlainTextResponse(data.to_csv())
-
     return (
         MultipartMixedResponse(
-            response_generator(is_multipart=True), content_type=form_params.output_format
+            response_generator(files, request, form_params, chunking_strategy, is_multipart=True),
+            content_type=form_params.output_format,
         )
         if content_type == "multipart/mixed"
         else (
-            list(response_generator(is_multipart=False))[0]
+            list(
+                response_generator(
+                    files, request, form_params, chunking_strategy, is_multipart=False
+                )
+            )[0]
             if len(files) == 1
-            else join_responses(list(response_generator(is_multipart=False)))
+            else join_responses(
+                form_params,
+                list(
+                    response_generator(
+                        files, request, form_params, chunking_strategy, is_multipart=False
+                    )
+                ),
+            )
         )
     )
+
+
+def join_responses(
+    form_params: GeneralFormParams,
+    responses: Sequence[str | List[Dict[str, Any]] | PlainTextResponse],
+) -> List[str | List[Dict[str, Any]]] | PlainTextResponse:
+    """Consolidate partitionings from multiple documents into single response payload."""
+    if form_params.output_format != "text/csv":
+        return cast(List[Union[str, List[Dict[str, Any]]]], responses)
+    responses = cast(List[PlainTextResponse], responses)
+    data = pd.read_csv(io.BytesIO(responses[0].body))  # pyright: ignore[reportUnknownMemberType]
+    if len(responses) > 1:
+        for resp in responses[1:]:
+            resp_data = pd.read_csv(  # pyright: ignore[reportUnknownMemberType]
+                io.BytesIO(resp.body)
+            )
+            data = data.merge(resp_data, how="outer")  # pyright: ignore[reportUnknownMemberType]
+    return PlainTextResponse(data.to_csv())
+
+
+def response_generator(
+    files: List[UploadFile],
+    request: Request,
+    form_params: GeneralFormParams,
+    chunking_strategy: Optional[str],
+    is_multipart: bool,
+):
+    for file in files:
+        file_content_type = get_validated_mimetype(file)
+        _file = file.file
+
+        response = pipeline_api(
+            _file,
+            request=request,
+            coordinates=form_params.coordinates,
+            encoding=form_params.encoding,
+            hi_res_model_name=form_params.hi_res_model_name,
+            include_page_breaks=form_params.include_page_breaks,
+            ocr_languages=form_params.ocr_languages,
+            pdf_infer_table_structure=form_params.pdf_infer_table_structure,
+            skip_infer_table_types=form_params.skip_infer_table_types,
+            strategy=form_params.strategy,
+            xml_keep_tags=form_params.xml_keep_tags,
+            response_type=form_params.output_format,
+            filename=str(file.filename),
+            file_content_type=file_content_type,
+            languages=form_params.languages,
+            extract_image_block_types=form_params.extract_image_block_types,
+            unique_element_ids=form_params.unique_element_ids,
+            # -- chunking options --
+            chunking_strategy=chunking_strategy,
+            combine_under_n_chars=form_params.combine_under_n_chars,
+            max_characters=form_params.max_characters,
+            multipage_sections=form_params.multipage_sections,
+            new_after_n_chars=form_params.new_after_n_chars,
+            overlap=form_params.overlap,
+            overlap_all=form_params.overlap_all,
+            starting_page_number=form_params.starting_page_number,
+        )
+
+        yield (
+            json.dumps(response)
+            if is_multipart and type(response) not in [str, bytes]
+            else (
+                PlainTextResponse(response)
+                if not is_multipart and form_params.output_format == "text/csv"
+                else response
+            )
+        )
 
 
 @router.get("/general/v0/general", include_in_schema=False)
