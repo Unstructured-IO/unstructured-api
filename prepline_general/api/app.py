@@ -1,12 +1,11 @@
-from fastapi import FastAPI, Request, status, HTTPException
-from fastapi.datastructures import FormData
+from fastapi import FastAPI, Request, HTTPException
 from fastapi.responses import JSONResponse
-from fastapi.security import APIKeyHeader
+from fastapi.datastructures import FormData
 import logging
 import os
 
-from .general import router as general_router
-from .openapi import set_custom_openapi
+from prepline_general.api.endpoints import router as general_router
+from prepline_general.api.openapi import set_custom_openapi
 
 logger = logging.getLogger("unstructured_api")
 
@@ -30,6 +29,8 @@ app = FastAPI(
     ],
     openapi_tags=[{"name": "general"}],
 )
+
+app.include_router(general_router)
 
 # Note(austin) - This logger just dumps exceptions
 # We'd rather handle those below, so disable this in deployments
@@ -62,7 +63,6 @@ if allowed_origins:
         allow_headers=["Content-Type"],
     )
 
-app.include_router(general_router)
 
 set_custom_openapi(app)
 
@@ -106,27 +106,5 @@ async def patched_get_form(
 
 # Replace the private method with our wrapper
 Request._get_form = patched_get_form  # type: ignore[assignment]
-
-
-# Filter out /healthcheck noise
-class HealthCheckFilter(logging.Filter):
-    def filter(self, record: logging.LogRecord) -> bool:
-        return record.getMessage().find("/healthcheck") == -1
-
-
-# Filter out /metrics noise
-class MetricsCheckFilter(logging.Filter):
-    def filter(self, record: logging.LogRecord) -> bool:
-        return record.getMessage().find("/metrics") == -1
-
-
-logging.getLogger("uvicorn.access").addFilter(HealthCheckFilter())
-logging.getLogger("uvicorn.access").addFilter(MetricsCheckFilter())
-
-
-@app.get("/healthcheck", status_code=status.HTTP_200_OK, include_in_schema=False)
-def healthcheck(request: Request):
-    return {"healthcheck": "HEALTHCHECK STATUS: EVERYTHING OK!"}
-
 
 logger.info("Started Unstructured API")
