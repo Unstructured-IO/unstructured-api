@@ -1134,3 +1134,25 @@ def test_output_format_csv_ignore_specified_accept_header():
     df = pd.read_csv(io.StringIO(response.text))
     assert len(df) == 9
     assert df["text"][3] == "Make sure to RSVP!"
+
+
+@pytest.mark.parametrize(
+    "pdf_infer_table_structure, strategy, skip_infer_table_types, expected",
+    [
+        (True, "fast", [], False),
+        (False, "fast", [], False),
+        (True, "hi_res", [], True),
+        (False, "hi_res", [], False),
+        (True, "hi_res", ["pdf"], False),
+        (False, "hi_res", ["pdf"], False),
+    ],
+)
+def test__set_pdf_infer_table_structure(
+    pdf_infer_table_structure, strategy, skip_infer_table_types, expected
+):
+    assert (
+        general._set_pdf_infer_table_structure(
+            pdf_infer_table_structure, strategy, skip_infer_table_types
+        )
+        is expected
+    )
