@@ -703,7 +703,9 @@ def test_parallel_mode_passes_params(monkeypatch):
         include_page_breaks=True,
         ocr_languages=None,
         languages=["eng"],
-        pdf_infer_table_structure=True,
+        # NOTE(robinson) - pdf_infer_table_structure is False because
+        # skip_infer_table_type=["pdf"] superceded pdf_infer_table_structure
+        pdf_infer_table_structure=False,
         strategy="hi_res",
         xml_keep_tags=True,
         skip_infer_table_types=["pdf"],
