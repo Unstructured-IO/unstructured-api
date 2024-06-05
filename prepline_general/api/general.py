@@ -441,9 +441,9 @@ def pipeline_api(
             )
         elif hi_res_model_name and hi_res_model_name in CHIPPER_MODEL_TYPES:
             with ChipperMemoryProtection():
-                elements = partition(**partition_kwargs)  # pyright: ignore[reportGeneralTypeIssues]
+                elements = partition(**partition_kwargs)  # type: ignore # pyright: ignore[reportGeneralTypeIssues]
         else:
-            elements = partition(**partition_kwargs)  # pyright: ignore[reportGeneralTypeIssues]
+            elements = partition(**partition_kwargs)  # type: ignore # pyright: ignore[reportGeneralTypeIssues]
 
     except OSError as e:
         if isinstance(e.args[0], str) and (
