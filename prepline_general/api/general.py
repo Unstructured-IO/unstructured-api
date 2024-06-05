@@ -361,7 +361,7 @@ def pipeline_api(
 
     hi_res_model_name = _validate_hi_res_model_name(hi_res_model_name, coordinates)
     strategy = _validate_strategy(strategy)
-    pdf_infer_table_structure = _set_pdf_infer_table_structure(pdf_infer_table_structure, strategy)
+    # pdf_infer_table_structure = _set_pdf_infer_table_structure(pdf_infer_table_structure, strategy)
 
     # Parallel mode is set by env variable
     enable_parallel_mode = os.environ.get("UNSTRUCTURED_PARALLEL_MODE_ENABLED", "false")
@@ -595,9 +595,9 @@ def _validate_chunking_strategy(chunking_strategy: Optional[str]) -> Optional[st
     return chunking_strategy
 
 
-def _set_pdf_infer_table_structure(pdf_infer_table_structure: bool, strategy: str) -> bool:
-    """Avoids table inference in "fast" and "ocr_only" runs."""
-    return strategy in ("hi_res", "auto") and pdf_infer_table_structure
+# def _set_pdf_infer_table_structure(pdf_infer_table_structure: bool, strategy: str) -> bool:
+#     """Avoids table inference in "fast" and "ocr_only" runs."""
+#     return strategy in ("hi_res", "auto") and pdf_infer_table_structure
 
 
 def get_validated_mimetype(file: UploadFile) -> Optional[str]:
