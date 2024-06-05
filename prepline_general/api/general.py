@@ -295,7 +295,7 @@ def pipeline_api(
     hi_res_model_name: Optional[str] = None,
     include_page_breaks: bool = False,
     ocr_languages: Optional[List[str]] = None,
-    pdf_infer_table_structure: bool = True,
+    pdf_infer_table_structure: bool = False,
     skip_infer_table_types: Optional[List[str]] = None,
     strategy: str = "auto",
     xml_keep_tags: bool = False,
