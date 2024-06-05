@@ -1,3 +1,8 @@
+## 0.0.69
+
+* Bump to `unstructured` 0.14.4
+* Add handling for `pdf_infer_table_structure` to reflect the "tables off by default" behavior in `unstructured`.
+
 ## 0.0.68
 
 * Fix list params such as `extract_image_block_types` not working via the python/js clients
@@ -20,7 +25,7 @@
 * Bump unstructured to 0.12.4
 * Add support for both `list[str]` and `str` input formats for `ocr_languages` parameter
 * Adds support for additional MIME types from `unstructured`
-* Document the support for gzip files and add additional testing 
+* Document the support for gzip files and add additional testing
 
 ## 0.0.64
 

@@ -361,7 +361,11 @@ def pipeline_api(
 
     hi_res_model_name = _validate_hi_res_model_name(hi_res_model_name, coordinates)
     strategy = _validate_strategy(strategy)
-    pdf_infer_table_structure = _set_pdf_infer_table_structure(pdf_infer_table_structure, strategy)
+    pdf_infer_table_structure = _set_pdf_infer_table_structure(
+        pdf_infer_table_structure,
+        strategy,
+        skip_infer_table_types,
+    )
 
     # Parallel mode is set by env variable
     enable_parallel_mode = os.environ.get("UNSTRUCTURED_PARALLEL_MODE_ENABLED", "false")
@@ -441,9 +445,9 @@ def pipeline_api(
             )
         elif hi_res_model_name and hi_res_model_name in CHIPPER_MODEL_TYPES:
             with ChipperMemoryProtection():
-                elements = partition(**partition_kwargs)  # pyright: ignore[reportGeneralTypeIssues]
+                elements = partition(**partition_kwargs)  # type: ignore # pyright: ignore[reportGeneralTypeIssues]
         else:
-            elements = partition(**partition_kwargs)  # pyright: ignore[reportGeneralTypeIssues]
+            elements = partition(**partition_kwargs)  # type: ignore # pyright: ignore[reportGeneralTypeIssues]
 
     except OSError as e:
         if isinstance(e.args[0], str) and (
@@ -595,8 +599,13 @@ def _validate_chunking_strategy(chunking_strategy: Optional[str]) -> Optional[st
     return chunking_strategy
 
 
-def _set_pdf_infer_table_structure(pdf_infer_table_structure: bool, strategy: str) -> bool:
+def _set_pdf_infer_table_structure(
+    pdf_infer_table_structure: bool, strategy: str, skip_infer_table_types: Optional[List[str]]
+) -> bool:
     """Avoids table inference in "fast" and "ocr_only" runs."""
+    # NOTE(robinson) - line below is for type checking
+    skip_infer_table_types = [] if skip_infer_table_types is None else skip_infer_table_types
+    pdf_infer_table_structure = pdf_infer_table_structure and ("pdf" not in skip_infer_table_types)
     return strategy in ("hi_res", "auto") and pdf_infer_table_structure
 
 
@@ -704,7 +713,7 @@ def ungz_file(file: UploadFile, gz_uncompressed_content_type: Optional[str] = No
 
 
 @router.get("/general/v0/general", include_in_schema=False)
-@router.get("/general/v0.0.68/general", include_in_schema=False)
+@router.get("/general/v0.0.69/general", include_in_schema=False)
 async def handle_invalid_get_request():
     raise HTTPException(
         status_code=status.HTTP_405_METHOD_NOT_ALLOWED, detail="Only POST requests are supported."
@@ -719,7 +728,7 @@ async def handle_invalid_get_request():
     description="Description",
     operation_id="partition_parameters",
 )
-@router.post("/general/v0.0.68/general", include_in_schema=False)
+@router.post("/general/v0.0.69/general", include_in_schema=False)
 def general_partition(
     request: Request,
     # cannot use annotated type here because of a bug described here:
