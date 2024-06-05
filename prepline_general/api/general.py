@@ -603,6 +603,8 @@ def _set_pdf_infer_table_structure(
     pdf_infer_table_structure: bool, strategy: str, skip_infer_table_types: Optional[List[str]]
 ) -> bool:
     """Avoids table inference in "fast" and "ocr_only" runs."""
+    # NOTE(robinson) - line below is for type checking
+    skip_infer_table_types = [] if skip_infer_table_types is None else skip_infer_table_types
     pdf_infer_table_structure = pdf_infer_table_structure and ("pdf" not in skip_infer_table_types)
     return strategy in ("hi_res", "auto") and pdf_infer_table_structure
 
