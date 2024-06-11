@@ -64,6 +64,10 @@ DOCKER_IMAGE ?= pipeline-family-${PIPELINE_FAMILY}-dev:latest
 docker-build:
 	PIP_VERSION=${PIP_VERSION} PIPELINE_FAMILY=${PIPELINE_FAMILY} PIPELINE_PACKAGE=${PIPELINE_PACKAGE} ./scripts/docker-build.sh
 
+.PHONY: docker-dl-packages
+docker-dl-packages:
+	@scripts/docker-dl-packages.sh
+
 .PHONY: docker-start-api
 docker-start-api:
 	docker run -p 8000:8000 \
