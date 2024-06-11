@@ -9,11 +9,12 @@ DOCKER_IMAGE="${DOCKER_IMAGE:-pipeline-family-${PIPELINE_FAMILY}-dev}"
 DOCKER_PLATFORM="${DOCKER_PLATFORM:-}"
 
 
-DOCKER_BUILD_CMD=(docker buildx build --load -f Dockerfile \
+DOCKER_BUILD_CMD=(docker buildx build --load -f Dockerfile-amd64 \
   --build-arg PIP_VERSION="$PIP_VERSION" \
   --build-arg BUILDKIT_INLINE_CACHE=1 \
   --build-arg PIPELINE_PACKAGE="$PIPELINE_PACKAGE" \
   --progress plain \
+  --platform linux/amd64 \
   --target code \
   --cache-from "$DOCKER_REPOSITORY":latest \
   -t "$DOCKER_IMAGE" .)
