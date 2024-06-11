@@ -68,6 +68,7 @@ jobs:
         # Clear some space (https://github.com/actions/runner-images/issues/2840)
         sudo rm -rf /usr/share/dotnet /opt/ghc /usr/local/share/boost
 
+        make docker-dl-packages
         ARCH=$(cut -d "/" -f2 <<< ${{ matrix.docker-platform }})
         DOCKER_BUILDKIT=1 docker buildx build --platform=$ARCH --load \
           --build-arg PIP_VERSION=$PIP_VERSION \
