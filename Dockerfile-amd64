@@ -7,33 +7,27 @@ ARG NB_USER=notebook-user
 ARG NB_UID=1000
 ARG PIP_VERSION
 ARG PIPELINE_PACKAGE
+ARG PYTHON_VERSION="3.11"
 
 # Set up environment
-ENV USER ${NB_USER}
-ENV HOME /home/${NB_USER}
+ENV PYTHON python${PYTHON_VERSION}
+ENV PIP ${PYTHON} -m pip
 
-RUN groupadd --gid ${NB_UID} ${NB_USER}
-RUN useradd --uid ${NB_UID} --gid ${NB_UID} ${NB_USER}
 WORKDIR ${HOME}
+USER ${NB_USER}
 
 ENV PYTHONPATH="${PYTHONPATH}:${HOME}"
 ENV PATH="/home/${NB_USER}/.local/bin:${PATH}"
 
 FROM base as python-deps
-COPY requirements/base.txt requirements-base.txt
-RUN python3.11 -m pip install pip==${PIP_VERSION} \
-  && dnf -y groupinstall "Development Tools" \
-  && su -l ${NB_USER} -c 'pip3.11 install  --no-cache  -r requirements-base.txt' \
-  && dnf -y groupremove "Development Tools" \
-  && dnf clean all \
-  && ln -s /home/notebook-user/.local/bin/pip3.11 /usr/local/bin/pip3.11 || true
-
-USER ${NB_USER}
+COPY --chown=${NB_USER}:${NB_USER} requirements/base.txt requirements-base.txt
+RUN ${PIP} install pip==${PIP_VERSION}
+RUN ${PIP} install --no-cache -r requirements-base.txt
 
 FROM python-deps as model-deps
-RUN python3.11 -c "import nltk; nltk.download('punkt')" && \
-  python3.11 -c "import nltk; nltk.download('averaged_perceptron_tagger')" && \
-  python3.11 -c "from unstructured.partition.model_init import initialize; initialize()"
+RUN ${PYTHON} -c "import nltk; nltk.download('punkt')" && \
+  ${PYTHON} -c "import nltk; nltk.download('averaged_perceptron_tagger')" && \
+  ${PYTHON} -c "from unstructured.partition.model_init import initialize; initialize()"
 
 FROM model-deps as code
 COPY --chown=${NB_USER}:${NB_USER} CHANGELOG.md CHANGELOG.md
