@@ -145,3 +145,6 @@ celerybeat-schedule.db
 
 # temporarily generated files by project-specific Makefile
 tmp*
+
+# pyinstaller
+nltk_data
