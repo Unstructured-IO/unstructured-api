@@ -1,5 +1,10 @@
 ## 0.0.69
 
+* Bump to `unstructured` 0.14.6
+* Bump to `unstructured-inference` 0.7.35
+
+## 0.0.69
+
 * Bump to `unstructured` 0.14.4
 * Add handling for `pdf_infer_table_structure` to reflect the "tables off by default" behavior in `unstructured`.
 
