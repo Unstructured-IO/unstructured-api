@@ -116,6 +116,6 @@ jobs:
     - name: Scan image
       uses: anchore/scan-action@v3
       with:
-        image: "pipeline-family-general-dev"
+        image: "pipeline-family-${{ env.PIPELINE_FAMILY }}-dev"
         # NOTE(robinson) - revert this to medium when we bump libreoffice
         severity-cutoff: high
