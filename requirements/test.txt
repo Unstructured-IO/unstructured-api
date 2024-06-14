@@ -86,6 +86,7 @@ click==8.1.3
     #   -r requirements/test.in
     #   black
     #   nltk
+    #   python-oxmsg
     #   typer
     #   uvicorn
 coloredlogs==15.0.1
@@ -110,7 +111,7 @@ cycler==0.12.1
     # via
     #   -r requirements/base.txt
     #   matplotlib
-dataclasses-json==0.6.6
+dataclasses-json==0.6.7
     # via
     #   -r requirements/base.txt
     #   unstructured
@@ -166,14 +167,14 @@ fastapi-cli==0.0.4
     # via
     #   -r requirements/base.txt
     #   fastapi
-fastcore==1.5.44
+fastcore==1.5.45
     # via
     #   execnb
     #   ghapi
     #   nbdev
 fastjsonschema==2.19.1
     # via nbformat
-filelock==3.14.0
+filelock==3.15.1
     # via
     #   -r requirements/base.txt
     #   huggingface-hub
@@ -206,7 +207,7 @@ google-api-core[grpc]==2.19.0
     # via
     #   -r requirements/base.txt
     #   google-cloud-vision
-google-auth==2.29.0
+google-auth==2.30.0
     # via
     #   -r requirements/base.txt
     #   google-api-core
@@ -249,7 +250,7 @@ httpx==0.27.0
     #   fastapi
     #   jupyterlab
     #   unstructured-client
-huggingface-hub==0.23.3
+huggingface-hub==0.23.4
     # via
     #   -r requirements/base.txt
     #   timm
@@ -312,7 +313,7 @@ jsonpath-python==1.0.6
     # via
     #   -r requirements/base.txt
     #   unstructured-client
-jsonpointer==2.4
+jsonpointer==3.0.0
     # via jsonschema
 jsonschema[format-nongpl]==4.22.0
     # via
@@ -356,7 +357,7 @@ jupyter-server==2.14.1
     #   notebook-shim
 jupyter-server-terminals==0.5.3
     # via jupyter-server
-jupyterlab==4.2.1
+jupyterlab==4.2.2
     # via notebook
 jupyterlab-pygments==0.3.0
     # via nbconvert
@@ -398,7 +399,7 @@ markupsafe==2.1.5
     #   -r requirements/base.txt
     #   jinja2
     #   nbconvert
-marshmallow==3.21.2
+marshmallow==3.21.3
     # via
     #   -r requirements/base.txt
     #   dataclasses-json
@@ -424,10 +425,6 @@ mpmath==1.3.0
     # via
     #   -r requirements/base.txt
     #   sympy
-msg-parser==1.2.0
-    # via
-    #   -r requirements/base.txt
-    #   unstructured
 mypy==1.10.0
     # via -r requirements/test.in
 mypy-extensions==1.0.0
@@ -464,7 +461,7 @@ nltk==3.8.1
     # via
     #   -r requirements/base.txt
     #   unstructured
-notebook==7.2.0
+notebook==7.2.1
     # via jupyter
 notebook-shim==0.2.4
     # via
@@ -488,7 +485,7 @@ numpy==1.26.4
 olefile==0.47
     # via
     #   -r requirements/base.txt
-    #   msg-parser
+    #   python-oxmsg
 omegaconf==2.3.0
     # via
     #   -r requirements/base.txt
@@ -507,7 +504,7 @@ opencv-python==4.10.0.82
     #   -r requirements/base.txt
     #   layoutparser
     #   unstructured-inference
-openpyxl==3.1.3
+openpyxl==3.1.4
     # via
     #   -r requirements/base.txt
     #   unstructured
@@ -515,13 +512,13 @@ ordered-set==4.1.0
     # via
     #   -r requirements/base.txt
     #   deepdiff
-orjson==3.10.3
+orjson==3.10.5
     # via
     #   -r requirements/base.txt
     #   fastapi
 overrides==7.7.0
     # via jupyter-server
-packaging==24.0
+packaging==24.1
     # via
     #   -r requirements/base.txt
     #   black
@@ -566,7 +563,7 @@ pdfminer-six==20231228
     #   -r requirements/base.txt
     #   pdfplumber
     #   unstructured
-pdfplumber==0.11.0
+pdfplumber==0.11.1
     # via
     #   -r requirements/base.txt
     #   layoutparser
@@ -605,7 +602,7 @@ portalocker==2.8.2
     #   iopath
 prometheus-client==0.20.0
     # via jupyter-server
-prompt-toolkit==3.0.46
+prompt-toolkit==3.0.47
     # via
     #   ipython
     #   jupyter-console
@@ -655,7 +652,7 @@ pycparser==2.22
     #   cffi
 pycryptodome==3.20.0
     # via -r requirements/base.txt
-pydantic==2.7.3
+pydantic==2.7.4
     # via
     #   -r requirements/base.txt
     #   fastapi
@@ -733,6 +730,10 @@ python-multipart==0.0.9
     #   -r requirements/base.txt
     #   fastapi
     #   unstructured-inference
+python-oxmsg==0.0.1
+    # via
+    #   -r requirements/base.txt
+    #   unstructured
 python-pptx==0.6.23
     # via
     #   -r requirements/base.txt
@@ -886,19 +887,19 @@ tomli==2.0.1
     #   jupyterlab
     #   mypy
     #   pytest
-torch==2.3.0
+torch==2.3.1
     # via
     #   -r requirements/base.txt
     #   effdet
     #   timm
     #   torchvision
     #   unstructured-inference
-torchvision==0.18.0
+torchvision==0.18.1
     # via
     #   -r requirements/base.txt
     #   effdet
     #   timm
-tornado==6.4
+tornado==6.4.1
     # via
     #   ipykernel
     #   jupyter-client
@@ -913,6 +914,7 @@ tqdm==4.66.4
     #   iopath
     #   nltk
     #   transformers
+    #   unstructured
 traitlets==5.14.3
     # via
     #   comm
@@ -940,7 +942,7 @@ typer==0.12.3
     #   fastapi-cli
 types-python-dateutil==2.9.0.20240316
     # via arrow
-typing-extensions==4.12.1
+typing-extensions==4.12.2
     # via
     #   -r requirements/base.txt
     #   anyio
@@ -956,6 +958,7 @@ typing-extensions==4.12.1
     #   pydantic-core
     #   pypdf
     #   python-docx
+    #   python-oxmsg
     #   torch
     #   typer
     #   typing-inspect
@@ -975,13 +978,13 @@ ujson==5.10.0
     # via
     #   -r requirements/base.txt
     #   fastapi
-unstructured[all-docs]==0.14.4
+unstructured[all-docs]==0.14.6
     # via -r requirements/base.txt
-unstructured-client==0.23.0
+unstructured-client==0.23.3
     # via
     #   -r requirements/base.txt
     #   unstructured
-unstructured-inference==0.7.33
+unstructured-inference==0.7.35
     # via
     #   -r requirements/base.txt
     #   unstructured
@@ -1012,7 +1015,7 @@ watchfiles==0.22.0
     #   uvicorn
 wcwidth==0.2.13
     # via prompt-toolkit
-webcolors==1.13
+webcolors==24.6.0
     # via jsonschema
 webencodings==0.5.1
     # via
@@ -1044,3 +1047,4 @@ xlsxwriter==3.2.0
 
 # The following packages are considered to be unsafe in a requirements file:
 # pip
+# setuptools
