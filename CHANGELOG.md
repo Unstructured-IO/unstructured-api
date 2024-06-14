@@ -1,3 +1,8 @@
+## 0.0.70
+
+* Bump to `unstructured` 0.14.6
+* Bump to `unstructured-inference` 0.7.35
+
 ## 0.0.69
 
 * Bump to `unstructured` 0.14.4
