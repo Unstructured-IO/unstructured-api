@@ -145,6 +145,3 @@ celerybeat-schedule.db
 
 # temporarily generated files by project-specific Makefile
 tmp*
-
-# APK packages for the docker build
-docker-packages/*

@@ -110,7 +110,6 @@ jobs:
     - name: Test Dockerfile
       run: |
         source .venv/bin/activate
-        make docker-dl-packages
         make docker-build
         make docker-test
     - name: Scan image

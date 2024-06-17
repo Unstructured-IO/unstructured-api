@@ -1,6 +1,6 @@
 ## 0.0.71-dev0
 
-* replace rockylinux with chainguard/wolfie as a base image for `amd64`
+* replace rockylinux with chainguard/wolfi as a base image for `amd64`
 
 ## 0.0.70
 
