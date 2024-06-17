@@ -1,3 +1,7 @@
+## 0.0.71-dev0
+
+* replace rockylinux with chainguard/wolfi as a base image for `amd64`
+
 ## 0.0.70
 
 * Bump to `unstructured` 0.14.6
