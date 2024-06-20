@@ -76,8 +76,8 @@ jobs:
           --build-arg PIPELINE_PACKAGE=${{ env.PIPELINE_FAMILY }} \
           --provenance=false \
           --progress plain \
-          --cache-from $DOCKER_BUILD_REPOSITORY:$ARCH \
-          -t $DOCKER_BUILD_REPOSITORY:$ARCH-$SHORT_SHA .
+          --cache-from $DOCKER_BUILD_REPOSITORY:${{ matrix.arch }} \
+          -t $DOCKER_BUILD_REPOSITORY:${{ matrix.arch }}-$SHORT_SHA .
     - name: Set virtualenv cache
       uses: actions/cache@v4
       id: virtualenv-cache
@@ -99,7 +99,7 @@ jobs:
     - name: Push image
       run: |
         # write to the build repository to cache for the publish-images job
-        docker push $DOCKER_BUILD_REPOSITORY:$ARCH-$SHORT_SHA
+        docker push $DOCKER_BUILD_REPOSITORY:${{ matrix.arch }}-$SHORT_SHA
   publish-images:
     runs-on: ubuntu-latest-m
     needs: [setup, set-short-sha, build-images]
