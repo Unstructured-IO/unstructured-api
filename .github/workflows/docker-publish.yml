@@ -69,7 +69,7 @@ jobs:
         sudo rm -rf /usr/share/dotnet /opt/ghc /usr/local/share/boost
 
         ARCH=$(cut -d "/" -f2 <<< ${{ matrix.docker-platform }})
-        DOCKER_BUILDKIT=1 docker buildx build --platform=$ARCH --load \
+        DOCKER_BUILDKIT=1 docker buildx build --platform=$ARCH --load -f Dockerfile-$ARCH \
           --build-arg PIP_VERSION=$PIP_VERSION \
           --build-arg BUILDKIT_INLINE_CACHE=1 \
           --build-arg PIPELINE_PACKAGE=${{ env.PIPELINE_FAMILY }} \
