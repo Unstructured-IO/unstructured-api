@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:experimental
-FROM quay.io/unstructured-io/base-images:wolfi-base@sha256:863fd5b87e780dacec62b97c2db2aeda7f770fcf9b045b29f53ec1ddbe607b4d as base
+FROM quay.io/unstructured-io/base-images:wolfi-base@sha256:7c3af225a39f730f4feee705df6cd8d1570739dc130456cf589ac53347da0f1d as base
 
 # NOTE(crag): NB_USER ARG for mybinder.org compat:
 #             https://mybinder.readthedocs.io/en/latest/tutorials/dockerfile.html
@@ -39,4 +39,5 @@ COPY --chown=${NB_USER}:${NB_USER} scripts/app-start.sh scripts/app-start.sh
 ENTRYPOINT ["scripts/app-start.sh"]
 # Expose a default port of 8000. Note: The EXPOSE instruction does not actually publish the port,
 # but some tooling will inspect containers and perform work contingent on networking support declared.
+
 EXPOSE 8000
