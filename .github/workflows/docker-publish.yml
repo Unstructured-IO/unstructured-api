@@ -88,10 +88,9 @@ jobs:
     - name: Set up QEMU
       uses: docker/setup-qemu-action@v3
     - name: Test image
-      env:
-        DOCKER_IMAGE: "$DOCKER_BUILD_REPOSITORY:$ARCH-$SHORT_SHA"
       run: |
         source .venv/bin/activate
+        export DOCKER_IMAGE="$DOCKER_BUILD_REPOSITORY:$ARCH-$SHORT_SHA"
         if [ "$DOCKER_PLATFORM" == "linux/arm64" ]; then
           SKIP_INFERENCE_TESTS=true make docker-test
         else
