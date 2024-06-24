@@ -277,7 +277,7 @@ protobuf==4.25.3
     #   onnx
     #   onnxruntime
     #   proto-plus
-psutil==5.9.8
+psutil==5.9.5
     # via -r requirements/base.in
 pyasn1==0.6.0
     # via

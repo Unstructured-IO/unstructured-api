@@ -1,6 +1,8 @@
 # syntax=docker/dockerfile:experimental
 FROM quay.io/unstructured-io/base-images:wolfi-base@sha256:753fa1ed5a4793eb2bb179c07a34ba9164ac46328642e2db615259274b0c9baf as base
 
+RUN apk add py3-psutil
+
 # NOTE(crag): NB_USER ARG for mybinder.org compat:
 #             https://mybinder.readthedocs.io/en/latest/tutorials/dockerfile.html
 ARG NB_USER=notebook-user
