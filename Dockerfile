@@ -3,7 +3,7 @@ FROM quay.io/unstructured-io/base-images:wolfi-base@sha256:753fa1ed5a4793eb2bb17
 
 USER root
 
-RUN apk add py3-psutil
+RUN apk add gcc py3-psutil
 
 # NOTE(crag): NB_USER ARG for mybinder.org compat:
 #             https://mybinder.readthedocs.io/en/latest/tutorials/dockerfile.html
