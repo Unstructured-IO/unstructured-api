@@ -467,8 +467,9 @@ notebook-shim==0.2.4
     # via
     #   jupyterlab
     #   notebook
-numpy==2.0.0
+numpy==1.26.4
     # via
+    #   -c requirements/constraints.in
     #   -r requirements/base.txt
     #   contourpy
     #   layoutparser

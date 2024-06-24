@@ -187,8 +187,9 @@ networkx==3.3
     #   unstructured
 nltk==3.8.1
     # via unstructured
-numpy==2.0.0
+numpy==1.26.4
     # via
+    #   -c requirements/constraints.in
     #   contourpy
     #   layoutparser
     #   matplotlib
