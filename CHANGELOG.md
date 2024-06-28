@@ -1,3 +1,7 @@
+## 0.0.72
+
+* Fix certain filetypes failing mimetype lookup in the new base image
+
 ## 0.0.71
 
 * replace rockylinux with chainguard/wolfi as a base image for `amd64`
