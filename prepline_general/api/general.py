@@ -34,6 +34,7 @@ from starlette.datastructures import Headers
 from starlette.types import Send
 
 from prepline_general.api.models.form_params import GeneralFormParams
+from prepline_general.api.filetypes import get_validated_mimetype
 from unstructured.documents.elements import Element
 from unstructured.partition.auto import partition
 from unstructured.staging.base import (
@@ -58,37 +59,6 @@ def is_compatible_response_type(media_type: str, response_type: type) -> bool:
 
 
 logger = logging.getLogger("unstructured_api")
-
-DEFAULT_MIMETYPES = (
-    "application/pdf,application/msword,image/jpeg,image/png,text/markdown,"
-    "text/x-markdown,text/html,"
-    "application/vnd.openxmlformats-officedocument.wordprocessingml.document,"
-    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,"
-    "application/vnd.ms-excel,application/vnd.openxmlformats-officedocument."
-    "presentationml.presentation,"
-    "application/json,"
-    "application/vnd.ms-powerpoint,"
-    "text/html,message/rfc822,text/plain,image/png,"
-    "application/epub,application/epub+zip,"
-    "application/rtf,text/rtf,"
-    "application/vnd.oasis.opendocument.text,"
-    "text/csv,text/x-csv,application/csv,application/x-csv,"
-    "text/comma-separated-values,text/x-comma-separated-values,"
-    "application/xml,text/xml,text/x-rst,text/prs.fallenstein.rst,"
-    "text/tsv,text/tab-separated-values,"
-    "application/x-ole-storage,application/vnd.ms-outlook,"
-    "application/yaml,"
-    "application/x-yaml,"
-    "text/x-yaml,"
-    "text/yaml,"
-    "image/bmp,"
-    "image/heic,"
-    "image/tiff,"
-    "text/org,"
-)
-
-if not os.environ.get("UNSTRUCTURED_ALLOWED_MIMETYPES", None):
-    os.environ["UNSTRUCTURED_ALLOWED_MIMETYPES"] = DEFAULT_MIMETYPES
 
 
 def get_pdf_splits(pdf_pages: Sequence[PageObject], split_size: int = 1):
@@ -607,38 +577,6 @@ def _set_pdf_infer_table_structure(
     skip_infer_table_types = [] if skip_infer_table_types is None else skip_infer_table_types
     pdf_infer_table_structure = pdf_infer_table_structure and ("pdf" not in skip_infer_table_types)
     return strategy in ("hi_res", "auto") and pdf_infer_table_structure
-
-
-def get_validated_mimetype(file: UploadFile) -> Optional[str]:
-    """The MIME-type of `file`.
-
-    The mimetype is computed based on `file.content_type`, or the mimetypes lib if that's too
-    generic. If the user has set UNSTRUCTURED_ALLOWED_MIMETYPES, validate against this list and
-    return HTTP 400 for an invalid type.
-    """
-    content_type = file.content_type
-    filename = str(file.filename)  # -- "None" when file.filename is None --
-    if not content_type or content_type == "application/octet-stream":
-        content_type = mimetypes.guess_type(filename)[0]
-
-        # Some filetypes missing for this library, just hardcode them for now
-        if not content_type:
-            if filename.endswith(".md"):
-                content_type = "text/markdown"
-            elif filename.endswith(".msg"):
-                content_type = "message/rfc822"
-
-    allowed_mimetypes_str = os.environ.get("UNSTRUCTURED_ALLOWED_MIMETYPES")
-    if allowed_mimetypes_str is not None:
-        allowed_mimetypes = allowed_mimetypes_str.split(",")
-
-        if content_type not in allowed_mimetypes:
-            raise HTTPException(
-                status_code=400,
-                detail=(f"File type {content_type} is not supported."),
-            )
-
-    return content_type
 
 
 class MultipartMixedResponse(StreamingResponse):
