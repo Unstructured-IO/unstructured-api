@@ -53,8 +53,7 @@ def is_convertible_to_list(s: str) -> Tuple[bool, Union[List, str]]:
         result = json.loads(s)
         if isinstance(result, list):
             return True, result  # Return the list if conversion is successful
-        else:
-            return False, "Input is valid JSON but not a list."  # Valid JSON but not a list
+        return False, "Input is valid JSON but not a list."  # Valid JSON but not a list
     except json.JSONDecodeError:
         pass  # proceed to check using delimiters if JSON parsing fails
 
@@ -86,7 +85,7 @@ class SmartValueParser(Generic[T]):
         if isinstance(value, list) and not isinstance(value, origin_class):
             extracted_value: T | None = _return_cast_first_element(value, origin_class)
             return extracted_value
-        elif isinstance(value, list) and origin_class == list and container_elems_class:
+        if isinstance(value, list) and origin_class == list and container_elems_class:
             if len(value) == 1:
                 is_list, result = is_convertible_to_list(str(value[0]))
                 new_value = result if is_list else value
