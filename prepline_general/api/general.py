@@ -634,8 +634,7 @@ def ungz_file(file: UploadFile, gz_uncompressed_content_type: Optional[str] = No
     def return_content_type(filename: str):
         if gz_uncompressed_content_type:
             return gz_uncompressed_content_type
-        else:
-            return str(mimetypes.guess_type(filename)[0])
+        return str(mimetypes.guess_type(filename)[0])
 
     filename = str(file.filename) if file.filename else ""
     if filename.endswith(".gz"):
