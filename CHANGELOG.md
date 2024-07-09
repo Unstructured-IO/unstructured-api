@@ -1,3 +1,16 @@
+## 0.0.72
+
+* Fix certain filetypes failing mimetype lookup in the new base image
+
+## 0.0.71
+
+* replace rockylinux with chainguard/wolfi as a base image for `amd64`
+
+## 0.0.70
+
+* Bump to `unstructured` 0.14.6
+* Bump to `unstructured-inference` 0.7.35
+
 ## 0.0.69
 
 * Bump to `unstructured` 0.14.4

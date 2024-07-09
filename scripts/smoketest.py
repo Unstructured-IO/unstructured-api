@@ -49,72 +49,96 @@ def send_document(
 
 
 @pytest.mark.parametrize(
-    "example_filename, content_type",
+    ("extension", "example_filename", "content_type"),
     [
-        # Note(yuming): Please sort filetypes alphabetically according to
-        # https://github.com/Unstructured-IO/unstructured/blob/main/unstructured/partition/auto.py#L14
-        ("stanley-cups.csv", "application/csv"),
-        ("fake.doc", "application/msword"),
-        ("fake.docx", "application/vnd.openxmlformats-officedocument.wordprocessingml.document"),
-        ("alert.eml", "message/rfc822"),
-        ("announcement.eml", "message/rfc822"),
-        ("fake-email-attachment.eml", "message/rfc822"),
-        ("fake-email-image-embedded.eml", "message/rfc822"),
-        ("fake-email.eml", "message/rfc822"),
-        ("family-day.eml", "message/rfc822"),
-        ("winter-sports.epub", "application/epub"),
-        ("fake-html.html", "text/html"),
-        pytest.param(
-            "layout-parser-paper-fast.jpg",
-            "image/jpeg",
-            marks=pytest.mark.skipif(skip_inference_tests, reason="emulated architecture"),
-        ),
-        ("spring-weather.html.json", "application/json"),
-        ("README.md", "text/markdown"),
-        ("fake-email.msg", "application/x-ole-storage"),
-        ("fake.odt", "application/vnd.oasis.opendocument.text"),
-        # Note(austin) The two inference calls will hang on mac with unsupported hardware error
-        # Skip these with SKIP_INFERENCE_TESTS=true make docker-test
-        pytest.param(
-            "layout-parser-paper.pdf.gz",
-            "application/gzip",
-            marks=pytest.mark.skipif(skip_inference_tests, reason="emulated architecture"),
-        ),
-        pytest.param(
-            "layout-parser-paper.pdf",
-            "application/pdf",
-            marks=pytest.mark.skipif(skip_inference_tests, reason="emulated architecture"),
-        ),
-        ("fake-power-point.ppt", "application/vnd.ms-powerpoint"),
+        (".bmp", "DA-1p.bmp", "image/bmp"),
+        (".csv", "stanley-cups.csv", "application/csv"),
+        (".doc", "fake.doc", "application/msword"),
         (
+            ".docx",
+            "fake.docx",
+            "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        ),
+        (".eml", "fake-email-attachment.eml", "message/rfc822"),
+        (".epub", "winter-sports.epub", "application/epub"),
+        (".heic", "DA-1p.heic", "image/heic"),
+        (".html", "fake-html.html", "text/html"),
+        (".jpeg", "layout-parser-paper-fast.jpg", "image/jpeg"),
+        (".md", "README.md", "text/markdown"),
+        (".msg", "fake-email.msg", "application/x-ole-storage"),
+        (".odt", "fake.odt", "application/vnd.oasis.opendocument.text"),
+        (".pdf", "layout-parser-paper.pdf", "application/pdf"),
+        (".png", "english-and-korean.png", "image/png"),
+        (".ppt", "fake-power-point.ppt", "application/vnd.ms-powerpoint"),
+        (
+            ".pptx",
             "fake-power-point.pptx",
             "application/vnd.openxmlformats-officedocument.presentationml.presentation",
         ),
-        ("README.rst", "text/prs.fallenstein.rst"),
-        ("fake-doc.rtf", "application/rtf"),
-        ("fake-text.txt", "text/plain"),
-        ("stanley-cups.tsv", "text/tab-separated-values"),
+        (".rst", "README.rst", "text/prs.fallenstein.rst"),
+        (".rtf", "fake-doc.rtf", "application/rtf"),
+        (".tiff", "layout-parser-paper-fast.tiff", "image/tiff"),
+        (".tsv", "stanley-cups.tsv", "text/tab-separated-values"),
+        (".txt", "fake-text.txt", "text/plain"),
         (
+            ".xlsx",
             "stanley-cups.xlsx",
             "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
         ),
-        ("fake-xml.xml", "text/xml"),
+        (".xml", "fake-xml.xml", "text/xml"),
+        (".json", "spring-weather.html.json", "application/json"),
+        (
+            ".gz",
+            "layout-parser-paper.pdf.gz",
+            "application/gzip",
+        ),
     ],
 )
-def test_happy_path(example_filename: str, content_type: str):
+def test_happy_path_all_types(extension, example_filename: str, content_type: str):
     """
     For the files in sample-docs, verify that we get a 200
     and some structured response
     """
-    test_file = str(Path("sample-docs") / example_filename)
-    print(f"sending {content_type}")
-    json_response = send_document(filenames=[test_file], content_type=content_type)
-    assert json_response.status_code == 200
-    assert len(json_response.json()) > 0
-    assert len("".join(elem["text"] for elem in json_response.json())) > 20
+    # The auto strategy will run ocr on these files
+    # This doesn't always work on our macs
+    if skip_inference_tests and extension in [
+        ".bmp",
+        ".heic",
+        ".jpeg",
+        ".pdf",
+        ".png",
+        ".tiff",
+        ".gz",  # Since we're using a gzipped pdf...
+    ]:
+        pytest.skip("emulated hardware")
 
+    test_file = str(Path("sample-docs") / example_filename)
+
+    # Verify we can send with explicit content type
+    response = send_document(filenames=[test_file], content_type=content_type)
+
+    if response.status_code != 200:
+        assert False, response.text
+
+    assert len(response.json()) > 0
+    assert len("".join(elem["text"] for elem in response.json())) > 20
+
+    # Verify we can infer the filetype on the server
+    response = send_document(filenames=[test_file], content_type=None)
+
+    if response.status_code != 200:
+        assert False, response.text
+
+    assert len(response.json()) > 0
+    assert len("".join(elem["text"] for elem in response.json())) > 20
+
+    json_response = response
+
+    # Verify we can set output type to csv
     csv_response = send_document(
-        filenames=[test_file], content_type=content_type, output_format="text/csv"
+        filenames=[test_file],
+        content_type=content_type,
+        output_format="text/csv",
     )
     assert csv_response.status_code == 200
     assert len(csv_response.text) > 0
