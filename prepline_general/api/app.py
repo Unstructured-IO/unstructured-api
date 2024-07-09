@@ -5,8 +5,8 @@ from fastapi.security import APIKeyHeader
 import logging
 import os
 
-from .general import router as general_router
-from .openapi import set_custom_openapi
+from prepline_general.api.general import router as general_router
+from prepline_general.api.openapi import set_custom_openapi
 
 logger = logging.getLogger("unstructured_api")
 

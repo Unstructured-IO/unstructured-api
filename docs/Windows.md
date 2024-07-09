@@ -15,10 +15,11 @@
 
 2. Setup python dependencies
     ```
-    cd unstructured-api
-    python -m pip install -r requirements/base.txt
-    python -c "import nltk; nltk.download('punkt')"
-    python -c "import nltk; nltk.download('averaged_perceptron_tagger')"
+    cd <path/to/repo/>
+    python -m pip install -r requirements/win-base.txt // uvloop does not support Windows
+    python -c "import nltk; nltk.download('punkt', download_dir='nltk_data')"
+    python -c "import nltk; nltk.download('averaged_perceptron_tagger', download_dir='nltk_data')"
+    pip install httpx htmlBuilder pydantic_settings
     ```
 
 3. Launch the app
@@ -40,7 +41,7 @@
     python -m pip install -r requirements/win-base.txt // uvloop does not support Windows
     python -c "import nltk; nltk.download('punkt', download_dir='nltk_data')"
     python -c "import nltk; nltk.download('averaged_perceptron_tagger', download_dir='nltk_data')"
-    pip install httpx htmlBuilder
+    pip install httpx htmlBuilder pydantic_settings
     ```
 4. Download `sqlite3.dll` as a patch from [link](https://www.sqlite.org/download.html). Download [sqlite-dll-win-x64-3460000.zip](https://www.sqlite.org/2024/sqlite-dll-win-x64-3460000.zip). Somehow python native `sqlite3` does not work. Place it at the root of repository. Unzip the zip file. 
 5.  Convert the unstructuredioapi repo into a python package by updating the `pyproject.toml`

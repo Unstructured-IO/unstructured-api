@@ -1,3 +1,24 @@
+
+[build-system]
+# setuptools-scm considers all files tracked by git to be data files
+requires = ["setuptools>=62.0", "setuptools-scm"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "prepline_general"
+description = "UnstructuredIO API"
+readme = "README.md"
+requires-python = "~=3.10"
+# keywords = ["one", "two"]
+license = { text = "Proprietary" }
+classifiers = [ # https://pypi.org/classifiers/
+    "Development Status :: 3 - Alpha",
+    "Programming Language :: Python :: 3 :: Only",
+    "Intended Audience :: Information Technology",
+    "Operating System :: Unix",
+]
+version="0.0.68"
+
 [tool.black]
 line-length = 100
 
@@ -35,3 +56,6 @@ known-first-party = [
     "unstructured",
     "unstructured_inference",
 ]
+
+[tool.setuptools.packages.find]
+where = ["."]
