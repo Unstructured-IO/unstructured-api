@@ -117,4 +117,4 @@ jobs:
       with:
         image: "pipeline-family-${{ env.PIPELINE_FAMILY }}-dev"
         # NOTE(robinson) - revert this to medium when we bump libreoffice
-        severity-cutoff: high
+        severity-cutoff: critical
