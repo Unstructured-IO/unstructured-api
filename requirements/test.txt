@@ -58,7 +58,7 @@ cachetools==5.3.3
     # via
     #   -r requirements/base.txt
     #   google-auth
-certifi==2024.6.2
+certifi==2024.7.4
     # via
     #   -r requirements/base.txt
     #   httpcore
@@ -116,7 +116,7 @@ dataclasses-json==0.6.7
     #   -r requirements/base.txt
     #   unstructured
     #   unstructured-client
-debugpy==1.8.1
+debugpy==1.8.2
     # via ipykernel
 decorator==5.1.1
     # via ipython
@@ -167,7 +167,7 @@ fastapi-cli==0.0.4
     # via
     #   -r requirements/base.txt
     #   fastapi
-fastcore==1.5.48
+fastcore==1.5.49
     # via
     #   execnb
     #   ghapi
@@ -190,33 +190,33 @@ flatbuffers==24.3.25
     # via
     #   -r requirements/base.txt
     #   onnxruntime
-fonttools==4.53.0
+fonttools==4.53.1
     # via
     #   -r requirements/base.txt
     #   matplotlib
 fqdn==1.5.1
     # via jsonschema
-fsspec==2024.6.0
+fsspec==2024.6.1
     # via
     #   -r requirements/base.txt
     #   huggingface-hub
     #   torch
 ghapi==1.0.5
     # via nbdev
-google-api-core[grpc]==2.19.0
+google-api-core[grpc]==2.19.1
     # via
     #   -r requirements/base.txt
     #   google-cloud-vision
-google-auth==2.30.0
+google-auth==2.32.0
     # via
     #   -r requirements/base.txt
     #   google-api-core
     #   google-cloud-vision
-google-cloud-vision==3.7.2
+google-cloud-vision==3.7.3
     # via
     #   -r requirements/base.txt
     #   unstructured
-googleapis-common-protos==1.63.1
+googleapis-common-protos==1.63.2
     # via
     #   -r requirements/base.txt
     #   google-api-core
@@ -226,7 +226,7 @@ grpcio==1.64.1
     #   -r requirements/base.txt
     #   google-api-core
     #   grpcio-status
-grpcio-status==1.62.2
+grpcio-status==1.64.1
     # via
     #   -r requirements/base.txt
     #   google-api-core
@@ -276,13 +276,13 @@ iopath==0.1.10
     # via
     #   -r requirements/base.txt
     #   layoutparser
-ipykernel==6.29.4
+ipykernel==6.29.5
     # via
     #   jupyter
     #   jupyter-console
     #   jupyterlab
     #   qtconsole
-ipython==8.25.0
+ipython==8.26.0
     # via
     #   execnb
     #   ipykernel
@@ -315,7 +315,7 @@ jsonpath-python==1.0.6
     #   unstructured-client
 jsonpointer==3.0.0
     # via jsonschema
-jsonschema[format-nongpl]==4.22.0
+jsonschema[format-nongpl]==4.23.0
     # via
     #   jupyter-events
     #   jupyterlab-server
@@ -357,7 +357,7 @@ jupyter-server==2.14.1
     #   notebook-shim
 jupyter-server-terminals==0.5.3
     # via jupyter-server
-jupyterlab==4.2.2
+jupyterlab==4.2.3
     # via notebook
 jupyterlab-pygments==0.3.0
     # via nbconvert
@@ -404,7 +404,7 @@ marshmallow==3.21.3
     #   -r requirements/base.txt
     #   dataclasses-json
     #   unstructured-client
-matplotlib==3.9.0
+matplotlib==3.9.1
     # via
     #   -r requirements/base.txt
     #   pycocotools
@@ -425,7 +425,7 @@ mpmath==1.3.0
     # via
     #   -r requirements/base.txt
     #   sympy
-mypy==1.10.0
+mypy==1.10.1
     # via -r requirements/test.in
 mypy-extensions==1.0.0
     # via
@@ -496,7 +496,7 @@ onnx==1.16.1
     #   -r requirements/base.txt
     #   unstructured
     #   unstructured-inference
-onnxruntime==1.18.0
+onnxruntime==1.18.1
     # via
     #   -r requirements/base.txt
     #   unstructured-inference
@@ -505,7 +505,7 @@ opencv-python==4.10.0.84
     #   -r requirements/base.txt
     #   layoutparser
     #   unstructured-inference
-openpyxl==3.1.4
+openpyxl==3.1.5
     # via
     #   -r requirements/base.txt
     #   unstructured
@@ -513,7 +513,7 @@ ordered-set==4.1.0
     # via
     #   -r requirements/base.txt
     #   deepdiff
-orjson==3.10.5
+orjson==3.10.6
     # via
     #   -r requirements/base.txt
     #   fastapi
@@ -564,7 +564,7 @@ pdfminer-six==20231228
     #   -r requirements/base.txt
     #   pdfplumber
     #   unstructured
-pdfplumber==0.11.1
+pdfplumber==0.11.2
     # via
     #   -r requirements/base.txt
     #   layoutparser
@@ -574,7 +574,7 @@ pikepdf==9.0.0
     # via
     #   -r requirements/base.txt
     #   unstructured
-pillow==10.3.0
+pillow==10.4.0
     # via
     #   -r requirements/base.txt
     #   layoutparser
@@ -587,7 +587,7 @@ pillow==10.3.0
     #   python-pptx
     #   torchvision
     #   unstructured-pytesseract
-pillow-heif==0.16.0
+pillow-heif==0.17.0
     # via
     #   -r requirements/base.txt
     #   unstructured
@@ -612,7 +612,7 @@ proto-plus==1.24.0
     #   -r requirements/base.txt
     #   google-api-core
     #   google-cloud-vision
-protobuf==4.25.3
+protobuf==5.27.2
     # via
     #   -r requirements/base.txt
     #   google-api-core
@@ -626,6 +626,7 @@ psutil==6.0.0
     # via
     #   -r requirements/base.txt
     #   ipykernel
+    #   unstructured
 ptyprocess==0.7.0
     # via
     #   pexpect
@@ -653,11 +654,11 @@ pycparser==2.22
     #   cffi
 pycryptodome==3.20.0
     # via -r requirements/base.txt
-pydantic==2.7.4
+pydantic==2.8.2
     # via
     #   -r requirements/base.txt
     #   fastapi
-pydantic-core==2.18.4
+pydantic-core==2.20.1
     # via
     #   -r requirements/base.txt
     #   pydantic
@@ -765,7 +766,7 @@ qtconsole==5.5.2
     # via jupyter
 qtpy==2.4.1
     # via qtconsole
-rapidfuzz==3.9.3
+rapidfuzz==3.9.4
     # via
     #   -r requirements/base.txt
     #   unstructured
@@ -808,7 +809,7 @@ rich==13.7.1
     # via
     #   -r requirements/base.txt
     #   typer
-rpds-py==0.18.1
+rpds-py==0.19.0
     # via
     #   jsonschema
     #   referencing
@@ -822,7 +823,7 @@ safetensors==0.3.2
     #   -r requirements/base.txt
     #   timm
     #   transformers
-scipy==1.13.1
+scipy==1.14.0
     # via
     #   -r requirements/base.txt
     #   layoutparser
@@ -857,7 +858,7 @@ starlette==0.37.2
     # via
     #   -r requirements/base.txt
     #   fastapi
-sympy==1.12.1
+sympy==1.13.0
     # via
     #   -r requirements/base.txt
     #   onnxruntime
@@ -979,9 +980,9 @@ ujson==5.10.0
     # via
     #   -r requirements/base.txt
     #   fastapi
-unstructured[all-docs]==0.14.8
+unstructured[all-docs]==0.14.10
     # via -r requirements/base.txt
-unstructured-client==0.23.7
+unstructured-client==0.24.0
     # via
     #   -r requirements/base.txt
     #   unstructured
