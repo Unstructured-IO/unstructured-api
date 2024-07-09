@@ -3,7 +3,8 @@
 import os
 from pathlib import Path
 import sys
-from PyInstaller.utils.hooks import collect_all
+import unstructured
+from PyInstaller.utils.hooks import collect_all, collect_data_files
 
 binaries_list = [
     ('C:\\Program Files\\LibreOffice\\program', 'libreoffice'), # modify this to point to where the LibreOffice is installed
@@ -17,20 +18,25 @@ datas_list = [
     (Path('nltk_data').as_posix(), 'nltk_data') # modify this to point to where nltk download the nltk data
 ]
 
-hiddenimports_list = []
+datas_list.extend(collect_data_files('unstructured'))
+
+hiddenimports_list = ['unstructured']
 
 def add_package(package_name):
+    print(f"Add Package {package_name}")
     datas, binaries, hiddenimports = collect_all(package_name)
     datas_list.extend(datas)
     binaries_list.extend(binaries)
     hiddenimports_list.extend(hiddenimports)
 
 # Collect all resources from the package_name
-add_package('unstructured')
+# add_package('unstructured')
 add_package('effdet')
 add_package('onnxruntime')
 add_package('encodings')
 add_package('prepline_general')
+
+print(len(datas_list))
 
 a = Analysis(
     [Path('unstructuredio_api.py').as_posix()],
@@ -53,7 +59,7 @@ exe = EXE(
     [],
     exclude_binaries=True,
     name='unstructuredio_api',
-    debug=False,
+    debug=True,
     bootloader_ignore_signals=False,
     strip=False,
     upx=True,

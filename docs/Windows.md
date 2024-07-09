@@ -1,19 +1,23 @@
 # Get Started
 
 ## Verified File Types
+
 1. pptx/ppt
 2. docx/doc
 3. xlsx/xls
 4. xml
 
 ## Setup Python
+
 1. Install Ananconda or Install Python
 
 2. Install LibreOffice
-    * Install the full LibreOffice
-    * Add the program to PATH. `Press "Windows" Key > Edit the system environment > Environment Variables > System variables > PATH > New > C:\Program Files\LibreOffice\program`
 
-2. Setup python dependencies
+    - Install the full LibreOffice
+    - Add the program to PATH. `Press "Windows" Key > Edit the system environment > Environment Variables > System variables > PATH > New > C:\Program Files\LibreOffice\program`
+
+3. Setup python dependencies
+
     ```
     cd <path/to/repo/>
     python -m pip install -r requirements/win-base.txt // uvloop does not support Windows
@@ -22,7 +26,7 @@
     pip install httpx htmlBuilder pydantic_settings
     ```
 
-3. Launch the app
+4. Launch the app
     ```
     python -m uvicorn prepline_general.api.app:app --reload --log-config logger_config.yaml
     ```
@@ -41,74 +45,75 @@
     python -m pip install -r requirements/win-base.txt // uvloop does not support Windows
     python -c "import nltk; nltk.download('punkt', download_dir='nltk_data')"
     python -c "import nltk; nltk.download('averaged_perceptron_tagger', download_dir='nltk_data')"
-    pip install httpx htmlBuilder pydantic_settings
+    pip install httpx htmlBuilder pydantic_settings python-magic-bin
     ```
-4. Download `sqlite3.dll` as a patch from [link](https://www.sqlite.org/download.html). Download [sqlite-dll-win-x64-3460000.zip](https://www.sqlite.org/2024/sqlite-dll-win-x64-3460000.zip). Somehow python native `sqlite3` does not work. Place it at the root of repository. Unzip the zip file. 
-5.  Convert the unstructuredioapi repo into a python package by updating the `pyproject.toml`
-      ```pyproject.toml
-      [build-system]
-      # setuptools-scm considers all files tracked by git to be data files
-      requires = ["setuptools>=62.0", "setuptools-scm"]
-      build-backend = "setuptools.build_meta"
-      
-      [project]
-      name = "prepline_general"
-      description = "UnstructuredIO API"
-      readme = "README.md"
-      requires-python = "~=3.10"
-      # keywords = ["one", "two"]
-      license = { text = "Proprietary" }
-      classifiers = [ # https://pypi.org/classifiers/
-          "Development Status :: 3 - Alpha",
-          "Programming Language :: Python :: 3 :: Only",
-          "Intended Audience :: Information Technology",
-          "Operating System :: Unix",
-      ]
-      version="0.0.68"
-      
-      [tool.black]
-      line-length = 100
-      
-      [tool.pyright]
-      pythonPlatform = "Linux"
-      pythonVersion = "3.9"
-      reportUnnecessaryCast = true
-      typeCheckingMode = "strict"
-      
-      [tool.ruff]
-      line-length = 100
-      select = [
-          "C4",       # -- flake8-comprehensions --
-          "COM",      # -- flake8-commas --
-          "E",        # -- pycodestyle errors --
-          "F",        # -- pyflakes --
-          "I",        # -- isort (imports) --
-          "PLR0402",  # -- Name compared with itself like `foo == foo` --
-          "PT",       # -- flake8-pytest-style --
-          "SIM",      # -- flake8-simplify --
-          "UP015",    # -- redundant `open()` mode parameter (like "r" is default) --
-          "UP018",    # -- Unnecessary {literal_type} call like `str("abc")`. (rewrite as a literal) --
-          "UP032",    # -- Use f-string instead of `.format()` call --
-          "UP034",    # -- Avoid extraneous parentheses --
-      ]
-      ignore = [
-          "COM812",   # -- over aggressively insists on trailing commas where not desireable --
-          "PT011",    # -- pytest.raises({exc}) too broad, use match param or more specific exception --
-          "PT012",    # -- pytest.raises() block should contain a single simple statement --
-          "SIM117",   # -- merge `with` statements for context managers that have same scope --
-      ]
-      
-      [tool.ruff.lint.isort]
-      known-first-party = [
-          "unstructured",
-          "unstructured_inference",
-      ]
-      
-      [tool.setuptools.packages.find]
-      where = ["."]
-      ```
+4. Download `sqlite3.dll` as a patch from [link](https://www.sqlite.org/download.html). Download [sqlite-dll-win-x64-3460000.zip](https://www.sqlite.org/2024/sqlite-dll-win-x64-3460000.zip). Somehow python native `sqlite3` does not work. Place it at the root of repository. Unzip the zip file.
+5. Convert the unstructuredioapi repo into a python package by updating the `pyproject.toml`
+    ```pyproject.toml
+    [build-system]
+    # setuptools-scm considers all files tracked by git to be data files
+    requires = ["setuptools>=62.0", "setuptools-scm"]
+    build-backend = "setuptools.build_meta"
+
+    [project]
+    name = "prepline_general"
+    description = "UnstructuredIO API"
+    readme = "README.md"
+    requires-python = "~=3.10"
+    # keywords = ["one", "two"]
+    license = { text = "Proprietary" }
+    classifiers = [ # https://pypi.org/classifiers/
+        "Development Status :: 3 - Alpha",
+        "Programming Language :: Python :: 3 :: Only",
+        "Intended Audience :: Information Technology",
+        "Operating System :: Unix",
+    ]
+    version="0.0.68"
+
+    [tool.black]
+    line-length = 100
+
+    [tool.pyright]
+    pythonPlatform = "Linux"
+    pythonVersion = "3.9"
+    reportUnnecessaryCast = true
+    typeCheckingMode = "strict"
+
+    [tool.ruff]
+    line-length = 100
+    select = [
+        "C4",       # -- flake8-comprehensions --
+        "COM",      # -- flake8-commas --
+        "E",        # -- pycodestyle errors --
+        "F",        # -- pyflakes --
+        "I",        # -- isort (imports) --
+        "PLR0402",  # -- Name compared with itself like `foo == foo` --
+        "PT",       # -- flake8-pytest-style --
+        "SIM",      # -- flake8-simplify --
+        "UP015",    # -- redundant `open()` mode parameter (like "r" is default) --
+        "UP018",    # -- Unnecessary {literal_type} call like `str("abc")`. (rewrite as a literal) --
+        "UP032",    # -- Use f-string instead of `.format()` call --
+        "UP034",    # -- Avoid extraneous parentheses --
+    ]
+    ignore = [
+        "COM812",   # -- over aggressively insists on trailing commas where not desireable --
+        "PT011",    # -- pytest.raises({exc}) too broad, use match param or more specific exception --
+        "PT012",    # -- pytest.raises() block should contain a single simple statement --
+        "SIM117",   # -- merge `with` statements for context managers that have same scope --
+    ]
+
+    [tool.ruff.lint.isort]
+    known-first-party = [
+        "unstructured",
+        "unstructured_inference",
+    ]
+
+    [tool.setuptools.packages.find]
+    where = ["."]
+    ```
 6. Install the repo as a package. `python -m pip install -e . `
 7. Create a pyinstaller spec file called `unstructured_api.spec` with following content. Modify the variables based on the comments found in the spec file.
+
     ```unstructuredio_api.spec
     # -*- mode: python ; coding: utf-8 -*-
 
@@ -186,11 +191,13 @@
         name='unstructuredio_api',
     )
     ```
+
 8. Create a `unstructuredio_api.py` file
+
     ```python
     import uvicorn
     import os
-    
+
     if __name__ == "__main__":
         uvicorn.run(
             "prepline_general.api.app:app",
@@ -199,8 +206,11 @@
             log_config=os.path.join("_internal", "config", "logger_config.yaml")
         )
     ```
+
 9. Remove relative path with absolute path.
-   - `prepline_general/api/app.py`
+
+    - `prepline_general/api/app.py`
+
     ```python
     ...
 
@@ -211,5 +221,6 @@
     from prepline_general.api.openapi import set_custom_openapi
     ...
     ```
-9. Install pyinstaller. `pip install pyinstaller`
-10. Start packaging. `pyinstaller .\unstructuredio_api.spec`
+
+10. Install pyinstaller. `pip install pyinstaller`
+11. Start packaging. `pyinstaller .\unstructuredio_api.spec`
