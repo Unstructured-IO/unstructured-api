@@ -452,14 +452,12 @@ def pipeline_api(
                 status_code=400,
                 detail="The fast strategy is not available for image files",
             )
-
+        if "not a ZIP archive (so not a DOCX file)" in e.args[0]:
+            raise HTTPException(
+                status_code=422,
+                detail="File is not a valid docx",
+            )
         raise e
-    except zipfile.BadZipFile:
-        raise HTTPException(
-            status_code=422,
-            detail="File is not a valid docx",
-        )
-
     except UnknownModelException:
         raise HTTPException(
             status_code=400,
