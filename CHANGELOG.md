@@ -1,3 +1,7 @@
+## 0.0.73
+
+* Bump to `unstructured` 0.14.10
+
 ## 0.0.72
 
 * Fix certain filetypes failing mimetype lookup in the new base image
