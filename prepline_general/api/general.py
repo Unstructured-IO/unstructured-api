@@ -452,14 +452,12 @@ def pipeline_api(
                 status_code=400,
                 detail="The fast strategy is not available for image files",
             )
-
+        if "not a ZIP archive (so not a DOCX file)" in e.args[0]:
+            raise HTTPException(
+                status_code=422,
+                detail="File is not a valid docx",
+            )
         raise e
-    except zipfile.BadZipFile:
-        raise HTTPException(
-            status_code=422,
-            detail="File is not a valid docx",
-        )
-
     except UnknownModelException:
         raise HTTPException(
             status_code=400,
@@ -651,7 +649,7 @@ def ungz_file(file: UploadFile, gz_uncompressed_content_type: Optional[str] = No
 
 
 @router.get("/general/v0/general", include_in_schema=False)
-@router.get("/general/v0.0.72/general", include_in_schema=False)
+@router.get("/general/v0.0.73/general", include_in_schema=False)
 async def handle_invalid_get_request():
     raise HTTPException(
         status_code=status.HTTP_405_METHOD_NOT_ALLOWED, detail="Only POST requests are supported."
@@ -666,7 +664,7 @@ async def handle_invalid_get_request():
     description="Description",
     operation_id="partition_parameters",
 )
-@router.post("/general/v0.0.72/general", include_in_schema=False)
+@router.post("/general/v0.0.73/general", include_in_schema=False)
 def general_partition(
     request: Request,
     # cannot use annotated type here because of a bug described here:
