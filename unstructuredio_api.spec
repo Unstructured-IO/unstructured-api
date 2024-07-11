@@ -7,10 +7,10 @@ import unstructured
 from PyInstaller.utils.hooks import collect_all, collect_data_files, collect_dynamic_libs
 
 binaries_list = [
-    ('C:\\Program Files\\LibreOffice\\program', 'libreoffice'), # modify this to point to where the LibreOffice is installed
+    ('C:\\Program Files\\LibreOffice', 'libreoffice'), # modify this to point to where the LibreOffice is installed
     ('C:\\path\\to\\poppler-24.02.0\\Library\\bin', 'poppler/bin'), # modify this to point to where the poppler is installed
     ('C:\\Program Files\\Tesseract-OCR', 'tesseract'), # modify this to point to where the tesseract is installed
-    ('C:\\Users\\ryzz\\AppData\\Local\\Pandoc', 'pandoc'), # modify this to point to where the pandoc is installed
+    ('C:\\path\\to\\Pandoc', 'pandoc'), # modify this to point to where the pandoc is installed
     (Path('sqlite-dll-win-x64-3460000/sqlite3.dll').as_posix(), '.'), # modify this to point to where you unzip the sqlite3.dll
     (Path('sqlite-dll-win-x64-3460000/sqlite3.def').as_posix(), '.'), # modify this to point to where you unzip the sqlite3.def
 
@@ -65,7 +65,7 @@ exe = EXE(
     [],
     exclude_binaries=True,
     name='unstructuredio_api',
-    debug=True,
+    debug=False,
     bootloader_ignore_signals=False,
     strip=False,
     upx=True,

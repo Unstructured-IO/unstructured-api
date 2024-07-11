@@ -8,6 +8,9 @@ else:
     bundle_dir = os.path.dirname(os.path.abspath(__file__))
 os.environ['PATH'] = os.path.join(bundle_dir, 'tesseract') + os.pathsep + os.environ['PATH']
 os.environ['PATH'] = os.path.join(bundle_dir, 'poppler', 'bin') + os.pathsep + os.environ['PATH']
+os.environ['PATH'] = os.path.join(bundle_dir, 'pandoc') + os.pathsep + os.environ['PATH']
+os.environ['PATH'] = os.path.join(bundle_dir, 'libreoffice', 'program') + os.pathsep + os.environ['PATH']
+os.environ['PATH'] = os.path.join(bundle_dir, 'libreoffice') + os.pathsep + os.environ['PATH']
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from prepline_general.api.app import app
