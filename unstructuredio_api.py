@@ -1,6 +1,16 @@
 import os
-from pydantic_settings import BaseSettings, SettingsConfigDict
+import sys
+if getattr(sys, 'frozen', False):
+    # we are running in a bundle
+    bundle_dir = sys._MEIPASS
+else:
+    # we are running in a normal Python environment
+    bundle_dir = os.path.dirname(os.path.abspath(__file__))
+os.environ['PATH'] = os.path.join(bundle_dir, 'tesseract') + os.pathsep + os.environ['PATH']
+os.environ['PATH'] = os.path.join(bundle_dir, 'poppler', 'bin') + os.pathsep + os.environ['PATH']
 
+from pydantic_settings import BaseSettings, SettingsConfigDict
+from prepline_general.api.app import app
 
 class Config(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")
@@ -24,7 +34,8 @@ if __name__ == "__main__":
     #     print("The system is not Windows.")
 
     uvicorn.run(
-        "prepline_general.api.app:app",
+        # "prepline_general.api.app:app",
+        app,
         reload=False,
         port=config.unstapi_port,
         host=config.unstapi_host,

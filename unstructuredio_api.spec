@@ -4,10 +4,13 @@ import os
 from pathlib import Path
 import sys
 import unstructured
-from PyInstaller.utils.hooks import collect_all, collect_data_files
+from PyInstaller.utils.hooks import collect_all, collect_data_files, collect_dynamic_libs
 
 binaries_list = [
     ('C:\\Program Files\\LibreOffice\\program', 'libreoffice'), # modify this to point to where the LibreOffice is installed
+    ('C:\\path\\to\\poppler-24.02.0\\Library\\bin', 'poppler/bin'), # modify this to point to where the poppler is installed
+    ('C:\\Program Files\\Tesseract-OCR', 'tesseract'), # modify this to point to where the tesseract is installed
+    ('C:\\Users\\ryzz\\AppData\\Local\\Pandoc', 'pandoc'), # modify this to point to where the pandoc is installed
     (Path('sqlite-dll-win-x64-3460000/sqlite3.dll').as_posix(), '.'), # modify this to point to where you unzip the sqlite3.dll
     (Path('sqlite-dll-win-x64-3460000/sqlite3.def').as_posix(), '.'), # modify this to point to where you unzip the sqlite3.def
 
@@ -18,9 +21,10 @@ datas_list = [
     (Path('nltk_data').as_posix(), 'nltk_data') # modify this to point to where nltk download the nltk data
 ]
 
-datas_list.extend(collect_data_files('unstructured'))
-
-hiddenimports_list = ['unstructured']
+# datas_list.extend(collect_data_files('unstructured'))
+datas_list.extend(collect_data_files('pytesseract'))
+# hiddenimports_list = ['unstructured']
+hiddenimports_list = []
 
 def add_package(package_name):
     print(f"Add Package {package_name}")
@@ -30,11 +34,13 @@ def add_package(package_name):
     hiddenimports_list.extend(hiddenimports)
 
 # Collect all resources from the package_name
-# add_package('unstructured')
+add_package('unstructured')
 add_package('effdet')
 add_package('onnxruntime')
 add_package('encodings')
 add_package('prepline_general')
+binaries_list.extend(collect_dynamic_libs('pdf2image'))
+binaries_list.extend(collect_dynamic_libs('pytesseract'))
 
 print(len(datas_list))
 
