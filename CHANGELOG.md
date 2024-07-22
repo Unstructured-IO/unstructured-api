@@ -1,3 +1,7 @@
+## 0.0.74
+
+* Bump to `unstructured` 0.15.0
+
 ## 0.0.73
 
 * Bump to `unstructured` 0.14.10
