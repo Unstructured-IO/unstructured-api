@@ -19,7 +19,7 @@ backoff==2.2.1
     #   unstructured
 beautifulsoup4==4.12.3
     # via unstructured
-cachetools==5.3.3
+cachetools==5.4.0
     # via google-auth
 certifi==2024.7.4
     # via
@@ -47,7 +47,7 @@ coloredlogs==15.0.1
     # via onnxruntime
 contourpy==1.2.1
     # via matplotlib
-cryptography==42.0.8
+cryptography==43.0.0
     # via pdfminer-six
 cycler==0.12.1
     # via matplotlib
@@ -69,9 +69,9 @@ emoji==2.12.1
     # via unstructured
 et-xmlfile==1.1.0
     # via openpyxl
-exceptiongroup==1.2.1
+exceptiongroup==1.2.2
     # via anyio
-fastapi==0.111.0
+fastapi==0.111.1
     # via -r requirements/base.in
 fastapi-cli==0.0.4
     # via fastapi
@@ -102,11 +102,11 @@ googleapis-common-protos==1.63.2
     # via
     #   google-api-core
     #   grpcio-status
-grpcio==1.64.1
+grpcio==1.65.1
     # via
     #   google-api-core
     #   grpcio-status
-grpcio-status==1.64.1
+grpcio-status==1.65.1
     # via google-api-core
 h11==0.14.0
     # via
@@ -120,7 +120,7 @@ httpx==0.27.0
     # via
     #   fastapi
     #   unstructured-client
-huggingface-hub==0.23.4
+huggingface-hub==0.24.0
     # via
     #   timm
     #   tokenizers
@@ -220,8 +220,6 @@ openpyxl==3.1.5
     # via unstructured
 ordered-set==4.1.0
     # via deepdiff
-orjson==3.10.6
-    # via fastapi
 packaging==24.1
     # via
     #   huggingface-hub
@@ -263,7 +261,7 @@ pillow==10.4.0
     #   unstructured-pytesseract
 pillow-heif==0.17.0
     # via unstructured
-portalocker==2.10.0
+portalocker==2.10.1
     # via iopath
 proto-plus==1.24.0
     # via
@@ -304,7 +302,7 @@ pypandoc==1.13
     # via unstructured
 pyparsing==3.1.2
     # via matplotlib
-pypdf==4.2.0
+pypdf==4.3.1
     # via
     #   -r requirements/base.in
     #   unstructured
@@ -391,7 +389,7 @@ soupsieve==2.5
     # via beautifulsoup4
 starlette==0.37.2
     # via fastapi
-sympy==1.13.0
+sympy==1.13.1
     # via
     #   onnxruntime
     #   torch
@@ -448,11 +446,9 @@ typing-inspect==0.9.0
     #   unstructured-client
 tzdata==2024.1
     # via pandas
-ujson==5.10.0
-    # via fastapi
-unstructured[all-docs]==0.14.10
+unstructured[all-docs]==0.15.0
     # via -r requirements/base.in
-unstructured-client==0.24.0
+unstructured-client==0.24.1
     # via unstructured
 unstructured-inference==0.7.36
     # via unstructured
@@ -462,7 +458,7 @@ urllib3==2.2.2
     # via
     #   requests
     #   unstructured-client
-uvicorn[standard]==0.30.1
+uvicorn[standard]==0.30.3
     # via
     #   -r requirements/base.in
     #   fastapi
