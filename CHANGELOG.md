@@ -1,3 +1,7 @@
+## 0.0.75
+
+* Remove constraint on `safetensors` that preventing us from bumping `transformers`.
+
 ## 0.0.74
 
 * Bump to `unstructured` 0.15.0
