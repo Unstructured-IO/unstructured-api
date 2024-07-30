@@ -1158,3 +1158,24 @@ def test__set_pdf_infer_table_structure(
         )
         is expected
     )
+
+@pytest.mark.parametrize(
+    ("strategy", "test_file", "max_pages", "expect_code"),
+    [
+        ("hi_res", Path("sample-docs") / "DA-1p-with-duplicate-pages.pdf", "300", 200),
+        ("hi_res", Path("sample-docs") / "DA-1p-with-duplicate-pages.pdf", "2", 422),
+        ("auto", Path("sample-docs") / "DA-1p-with-duplicate-pages.pdf", "300", 200),
+        ("auto", Path("sample-docs") / "DA-1p-with-duplicate-pages.pdf", "2", 422),
+        ("fast", Path("sample-docs") / "DA-1p-with-duplicate-pages.pdf", "300", 200),
+        ("fast", Path("sample-docs") / "DA-1p-with-duplicate-pages.pdf", "2", 200),
+    ],
+)
+def test_max_pages_in_hi_res(monkeypatch, strategy, test_file, max_pages, expect_code):
+    monkeypatch.setenv("UNSTRUCTURED_MAX_PDF_PAGES", max_pages)
+    client = TestClient(app)
+    response = client.post(
+        MAIN_API_ROUTE,
+        files=[("files", (str(test_file), open(test_file, "rb")))],
+        data={"strategy": strategy}
+    )
+    assert response.status_code == expect_code
