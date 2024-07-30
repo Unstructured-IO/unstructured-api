@@ -373,6 +373,7 @@ As mentioned above, processing a pdf using `hi_res` is currently a slow operatio
 * `UNSTRUCTURED_PARALLEL_MODE_THREADS` - the number of threads making requests at once, default is `3`.
 * `UNSTRUCTURED_PARALLEL_MODE_SPLIT_SIZE` - the number of pages to be processed in one request, default is `1`.
 * `UNSTRUCTURED_PARALLEL_RETRY_ATTEMPTS` - the number of retry attempts on a retryable error, default is `2`. (i.e. 3 attempts are made in total)
+* `UNSTRUCTURED_MAX_PDF_PAGES` - the maximum number of pages in pdf file that will not be rejected in `hi_res` strategy, default is `300`.
 
 Due to the overhead associated with file splitting, parallel processing mode is only recommended for the `hi_res` strategy. Additionally users of the official [Python client](https://github.com/Unstructured-IO/unstructured-python-client?tab=readme-ov-file#splitting-pdf-by-pages) can enable client-side splitting by setting `split_pdf_page=True`.
 
