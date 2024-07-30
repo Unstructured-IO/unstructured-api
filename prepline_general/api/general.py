@@ -329,7 +329,7 @@ def pipeline_api(
 
     if file_content_type == "application/pdf":
         _check_pdf(file)
-    max_pages = int(os.environ.get("UNSTRUCTURED_MAX_PDF_PAGES", 300))
+    pdf_hi_res_max_pages = int(os.environ.get("UNSTRUCTURED_PDF_HI_RES_MAX_PAGES", 300))
 
     hi_res_model_name = _validate_hi_res_model_name(hi_res_model_name, coordinates)
     strategy = _validate_strategy(strategy)
@@ -375,7 +375,7 @@ def pipeline_api(
                         "extract_image_block_types": extract_image_block_types,
                         "extract_image_block_to_payload": extract_image_block_to_payload,
                         "unique_element_ids": unique_element_ids,
-                        "max_pages": max_pages,
+                        "pdf_hi_res_max_pages": pdf_hi_res_max_pages,
                     },
                     default=str,
                 )
@@ -406,7 +406,7 @@ def pipeline_api(
             "extract_image_block_to_payload": extract_image_block_to_payload,
             "unique_element_ids": unique_element_ids,
             "starting_page_number": starting_page_number,
-            "max_pages": max_pages,
+            "pdf_hi_res_max_pages": pdf_hi_res_max_pages,
         }
 
         if file_content_type == "application/pdf" and pdf_parallel_mode_enabled:

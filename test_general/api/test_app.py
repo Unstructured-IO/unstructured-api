@@ -1161,7 +1161,7 @@ def test__set_pdf_infer_table_structure(
 
 
 @pytest.mark.parametrize(
-    ("strategy", "test_file", "max_pages", "expect_code"),
+    ("strategy", "test_file", "pdf_hi_res_max_pages", "expect_code"),
     [
         ("hi_res", Path("sample-docs") / "DA-1p-with-duplicate-pages.pdf", "300", 200),
         ("hi_res", Path("sample-docs") / "DA-1p-with-duplicate-pages.pdf", "2", 422),
@@ -1171,8 +1171,8 @@ def test__set_pdf_infer_table_structure(
         ("fast", Path("sample-docs") / "DA-1p-with-duplicate-pages.pdf", "2", 200),
     ],
 )
-def test_max_pages_in_hi_res(monkeypatch, strategy, test_file, max_pages, expect_code):
-    monkeypatch.setenv("UNSTRUCTURED_MAX_PDF_PAGES", max_pages)
+def test_max_pages_in_hi_res(monkeypatch, strategy, test_file, pdf_hi_res_max_pages, expect_code):
+    monkeypatch.setenv("UNSTRUCTURED_PDF_HI_RES_MAX_PAGES", pdf_hi_res_max_pages)
     client = TestClient(app)
     response = client.post(
         MAIN_API_ROUTE,
