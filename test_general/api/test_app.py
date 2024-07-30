@@ -1159,6 +1159,7 @@ def test__set_pdf_infer_table_structure(
         is expected
     )
 
+
 @pytest.mark.parametrize(
     ("strategy", "test_file", "max_pages", "expect_code"),
     [
@@ -1176,6 +1177,6 @@ def test_max_pages_in_hi_res(monkeypatch, strategy, test_file, max_pages, expect
     response = client.post(
         MAIN_API_ROUTE,
         files=[("files", (str(test_file), open(test_file, "rb")))],
-        data={"strategy": strategy}
+        data={"strategy": strategy},
     )
     assert response.status_code == expect_code

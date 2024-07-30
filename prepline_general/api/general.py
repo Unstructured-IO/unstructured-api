@@ -329,7 +329,7 @@ def pipeline_api(
 
     if file_content_type == "application/pdf":
         _check_pdf(file)
-    max_pages = int(os.environ.get('UNSTRUCTURED_MAX_PDF_PAGES', 300))
+    max_pages = int(os.environ.get("UNSTRUCTURED_MAX_PDF_PAGES", 300))
 
     hi_res_model_name = _validate_hi_res_model_name(hi_res_model_name, coordinates)
     strategy = _validate_strategy(strategy)
@@ -445,7 +445,7 @@ def pipeline_api(
         raise HTTPException(
             status_code=422,
             detail=f"{e} Check the split_pdf_page functionality of unstructured_client to send the file "
-                   f"in smaller chunks."
+            f"in smaller chunks.",
         )
 
     except ValueError as e:
