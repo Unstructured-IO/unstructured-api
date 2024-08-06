@@ -20,6 +20,7 @@ class GeneralFormParams(BaseModel):
     output_format: str
     coordinates: bool
     encoding: str
+    content_type: Optional[str]
     hi_res_model_name: Optional[str]
     include_page_breaks: bool
     pdf_infer_table_structure: bool
@@ -100,6 +101,15 @@ class GeneralFormParams(BaseModel):
             ),
             BeforeValidator(SmartValueParser[bool]().value_or_first_element),
         ] = False,
+        content_type: Annotated[
+            Optional[str],
+            Form(
+                title="Content type",
+                description="A hint about the content type to use (such as text/markdown), when there are problems processing a specific file. This value is a MIME type in the format type/subtype.",
+                example="text/markdown",
+            ),
+            BeforeValidator(SmartValueParser[str]().value_or_first_element),
+        ] = None,
         encoding: Annotated[
             str,
             Form(
@@ -245,6 +255,7 @@ level of "pollution" of otherwise clean semantic chunk boundaries. Default: Fals
             gz_uncompressed_content_type=gz_uncompressed_content_type,
             output_format=output_format,
             coordinates=coordinates,
+            content_type=content_type,
             encoding=encoding,
             hi_res_model_name=hi_res_model_name,
             include_page_breaks=include_page_breaks,

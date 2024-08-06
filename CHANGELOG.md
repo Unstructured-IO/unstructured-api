@@ -1,3 +1,8 @@
+## 0.0.76
+* Use the library's `detect_filetype` in API to determine mimetype
+* Add content_type api parameter
+* Bump to `unstructured` 0.15.1
+
 ## 0.0.75
 
 * Remove constraint on `safetensors` that preventing us from bumping `transformers`.
