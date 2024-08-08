@@ -210,12 +210,6 @@ omegaconf==2.3.0
     # via
     #   unstructured
     #   unstructured-inference
-# onnxruntime==1.18.0
-    # via unstructured-inference
-# opencv-python==4.10.0.84
-    # via
-    #   layoutparser
-    #   unstructured-inference
 openpyxl==3.1.4
     # via unstructured
 ordered-set==4.1.0
@@ -309,8 +303,6 @@ pypdf==4.2.0
     #   unstructured-client
 pypdfium2==4.30.0
     # via pdfplumber
-# pytesseract==0.3.10
-    # via unstructured
 python-dateutil==2.9.0.post0
     # via
     #   matplotlib
