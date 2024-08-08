@@ -1,5 +1,6 @@
 -c constraints.in
-unstructured[all-docs]>=0.8.1
+unstructured[docx,pptx]
+# unstructured[all-docs]>=0.8.1
 # Pinning click due to a unicode issue in black
 # can remove after black drops support for Python 3.6
 # ref: https://github.com/psf/black/issues/2964
@@ -12,4 +13,3 @@ backoff
 pypdf
 pycryptodome
 psutil
-
