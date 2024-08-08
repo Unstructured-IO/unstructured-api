@@ -1,14 +1,21 @@
 from fastapi import FastAPI, Request, status, HTTPException
 from fastapi.datastructures import FormData
 from fastapi.responses import JSONResponse
-from fastapi.security import APIKeyHeader
 import logging
 import os
 
-from .general import router as general_router
+from starlette.middleware.base import BaseHTTPMiddleware
+
+from .general import router as general_router, _check_free_memory
 from .openapi import set_custom_openapi
 
 logger = logging.getLogger("unstructured_api")
+
+import threading
+
+is_memory_low = False
+active_requests = 0
+request_lock = threading.Lock()
 
 app = FastAPI(
     title="Unstructured Pipeline API",
@@ -40,14 +47,14 @@ if os.environ.get("ENV") in ["dev", "prod"]:
 
 # Catch all HTTPException for uniform logging and response
 @app.exception_handler(HTTPException)
-async def http_error_handler(request: Request, e: HTTPException):
+async def http_error_handler(_: Request, e: HTTPException):
     logger.error(e.detail)
     return JSONResponse(status_code=e.status_code, content={"detail": e.detail})
 
 
 # Catch any other errors and return as 500
 @app.exception_handler(Exception)
-async def error_handler(request: Request, e: Exception):
+async def error_handler(_: Request, e: Exception):
     return JSONResponse(status_code=500, content={"detail": str(e)})
 
 
@@ -125,8 +132,52 @@ logging.getLogger("uvicorn.access").addFilter(MetricsCheckFilter())
 
 
 @app.get("/healthcheck", status_code=status.HTTP_200_OK, include_in_schema=False)
-def healthcheck(request: Request):
-    return {"healthcheck": "HEALTHCHECK STATUS: EVERYTHING OK!"}
+def healthcheck(_: Request):
+    global is_memory_low, active_requests
+
+    _check_free_memory()
+
+    if is_memory_low:
+        status_code = 503 if active_requests == 0 else 200
+        return JSONResponse(
+            status_code=status_code,
+            content={
+                "status": "UNHEALTHY" if status_code == 503 else "DEGRADED",
+                "memory_status": "LOW",
+                "active_requests": active_requests
+            }
+        )
+
+    return {
+        "status": "HEALTHY",
+        "memory_status": "OK",
+        "active_requests": active_requests
+    }
+
+
+class MemoryCheckMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request: Request, call_next):
+        global is_memory_low, active_requests
+
+        if request.url.path == "/general/v0/general":
+            if is_memory_low:
+                logger.error(f"Service is currently unavailable due to low memory, {active_requests} active requests")
+                raise HTTPException(status_code=503, detail="Service is currently unavailable due to low memory")
+
+            with request_lock:
+                active_requests += 1
+
+            try:
+                response = await call_next(request)
+                return response
+            finally:
+                with request_lock:
+                    active_requests -= 1
+        else:
+            return await call_next(request)
+
+
+app.add_middleware(MemoryCheckMiddleware)
 
 
 logger.info("Started Unstructured API")
