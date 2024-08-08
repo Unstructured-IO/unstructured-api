@@ -28,7 +28,7 @@ ENV PYTHONPATH="${PYTHONPATH}:${HOME}"
 ENV PATH="/home/${NB_USER}/.local/bin:${PATH}"
 
 FROM base as python-deps
-COPY --chown=${NB_UID}:${NB_UID} requirements/base.txt requirements-base.txt
+COPY requirements/base.txt requirements-base.txt
 RUN ${PIP} install pip==${PIP_VERSION}
 RUN ${PIP} install --no-cache-dir -r requirements-base.txt
 
@@ -39,11 +39,11 @@ RUN ${PIP} install --no-cache-dir -r requirements-base.txt
 #   ${PYTHON} -c "from unstructured.partition.model_init import initialize; initialize()"
 
 FROM python-deps as code
-COPY --chown=${NB_UID}:${NB_UID} CHANGELOG.md CHANGELOG.md
-COPY --chown=${NB_UID}:${NB_UID} logger_config.yaml logger_config.yaml
-COPY --chown=${NB_UID}:${NB_UID} prepline_${PIPELINE_PACKAGE}/ prepline_${PIPELINE_PACKAGE}/
-COPY --chown=${NB_UID}:${NB_UID} exploration-notebooks exploration-notebooks
-COPY --chown=${NB_UID}:${NB_UID} scripts/app-start.sh scripts/app-start.sh
+COPY CHANGELOG.md CHANGELOG.md
+COPY logger_config.yaml logger_config.yaml
+COPY prepline_${PIPELINE_PACKAGE}/ prepline_${PIPELINE_PACKAGE}/
+COPY exploration-notebooks exploration-notebooks
+COPY scripts/app-start.sh scripts/app-start.sh
 
 ENTRYPOINT ["scripts/app-start.sh"]
 # Expose a default port of 8000. Note: The EXPOSE instruction does not actually publish the port,
