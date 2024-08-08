@@ -10,9 +10,12 @@ ARG PIPELINE_PACKAGE
 ARG PYTHON_VERSION="3.11"
 
 # Set up environment
-ENV PYTHON python${PYTHON_VERSION}
-ENV PIP ${PYTHON} -m pip
+ENV PYTHON=python${PYTHON_VERSION}
+ENV PIP="${PYTHON} -m pip"
 ENV HOME=/home/${NB_USER}
+
+# Create user and home directory
+RUN adduser -u ${NB_UID} -h ${HOME} -D ${NB_USER}
 
 WORKDIR ${HOME}
 USER ${NB_USER}
@@ -25,6 +28,7 @@ COPY --chown=${NB_USER}:${NB_USER} requirements/base.txt requirements-base.txt
 RUN ${PIP} install pip==${PIP_VERSION}
 RUN ${PIP} install --no-cache-dir -r requirements-base.txt
 
+# Uncomment this section if model dependencies are needed
 # FROM python-deps as model-deps
 # RUN ${PYTHON} -c "import nltk; nltk.download('punkt')" && \
 #   ${PYTHON} -c "import nltk; nltk.download('averaged_perceptron_tagger')" && \
@@ -40,5 +44,4 @@ COPY --chown=${NB_USER}:${NB_USER} scripts/app-start.sh scripts/app-start.sh
 ENTRYPOINT ["scripts/app-start.sh"]
 # Expose a default port of 8000. Note: The EXPOSE instruction does not actually publish the port,
 # but some tooling will inspect containers and perform work contingent on networking support declared.
-
 EXPOSE 8000
