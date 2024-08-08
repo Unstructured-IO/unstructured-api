@@ -6,16 +6,11 @@ import os
 
 from starlette.middleware.base import BaseHTTPMiddleware
 
-from .general import router as general_router, _check_free_memory
+from .events import healthcheck, MemoryCheckMiddleware
+from .general import router as general_router, _check_free_memory, graceful_shutdown, request_lock
 from .openapi import set_custom_openapi
 
 logger = logging.getLogger("unstructured_api")
-
-import threading
-
-is_memory_low = False
-active_requests = 0
-request_lock = threading.Lock()
 
 app = FastAPI(
     title="Unstructured Pipeline API",
@@ -130,54 +125,16 @@ class MetricsCheckFilter(logging.Filter):
 logging.getLogger("uvicorn.access").addFilter(HealthCheckFilter())
 logging.getLogger("uvicorn.access").addFilter(MetricsCheckFilter())
 
+@app.get("/healthcheck", include_in_schema=False)
+def healthcheck_endpoint(request: Request):
+    return healthcheck(request)
 
-@app.get("/healthcheck", status_code=status.HTTP_200_OK, include_in_schema=False)
-def healthcheck(_: Request):
-    global is_memory_low, active_requests
-
-    _check_free_memory()
-
-    if is_memory_low:
-        status_code = 503 if active_requests == 0 else 200
-        return JSONResponse(
-            status_code=status_code,
-            content={
-                "status": "UNHEALTHY" if status_code == 503 else "DEGRADED",
-                "memory_status": "LOW",
-                "active_requests": active_requests
-            }
-        )
-
-    return {
-        "status": "HEALTHY",
-        "memory_status": "OK",
-        "active_requests": active_requests
-    }
-
-
-class MemoryCheckMiddleware(BaseHTTPMiddleware):
-    async def dispatch(self, request: Request, call_next):
-        global is_memory_low, active_requests
-
-        if request.url.path == "/general/v0/general":
-            if is_memory_low:
-                logger.error(f"Service is currently unavailable due to low memory, {active_requests} active requests")
-                raise HTTPException(status_code=503, detail="Service is currently unavailable due to low memory")
-
-            with request_lock:
-                active_requests += 1
-
-            try:
-                response = await call_next(request)
-                return response
-            finally:
-                with request_lock:
-                    active_requests -= 1
-        else:
-            return await call_next(request)
 
 
 app.add_middleware(MemoryCheckMiddleware)
 
+@app.on_event("shutdown")
+def shutdown_event():
+    graceful_shutdown()
 
 logger.info("Started Unstructured API")
