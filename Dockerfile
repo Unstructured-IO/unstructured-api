@@ -7,7 +7,7 @@ USER root
 # https://mybinder.readthedocs.io/en/latest/tutorials/dockerfile.html
 ARG NB_USER=notebook-user
 ARG NB_UID=1000
-ARG PIP_VERSION
+ARG PIP_VERSION="24.2"
 ARG PIPELINE_PACKAGE
 ARG PYTHON_VERSION="3.11"
 
