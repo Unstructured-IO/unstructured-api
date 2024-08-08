@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:experimental
-FROM quay.io/unstructured-io/base-images:rocky9.2-cpu-latest as base
+FROM quay.io/unstructured-io/base-images:rocky9.2-cpu-latest AS base
 
 # NOTE: NB_USER ARG for mybinder.org compatibility:
 # https://mybinder.readthedocs.io/en/latest/tutorials/dockerfile.html
@@ -23,6 +23,10 @@ WORKDIR ${HOME}
 USER ${NB_USER}
 
 FROM base as python-deps
+
+ARG NB_USER=notebook-user
+ARG NB_UID=1000
+
 COPY --chown=${NB_UID}:${NB_UID} requirements/base.txt requirements-base.txt
 RUN ${PIP} install pip==${PIP_VERSION}
 RUN ${PIP} install --no-cache -r requirements-base.txt
@@ -33,6 +37,10 @@ RUN ${PYTHON} -c "import nltk; nltk.download('punkt')" && \
   ${PYTHON} -c "from unstructured.partition.model_init import initialize; initialize()"
 
 FROM model-deps as code
+
+ARG NB_USER=notebook-user
+ARG NB_UID=1000
+
 COPY --chown=${NB_UID}:${NB_UID} CHANGELOG.md CHANGELOG.md
 COPY --chown=${NB_UID}:${NB_UID} logger_config.yaml logger_config.yaml
 COPY --chown=${NB_UID}:${NB_UID} prepline_${PIPELINE_PACKAGE}/ prepline_${PIPELINE_PACKAGE}/
