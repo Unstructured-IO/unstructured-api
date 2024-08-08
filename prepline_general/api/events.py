@@ -50,27 +50,26 @@ def get_memory_limit():
 
 
 def _check_free_memory():
-    global is_memory_low  # 전역 변수로 선언
-    memory_free_minimum = int(os.environ.get("UNSTRUCTURED_MEMORY_FREE_MINIMUM_MB", 2048))
-    memory_free_minimum_bytes = memory_free_minimum * 1024 * 1024
+    global is_memory_low  # 전역 변수로 is_memory_low를 사용
 
     usage = get_memory_usage()
     limit = get_memory_limit()
 
+    print(f"Memory usage: {usage / 1024 / 1024:.2f} MB, Memory limit: {limit / 1024 / 1024:.2f} MB")
+
     if usage is None or limit is None:
         print("Unable to determine memory usage or limit. Assuming sufficient memory.")
-        is_memory_low = False  # 메모리 상태를 알 수 없을 때 False로 설정
+        is_memory_low = False  # 충분한 메모리가 있다고 가정
         return True
 
-    free_memory = limit - usage
+    usage_threshold = limit * 0.8
 
-    if free_memory <= memory_free_minimum_bytes:
-        print(
-            f"Free memory ({free_memory / 1024 / 1024:.2f} MB) is below {memory_free_minimum} MB")
+    if usage >= usage_threshold:
+        print(f"Memory usage ({usage / 1024 / 1024:.2f} MB) is above 80% of the limit ({usage_threshold / 1024 / 1024:.2f} MB)")
         is_memory_low = True
         return False
     else:
-        print(f"Free memory: {free_memory / 1024 / 1024:.2f} MB, Limit: {limit / 1024 / 1024:.2f} MB")
+        print(f"Memory usage: {usage / 1024 / 1024:.2f} MB, below 80% of the limit ({usage_threshold / 1024 / 1024:.2f} MB)")
         is_memory_low = False
         return True
 
