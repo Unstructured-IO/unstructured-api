@@ -32,13 +32,17 @@ RUN if [ ! -d "$(${PYTHON} -c "import site; print(site.getsitepackages()[0])")/u
 # Reset Python environment
 RUN ${PYTHON} -m site
 
+# Ensure numpy is installed
+RUN ${PIP} install numpy
+
 # Debug information
 RUN echo "PYTHONPATH: $PYTHONPATH" && \
     ${PYTHON} -c "import sys; print('Python sys.path:', sys.path)" && \
     ls -l /app && \
     ${PYTHON} --version && \
     ${PYTHON} -c "import site; print(site.getsitepackages())" && \
-    ${PYTHON} -c "import unstructured; print(unstructured.__file__)" || echo "Failed to import unstructured"
+    ${PYTHON} -c "import unstructured; print(unstructured.__file__)" || echo "Failed to import unstructured" && \
+    ${PYTHON} -c "import numpy; print(numpy.__version__)" || echo "Failed to import numpy"
 
 # Download NLTK data and initialize unstructured
 RUN ${PYTHON} -c "import nltk; nltk.download('punkt')" && \
