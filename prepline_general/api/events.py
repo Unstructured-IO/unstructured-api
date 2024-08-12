@@ -13,14 +13,6 @@ request_lock = threading.Lock()
 shutdown_event = threading.Event()
 
 
-def graceful_shutdown():
-    global is_shutting_down
-    is_shutting_down = True
-
-    if active_requests > 0:
-        shutdown_event.wait()
-
-
 
 def get_memory_usage():
     try:
