@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:experimental
-FROM harbor.sionic.tech/usio-test/a69b0a9f965c AS base
+FROM harbor.sionic.tech/usio-test/2b83f193aabb AS base
 
 USER root
 
