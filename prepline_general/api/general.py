@@ -649,10 +649,6 @@ def general_partition(
     if is_shutting_down:
         raise HTTPException(status_code=503, detail="Service is shutting down")
 
-    with request_lock:
-        active_requests += 1
-
-    try:
         # -- must have a valid API key --
         if api_key_env := os.environ.get("UNSTRUCTURED_API_KEY"):
             api_key = request.headers.get("unstructured-api-key")
@@ -740,7 +736,7 @@ def general_partition(
                 )
 
         def join_responses(
-            responses: Sequence[str | List[Dict[str, Any]] | PlainTextResponse]
+                responses: Sequence[str | List[Dict[str, Any]] | PlainTextResponse]
         ) -> List[str | List[Dict[str, Any]]] | PlainTextResponse:
             """Consolidate partitionings from multiple documents into single response payload."""
             if form_params.output_format != "text/csv":
@@ -772,12 +768,6 @@ def general_partition(
         )
 
         return result
-
-    finally:
-        with request_lock:
-            active_requests -= 1
-            if active_requests == 0 and is_shutting_down:
-                shutdown_event.set()
 
 
 app.include_router(router)
