@@ -13,7 +13,6 @@ from concurrent.futures import ThreadPoolExecutor
 from functools import partial
 from types import TracebackType
 from typing import IO, Any, Dict, List, Mapping, Optional, Sequence, Tuple, Union, cast
-from .events import is_memory_low, active_requests, request_lock
 
 import backoff
 import pandas as pd
@@ -34,7 +33,6 @@ from pypdf.errors import FileNotDecryptedError, PdfReadError
 from starlette.datastructures import Headers
 from starlette.types import Send
 
-from prepline_general.api.events import request_lock, shutdown_event, _check_free_memory
 from prepline_general.api.models.form_params import GeneralFormParams
 from prepline_general.api.filetypes import get_validated_mimetype
 from unstructured.documents.elements import Element
@@ -102,12 +100,12 @@ def is_non_retryable(e: Exception) -> bool:
     logger=logger,
 )
 def call_api(
-        request_url: str,
-        api_key: str,
-        filename: str,
-        file: IO[bytes],
-        content_type: str,
-        **partition_kwargs: Any,
+    request_url: str,
+    api_key: str,
+    filename: str,
+    file: IO[bytes],
+    content_type: str,
+    **partition_kwargs: Any,
 ) -> str:
     """Call the api with the given request_url."""
     headers = {"unstructured-api-key": api_key}
@@ -127,11 +125,11 @@ def call_api(
 
 
 def partition_file_via_api(
-        file_tuple: Tuple[IO[bytes], int],
-        request: Request,
-        filename: str,
-        content_type: str,
-        **partition_kwargs: Any,
+    file_tuple: Tuple[IO[bytes], int],
+    request: Request,
+    filename: str,
+    content_type: str,
+    **partition_kwargs: Any,
 ) -> List[Element]:
     """Send the given file to be partitioned remotely with retry logic.
 
@@ -151,7 +149,7 @@ def partition_file_via_api(
 
     api_key = request.headers.get("unstructured-api-key", default="")
     partition_kwargs["starting_page_number"] = (
-            partition_kwargs.get("starting_page_number", 1) + page_offset
+        partition_kwargs.get("starting_page_number", 1) + page_offset
     )
 
     result = call_api(
@@ -166,13 +164,13 @@ def partition_file_via_api(
 
 
 def partition_pdf_splits(
-        request: Request,
-        pdf_pages: Sequence[PageObject],
-        file: IO[bytes],
-        metadata_filename: str,
-        content_type: str,
-        coordinates: bool,
-        **partition_kwargs: Any,
+    request: Request,
+    pdf_pages: Sequence[PageObject],
+    file: IO[bytes],
+    metadata_filename: str,
+    content_type: str,
+    coordinates: bool,
+    **partition_kwargs: Any,
 ) -> List[Element]:
     """Split a pdf into chunks and process in parallel with more api calls.
 
@@ -238,43 +236,43 @@ class ChipperMemoryProtection:
         is_chipper_processing = True
 
     def __exit__(
-            self,
-            exc_type: Optional[type[BaseException]],
-            exc_value: Optional[BaseException],
-            exc_tb: Optional[TracebackType],
+        self,
+        exc_type: Optional[type[BaseException]],
+        exc_value: Optional[BaseException],
+        exc_tb: Optional[TracebackType],
     ):
         global is_chipper_processing
         is_chipper_processing = False
 
 
 def pipeline_api(
-        file: IO[bytes],
-        request: Request,
-        # -- chunking options --
-        chunking_strategy: Optional[str],
-        combine_under_n_chars: Optional[int],
-        max_characters: int,
-        multipage_sections: bool,
-        new_after_n_chars: Optional[int],
-        overlap: int,
-        overlap_all: bool,
-        # ----------------------
-        filename: str = "",
-        file_content_type: Optional[str] = None,
-        response_type: str = "application/json",
-        coordinates: bool = False,
-        encoding: str = "utf-8",
-        hi_res_model_name: Optional[str] = None,
-        include_page_breaks: bool = False,
-        ocr_languages: Optional[List[str]] = None,
-        pdf_infer_table_structure: bool = True,
-        skip_infer_table_types: Optional[List[str]] = None,
-        strategy: str = "auto",
-        xml_keep_tags: bool = False,
-        languages: Optional[List[str]] = None,
-        extract_image_block_types: Optional[List[str]] = None,
-        unique_element_ids: Optional[bool] = False,
-        starting_page_number: Optional[int] = None,
+    file: IO[bytes],
+    request: Request,
+    # -- chunking options --
+    chunking_strategy: Optional[str],
+    combine_under_n_chars: Optional[int],
+    max_characters: int,
+    multipage_sections: bool,
+    new_after_n_chars: Optional[int],
+    overlap: int,
+    overlap_all: bool,
+    # ----------------------
+    filename: str = "",
+    file_content_type: Optional[str] = None,
+    response_type: str = "application/json",
+    coordinates: bool = False,
+    encoding: str = "utf-8",
+    hi_res_model_name: Optional[str] = None,
+    include_page_breaks: bool = False,
+    ocr_languages: Optional[List[str]] = None,
+    pdf_infer_table_structure: bool = True,
+    skip_infer_table_types: Optional[List[str]] = None,
+    strategy: str = "auto",
+    xml_keep_tags: bool = False,
+    languages: Optional[List[str]] = None,
+    extract_image_block_types: Optional[List[str]] = None,
+    unique_element_ids: Optional[bool] = False,
+    starting_page_number: Optional[int] = None,
 ) -> List[Dict[str, Any]] | str:
     if filename.endswith(".msg"):
         # Note(yuming): convert file type for msg files
@@ -283,12 +281,12 @@ def pipeline_api(
 
     # We don't want to keep logging the same params for every parallel call
     is_internal_request = (
-            (
-                    request.headers.get("X-Forwarded-For")
-                    and str(request.headers.get("X-Forwarded-For")).startswith("10.")
-            )
-            # -- NOTE(scanny): request.client is None in certain testing environments --
-            or (request.client and request.client.host.startswith("10."))
+        (
+            request.headers.get("X-Forwarded-For")
+            and str(request.headers.get("X-Forwarded-For")).startswith("10.")
+        )
+        # -- NOTE(scanny): request.client is None in certain testing environments --
+        or (request.client and request.client.host.startswith("10."))
     )
 
     if not is_internal_request:
@@ -331,6 +329,7 @@ def pipeline_api(
     if file_content_type == "application/pdf":
         _check_pdf(file)
 
+    hi_res_model_name = _validate_hi_res_model_name(hi_res_model_name, coordinates)
     strategy = _validate_strategy(strategy)
     pdf_infer_table_structure = _set_pdf_infer_table_structure(
         pdf_infer_table_structure,
@@ -414,16 +413,16 @@ def pipeline_api(
                 coordinates=coordinates,
                 **partition_kwargs,  # type: ignore # pyright: ignore[reportGeneralTypeIssues]
             )
-        # elif hi_res_model_name and hi_res_model_name in CHIPPER_MODEL_TYPES:
-        #     with ChipperMemoryProtection():
-        #         elements = partition(**partition_kwargs)  # type: ignore # pyright: ignore[reportGeneralTypeIssues]
+        elif hi_res_model_name and hi_res_model_name in CHIPPER_MODEL_TYPES:
+            with ChipperMemoryProtection():
+                elements = partition(**partition_kwargs)  # type: ignore # pyright: ignore[reportGeneralTypeIssues]
         else:
             elements = partition(**partition_kwargs)  # type: ignore # pyright: ignore[reportGeneralTypeIssues]
 
     except OSError as e:
         if isinstance(e.args[0], str) and (
-                "chipper-fast-fine-tuning is not a local folder" in e.args[0]
-                or "ved-fine-tuning is not a local folder" in e.args[0]
+            "chipper-fast-fine-tuning is not a local folder" in e.args[0]
+            or "ved-fine-tuning is not a local folder" in e.args[0]
         ):
             raise HTTPException(
                 status_code=400,
@@ -492,11 +491,26 @@ def pipeline_api(
 
     return result
 
+
+def _check_free_memory():
+    """Reject traffic when free memory is below minimum (default 2GB)."""
+    mem = psutil.virtual_memory()
+    memory_free_minimum = int(os.environ.get("UNSTRUCTURED_MEMORY_FREE_MINIMUM_MB", 2048))
+
+    if mem.available <= memory_free_minimum * 1024 * 1024:
+        logger.warning(f"Rejecting because free memory is below {memory_free_minimum} MB")
+        raise HTTPException(
+            status_code=503, detail="Server is under heavy load. Please try again later."
+        )
+
+
 def _check_pdf(file: IO[bytes]):
     """Check if the PDF file is encrypted, otherwise assume it is not a valid PDF."""
     try:
         pdf = PdfReader(file)
-        pdf.metadata  # This will raise if the file is encrypted
+
+        # This will raise if the file is encrypted
+        pdf.metadata
         return pdf
     except FileNotDecryptedError:
         raise HTTPException(
@@ -509,12 +523,27 @@ def _check_pdf(file: IO[bytes]):
 
 def _validate_strategy(strategy: str) -> str:
     strategy = strategy.lower()
-    strategies = ["fast", "auto"]
+    strategies = ["fast", "hi_res", "auto", "ocr_only"]
     if strategy not in strategies:
         raise HTTPException(
             status_code=400, detail=f"Invalid strategy: {strategy}. Must be one of {strategies}"
         )
     return strategy
+
+
+def _validate_hi_res_model_name(
+    hi_res_model_name: Optional[str], show_coordinates: bool
+) -> Optional[str]:
+    # Make sure chipper aliases to the latest model
+    if hi_res_model_name and hi_res_model_name == "chipper":
+        hi_res_model_name = "chipperv2"
+
+    if hi_res_model_name and hi_res_model_name in CHIPPER_MODEL_TYPES and show_coordinates:
+        raise HTTPException(
+            status_code=400,
+            detail=f"coordinates aren't available when using the {hi_res_model_name} model type",
+        )
+    return hi_res_model_name
 
 
 def _validate_chunking_strategy(chunking_strategy: Optional[str]) -> Optional[str]:
@@ -541,7 +570,7 @@ def _validate_chunking_strategy(chunking_strategy: Optional[str]) -> Optional[st
 
 
 def _set_pdf_infer_table_structure(
-        pdf_infer_table_structure: bool, strategy: str, skip_infer_table_types: Optional[List[str]]
+    pdf_infer_table_structure: bool, strategy: str, skip_infer_table_types: Optional[List[str]]
 ) -> bool:
     """Avoids table inference in "fast" and "ocr_only" runs."""
     # NOTE(robinson) - line below is for type checking
@@ -639,145 +668,123 @@ async def handle_invalid_get_request():
 )
 @router.post("/general/v0.0.72/general", include_in_schema=False)
 def general_partition(
-        request: Request,
-        files: List[UploadFile],
-        form_params: GeneralFormParams = Depends(GeneralFormParams.as_form),
+    request: Request,
+    files: List[UploadFile],
+    form_params: GeneralFormParams = Depends(GeneralFormParams.as_form),
 ):
-    from .events import active_requests, is_shutting_down, request_lock, is_memory_low
-    global active_requests, is_shutting_down
+    # -- must have a valid API key --
+    if api_key_env := os.environ.get("UNSTRUCTURED_API_KEY"):
+        api_key = request.headers.get("unstructured-api-key")
+        if api_key != api_key_env:
+            raise HTTPException(
+                detail=f"API key {api_key} is invalid", status_code=status.HTTP_401_UNAUTHORIZED
+            )
 
-    if is_shutting_down:
-        raise HTTPException(status_code=503, detail="Service is shutting down")
+    content_type = request.headers.get("Accept")
 
-        # -- must have a valid API key --
-        if api_key_env := os.environ.get("UNSTRUCTURED_API_KEY"):
-            api_key = request.headers.get("unstructured-api-key")
-            if api_key != api_key_env:
-                raise HTTPException(
-                    detail=f"API key {api_key} is invalid", status_code=status.HTTP_401_UNAUTHORIZED
-                )
-
-        content_type = request.headers.get("Accept")
-
-        # -- detect response content-type conflict when multiple files are uploaded --
-        if (
-                len(files) > 1
-                and content_type
-                and content_type
-                not in [
+    # -- detect response content-type conflict when multiple files are uploaded --
+    if (
+        len(files) > 1
+        and content_type
+        and content_type
+        not in [
             "*/*",
             "multipart/mixed",
             "application/json",
             "text/csv",
         ]
-        ):
-            raise HTTPException(
-                detail=f"Conflict in media type {content_type} with response type 'multipart/mixed'.\n",
-                status_code=status.HTTP_406_NOT_ACCEPTABLE,
-            )
-
-        # -- validate other arguments --
-        chunking_strategy = _validate_chunking_strategy(form_params.chunking_strategy)
-
-        # -- unzip any uploaded files that need it --
-        for idx, file in enumerate(files):
-            is_content_type_gz = file.content_type == "application/gzip"
-            is_extension_gz = file.filename and file.filename.endswith(".gz")
-            if is_content_type_gz or is_extension_gz:
-                files[idx] = ungz_file(file, form_params.gz_uncompressed_content_type)
-
-        def response_generator(is_multipart: bool):
-            for file in files:
-                if is_shutting_down:
-                    yield {"error": "Service is shutting down", "partial_results": True}
-                    break
-
-                file_content_type = get_validated_mimetype(file)
-
-                _file = file.file
-
-                response = pipeline_api(
-                    _file,
-                    request=request,
-                    coordinates=form_params.coordinates,
-                    encoding=form_params.encoding,
-                    hi_res_model_name=form_params.hi_res_model_name,
-                    include_page_breaks=form_params.include_page_breaks,
-                    ocr_languages=form_params.ocr_languages,
-                    pdf_infer_table_structure=form_params.pdf_infer_table_structure,
-                    skip_infer_table_types=form_params.skip_infer_table_types,
-                    strategy=form_params.strategy,
-                    xml_keep_tags=form_params.xml_keep_tags,
-                    response_type=form_params.output_format,
-                    filename=str(file.filename),
-                    file_content_type=file_content_type,
-                    languages=form_params.languages,
-                    extract_image_block_types=form_params.extract_image_block_types,
-                    unique_element_ids=form_params.unique_element_ids,
-                    # -- chunking options --
-                    chunking_strategy=chunking_strategy,
-                    combine_under_n_chars=form_params.combine_under_n_chars,
-                    max_characters=form_params.max_characters,
-                    multipage_sections=form_params.multipage_sections,
-                    new_after_n_chars=form_params.new_after_n_chars,
-                    overlap=form_params.overlap,
-                    overlap_all=form_params.overlap_all,
-                    starting_page_number=form_params.starting_page_number,
-                )
-
-                yield (
-                    json.dumps(response)
-                    if is_multipart and type(response) not in [str, bytes]
-                    else (
-                        PlainTextResponse(response)
-                        if not is_multipart and form_params.output_format == "text/csv"
-                        else response
-                    )
-                )
-
-        def join_responses(
-                responses: Sequence[str | List[Dict[str, Any]] | PlainTextResponse]
-        ) -> List[str | List[Dict[str, Any]]] | PlainTextResponse:
-            """Consolidate partitionings from multiple documents into single response payload."""
-            if form_params.output_format != "text/csv":
-                return cast(List[Union[str, List[Dict[str, Any]]]], responses)
-            responses = cast(List[PlainTextResponse], responses)
-            data = pd.read_csv(  # pyright: ignore[reportUnknownMemberType]
-                io.BytesIO(responses[0].body)
-            )
-            if len(responses) > 1:
-                for resp in responses[1:]:
-                    resp_data = pd.read_csv(  # pyright: ignore[reportUnknownMemberType]
-                        io.BytesIO(resp.body)
-                    )
-                    data = data.merge(  # pyright: ignore[reportUnknownMemberType]
-                        resp_data, how="outer"
-                    )
-            return PlainTextResponse(data.to_csv())
-
-        result = (
-            MultipartMixedResponse(
-                response_generator(is_multipart=True), content_type=form_params.output_format
-            )
-            if content_type == "multipart/mixed"
-            else (
-                list(response_generator(is_multipart=False))[0]
-                if len(files) == 1
-                else join_responses(list(response_generator(is_multipart=False)))
-            )
+    ):
+        raise HTTPException(
+            detail=f"Conflict in media type {content_type} with response type 'multipart/mixed'.\n",
+            status_code=status.HTTP_406_NOT_ACCEPTABLE,
         )
 
-        return result
+    # -- validate other arguments --
+    chunking_strategy = _validate_chunking_strategy(form_params.chunking_strategy)
+
+    # -- unzip any uploaded files that need it --
+    for idx, file in enumerate(files):
+        is_content_type_gz = file.content_type == "application/gzip"
+        is_extension_gz = file.filename and file.filename.endswith(".gz")
+        if is_content_type_gz or is_extension_gz:
+            files[idx] = ungz_file(file, form_params.gz_uncompressed_content_type)
+
+    def response_generator(is_multipart: bool):
+        for file in files:
+            file_content_type = get_validated_mimetype(file)
+
+            _file = file.file
+
+            response = pipeline_api(
+                _file,
+                request=request,
+                coordinates=form_params.coordinates,
+                encoding=form_params.encoding,
+                hi_res_model_name=form_params.hi_res_model_name,
+                include_page_breaks=form_params.include_page_breaks,
+                ocr_languages=form_params.ocr_languages,
+                pdf_infer_table_structure=form_params.pdf_infer_table_structure,
+                skip_infer_table_types=form_params.skip_infer_table_types,
+                strategy=form_params.strategy,
+                xml_keep_tags=form_params.xml_keep_tags,
+                response_type=form_params.output_format,
+                filename=str(file.filename),
+                file_content_type=file_content_type,
+                languages=form_params.languages,
+                extract_image_block_types=form_params.extract_image_block_types,
+                unique_element_ids=form_params.unique_element_ids,
+                # -- chunking options --
+                chunking_strategy=chunking_strategy,
+                combine_under_n_chars=form_params.combine_under_n_chars,
+                max_characters=form_params.max_characters,
+                multipage_sections=form_params.multipage_sections,
+                new_after_n_chars=form_params.new_after_n_chars,
+                overlap=form_params.overlap,
+                overlap_all=form_params.overlap_all,
+                starting_page_number=form_params.starting_page_number,
+            )
+
+            yield (
+                json.dumps(response)
+                if is_multipart and type(response) not in [str, bytes]
+                else (
+                    PlainTextResponse(response)
+                    if not is_multipart and form_params.output_format == "text/csv"
+                    else response
+                )
+            )
+
+    def join_responses(
+        responses: Sequence[str | List[Dict[str, Any]] | PlainTextResponse]
+    ) -> List[str | List[Dict[str, Any]]] | PlainTextResponse:
+        """Consolidate partitionings from multiple documents into single response payload."""
+        if form_params.output_format != "text/csv":
+            return cast(List[Union[str, List[Dict[str, Any]]]], responses)
+        responses = cast(List[PlainTextResponse], responses)
+        data = pd.read_csv(  # pyright: ignore[reportUnknownMemberType]
+            io.BytesIO(responses[0].body)
+        )
+        if len(responses) > 1:
+            for resp in responses[1:]:
+                resp_data = pd.read_csv(  # pyright: ignore[reportUnknownMemberType]
+                    io.BytesIO(resp.body)
+                )
+                data = data.merge(  # pyright: ignore[reportUnknownMemberType]
+                    resp_data, how="outer"
+                )
+        return PlainTextResponse(data.to_csv())
+
+    return (
+        MultipartMixedResponse(
+            response_generator(is_multipart=True), content_type=form_params.output_format
+        )
+        if content_type == "multipart/mixed"
+        else (
+            list(response_generator(is_multipart=False))[0]
+            if len(files) == 1
+            else join_responses(list(response_generator(is_multipart=False)))
+        )
+    )
 
 
 app.include_router(router)
-
-
-def graceful_shutdown():
-    global is_shutting_down
-    is_shutting_down = True
-
-    if active_requests > 0:
-        shutdown_event.wait()
-
-    logger.info("All requests completed, shutting down")
