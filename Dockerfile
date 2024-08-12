@@ -41,10 +41,10 @@ RUN ${PYTHON} -c "import nltk; nltk.download('punkt')" && \
     ${PYTHON} -c "from unstructured.partition.model_init import initialize; initialize()"
 
 FROM model-deps as code
-COPY CHANGELOG.md CHANGELOG.md
-COPY logger_config.yaml logger_config.yaml
+# COPY CHANGELOG.md CHANGELOG.md
+# COPY logger_config.yaml logger_config.yaml
 COPY prepline_general/ prepline_general/
-COPY exploration-notebooks exploration-notebooks
+# COPY exploration-notebooks exploration-notebooks
 COPY scripts/app-start.sh scripts/app-start.sh
 
 ENTRYPOINT ["scripts/app-start.sh"]
