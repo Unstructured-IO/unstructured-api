@@ -120,7 +120,7 @@ httpx==0.27.0
     # via
     #   fastapi
     #   unstructured-client
-huggingface-hub==0.24.5
+# huggingface-hub==0.24.5
     # via
     #   timm
     #   tokenizers
@@ -149,7 +149,7 @@ kiwisolver==1.4.5
     # via matplotlib
 langdetect==1.0.9
     # via unstructured
-layoutparser==0.3.4
+# layoutparser==0.3.4
     # via unstructured-inference
 lxml==5.2.2
     # via
@@ -206,13 +206,13 @@ olefile==0.47
     # via python-oxmsg
 omegaconf==2.3.0
     # via effdet
-onnx==1.16.2
+# onnx==1.16.2
     # via
     #   unstructured
     #   unstructured-inference
-onnxruntime==1.18.1
+# onnxruntime==1.18.1
     # via unstructured-inference
-opencv-python==4.10.0.84
+# opencv-python==4.10.0.84
     # via
     #   layoutparser
     #   unstructured-inference
@@ -283,198 +283,3 @@ psutil==6.0.0
 pyasn1==0.6.0
     # via
     #   pyasn1-modules
-    #   rsa
-pyasn1-modules==0.4.0
-    # via google-auth
-pycocotools==2.0.8
-    # via effdet
-pycparser==2.22
-    # via cffi
-pycryptodome==3.20.0
-    # via -r base.in
-pydantic==2.7.4
-    # via fastapi
-pydantic-core==2.18.4
-    # via pydantic
-pygments==2.18.0
-    # via rich
-pypandoc==1.13
-    # via unstructured
-pyparsing==3.1.2
-    # via matplotlib
-pypdf==4.2.0
-    # via
-    #   -r base.in
-    #   unstructured
-    #   unstructured-client
-pypdfium2==4.30.0
-    # via pdfplumber
-pytesseract==0.3.10
-    # via unstructured
-python-dateutil==2.9.0.post0
-    # via
-    #   matplotlib
-    #   pandas
-    #   unstructured-client
-python-docx==1.1.2
-    # via unstructured
-python-dotenv==1.0.1
-    # via uvicorn
-python-iso639==2024.4.27
-    # via unstructured
-python-magic==0.4.27
-    # via unstructured
-python-multipart==0.0.9
-    # via
-    #   fastapi
-    #   unstructured-inference
-python-oxmsg==0.0.1
-    # via unstructured
-python-pptx==0.6.23
-    # via unstructured
-pytz==2024.1
-    # via pandas
-pyyaml==6.0.1
-    # via
-    #   huggingface-hub
-    #   layoutparser
-    #   omegaconf
-    #   timm
-    #   transformers
-    #   uvicorn
-rapidfuzz==3.9.3
-    # via
-    #   unstructured
-    #   unstructured-inference
-ratelimit==2.2.1
-    # via -r base.in
-regex==2024.5.15
-    # via
-    #   nltk
-    #   transformers
-requests==2.32.3
-    # via
-    #   -r base.in
-    #   google-api-core
-    #   huggingface-hub
-    #   requests-toolbelt
-    #   transformers
-    #   unstructured
-    #   unstructured-client
-requests-toolbelt==1.0.0
-    # via unstructured-client
-rich==13.7.1
-    # via typer
-rsa==4.9
-    # via google-auth
-safetensors==0.3.2
-    # via
-    #   -c constraints.in
-    #   timm
-    #   transformers
-scipy==1.14.0
-    # via layoutparser
-shellingham==1.5.4
-    # via typer
-six==1.16.0
-    # via
-    #   langdetect
-    #   python-dateutil
-    #   unstructured-client
-sniffio==1.3.1
-    # via
-    #   anyio
-    #   httpx
-soupsieve==2.5
-    # via beautifulsoup4
-starlette==0.37.2
-    # via fastapi
-sympy==1.13.1
-    # via
-    #   onnxruntime
-    #   torch
-tabulate==0.9.0
-    # via unstructured
-timm==1.0.8
-    # via
-    #   effdet
-    #   unstructured-inference
-tokenizers==0.15.2
-    # via transformers
-torch==2.4.0
-    # via
-    #   effdet
-    #   timm
-    #   torchvision
-    #   unstructured-inference
-torchvision==0.19.0
-    # via
-    #   effdet
-    #   timm
-tqdm==4.66.4
-    # via
-    #   huggingface-hub
-    #   iopath
-    #   nltk
-    #   transformers
-    #   unstructured
-transformers==4.37.1
-    # via unstructured-inference
-typer==0.12.3
-    # via fastapi-cli
-typing-extensions==4.12.2
-    # via
-    #   anyio
-    #   emoji
-    #   fastapi
-    #   huggingface-hub
-    #   iopath
-    #   pydantic
-    #   pydantic-core
-    #   pypdf
-    #   python-docx
-    #   python-oxmsg
-    #   torch
-    #   typer
-    #   typing-inspect
-    #   unstructured
-    #   unstructured-client
-    #   uvicorn
-typing-inspect==0.9.0
-    # via
-    #   dataclasses-json
-    #   unstructured-client
-tzdata==2024.1
-    # via pandas
-ujson==5.10.0
-    # via fastapi
-unstructured[all-docs]==0.14.8
-    # via -r base.in
-unstructured-client==0.23.7
-    # via unstructured
-unstructured-inference==0.7.36
-    # via unstructured
-unstructured-pytesseract==0.3.12
-    # via unstructured
-urllib3==2.2.2
-    # via
-    #   requests
-    #   unstructured-client
-uvicorn[standard]==0.30.1
-    # via
-    #   -r base.in
-    #   fastapi
-uvloop==0.19.0
-    # via uvicorn
-watchfiles==0.22.0
-    # via uvicorn
-websockets==12.0
-    # via uvicorn
-wrapt==1.16.0
-    # via
-    #   deprecated
-    #   unstructured
-xlrd==2.0.1
-    # via unstructured
-xlsxwriter==3.2.0
-    # via python-pptx
