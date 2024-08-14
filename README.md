@@ -2,62 +2,90 @@
   <img src="img/unstructured_logo.png" height="200">
 </h3>
 
-<h3 align="center">
-  <p>API Announcement!</p>
-</h3>
-
-We are thrilled to announce our newly launched [Unstructured API](https://unstructured-io.github.io/unstructured/api.html). While access to the hosted Unstructured API will remain free, API Keys are required to make requests. To prevent disruption, get yours [here](https://www.unstructured.io/#get-api-key) now and start using it today! Check out the [readme](https://github.com/Unstructured-IO/unstructured-api#--) here to get started making API calls.</p>
-
-#### :rocket: Beta Feature: Chipper Model
-
-We are releasing the beta version of our Chipper model to deliver superior performance when processing high-resolution, complex documents. To start using the Chipper model in your API request, you can utilize the `hi_res` strategy. Please refer to the documentation [here](https://unstructured-io.github.io/unstructured/api.html#strategies).
-
-As the Chipper model is in beta version, we welcome feedback and suggestions. For those interested in testing the Chipper model, we encourage you to connect with us on [Slack community](https://join.slack.com/t/unstructuredw-kbe4326/shared_invite/zt-1x7cgo0pg-PTptXWylzPQF9xZolzCnwQ).
-
 <div align="center">
-
  <a
    href="https://www.phorm.ai/query?projectId=34efc517-2201-4376-af43-40c4b9da3dc5">
 	<img src="https://img.shields.io/badge/Phorm-Ask_AI-%23F2777A.svg?&logo=data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNSIgaGVpZ2h0PSI0IiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgogIDxwYXRoIGQ9Ik00LjQzIDEuODgyYTEuNDQgMS40NCAwIDAgMS0uMDk4LjQyNmMtLjA1LjEyMy0uMTE1LjIzLS4xOTIuMzIyLS4wNzUuMDktLjE2LjE2NS0uMjU1LjIyNmExLjM1MyAxLjM1MyAwIDAgMS0uNTk1LjIxMmMtLjA5OS4wMTItLjE5Mi4wMTQtLjI3OS4wMDZsLTEuNTkzLS4xNHYtLjQwNmgxLjY1OGMuMDkuMDAxLjE3LS4xNjkuMjQ2LS4xOTFhLjYwMy42MDMgMCAwIDAgLjItLjEwNi41MjkuNTI5IDAgMCAwIC4xMzgtLjE3LjY1NC42NTQgMCAwIDAgLjA2NS0uMjRsLjAyOC0uMzJhLjkzLjkzIDAgMCAwLS4wMzYtLjI0OS41NjcuNTY3IDAgMCAwLS4xMDMtLjIuNTAyLjUwMiAwIDAgMC0uMTY4LS4xMzguNjA4LjYwOCAwIDAgMC0uMjQtLjA2N0wyLjQzNy43MjkgMS42MjUuNjcxYS4zMjIuMzIyIDAgMCAwLS4yMzIuMDU4LjM3NS4zNzUgMCAwIDAtLjExNi4yMzJsLS4xMTYgMS40NS0uMDU4LjY5Ny0uMDU4Ljc1NEwuNzA1IDRsLS4zNTctLjA3OUwuNjAyLjkwNkMuNjE3LjcyNi42NjMuNTc0LjczOS40NTRhLjk1OC45NTggMCAwIDEgLjI3NC0uMjg1Ljk3MS45NzEgMCAwIDEgLjMzNy0uMTRjLjExOS0uMDI2LjIyNy0uMDM0LjMyNS0uMDI2TDMuMjMyLjE2Yy4xNTkuMDE0LjMzNi4wMy40NTkuMDgyYTEuMTczIDEuMTczIDAgMCAxIC41NDUuNDQ3Yy4wNi4wOTQuMTA5LjE5Mi4xNDQuMjkzYTEuMzkyIDEuMzkyIDAgMCAxIC4wNzguNThsLS4wMjkuMzJaIiBmaWxsPSIjRjI3NzdBIi8+CiAgPHBhdGggZD0iTTQuMDgyIDIuMDA3YTEuNDU1IDEuNDU1IDAgMCAxLS4wOTguNDI3Yy0uMDUuMTI0LS4xMTQuMjMyLS4xOTIuMzI0YTEuMTMgMS4xMyAwIDAgMS0uMjU0LjIyNyAxLjM1MyAxLjM1MyAwIDAgMS0uNTk1LjIxNGMtLjEuMDEyLS4xOTMuMDE0LS4yOC4wMDZsLTEuNTYtLjEwOC4wMzQtLjQwNi4wMy0uMzQ4IDEuNTU5LjE1NGMuMDkgMCAuMTczLS4wMS4yNDgtLjAzM2EuNjAzLjYwMyAwIDAgMCAuMi0uMTA2LjUzMi41MzIgMCAwIDAgLjEzOS0uMTcyLjY2LjY2IDAgMCAwIC4wNjQtLjI0MWwuMDI5LS4zMjFhLjk0Ljk0IDAgMCAwLS4wMzYtLjI1LjU3LjU3IDAgMCAwLS4xMDMtLjIwMi41MDIuNTAyIDAgMCAwLS4xNjgtLjEzOC42MDUuNjA1IDAgMCAwLS4yNC0uMDY3TDEuMjczLjgyN2MtLjA5NC0uMDA4LS4xNjguMDEtLjIyMS4wNTUtLjA1My4wNDUtLjA4NC4xMTQtLjA5Mi4yMDZMLjcwNSA0IDAgMy45MzhsLjI1NS0yLjkxMUExLjAxIDEuMDEgMCAwIDEgLjM5My41NzIuOTYyLjk2MiAwIDAgMSAuNjY2LjI4NmEuOTcuOTcgMCAwIDEgLjMzOC0uMTRDMS4xMjIuMTIgMS4yMy4xMSAxLjMyOC4xMTlsMS41OTMuMTRjLjE2LjAxNC4zLjA0Ny40MjMuMWExLjE3IDEuMTcgMCAwIDEgLjU0NS40NDhjLjA2MS4wOTUuMTA5LjE5My4xNDQuMjk1YTEuNDA2IDEuNDA2IDAgMCAxIC4wNzcuNTgzbC0uMDI4LjMyMloiIGZpbGw9IndoaXRlIi8+CiAgPHBhdGggZD0iTTQuMDgyIDIuMDA3YTEuNDU1IDEuNDU1IDAgMCAxLS4wOTguNDI3Yy0uMDUuMTI0LS4xMTQuMjMyLS4xOTIuMzI0YTEuMTMgMS4xMyAwIDAgMS0uMjU0LjIyNyAxLjM1MyAxLjM1MyAwIDAgMS0uNTk1LjIxNGMtLjEuMDEyLS4xOTMuMDE0LS4yOC4wMDZsLTEuNTYtLjEwOC4wMzQtLjQwNi4wMy0uMzQ4IDEuNTU5LjE1NGMuMDkgMCAuMTczLS4wMS4yNDgtLjAzM2EuNjAzLjYwMyAwIDAgMCAuMi0uMTA2LjUzMi41MzIgMCAwIDAgLjEzOS0uMTcyLjY2LjY2IDAgMCAwIC4wNjQtLjI0MWwuMDI5LS4zMjFhLjk0Ljk0IDAgMCAwLS4wMzYtLjI1LjU3LjU3IDAgMCAwLS4xMDMtLjIwMi41MDIuNTAyIDAgMCAwLS4xNjgtLjEzOC42MDUuNjA1IDAgMCAwLS4yNC0uMDY3TDEuMjczLjgyN2MtLjA5NC0uMDA4LS4xNjguMDEtLjIyMS4wNTUtLjA1My4wNDUtLjA4NC4xMTQtLjA5Mi4yMDZMLjcwNSA0IDAgMy45MzhsLjI1NS0yLjkxMUExLjAxIDEuMDEgMCAwIDEgLjM5My41NzIuOTYyLjk2MiAwIDAgMSAuNjY2LjI4NmEuOTcuOTcgMCAwIDEgLjMzOC0uMTRDMS4xMjIuMTIgMS4yMy4xMSAxLjMyOC4xMTlsMS41OTMuMTRjLjE2LjAxNC4zLjA0Ny40MjMuMWExLjE3IDEuMTcgMCAwIDEgLjU0NS40NDhjLjA2MS4wOTUuMTA5LjE5My4xNDQuMjk1YTEuNDA2IDEuNDA2IDAgMCAxIC4wNzcuNTgzbC0uMDI4LjMyMloiIGZpbGw9IndoaXRlIi8+Cjwvc3ZnPgo=" />
    </a>
-
 </div>
 
+<h1 align="center">
+   <p>Open Source Unstructured API</p>
+</h1>
 
----
-
-<h3 align="center">
-  <p>General Pre-Processing Pipeline for Documents</p>
-</h3>
-
-This repo implements a pre-processing pipeline for the following documents. Currently, the pipeline is capable of recognizing the file type and choosing the relevant partition function to process the file.
+This repo implements a FastAPI server with the partitioning functionality of the [Unstructured library](https://github.com/Unstructured-IO/unstructured). It has one endpoint that accepts any of the following filetypes, and returns the contents as structured JSON.
 
 
 | Category  | Document Types                |
 |-----------|-------------------------------|
-| Plaintext | `.txt`, `.eml`, `.msg`, `.xml`, `.html`, `.md`, `.rst`, `.json`, `.rtf` |
-| Images    | `.jpeg`, `.png`               |
-| Documents | `.doc`, `.docx`, `.ppt`, `.pptx`, `.pdf`, `.odt`, `.epub`, `.csv`, `.tsv`, `.xlsx` |
+| Plaintext | `.csv`, `.eml`, `.html`, `.md`, `.msg`, `.rst`, `.rtf`, `.tsv`, `.txt`, `.xml`|
+| Images    | `.bmp`, `.heic`, `.jpeg`, `.png`, `.tiff`                            |
+| Documents | `.doc`, `.docx`, `.epub`, `.odt`, `.pdf`, `.ppt`, `.pptx`, `.xlsx` |
 | Zipped    | `.gz`                         |
 
+Any questions? Get in touch through our [Slack community](https://short.unstructured.io/pzw05l7)!
 
-## :rocket: Unstructured API
+## Quickstart
 
-Try our hosted API! It's freely available to use with any of the filetypes listed above. This is the easiest way to get started. If you'd like to host your own version of the API, jump down to the [Developer Quickstart Guide](#developer-quick-start).
+You can try it out by running the docker container and sending one of the sample files:
 
 ```
- curl -X 'POST' \
-  'https://api.unstructured.io/general/v0/general' \
+make docker-build && make docker-start-api
+...
+...
+curl -X 'POST' \
+  'http://localhost:8000/general/v0/general' \
   -H 'accept: application/json' \
   -H 'Content-Type: multipart/form-data' \
-  -H 'unstructured-api-key: <YOUR API KEY>' \
-  -F 'files=@sample-docs/family-day.eml' \
-  | jq -C . | less -R
+  -F 'files=@sample-docs/winter-sports.epub'
 ```
 
-### Parameters
+```
+[
+    {
+        "type": "Title",
+        "element_id": "7bfc19ac1a1a44b913be67b8e7afb04c",
+        "text": "The Project Gutenberg eBook of Winter Sports in\nSwitzerland, by E. F. Benson",
+        "metadata": {
+            "page_number": 1,
+            "languages": [
+                "eng"
+            ],
+            "filename": "winter-sports.epub",
+            "filetype": "application/epub"
+        }
+    },
+    {
+        "type": "NarrativeText",
+        "element_id": "38f40c108f1732d03d72747a0995004a",
+        "text": "\nThis ebook is for the use of anyone anywhere in the United States and\nmost other parts of the world at no cost and with almost no restrictions\nwhatsoever. You may copy it, give it away or re-use it under the terms\nof the Project Gutenberg License included with this ebook or online at\n",
+        "metadata": {
+            "page_number": 1,
+            "languages": [
+                "eng"
+            ],
+            "parent_id": "7bfc19ac1a1a44b913be67b8e7afb04c",
+            "filename": "winter-sports.epub",
+            "filetype": "application/epub"
+        }
+    },
+```
 
-#### Strategies
+## :rocket: Try the Unstructured Serverless API!
+
+This open source server is not recommended for production use. See [our docs](https://docs.unstructured.io/api-reference/api-services/overview#benefits-over-open-source) for specific limitations. When you're ready to take things to the next level, check out our [Serverless API](https://docs.unstructured.io/api-reference/api-services/saas-api-development-guide) and get the first 14 days of document transformation for free! We also offer the premium version of this API for your [Azure](https://docs.unstructured.io/api-reference/api-services/azure) or [AWS](https://docs.unstructured.io/api-reference/api-services/aws) environment.
+
+To host your own version, jump down to the [Developer Quickstart Guide](#developer-quick-start).
+
+## Unstructured SDKs
+
+We also recommend using our official [Python client](https://github.com/Unstructured-IO/unstructured-python-client) or [Typescript/Javascript client](https://github.com/Unstructured-IO/unstructured-js-client) to interact with the API, whether it's local or one of the paid options above.
+
+## Parameters
+
+See [this page](https://docs.unstructured.io/api-reference/api-services/api-parameters) for all currently available parameters.
+
+### Strategies
 
 Four strategies are available for processing PDF/Images files: `hi_res`, `fast`, `ocr_only` and `auto`. `fast` is the default `strategy` and works well for documents that do not have text embedded in images.
 
@@ -65,7 +93,7 @@ On the other hand, `hi_res` is the better choice for PDFs that may have text wit
 
 ```
  curl -X 'POST' \
-  'https://api.unstructured.io/general/v0/general' \
+  'https://api.unstructuredapp.io/general/v0/general' \
   -H 'accept: application/json' \
   -H 'Content-Type: multipart/form-data' \
   -F 'files=@sample-docs/layout-parser-paper.pdf' \
@@ -77,13 +105,13 @@ The `ocr_only` strategy runs the document through Tesseract for OCR. Currently, 
 
 For the best of all worlds, `auto` will determine when a page can be extracted using `fast` or `ocr_only` mode, otherwise it will fall back to `hi_res`.
 
-#### Hi Res model name
+### Hi Res model name
 
 The `hi_res` strategy supports different models, and the default is `detectron2onnx`. You can also specify `hi_res_model_name` parameter to run `hi_res` strategy with the chipper model while using the host API:
 
 ```
  curl -X 'POST' \
-  'https://api.unstructured.io/general/v0/general' \
+  'https://api.unstructuredapp.io/general/v0/general' \
   -H 'accept: application/json' \
   -H 'Content-Type: multipart/form-data' \
   -F 'files=@sample-docs/layout-parser-paper.pdf' \
@@ -94,14 +122,14 @@ The `hi_res` strategy supports different models, and the default is `detectron2o
 
 We also support models to be used locally, for example, `yolox`. Please refer to the `using-the-api-locally` section for more information on how to use the local API.
 
-#### OCR languages
+### OCR languages
 
 Note: This kwarg will eventually be deprecated. Please use `languages`.
 You can also specify what languages to use for OCR with the `ocr_languages` kwarg. See the [Tesseract documentation](https://github.com/tesseract-ocr/tessdata) for a full list of languages and install instructions. OCR is only applied if the text is not already available in the PDF document.
 
 ```
 curl -X 'POST' \
-  'https://api.unstructured.io/general/v0/general' \
+  'https://api.unstructuredapp.io/general/v0/general' \
   -H 'accept: application/json' \
   -H 'Content-Type: multipart/form-data' \
   -F 'files=@sample-docs/english-and-korean.png' \
@@ -111,13 +139,13 @@ curl -X 'POST' \
   | jq -C . | less -R
 ```
 
-#### Languages
+### Languages
 
 You can also specify what languages to use for OCR with the `languages` kwarg. See the [Tesseract documentation](https://github.com/tesseract-ocr/tessdata) for a full list of languages and install instructions. OCR is only applied if the text is not already available in the PDF document.
 
 ```
 curl -X 'POST' \
-  'https://api.unstructured.io/general/v0/general' \
+  'https://api.unstructuredapp.io/general/v0/general' \
   -H 'accept: application/json' \
   -H 'Content-Type: multipart/form-data' \
   -F 'files=@sample-docs/english-and-korean.png' \
@@ -127,13 +155,13 @@ curl -X 'POST' \
   | jq -C . | less -R
 ```
 
-#### Coordinates
+### Coordinates
 
 When elements are extracted from PDFs or images, it may be useful to get their bounding boxes as well. Set the `coordinates` parameter to `true` to add this field to the elements in the response.
 
 ```
  curl -X 'POST' \
-  'https://api.unstructured.io/general/v0/general' \
+  'https://api.unstructuredapp.io/general/v0/general' \
   -H 'accept: application/json' \
   -H 'Content-Type: multipart/form-data' \
   -F 'files=@sample-docs/layout-parser-paper.pdf' \
@@ -141,14 +169,14 @@ When elements are extracted from PDFs or images, it may be useful to get their b
   | jq -C . | less -R
 ```
 
-#### Skip Table Extraction
+### Skip Table Extraction
 
 Currently, we provide support for enabling and disabling table extraction for all file types. Set parameter `skip_infer_table_types` to specify the document types that you want to skip table extraction with. By default, we enable table extraction
 for all file types (`skip_infer_table_types=[]`). Again, please note that table extraction only works with `hi_res` strategy. For example, if you want to skip table extraction for images, you can pass a list with matching image file types:
 
 ```
  curl -X 'POST' \
-  'https://api.unstructured.io/general/v0/general' \
+  'https://api.unstructuredapp.io/general/v0/general' \
   -H 'accept: application/json' \
   -H 'Content-Type: multipart/form-data' \
   -F 'files=@sample-docs/layout-parser-paper-with-table.jpg' \
@@ -157,13 +185,13 @@ for all file types (`skip_infer_table_types=[]`). Again, please note that table 
   | jq -C . | less -R
 ```
 
-#### Encoding
+### Encoding
 
 You can specify the encoding to use to decode the text input. If no value is provided, utf-8 will be used.
 
 ```
 curl -X 'POST' \
- 'https://api.unstructured.io/general/v0/general' \
+ 'https://api.unstructuredapp.io/general/v0/general' \
  -H 'accept: application/json'  \
  -H 'Content-Type: multipart/form-data' \
  -F 'files=@sample-docs/fake-power-point.pptx' \
@@ -171,13 +199,13 @@ curl -X 'POST' \
  | jq -C . | less -R
 ```
 
-#### Gzipped files
+### Gzipped files
 
 You can send gzipped file and api will un-gzip it. 
 
 ```
 curl -X 'POST' \
- 'https://api.unstructured.io/general/v0/general' \
+ 'https://api.unstructuredapp.io/general/v0/general' \
  -H 'accept: application/json'  \
  -H 'Content-Type: multipart/form-data' \
  -F 'gz_uncompressed_content_type=application/pdf' \
@@ -188,13 +216,13 @@ If field `gz_uncompressed_content_type` is set, the API will use its value as co
 after uncompressing the .gz files that are sent in single batch. If not set, the API will use
 various heuristics to detect the filetypes after uncompressing from .gz.
 
-#### XML Tags
+### XML Tags
 
 When processing XML documents, set the `xml_keep_tags` parameter to `true` to retain the XML tags in the output. If not specified, it will simply extract the text from within the tags.
 
 ```
 curl -X 'POST' \
- 'https://api.unstructured.io/general/v0/general' \
+ 'https://api.unstructuredapp.io/general/v0/general' \
  -H 'accept: application/json'  \
  -H 'Content-Type: multipart/form-data' \
  -F 'files=@sample-docs/fake-xml.xml' \
@@ -202,13 +230,13 @@ curl -X 'POST' \
  | jq -C . | less -R
 ```
 
-#### Page Breaks
+### Page Breaks
 
 For supported filetypes, set the `include_page_breaks` parameter to `true` to include `PageBreak` elements in the output.
 
 ```
 curl -X 'POST' \
- 'https://api.unstructured.io/general/v0/general' \
+ 'https://api.unstructuredapp.io/general/v0/general' \
  -H 'accept: application/json'  \
  -H 'Content-Type: multipart/form-data' \
  -F 'files=@sample-docs/layout-parser-paper-fast.pdf' \
@@ -217,7 +245,7 @@ curl -X 'POST' \
 ```
 
 
-#### Unique element IDs
+### Unique element IDs
 
 By default, the element ID is a SHA-256 hash of the element text. This is to ensure that
 the ID is deterministic. One downside is that the ID is not guaranteed to be unique.
@@ -228,7 +256,7 @@ This can be helpful if you'd like to use the IDs as a primary key in a database,
 
 ```
 curl -X 'POST' \ 
- 'https://api.unstructured.io/general/v0/general' \
+ 'https://api.unstructuredapp.io/general/v0/general' \
  -H 'accept: application/json'  \
  -H 'Content-Type: multipart/form-data' \
  -F 'files=@sample-docs/layout-parser-paper-fast.pdf' \
@@ -237,7 +265,7 @@ curl -X 'POST' \
 ```
 
 
-#### Chunking Elements
+### Chunking Elements
 
 Use the `chunking_strategy` form-field to chunk text into larger or smaller elements. Defaults to `None` which performs no chunking. The available chunking strategies are `basic` and `by_title`.
 
@@ -276,7 +304,7 @@ The `by_title` strategy has the same behaviors except document section boundarie
 
 ```
 curl -X 'POST' 
- 'https://api.unstructured.io/general/v0/general' \
+ 'https://api.unstructuredapp.io/general/v0/general' \
  -H 'accept: application/json'  \
  -H 'Content-Type: multipart/form-data' \
  -F 'files=@sample-docs/layout-parser-paper-fast.pdf' \
