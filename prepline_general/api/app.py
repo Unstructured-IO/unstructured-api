@@ -6,8 +6,8 @@ import os
 
 from starlette.middleware.base import BaseHTTPMiddleware
 
-from .events import healthcheck, MemoryCheckMiddleware
-from .general import router as general_router, _check_free_memory, graceful_shutdown, request_lock
+from .events import ready_healthcheck, live_healthcheck, MemoryCheckMiddleware, NotReadyMarkingMiddleware
+from .general import router as general_router, _check_free_memory, request_lock
 from .openapi import set_custom_openapi
 
 logger = logging.getLogger("unstructured_api")
@@ -125,16 +125,23 @@ class MetricsCheckFilter(logging.Filter):
 logging.getLogger("uvicorn.access").addFilter(HealthCheckFilter())
 logging.getLogger("uvicorn.access").addFilter(MetricsCheckFilter())
 
-@app.get("/healthcheck", include_in_schema=False)
+#@app.get("/healthcheck", include_in_schema=False)
+#def healthcheck_endpoint(request: Request):
+#    return healthcheck(request)
+
+@app.get("/health/ready", include_in_schema=False)
 def healthcheck_endpoint(request: Request):
-    return healthcheck(request)
+    return ready_healthcheck(request)
+
+@app.get("/health/live", include_in_schema=False)
+def healthcheck_endpoint(request: Request):
+    return live_healthcheck(request)
 
 
+app.add_middleware(NotReadyMarkingMiddleware)
 
-app.add_middleware(MemoryCheckMiddleware)
-
-@app.on_event("shutdown")
-def shutdown_event():
-    graceful_shutdown()
+# @app.on_event("shutdown")
+# def shutdown_event():
+#     graceful_shutdown()
 
 logger.info("Started Unstructured API")

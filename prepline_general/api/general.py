@@ -766,11 +766,11 @@ def general_partition(
 app.include_router(router)
 
 
-def graceful_shutdown():
-    global is_shutting_down
-    is_shutting_down = True
-
-    if active_requests > 0:
-        shutdown_event.wait()
-
-    logger.info("All requests completed, shutting down")
+# def graceful_shutdown():
+#     global is_shutting_down
+#     is_shutting_down = True
+#
+#     if active_requests > 0:
+#         shutdown_event.wait()
+#
+#     logger.info("All requests completed, shutting down")
