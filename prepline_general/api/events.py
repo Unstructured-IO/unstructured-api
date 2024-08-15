@@ -6,8 +6,8 @@ from fastapi import Request, HTTPException, Response
 from fastapi.responses import JSONResponse
 from starlette.middleware.base import BaseHTTPMiddleware
 
-
 # Configuration
+MAKE_NOT_READY_WHEN_PROCESSING = os.getenv('MAKE_NOT_READY_WHEN_PROCESSING', 'true').lower() == 'true'
 USE_MAX_REQUESTS_LIMIT = os.getenv('USE_MAX_REQUESTS_LIMIT', 'false').lower() == 'true'
 MAX_REQUESTS = int(os.getenv('MAX_REQUESTS', 1))
 MEMORY_THRESHOLD = 0.8  # 80% of memory limit
@@ -70,12 +70,13 @@ def check_memory():
 
 def update_state():
     global is_ready, is_live
-    if processed_requests == 0:
-        is_ready = is_live = True
-    elif 0 < processed_requests < MAX_REQUESTS:
-        is_ready = is_live = True
+    if USE_MAX_REQUESTS_LIMIT:
+        if processed_requests >= MAX_REQUESTS:
+            is_ready = is_live = False
+        else:
+            is_ready = is_live = True
     else:
-        is_ready = is_live = False
+        is_ready = is_live = True
 
 
 class NotReadyMarkingMiddleware(BaseHTTPMiddleware):
@@ -86,26 +87,27 @@ class NotReadyMarkingMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
         global processed_requests, is_ready, is_live, is_processing
 
-        if USE_MAX_REQUESTS_LIMIT and request.url.path == self.target_path:
-            if not is_ready or not is_live or is_processing:
+        if request.url.path == self.target_path:
+            if (USE_MAX_REQUESTS_LIMIT and not is_ready) or not is_live or (
+                    MAKE_NOT_READY_WHEN_PROCESSING and is_processing):
                 status = "not ready" if not is_ready else "no longer live" if not is_live else "processing"
                 logger.info(f"Request rejected: Service is {status}")
                 return Response(content=f"Service is {status}", status_code=503)
 
-            # 원래 상태 저장
             original_is_ready = is_ready
             original_is_live = is_live
             original_is_processing = is_processing
             original_processed_requests = processed_requests
 
-            is_ready = False
+            if MAKE_NOT_READY_WHEN_PROCESSING:
+                is_ready = False
             is_processing = True
 
             try:
                 response = await call_next(request)
 
                 if response.status_code == 422 or response.status_code == 400:
-                    logger.info("Request resulted in 422 error (Unprocessable Entity). Restoring original state.")
+                    logger.info("Request resulted in 422 or 400 error. Restoring original state.")
                     is_ready = original_is_ready
                     is_live = original_is_live
                     is_processing = original_is_processing
@@ -113,17 +115,21 @@ class NotReadyMarkingMiddleware(BaseHTTPMiddleware):
                     return response
 
                 processed_requests += 1
-                logger.info(f"Processing request {processed_requests} of {MAX_REQUESTS}")
+                logger.info(f"Processing request {processed_requests}" + (
+                    f" of {MAX_REQUESTS}" if USE_MAX_REQUESTS_LIMIT else ""))
                 return response
             except Exception as e:
                 logger.error(f"Error processing request: {str(e)}")
                 raise
             finally:
-                if getattr(response, 'status_code', 0) != 422 and getattr(response, 'status_code', 0) != 400:
+                if getattr(response, 'status_code', 0) not in [422, 400]:
                     is_processing = False
                     update_state()
                     logger.info(
-                        f"Request completed. Processed: {processed_requests}/{MAX_REQUESTS}. Ready: {is_ready}, Live: {is_live}")
+                        f"Request completed. Processed: {processed_requests}" +
+                        (f"/{MAX_REQUESTS}" if USE_MAX_REQUESTS_LIMIT else "") +
+                        f". Ready: {is_ready}, Live: {is_live}"
+                    )
 
         else:
             return await call_next(request)
@@ -166,14 +172,16 @@ def healthcheck(_: Request):
 
 
 def ready_healthcheck(_: Request):
-    if is_ready and not is_processing:
+    if (is_ready and not (MAKE_NOT_READY_WHEN_PROCESSING and is_processing)):
         return JSONResponse(
             status_code=200,
             content={
                 "status": "READY",
                 "processed_requests": processed_requests,
                 "is_processing": is_processing,
-                "max_requests_env": MAX_REQUESTS,
+                "max_requests_env": MAX_REQUESTS if USE_MAX_REQUESTS_LIMIT else "N/A",
+                "use_max_requests_limit": USE_MAX_REQUESTS_LIMIT,
+                "make_not_ready_when_processing": MAKE_NOT_READY_WHEN_PROCESSING,
                 "memory_usage": check_memory()
             }
         )
@@ -184,7 +192,9 @@ def ready_healthcheck(_: Request):
                 "status": "NOT_READY",
                 "processed_requests": processed_requests,
                 "is_processing": is_processing,
-                "max_requests_env": MAX_REQUESTS,
+                "max_requests_env": MAX_REQUESTS if USE_MAX_REQUESTS_LIMIT else "N/A",
+                "use_max_requests_limit": USE_MAX_REQUESTS_LIMIT,
+                "make_not_ready_when_processing": MAKE_NOT_READY_WHEN_PROCESSING,
                 "memory_usage": check_memory()
             }
         )
@@ -198,7 +208,9 @@ def live_healthcheck(_: Request):
                 "status": "LIVE",
                 "processed_requests": processed_requests,
                 "is_processing": is_processing,
-                "max_requests_env": MAX_REQUESTS,
+                "max_requests_env": MAX_REQUESTS if USE_MAX_REQUESTS_LIMIT else "N/A",
+                "use_max_requests_limit": USE_MAX_REQUESTS_LIMIT,
+                "make_not_ready_when_processing": MAKE_NOT_READY_WHEN_PROCESSING,
                 "memory_usage": check_memory()
             }
         )
@@ -209,7 +221,9 @@ def live_healthcheck(_: Request):
                 "status": "NOT_LIVE",
                 "processed_requests": processed_requests,
                 "is_processing": is_processing,
-                "max_requests_env": MAX_REQUESTS,
+                "max_requests_env": MAX_REQUESTS if USE_MAX_REQUESTS_LIMIT else "N/A",
+                "use_max_requests_limit": USE_MAX_REQUESTS_LIMIT,
+                "make_not_ready_when_processing": MAKE_NOT_READY_WHEN_PROCESSING,
                 "memory_usage": check_memory()
             }
         )
