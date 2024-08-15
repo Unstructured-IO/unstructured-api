@@ -90,22 +90,38 @@ class NotReadyMarkingMiddleware(BaseHTTPMiddleware):
                 logger.info(f"Request rejected: Service is {status}")
                 return Response(content=f"Service is {status}", status_code=503)
 
+            # 원래 상태 저장
+            original_is_ready = is_ready
+            original_is_live = is_live
+            original_is_processing = is_processing
+            original_processed_requests = processed_requests
+
             is_ready = False
             is_processing = True
-            processed_requests += 1
-            logger.info(f"Processing request {processed_requests} of {MAX_REQUESTS}")
 
             try:
                 response = await call_next(request)
+
+                if response.status_code == 422 or response.status_code == 400:
+                    logger.info("Request resulted in 422 error (Unprocessable Entity). Restoring original state.")
+                    is_ready = original_is_ready
+                    is_live = original_is_live
+                    is_processing = original_is_processing
+                    processed_requests = original_processed_requests
+                    return response
+
+                processed_requests += 1
+                logger.info(f"Processing request {processed_requests} of {MAX_REQUESTS}")
                 return response
             except Exception as e:
                 logger.error(f"Error processing request: {str(e)}")
                 raise
             finally:
-                is_processing = False
-                update_state()
-                logger.info(
-                    f"Request completed. Processed: {processed_requests}/{MAX_REQUESTS}. Ready: {is_ready}, Live: {is_live}")
+                if getattr(response, 'status_code', 0) != 422 and getattr(response, 'status_code', 0) != 400:
+                    is_processing = False
+                    update_state()
+                    logger.info(
+                        f"Request completed. Processed: {processed_requests}/{MAX_REQUESTS}. Ready: {is_ready}, Live: {is_live}")
 
         else:
             return await call_next(request)
