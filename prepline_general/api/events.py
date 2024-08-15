@@ -6,7 +6,9 @@ from fastapi import Request, HTTPException, Response
 from fastapi.responses import JSONResponse
 from starlette.middleware.base import BaseHTTPMiddleware
 
+
 # Configuration
+USE_MAX_REQUESTS_LIMIT = os.getenv('USE_MAX_REQUESTS_LIMIT', 'false').lower() == 'true'
 MAX_REQUESTS = int(os.getenv('MAX_REQUESTS', 1))
 MEMORY_THRESHOLD = 0.8  # 80% of memory limit
 
@@ -84,7 +86,7 @@ class NotReadyMarkingMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
         global processed_requests, is_ready, is_live, is_processing
 
-        if request.url.path == self.target_path:
+        if USE_MAX_REQUESTS_LIMIT and request.url.path == self.target_path:
             if not is_ready or not is_live or is_processing:
                 status = "not ready" if not is_ready else "no longer live" if not is_live else "processing"
                 logger.info(f"Request rejected: Service is {status}")
