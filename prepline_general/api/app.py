@@ -7,7 +7,7 @@ import os
 from starlette.middleware.base import BaseHTTPMiddleware
 
 from .events import ready_healthcheck, live_healthcheck, MemoryCheckMiddleware, NotReadyMarkingMiddleware
-from .general import router as general_router, _check_free_memory, request_lock
+from .general import router as general_router, request_lock
 from .openapi import set_custom_openapi
 
 logger = logging.getLogger("unstructured_api")

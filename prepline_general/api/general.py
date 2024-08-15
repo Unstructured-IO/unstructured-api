@@ -13,7 +13,7 @@ from concurrent.futures import ThreadPoolExecutor
 from functools import partial
 from types import TracebackType
 from typing import IO, Any, Dict, List, Mapping, Optional, Sequence, Tuple, Union, cast
-from .events import is_memory_low, active_requests, request_lock
+from .events import is_memory_low, request_lock
 
 import backoff
 import pandas as pd
@@ -34,7 +34,7 @@ from pypdf.errors import FileNotDecryptedError, PdfReadError
 from starlette.datastructures import Headers
 from starlette.types import Send
 
-from prepline_general.api.events import request_lock, shutdown_event, _check_free_memory
+from prepline_general.api.events import request_lock
 from prepline_general.api.models.form_params import GeneralFormParams
 from prepline_general.api.filetypes import get_validated_mimetype
 from unstructured.documents.elements import Element
@@ -326,7 +326,7 @@ def pipeline_api(
 
         logger.debug(f"filetype: {file_content_type}")
 
-    _check_free_memory()
+    # _check_free_memory()
 
     if file_content_type == "application/pdf":
         _check_pdf(file)

@@ -1,92 +1,139 @@
 import os
 import threading
-
+import logging
 import psutil
-from fastapi import Request, HTTPException
+from fastapi import Request, HTTPException, Response
 from fastapi.responses import JSONResponse
 from starlette.middleware.base import BaseHTTPMiddleware
-import logging
 
-# not used parameters
-is_shutting_down = False
+# Configuration
+MAX_REQUESTS = int(os.getenv('MAX_REQUESTS', 1))
+MEMORY_THRESHOLD = 0.8  # 80% of memory limit
+
+# Global variables
 is_memory_low = False
-
-# used parameters
-active_requests = 0
-
 request_lock = threading.Lock()
-shutdown_event = threading.Event()
 
+# Global state variables
+processed_requests = 0
 is_ready = True
 is_live = True
+is_processing = False
+
+# Logging setup
+logger = logging.getLogger(__name__)
 
 
-
-def get_memory_usage():
+def get_memory_info():
     try:
         with open('/sys/fs/cgroup/memory/memory.usage_in_bytes', 'r') as f:
-            return int(f.read().strip())
+            usage = int(f.read().strip())
+        with open('/sys/fs/cgroup/memory/memory.limit_in_bytes', 'r') as f:
+            limit = int(f.read().strip())
     except FileNotFoundError:
         try:
             with open('/sys/fs/cgroup/memory.current', 'r') as f:
-                return int(f.read().strip())
-        except FileNotFoundError:
-            mem = psutil.virtual_memory()
-            return mem
-
-
-def get_memory_limit():
-    try:
-        with open('/sys/fs/cgroup/memory/memory.limit_in_bytes', 'r') as f:
-            return int(f.read().strip())
-    except FileNotFoundError:
-        try:
+                usage = int(f.read().strip())
             with open('/sys/fs/cgroup/memory.max', 'r') as f:
-                value = f.read().strip()
-                return int(value) if value != 'max' else None
+                limit_value = f.read().strip()
+                limit = int(limit_value) if limit_value != 'max' else None
         except FileNotFoundError:
             mem = psutil.virtual_memory()
-            return mem
+            usage = mem.used
+            limit = mem.total
+
+    return usage, limit
 
 
-def _check_free_memory():
-    global is_memory_low  # 전역 변수로 is_memory_low를 사용
-
-    usage = get_memory_usage()
-    limit = get_memory_limit()
+def check_memory():
+    global is_memory_low
+    usage, limit = get_memory_info()
 
     if usage is None or limit is None:
-        print("Unable to determine memory usage or limit. Assuming sufficient memory.")
-        is_memory_low = False  # 충분한 메모리가 있다고 가정
+        logger.warning("Unable to determine memory usage or limit. Assuming sufficient memory.")
+        is_memory_low = False
         return None, None, is_memory_low
 
-    print(f"Memory usage: {usage / 1024 / 1024:.2f} MB, Memory limit: {limit / 1024 / 1024:.2f} MB")
+    logger.info(f"Memory usage: {usage / 1024 / 1024:.2f} MB, Memory limit: {limit / 1024 / 1024:.2f} MB")
 
-    usage_threshold = limit * 0.8
-
-    if usage >= usage_threshold:
-        print(f"Memory usage ({usage / 1024 / 1024:.2f} MB) is above 80% of the limit ({usage_threshold / 1024 / 1024:.2f} MB)")
+    if usage >= limit * MEMORY_THRESHOLD:
+        logger.warning(f"Memory usage ({usage / 1024 / 1024:.2f} MB) is above {MEMORY_THRESHOLD * 100}% of the limit")
         is_memory_low = True
-        return usage, limit, is_memory_low
-
     else:
-        print(f"Memory usage: {usage / 1024 / 1024:.2f} MB, below 80% of the limit ({usage_threshold / 1024 / 1024:.2f} MB)")
+        logger.info(f"Memory usage: {usage / 1024 / 1024:.2f} MB, below {MEMORY_THRESHOLD * 100}% of the limit")
         is_memory_low = False
-        return usage, limit, is_memory_low
+
+    return usage, limit, is_memory_low
+
+
+def update_state():
+    global is_ready, is_live
+    if processed_requests == 0:
+        is_ready = is_live = True
+    elif 0 < processed_requests < MAX_REQUESTS:
+        is_ready = is_live = True
+    else:
+        is_ready = is_live = False
+
+
+class NotReadyMarkingMiddleware(BaseHTTPMiddleware):
+    def __init__(self, app, target_path="/general/v0/general"):
+        super().__init__(app)
+        self.target_path = target_path
+
+    async def dispatch(self, request: Request, call_next):
+        global processed_requests, is_ready, is_live, is_processing
+
+        if request.url.path == self.target_path:
+            if not is_ready or not is_live or is_processing:
+                status = "not ready" if not is_ready else "no longer live" if not is_live else "processing"
+                logger.info(f"Request rejected: Service is {status}")
+                return Response(content=f"Service is {status}", status_code=503)
+
+            is_ready = False
+            is_processing = True
+            processed_requests += 1
+            logger.info(f"Processing request {processed_requests} of {MAX_REQUESTS}")
+
+            try:
+                response = await call_next(request)
+                return response
+            except Exception as e:
+                logger.error(f"Error processing request: {str(e)}")
+                raise
+            finally:
+                is_processing = False
+                update_state()
+                logger.info(
+                    f"Request completed. Processed: {processed_requests}/{MAX_REQUESTS}. Ready: {is_ready}, Live: {is_live}")
+
+        else:
+            return await call_next(request)
+
+
+class MemoryCheckMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request: Request, call_next):
+        global is_memory_low
+
+        if request.url.path == "/general/v0/general":
+            if is_memory_low:
+                logger.warning(f"Service is currently unavailable due to low memory")
+                raise HTTPException(status_code=503, detail="Service is currently unavailable due to low memory")
+
+        return await call_next(request)
 
 
 def healthcheck(_: Request):
-    global is_shutting_down, is_memory_low, active_requests
+    usage, limit, is_memory_low = check_memory()
 
-    _check_free_memory()
-
-    if is_shutting_down or is_memory_low:
+    if is_memory_low:
         return JSONResponse(
             status_code=503,
             content={
-                "status": "SHUTTING_DOWN",
-                "reason": "Low memory" if is_memory_low else "Service is shutting down",
-                "active_requests": active_requests
+                "status": "UNHEALTHY",
+                "reason": "Low memory",
+                "memory_usage": usage,
+                "memory_limit": limit
             }
         )
 
@@ -94,21 +141,22 @@ def healthcheck(_: Request):
         status_code=200,
         content={
             "status": "HEALTHY",
-            "active_requests": active_requests
+            "memory_usage": usage,
+            "memory_limit": limit
         }
     )
 
 
 def ready_healthcheck(_: Request):
-    global is_ready, active_requests
-
-    if is_ready:
+    if is_ready and not is_processing:
         return JSONResponse(
             status_code=200,
             content={
                 "status": "READY",
-                "active_requests": active_requests,
-                "memory_usage": _check_free_memory()
+                "processed_requests": processed_requests,
+                "is_processing": is_processing,
+                "max_requests_env": MAX_REQUESTS,
+                "memory_usage": check_memory()
             }
         )
     else:
@@ -116,21 +164,24 @@ def ready_healthcheck(_: Request):
             status_code=503,
             content={
                 "status": "NOT_READY",
-                "active_requests": active_requests,
-                "memory_usage": _check_free_memory()
+                "processed_requests": processed_requests,
+                "is_processing": is_processing,
+                "max_requests_env": MAX_REQUESTS,
+                "memory_usage": check_memory()
             }
         )
 
-def live_healthcheck(_: Request):
-    global is_live, active_requests
 
+def live_healthcheck(_: Request):
     if is_live:
         return JSONResponse(
             status_code=200,
             content={
                 "status": "LIVE",
-                "active_requests": active_requests,
-                "memory_usage": _check_free_memory()
+                "processed_requests": processed_requests,
+                "is_processing": is_processing,
+                "max_requests_env": MAX_REQUESTS,
+                "memory_usage": check_memory()
             }
         )
     else:
@@ -138,59 +189,9 @@ def live_healthcheck(_: Request):
             status_code=503,
             content={
                 "status": "NOT_LIVE",
-                "active_requests": active_requests,
-                "memory_usage": _check_free_memory()
+                "processed_requests": processed_requests,
+                "is_processing": is_processing,
+                "max_requests_env": MAX_REQUESTS,
+                "memory_usage": check_memory()
             }
         )
-
-
-class NotReadyMarkingMiddleware(BaseHTTPMiddleware):
-    def __init__(self, app, target_path="/general/v0/general"):
-        super().__init__(app)
-        self.target_path = target_path
-        self.logger = logging.getLogger(__name__)
-
-    async def dispatch(self, request: Request, call_next):
-        global is_ready, is_live, active_requests
-
-        if request.url.path == self.target_path:
-            is_ready = False
-            active_requests += 1
-            self.logger.info(f"Request received. Active requests: {active_requests}")
-
-            try:
-                response = await call_next(request)
-                return response
-            except Exception as e:
-                self.logger.error(f"Error processing request: {str(e)}")
-                raise
-            finally:
-                active_requests -= 1
-                is_live = False
-                self.logger.info(f"Request completed. Active requests: {active_requests}. Service is no longer live.")
-
-        else:
-            return await call_next(request)
-
-
-
-class MemoryCheckMiddleware(BaseHTTPMiddleware):
-    async def dispatch(self, request: Request, call_next):
-        global is_memory_low, active_requests
-
-        if request.url.path == "/general/v0/general":
-            if is_memory_low:
-                print(f"Service is currently unavailable due to low memory, {active_requests} active requests")
-                raise HTTPException(status_code=503, detail="Service is currently unavailable due to low memory")
-
-            with request_lock:
-                active_requests += 1
-
-            try:
-                response = await call_next(request)
-                return response
-            finally:
-                with request_lock:
-                    active_requests -= 1
-        else:
-            return await call_next(request)
