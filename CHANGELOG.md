@@ -1,3 +1,7 @@
+## 0.0.77
+
+* Bump to `unstructured` 0.15.5
+
 ## 0.0.76
 * Use the library's `detect_filetype` in API to determine mimetype
 * Add content_type api parameter
