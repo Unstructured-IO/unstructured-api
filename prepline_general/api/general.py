@@ -619,7 +619,7 @@ class MultipartMixedResponse(StreamingResponse):
         )
         async for chunk in self.body_iterator:
             if not isinstance(chunk, bytes):
-                chunk = chunk.encode(self.charset)
+                chunk = chunk.encode(self.charset)  # type: ignore
                 chunk = b64encode(chunk)
             await send(
                 {"type": "http.response.body", "body": self.build_part(chunk), "more_body": True}
