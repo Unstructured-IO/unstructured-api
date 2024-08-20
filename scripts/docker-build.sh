@@ -6,11 +6,10 @@ PIPELINE_PACKAGE=${PIPELINE_PACKAGE:-"general"}
 PIPELINE_FAMILY=${PIPELINE_FAMILY:-"general"}
 PIP_VERSION="${PIP_VERSION:-22.2.1}"
 DOCKER_IMAGE="${DOCKER_IMAGE:-pipeline-family-${PIPELINE_FAMILY}-dev}"
-DOCKER_PLATFORM="${DOCKER_PLATFORM:-}"
-
+DOCKER_PLATFORM="linux/amd64"
 
 DOCKER_BUILD_CMD=(
-  docker buildx build --load -f Dockerfile-amd64
+  docker buildx build --load -f Dockerfile
   --build-arg PIP_VERSION="$PIP_VERSION"
   --build-arg BUILDKIT_INLINE_CACHE=1
   --build-arg PIPELINE_PACKAGE="$PIPELINE_PACKAGE"
@@ -21,9 +20,7 @@ DOCKER_BUILD_CMD=(
   .
 )
 
-# only build for specific platform if DOCKER_PLATFORM is set
-if [ -n "${DOCKER_PLATFORM:-}" ]; then
-  DOCKER_BUILD_CMD+=("--platform=$DOCKER_PLATFORM")
-fi
+# Set the platform using the DOCKER_PLATFORM environment variable
+export DOCKER_DEFAULT_PLATFORM="$DOCKER_PLATFORM"
 
 DOCKER_BUILDKIT=1 "${DOCKER_BUILD_CMD[@]}"

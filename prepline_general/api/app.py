@@ -1,11 +1,13 @@
 from fastapi import FastAPI, Request, status, HTTPException
 from fastapi.datastructures import FormData
 from fastapi.responses import JSONResponse
-from fastapi.security import APIKeyHeader
 import logging
 import os
 
-from .general import router as general_router
+from starlette.middleware.base import BaseHTTPMiddleware
+
+from .events import ready_healthcheck, live_healthcheck, MemoryCheckMiddleware, NotReadyMarkingMiddleware
+from .general import router as general_router, request_lock
 from .openapi import set_custom_openapi
 
 logger = logging.getLogger("unstructured_api")
@@ -40,14 +42,14 @@ if os.environ.get("ENV") in ["dev", "prod"]:
 
 # Catch all HTTPException for uniform logging and response
 @app.exception_handler(HTTPException)
-async def http_error_handler(request: Request, e: HTTPException):
+async def http_error_handler(_: Request, e: HTTPException):
     logger.error(e.detail)
     return JSONResponse(status_code=e.status_code, content={"detail": e.detail})
 
 
 # Catch any other errors and return as 500
 @app.exception_handler(Exception)
-async def error_handler(request: Request, e: Exception):
+async def error_handler(_: Request, e: Exception):
     return JSONResponse(status_code=500, content={"detail": str(e)})
 
 
@@ -123,10 +125,23 @@ class MetricsCheckFilter(logging.Filter):
 logging.getLogger("uvicorn.access").addFilter(HealthCheckFilter())
 logging.getLogger("uvicorn.access").addFilter(MetricsCheckFilter())
 
+#@app.get("/healthcheck", include_in_schema=False)
+#def healthcheck_endpoint(request: Request):
+#    return healthcheck(request)
 
-@app.get("/healthcheck", status_code=status.HTTP_200_OK, include_in_schema=False)
-def healthcheck(request: Request):
-    return {"healthcheck": "HEALTHCHECK STATUS: EVERYTHING OK!"}
+@app.get("/health/ready", include_in_schema=False)
+def healthcheck_endpoint(request: Request):
+    return ready_healthcheck(request)
 
+@app.get("/health/live", include_in_schema=False)
+def healthcheck_endpoint(request: Request):
+    return live_healthcheck(request)
+
+
+app.add_middleware(NotReadyMarkingMiddleware)
+
+# @app.on_event("shutdown")
+# def shutdown_event():
+#     graceful_shutdown()
 
 logger.info("Started Unstructured API")

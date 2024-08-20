@@ -13,6 +13,7 @@ from concurrent.futures import ThreadPoolExecutor
 from functools import partial
 from types import TracebackType
 from typing import IO, Any, Dict, List, Mapping, Optional, Sequence, Tuple, Union, cast
+from .events import is_memory_low, request_lock
 
 import backoff
 import pandas as pd
@@ -33,6 +34,7 @@ from pypdf.errors import FileNotDecryptedError, PdfReadError
 from starlette.datastructures import Headers
 from starlette.types import Send
 
+from prepline_general.api.events import request_lock
 from prepline_general.api.models.form_params import GeneralFormParams
 from prepline_general.api.filetypes import get_validated_mimetype
 from unstructured.documents.elements import Element
@@ -100,12 +102,12 @@ def is_non_retryable(e: Exception) -> bool:
     logger=logger,
 )
 def call_api(
-    request_url: str,
-    api_key: str,
-    filename: str,
-    file: IO[bytes],
-    content_type: str,
-    **partition_kwargs: Any,
+        request_url: str,
+        api_key: str,
+        filename: str,
+        file: IO[bytes],
+        content_type: str,
+        **partition_kwargs: Any,
 ) -> str:
     """Call the api with the given request_url."""
     headers = {"unstructured-api-key": api_key}
@@ -125,11 +127,11 @@ def call_api(
 
 
 def partition_file_via_api(
-    file_tuple: Tuple[IO[bytes], int],
-    request: Request,
-    filename: str,
-    content_type: str,
-    **partition_kwargs: Any,
+        file_tuple: Tuple[IO[bytes], int],
+        request: Request,
+        filename: str,
+        content_type: str,
+        **partition_kwargs: Any,
 ) -> List[Element]:
     """Send the given file to be partitioned remotely with retry logic.
 
@@ -149,7 +151,7 @@ def partition_file_via_api(
 
     api_key = request.headers.get("unstructured-api-key", default="")
     partition_kwargs["starting_page_number"] = (
-        partition_kwargs.get("starting_page_number", 1) + page_offset
+            partition_kwargs.get("starting_page_number", 1) + page_offset
     )
 
     result = call_api(
@@ -164,13 +166,13 @@ def partition_file_via_api(
 
 
 def partition_pdf_splits(
-    request: Request,
-    pdf_pages: Sequence[PageObject],
-    file: IO[bytes],
-    metadata_filename: str,
-    content_type: str,
-    coordinates: bool,
-    **partition_kwargs: Any,
+        request: Request,
+        pdf_pages: Sequence[PageObject],
+        file: IO[bytes],
+        metadata_filename: str,
+        content_type: str,
+        coordinates: bool,
+        **partition_kwargs: Any,
 ) -> List[Element]:
     """Split a pdf into chunks and process in parallel with more api calls.
 
@@ -236,43 +238,43 @@ class ChipperMemoryProtection:
         is_chipper_processing = True
 
     def __exit__(
-        self,
-        exc_type: Optional[type[BaseException]],
-        exc_value: Optional[BaseException],
-        exc_tb: Optional[TracebackType],
+            self,
+            exc_type: Optional[type[BaseException]],
+            exc_value: Optional[BaseException],
+            exc_tb: Optional[TracebackType],
     ):
         global is_chipper_processing
         is_chipper_processing = False
 
 
 def pipeline_api(
-    file: IO[bytes],
-    request: Request,
-    # -- chunking options --
-    chunking_strategy: Optional[str],
-    combine_under_n_chars: Optional[int],
-    max_characters: int,
-    multipage_sections: bool,
-    new_after_n_chars: Optional[int],
-    overlap: int,
-    overlap_all: bool,
-    # ----------------------
-    filename: str = "",
-    file_content_type: Optional[str] = None,
-    response_type: str = "application/json",
-    coordinates: bool = False,
-    encoding: str = "utf-8",
-    hi_res_model_name: Optional[str] = None,
-    include_page_breaks: bool = False,
-    ocr_languages: Optional[List[str]] = None,
-    pdf_infer_table_structure: bool = True,
-    skip_infer_table_types: Optional[List[str]] = None,
-    strategy: str = "auto",
-    xml_keep_tags: bool = False,
-    languages: Optional[List[str]] = None,
-    extract_image_block_types: Optional[List[str]] = None,
-    unique_element_ids: Optional[bool] = False,
-    starting_page_number: Optional[int] = None,
+        file: IO[bytes],
+        request: Request,
+        # -- chunking options --
+        chunking_strategy: Optional[str],
+        combine_under_n_chars: Optional[int],
+        max_characters: int,
+        multipage_sections: bool,
+        new_after_n_chars: Optional[int],
+        overlap: int,
+        overlap_all: bool,
+        # ----------------------
+        filename: str = "",
+        file_content_type: Optional[str] = None,
+        response_type: str = "application/json",
+        coordinates: bool = False,
+        encoding: str = "utf-8",
+        hi_res_model_name: Optional[str] = None,
+        include_page_breaks: bool = False,
+        ocr_languages: Optional[List[str]] = None,
+        pdf_infer_table_structure: bool = True,
+        skip_infer_table_types: Optional[List[str]] = None,
+        strategy: str = "auto",
+        xml_keep_tags: bool = False,
+        languages: Optional[List[str]] = None,
+        extract_image_block_types: Optional[List[str]] = None,
+        unique_element_ids: Optional[bool] = False,
+        starting_page_number: Optional[int] = None,
 ) -> List[Dict[str, Any]] | str:
     if filename.endswith(".msg"):
         # Note(yuming): convert file type for msg files
@@ -281,12 +283,12 @@ def pipeline_api(
 
     # We don't want to keep logging the same params for every parallel call
     is_internal_request = (
-        (
-            request.headers.get("X-Forwarded-For")
-            and str(request.headers.get("X-Forwarded-For")).startswith("10.")
-        )
-        # -- NOTE(scanny): request.client is None in certain testing environments --
-        or (request.client and request.client.host.startswith("10."))
+            (
+                    request.headers.get("X-Forwarded-For")
+                    and str(request.headers.get("X-Forwarded-For")).startswith("10.")
+            )
+            # -- NOTE(scanny): request.client is None in certain testing environments --
+            or (request.client and request.client.host.startswith("10."))
     )
 
     if not is_internal_request:
@@ -324,12 +326,11 @@ def pipeline_api(
 
         logger.debug(f"filetype: {file_content_type}")
 
-    _check_free_memory()
+    # _check_free_memory()
 
     if file_content_type == "application/pdf":
         _check_pdf(file)
 
-    hi_res_model_name = _validate_hi_res_model_name(hi_res_model_name, coordinates)
     strategy = _validate_strategy(strategy)
     pdf_infer_table_structure = _set_pdf_infer_table_structure(
         pdf_infer_table_structure,
@@ -413,16 +414,16 @@ def pipeline_api(
                 coordinates=coordinates,
                 **partition_kwargs,  # type: ignore # pyright: ignore[reportGeneralTypeIssues]
             )
-        elif hi_res_model_name and hi_res_model_name in CHIPPER_MODEL_TYPES:
-            with ChipperMemoryProtection():
-                elements = partition(**partition_kwargs)  # type: ignore # pyright: ignore[reportGeneralTypeIssues]
+        # elif hi_res_model_name and hi_res_model_name in CHIPPER_MODEL_TYPES:
+        #     with ChipperMemoryProtection():
+        #         elements = partition(**partition_kwargs)  # type: ignore # pyright: ignore[reportGeneralTypeIssues]
         else:
             elements = partition(**partition_kwargs)  # type: ignore # pyright: ignore[reportGeneralTypeIssues]
 
     except OSError as e:
         if isinstance(e.args[0], str) and (
-            "chipper-fast-fine-tuning is not a local folder" in e.args[0]
-            or "ved-fine-tuning is not a local folder" in e.args[0]
+                "chipper-fast-fine-tuning is not a local folder" in e.args[0]
+                or "ved-fine-tuning is not a local folder" in e.args[0]
         ):
             raise HTTPException(
                 status_code=400,
@@ -491,26 +492,11 @@ def pipeline_api(
 
     return result
 
-
-def _check_free_memory():
-    """Reject traffic when free memory is below minimum (default 2GB)."""
-    mem = psutil.virtual_memory()
-    memory_free_minimum = int(os.environ.get("UNSTRUCTURED_MEMORY_FREE_MINIMUM_MB", 2048))
-
-    if mem.available <= memory_free_minimum * 1024 * 1024:
-        logger.warning(f"Rejecting because free memory is below {memory_free_minimum} MB")
-        raise HTTPException(
-            status_code=503, detail="Server is under heavy load. Please try again later."
-        )
-
-
 def _check_pdf(file: IO[bytes]):
     """Check if the PDF file is encrypted, otherwise assume it is not a valid PDF."""
     try:
         pdf = PdfReader(file)
-
-        # This will raise if the file is encrypted
-        pdf.metadata
+        pdf.metadata  # This will raise if the file is encrypted
         return pdf
     except FileNotDecryptedError:
         raise HTTPException(
@@ -523,27 +509,12 @@ def _check_pdf(file: IO[bytes]):
 
 def _validate_strategy(strategy: str) -> str:
     strategy = strategy.lower()
-    strategies = ["fast", "hi_res", "auto", "ocr_only"]
+    strategies = ["fast", "auto"]
     if strategy not in strategies:
         raise HTTPException(
             status_code=400, detail=f"Invalid strategy: {strategy}. Must be one of {strategies}"
         )
     return strategy
-
-
-def _validate_hi_res_model_name(
-    hi_res_model_name: Optional[str], show_coordinates: bool
-) -> Optional[str]:
-    # Make sure chipper aliases to the latest model
-    if hi_res_model_name and hi_res_model_name == "chipper":
-        hi_res_model_name = "chipperv2"
-
-    if hi_res_model_name and hi_res_model_name in CHIPPER_MODEL_TYPES and show_coordinates:
-        raise HTTPException(
-            status_code=400,
-            detail=f"coordinates aren't available when using the {hi_res_model_name} model type",
-        )
-    return hi_res_model_name
 
 
 def _validate_chunking_strategy(chunking_strategy: Optional[str]) -> Optional[str]:
@@ -570,7 +541,7 @@ def _validate_chunking_strategy(chunking_strategy: Optional[str]) -> Optional[st
 
 
 def _set_pdf_infer_table_structure(
-    pdf_infer_table_structure: bool, strategy: str, skip_infer_table_types: Optional[List[str]]
+        pdf_infer_table_structure: bool, strategy: str, skip_infer_table_types: Optional[List[str]]
 ) -> bool:
     """Avoids table inference in "fast" and "ocr_only" runs."""
     # NOTE(robinson) - line below is for type checking
@@ -793,3 +764,13 @@ def general_partition(
 
 
 app.include_router(router)
+
+
+# def graceful_shutdown():
+#     global is_shutting_down
+#     is_shutting_down = True
+#
+#     if active_requests > 0:
+#         shutdown_event.wait()
+#
+#     logger.info("All requests completed, shutting down")
