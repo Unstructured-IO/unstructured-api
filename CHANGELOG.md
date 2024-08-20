@@ -1,3 +1,7 @@
+## 0.0.79
+
+* Bump to `unstructured` 0.15.7
+
 ## 0.0.78
 
 * Resolve NLTK CVE.
