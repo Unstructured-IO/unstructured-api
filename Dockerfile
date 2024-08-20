@@ -25,8 +25,7 @@ RUN ${PIP} install pip==${PIP_VERSION}
 RUN ${PIP} install --no-cache -r requirements-base.txt
 
 FROM python-deps as model-deps
-RUN ${PYTHON} -c "import nltk; nltk.download('punkt')" && \
-  ${PYTHON} -c "import nltk; nltk.download('averaged_perceptron_tagger')" && \
+RUN ${PYTHON} -c "from unstructured.nlp.tokenize import download_nltk_packages; download_nltk_packages()" && \
   ${PYTHON} -c "from unstructured.partition.model_init import initialize; initialize()"
 
 FROM model-deps as code

@@ -33,10 +33,9 @@ install-test: install-base
 .PHONY: install-ci
 install-ci: install-test
 
-.PHONE: install-nltk-models
+.PHONY: install-nltk-models
 install-nltk-models:
-	python3 -c "import nltk; nltk.download('punkt')"
-	python3 -c "import nltk; nltk.download('averaged_perceptron_tagger')"
+	python3 -c "from unstructured.nlp.tokenize import download_nltk_packages; download_nltk_packages()"
 
 ## pip-compile:                 compiles all base/dev/test requirements
 .PHONY: pip-compile

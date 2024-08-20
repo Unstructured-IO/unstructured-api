@@ -32,8 +32,7 @@ RUN python3.10 -m pip install pip==${PIP_VERSION} \
 USER ${NB_USER}
 
 FROM python-deps as model-deps
-RUN python3.10 -c "import nltk; nltk.download('punkt')" && \
-  python3.10 -c "import nltk; nltk.download('averaged_perceptron_tagger')" && \
+RUN python3.10 -c "from unstructured.nlp.tokenize import download_nltk_packages; download_nltk_packages()" && \
   python3.10 -c "from unstructured.partition.model_init import initialize; initialize()"
 
 FROM model-deps as code
