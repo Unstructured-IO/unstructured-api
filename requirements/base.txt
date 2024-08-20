@@ -146,7 +146,7 @@ markdown==3.7
     # via unstructured
 markupsafe==2.1.5
     # via jinja2
-marshmallow==3.21.3
+marshmallow==3.22.0
     # via
     #   dataclasses-json
     #   unstructured-client
@@ -383,7 +383,7 @@ tqdm==4.66.5
     #   nltk
     #   transformers
     #   unstructured
-transformers==4.44.0
+transformers==4.44.1
     # via unstructured-inference
 typing-extensions==4.12.2
     # via
@@ -409,7 +409,7 @@ typing-inspect==0.9.0
     #   unstructured-client
 tzdata==2024.1
     # via pandas
-unstructured[all-docs]==0.15.6
+unstructured[all-docs]==0.15.7
     # via -r requirements/base.in
 unstructured-client==0.25.5
     # via unstructured

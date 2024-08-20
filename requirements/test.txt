@@ -374,7 +374,7 @@ markupsafe==2.1.5
     #   -r requirements/base.txt
     #   jinja2
     #   nbconvert
-marshmallow==3.21.3
+marshmallow==3.22.0
     # via
     #   -r requirements/base.txt
     #   dataclasses-json
@@ -878,7 +878,7 @@ traitlets==5.14.3
     #   nbconvert
     #   nbformat
     #   qtconsole
-transformers==4.44.0
+transformers==4.44.1
     # via
     #   -r requirements/base.txt
     #   unstructured-inference
@@ -916,7 +916,7 @@ tzdata==2024.1
     # via
     #   -r requirements/base.txt
     #   pandas
-unstructured[all-docs]==0.15.6
+unstructured[all-docs]==0.15.7
     # via -r requirements/base.txt
 unstructured-client==0.25.5
     # via
