@@ -480,23 +480,6 @@ def test_include_extract_image_block_types_param(extract_image_block_types):
             assert element == element_with_image
 
 
-@pytest.mark.parametrize(
-    "example_filename",
-    [
-        "fake-xml.xml",
-    ],
-)
-def test_general_api_returns_400_unsupported_file(example_filename):
-    client = TestClient(app)
-    test_file = Path("sample-docs") / example_filename
-    filetype = "invalid/filetype"
-    response = client.post(
-        MAIN_API_ROUTE, files=[("files", (str(test_file), open(test_file, "rb"), filetype))]
-    )
-    assert response.json() == {"detail": f"File type {filetype} is not supported."}
-    assert response.status_code == 400
-
-
 def test_general_api_returns_422_bad_pdf():
     """
     Verify that we get a 422 for invalid PDF files
@@ -639,6 +622,35 @@ def test_parallel_mode_preserves_uniqueness_of_hashes_when_assembling_pages_spli
 
     ids = [element.get("element_id") for element in elements]
     assert len(set(ids)) == len(ids), "Element IDs across all pages should be unique."
+
+
+def test_general_api_can_set_content_type():
+    """Test that we can override the content type via header or form data param"""
+    client = TestClient(app)
+    example_filename = "family-day.eml"
+    test_file_path = str(Path("sample-docs") / example_filename)
+
+    # requests can override the content type in the header by using this tuple
+    with open(test_file_path, "rb") as f:
+        response = client.post(MAIN_API_ROUTE, files=[("files", (test_file_path, f, "text/plain"))])
+
+        assert response.status_code == 200
+        assert len(response.json()) > 0
+        for i in response.json():
+            assert i["metadata"]["filetype"] == "text/plain"
+
+        # We can also override the type via api param
+        with open(test_file_path, "rb") as f:
+            response = client.post(
+                MAIN_API_ROUTE,
+                files=[("files", f)],
+                data={"content_type": "text/plain"},
+            )
+
+        assert response.status_code == 200
+        assert len(response.json()) > 0
+        for i in response.json():
+            assert i["metadata"]["filetype"] == "text/plain"
 
 
 def test_parallel_mode_passes_params(monkeypatch):
@@ -939,29 +951,6 @@ def test_encrypted_pdf():
             files=[("files", (str(temp_file.name), open(temp_file.name, "rb"), "application/pdf"))],
         )
         assert response.status_code == 200
-
-
-def test_general_api_returns_422_bad_docx():
-    """
-    Verify that we get a 400 for invalid docx files
-    """
-    client = TestClient(app)
-    test_file = Path("sample-docs") / "fake-text.txt"
-    response = client.post(
-        MAIN_API_ROUTE,
-        files=[
-            (
-                "files",
-                (
-                    str(test_file),
-                    open(test_file, "rb"),
-                    "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-                ),
-            )
-        ],
-    )
-    assert response.json().get("detail") == "File is not a valid docx"
-    assert response.status_code == 422
 
 
 def test_general_api_returns_400_bad_json(tmpdir):

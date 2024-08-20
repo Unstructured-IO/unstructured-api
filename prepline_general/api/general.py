@@ -452,14 +452,12 @@ def pipeline_api(
                 status_code=400,
                 detail="The fast strategy is not available for image files",
             )
-
+        if "not a ZIP archive (so not a DOCX file)" in e.args[0]:
+            raise HTTPException(
+                status_code=422,
+                detail="File is not a valid docx",
+            )
         raise e
-    except zipfile.BadZipFile:
-        raise HTTPException(
-            status_code=422,
-            detail="File is not a valid docx",
-        )
-
     except UnknownModelException:
         raise HTTPException(
             status_code=400,
@@ -621,7 +619,7 @@ class MultipartMixedResponse(StreamingResponse):
         )
         async for chunk in self.body_iterator:
             if not isinstance(chunk, bytes):
-                chunk = chunk.encode(self.charset)
+                chunk = chunk.encode(self.charset)  # type: ignore
                 chunk = b64encode(chunk)
             await send(
                 {"type": "http.response.body", "body": self.build_part(chunk), "more_body": True}
@@ -651,7 +649,7 @@ def ungz_file(file: UploadFile, gz_uncompressed_content_type: Optional[str] = No
 
 
 @router.get("/general/v0/general", include_in_schema=False)
-@router.get("/general/v0.0.72/general", include_in_schema=False)
+@router.get("/general/v0.0.77/general", include_in_schema=False)
 async def handle_invalid_get_request():
     raise HTTPException(
         status_code=status.HTTP_405_METHOD_NOT_ALLOWED, detail="Only POST requests are supported."
@@ -666,7 +664,7 @@ async def handle_invalid_get_request():
     description="Description",
     operation_id="partition_parameters",
 )
-@router.post("/general/v0.0.72/general", include_in_schema=False)
+@router.post("/general/v0.0.77/general", include_in_schema=False)
 def general_partition(
     request: Request,
     # cannot use annotated type here because of a bug described here:
@@ -685,13 +683,13 @@ def general_partition(
                 detail=f"API key {api_key} is invalid", status_code=status.HTTP_401_UNAUTHORIZED
             )
 
-    content_type = request.headers.get("Accept")
+    accept_type = request.headers.get("Accept")
 
     # -- detect response content-type conflict when multiple files are uploaded --
     if (
         len(files) > 1
-        and content_type
-        and content_type
+        and accept_type
+        and accept_type
         not in [
             "*/*",
             "multipart/mixed",
@@ -700,7 +698,7 @@ def general_partition(
         ]
     ):
         raise HTTPException(
-            detail=f"Conflict in media type {content_type} with response type 'multipart/mixed'.\n",
+            detail=f"Conflict in media type {accept_type} with response type 'multipart/mixed'.\n",
             status_code=status.HTTP_406_NOT_ACCEPTABLE,
         )
 
@@ -716,7 +714,9 @@ def general_partition(
 
     def response_generator(is_multipart: bool):
         for file in files:
-            file_content_type = get_validated_mimetype(file)
+            file_content_type = get_validated_mimetype(
+                file, content_type_hint=form_params.content_type
+            )
 
             _file = file.file
 
@@ -783,7 +783,7 @@ def general_partition(
         MultipartMixedResponse(
             response_generator(is_multipart=True), content_type=form_params.output_format
         )
-        if content_type == "multipart/mixed"
+        if accept_type == "multipart/mixed"
         else (
             list(response_generator(is_multipart=False))[0]
             if len(files) == 1
