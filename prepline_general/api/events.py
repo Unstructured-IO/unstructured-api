@@ -7,7 +7,7 @@ from fastapi.responses import JSONResponse
 from starlette.middleware.base import BaseHTTPMiddleware
 
 # Configuration
-MAKE_NOT_READY_WHEN_PROCESSING = os.getenv('MAKE_NOT_READY_WHEN_PROCESSING', 'true').lower() == 'true'
+MAKE_NOT_READY_WHEN_PROCESSING = os.getenv('MAKE_NOT_READY_WHEN_PROCESSING', 'false').lower() == 'true'
 USE_MAX_REQUESTS_LIMIT = os.getenv('USE_MAX_REQUESTS_LIMIT', 'false').lower() == 'true'
 MAX_REQUESTS = int(os.getenv('MAX_REQUESTS', 1))
 MEMORY_THRESHOLD = 0.8  # 80% of memory limit
