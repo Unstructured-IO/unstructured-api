@@ -36,6 +36,7 @@ class GeneralFormParams(BaseModel):
     overlap: int
     overlap_all: bool
     starting_page_number: Optional[int] = None
+    include_slide_notes: bool
 
     @classmethod
     def as_form(
@@ -246,6 +247,17 @@ level of "pollution" of otherwise clean semantic chunk boundaries. Default: Fals
                 example=3,
             ),
         ] = None,
+        include_slide_notes: Annotated[
+            bool,
+            Form(
+                title="include_slide_notes",
+                description=(
+                    "When `True`, slide notes from .ppt and .pptx files"
+                    " will be included in the response. Default: `True`"
+                ),
+                example=False,
+            ),
+        ] = True,
     ) -> "GeneralFormParams":
         return cls(
             xml_keep_tags=xml_keep_tags,
@@ -273,4 +285,5 @@ level of "pollution" of otherwise clean semantic chunk boundaries. Default: Fals
             overlap_all=overlap_all,
             unique_element_ids=unique_element_ids,
             starting_page_number=starting_page_number,
+            include_slide_notes=include_slide_notes,
         )

@@ -273,6 +273,7 @@ def pipeline_api(
     extract_image_block_types: Optional[List[str]] = None,
     unique_element_ids: Optional[bool] = False,
     starting_page_number: Optional[int] = None,
+    include_slide_notes: Optional[bool] = True,
 ) -> List[Dict[str, Any]] | str:
     if filename.endswith(".msg"):
         # Note(yuming): convert file type for msg files
@@ -316,6 +317,7 @@ def pipeline_api(
                         "overlap": overlap,
                         "overlap_all": overlap_all,
                         "starting_page_number": starting_page_number,
+                        "include_slide_notes": include_slide_notes,
                     },
                     default=str,
                 )
@@ -373,6 +375,7 @@ def pipeline_api(
                         "extract_image_block_types": extract_image_block_types,
                         "extract_image_block_to_payload": extract_image_block_to_payload,
                         "unique_element_ids": unique_element_ids,
+                        "include_slide_notes": include_slide_notes,
                     },
                     default=str,
                 )
@@ -403,6 +406,7 @@ def pipeline_api(
             "extract_image_block_to_payload": extract_image_block_to_payload,
             "unique_element_ids": unique_element_ids,
             "starting_page_number": starting_page_number,
+            "include_slide_notes": include_slide_notes,
         }
 
         if file_content_type == "application/pdf" and pdf_parallel_mode_enabled:
@@ -747,6 +751,7 @@ def general_partition(
                 overlap=form_params.overlap,
                 overlap_all=form_params.overlap_all,
                 starting_page_number=form_params.starting_page_number,
+                include_slide_notes=form_params.include_slide_notes,
             )
 
             yield (
