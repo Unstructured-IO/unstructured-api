@@ -1,3 +1,7 @@
+## 0.0.80-dev0
+
+* Add `include_slide_notes` parameter, indicating whether slide notes in `ppt` and `pptx` files should be partitioned. Default is `True`
+
 ## 0.0.79
 
 * Bump to `unstructured` 0.15.7
