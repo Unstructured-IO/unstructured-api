@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:experimental
-FROM harbor.sionic.tech/usio-test/2b83f193aabb
+FROM harbor.sionic.tech/unstructured/c212ca88@sha256:c212ca88005631cb80854341e741451d63967c5f95c4d477963b57b732492738
 
 USER root
 
