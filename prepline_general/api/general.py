@@ -35,6 +35,7 @@ from starlette.types import Send
 
 from prepline_general.api.models.form_params import GeneralFormParams
 from prepline_general.api.filetypes import get_validated_mimetype
+from unstructured.errors import PageCountExceededError
 from unstructured.documents.elements import Element
 from unstructured.partition.auto import partition
 from unstructured.staging.base import (
@@ -328,6 +329,7 @@ def pipeline_api(
 
     if file_content_type == "application/pdf":
         _check_pdf(file)
+    pdf_hi_res_max_pages = int(os.environ.get("UNSTRUCTURED_PDF_HI_RES_MAX_PAGES", 300))
 
     hi_res_model_name = _validate_hi_res_model_name(hi_res_model_name, coordinates)
     strategy = _validate_strategy(strategy)
@@ -373,6 +375,7 @@ def pipeline_api(
                         "extract_image_block_types": extract_image_block_types,
                         "extract_image_block_to_payload": extract_image_block_to_payload,
                         "unique_element_ids": unique_element_ids,
+                        "pdf_hi_res_max_pages": pdf_hi_res_max_pages,
                     },
                     default=str,
                 )
@@ -403,6 +406,7 @@ def pipeline_api(
             "extract_image_block_to_payload": extract_image_block_to_payload,
             "unique_element_ids": unique_element_ids,
             "starting_page_number": starting_page_number,
+            "pdf_hi_res_max_pages": pdf_hi_res_max_pages,
         }
 
         if file_content_type == "application/pdf" and pdf_parallel_mode_enabled:
@@ -437,6 +441,13 @@ def pipeline_api(
             status_code=500,
             detail=str(e),
         )
+    except PageCountExceededError as e:
+        raise HTTPException(
+            status_code=422,
+            detail=f"{e} Check the split_pdf_page functionality of unstructured_client to send the file "
+            f"in smaller chunks.",
+        )
+
     except ValueError as e:
         if "Invalid file" in e.args[0]:
             raise HTTPException(
