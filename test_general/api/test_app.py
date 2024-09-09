@@ -701,6 +701,7 @@ def test_parallel_mode_passes_params(monkeypatch):
             "new_after_n_chars": "1501",
             "overlap": "25",
             "overlap_all": "true",
+            "include_slide_notes": "true",
         },
     )
 
@@ -733,6 +734,7 @@ def test_parallel_mode_passes_params(monkeypatch):
         new_after_n_chars=1501,
         overlap=25,
         overlap_all=True,
+        include_slide_notes=True,
     )
 
 
@@ -1147,3 +1149,38 @@ def test__set_pdf_infer_table_structure(
         )
         is expected
     )
+
+
+@pytest.mark.parametrize(
+    ("test_default", "include_slide_notes", "test_file"),
+    [
+        (True, None, Path("sample-docs") / "notes.ppt"),
+        (True, None, Path("sample-docs") / "notes.pptx"),
+        (False, True, Path("sample-docs") / "notes.ppt"),
+        (False, True, Path("sample-docs") / "notes.pptx"),
+        (False, False, Path("sample-docs") / "notes.ppt"),
+        (False, False, Path("sample-docs") / "notes.pptx"),
+    ],
+)
+def test_include_slide_notes(monkeypatch, test_default, include_slide_notes, test_file):
+    """
+    Verifies that the output includes slide notes when the include_slide_notes parameter
+    is left as default or explicitly set to True.
+    """
+    client = TestClient(app)
+    data = (
+        {"output_format": "text/csv"}
+        if test_default
+        else {"include_slide_notes": str(include_slide_notes), "output_format": "text/csv"}
+    )
+    response = client.post(
+        MAIN_API_ROUTE,
+        files=[("files", (str(test_file), open(test_file, "rb")))],
+        data=data,
+    )
+    df = pd.read_csv(io.StringIO(response.text))
+
+    if include_slide_notes or test_default:
+        assert "Here are important notes" == df["text"][0]
+    else:
+        assert "Here are important notes" != df["text"][0]
