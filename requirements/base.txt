@@ -411,8 +411,10 @@ tzdata==2024.1
     # via pandas
 unstructured[all-docs]==0.15.10
     # via -r requirements/base.in
-unstructured-client==0.25.7
-    # via unstructured
+unstructured-client==0.25.5
+    # via
+    #   -r requirements/base.in
+    #   unstructured
 unstructured-inference==0.7.36
     # via unstructured
 unstructured-pytesseract==0.3.13
