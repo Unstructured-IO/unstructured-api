@@ -1,6 +1,7 @@
-## 0.0.80-dev0
+## 0.0.80
 
-* Add `include_slide_notes` parameter, indicating whether slide notes in `ppt` and `pptx` files should be partitioned. Default is `True`. Now, when slide notes are present in the file, they will be included alongside other elements, which may shift the index numbers of non-note elements. 
+* Bump to `unstructured` 0.15.10
+* Add `include_slide_notes` parameter, indicating whether slide notes in `ppt` and `pptx` files should be partitioned. Default is `True`. Now, when slide notes are present in the file, they will be included alongside other elements, which may shift the index numbers of non-note elements.
 
 ## 0.0.79
 
