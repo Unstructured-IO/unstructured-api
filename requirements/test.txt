@@ -151,7 +151,7 @@ execnb==0.1.6
     # via nbdev
 executing==2.1.0
     # via stack-data
-fastapi==0.114.0
+fastapi==0.113.0
     # via -r requirements/base.txt
 fastcore==1.7.5
     # via

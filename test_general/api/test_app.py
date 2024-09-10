@@ -602,7 +602,6 @@ def test_parallel_mode_preserves_uniqueness_of_hashes_when_assembling_pages_spli
         MAIN_API_ROUTE,
         files=[("files", (str(test_file), open(test_file, "rb"), "application/pdf"))],
         data={},
-        # data={"chunking_strategy": "by_title", "new_after_n_chars": 500},
     )
 
     assert response.status_code == 200
