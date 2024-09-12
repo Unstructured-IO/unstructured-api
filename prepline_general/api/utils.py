@@ -94,6 +94,17 @@ class SmartValueParser(Generic[T]):
             return [_cast_to_type(elem, container_elems_class) for elem in value]
         return _cast_to_type(value, origin_class)  # noqa
 
+    def literal_value_stripped_or_first_element(self, value: str) -> str | None:
+        """Returns the value itself for literal strings and strips quotation characters.
+
+        Args:
+            value (Union[T, List[str]]): value to cast to a type T or return as is
+        """
+        origin_class, container_elems_class = self._get_origin_container_classes()
+        value = value.replace("'", "")
+        value = value.replace('"', "")
+        return _cast_to_type(value, origin_class)
+
     def _get_origin_container_classes(self) -> tuple[type, type | None]:
         """Extracts class (and container class if it's a list) from a type hint
 

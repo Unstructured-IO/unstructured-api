@@ -30,3 +30,23 @@ from prepline_general.api.utils import SmartValueParser
 def test_smart_value_parser(desired_type: type, value_to_parse: Any, expected_result: Any):
     parsed_value = SmartValueParser[desired_type]().value_or_first_element(value_to_parse)
     assert expected_result == parsed_value
+
+
+@pytest.mark.parametrize(
+    "desired_type, value_to_parse, expected_result",
+    [
+        (str, "fast", "fast"),
+        (str, "'fast'", "fast"),
+        (str, '"fast"', "fast"),
+        (str, "!fast", "!fast"),
+        (str, "fa'st", "fast"),
+        (str, "fast''''''", "fast"),
+    ],
+)
+def test_literal_value_stripped_or_first_element(
+    desired_type: type, value_to_parse: Any, expected_result: Any
+):
+    parsed_value = SmartValueParser[desired_type]().literal_value_stripped_or_first_element(
+        value_to_parse
+    )
+    assert expected_result == parsed_value
