@@ -674,7 +674,7 @@ def general_partition(
     # cannot use annotated type here because of a bug described here:
     # https://github.com/tiangolo/fastapi/discussions/10280
     # The openapi metadata must be added separately in openapi.py file.
-    # TODO: Check if the bug is fixed and change the declaration to use Annoteted[List[UploadFile], File(...)]
+    # TODO: Check if the bug is fixed and change the declaration to use Annotated[List[UploadFile], File(...)]
     # For new parameters - add them in models/form_params.py
     files: List[UploadFile],
     form_params: GeneralFormParams = Depends(GeneralFormParams.as_form),
