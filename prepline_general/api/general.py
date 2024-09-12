@@ -136,7 +136,7 @@ def partition_file_via_api(
     The remote url is set by the `UNSTRUCTURED_PARALLEL_MODE_URL` environment variable.
 
     Args:
-    `file_tuple` is a file-like object and byte offset of a page (file, page_offest)
+    `file_tuple` is a file-like object and byte offset of a page (file, page_offset)
     `request` is used to forward the api key header
     `filename` and `content_type` are passed in the file form data
     `partition_kwargs` holds any form parameters to be sent on
