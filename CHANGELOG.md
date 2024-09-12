@@ -118,7 +118,7 @@
 ## 0.0.56
 * **Add `max_characters` param for chunking** This param gives users additional control to "chunk" elements into larger or smaller `CompositeElement`s
 * Bump unstructured to 0.10.28
-* Make sure chipperv2 is called whien `hi_res_model_name==chipper`
+* Make sure chipperv2 is called when `hi_res_model_name==chipper`
 
 
 ## 0.0.55
