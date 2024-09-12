@@ -7,7 +7,7 @@ click==8.1.3
 # NOTE(robinson) - fastapi>=0.114.0 causes the test listed below to fail, though it
 # works if data if chunking strategy and new_after_n_chars are explicitly set. Pinning
 # for now to preserve behavior
-# test_parallel_mode_preserves_uniqueness_of_hashes_when_asssembling_page_splits
+# test_parallel_mode_preserves_uniqueness_of_hashes_when_assembling_page_splits
 fastapi<0.114.0
 uvicorn
 ratelimit

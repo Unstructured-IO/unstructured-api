@@ -136,7 +136,7 @@ def partition_file_via_api(
     The remote url is set by the `UNSTRUCTURED_PARALLEL_MODE_URL` environment variable.
 
     Args:
-    `file_tuple` is a file-like object and byte offset of a page (file, page_offest)
+    `file_tuple` is a file-like object and byte offset of a page (file, page_offset)
     `request` is used to forward the api key header
     `filename` and `content_type` are passed in the file form data
     `partition_kwargs` holds any form parameters to be sent on
@@ -674,7 +674,7 @@ def general_partition(
     # cannot use annotated type here because of a bug described here:
     # https://github.com/tiangolo/fastapi/discussions/10280
     # The openapi metadata must be added separately in openapi.py file.
-    # TODO: Check if the bug is fixed and change the declaration to use Annoteted[List[UploadFile], File(...)]
+    # TODO: Check if the bug is fixed and change the declaration to use Annotated[List[UploadFile], File(...)]
     # For new parameters - add them in models/form_params.py
     files: List[UploadFile],
     form_params: GeneralFormParams = Depends(GeneralFormParams.as_form),

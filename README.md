@@ -389,7 +389,7 @@ By default server will run for indefinitely. To change that the `MAX_LIFETIME_SE
 
 After the graceful period is over if server is still running, it is shutdown forcefully, cancelling all active requests and sending empty responses to each of them.
 
-*Max lifetime requires gnu [timeout](https://www.gnu.org/software/coreutils/manual/html_node/timeout-invocation.html#timeout-invocation) to be installed, available by default on most linux systems. Downloadable on MacOS as gtimeout with gnu coreutils.*
+*Max lifetime requires gnu [timeout](https://www.gnu.org/software/coreutils/manual/html_node/timeout-invocation.html#timeout-invocation) to be installed, available by default on most linux systems. Downloadable on macOS as gtimeout with gnu coreutils.*
 
 ## :dizzy: Instructions for using the Docker image
 
@@ -425,8 +425,8 @@ information on how to report security vulnerabilities.
 
 | Section | Description |
 |-|-|
-| [Unstructured Community Github](https://github.com/Unstructured-IO/community) | Information about Unstructured.io community projects  |
-| [Unstructured Github](https://github.com/Unstructured-IO) | Unstructured.io open source repositories |
+| [Unstructured Community GitHub](https://github.com/Unstructured-IO/community) | Information about Unstructured.io community projects  |
+| [Unstructured GitHub](https://github.com/Unstructured-IO) | Unstructured.io open source repositories |
 | [Company Website](https://unstructured.io) | Unstructured.io product and company info |
 
 ## :chart_with_upwards_trend: Analytics

@@ -71,10 +71,10 @@ def _apply_customizations(openapi_schema: dict[str, Any]) -> None:
         }
     }
 
-    # TODO: Instead of a list of paramaters, crete a PartitionParameters model
+    # TODO: Instead of a list of parameters, crete a PartitionParameters model
     # and declare schema keys (type, format, description) as attributes
     # https://fastapi.tiangolo.com/reference/openapi/models/?h=model
-    # Update the schema key from `Body_partition` to `partition_paramaters`
+    # Update the schema key from `Body_partition` to `partition_parameters`
 
     # TODO: Similarly, create an Element model
     # https://fastapi.tiangolo.com/reference/openapi/models/?h=model
