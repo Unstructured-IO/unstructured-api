@@ -1,3 +1,7 @@
+## 0.0.81.dev
+
+* Update `strategy` parameter to allow `'` and `"` as input surrounding the value.
+
 ## 0.0.80
 
 * Bump to `unstructured` 0.15.10

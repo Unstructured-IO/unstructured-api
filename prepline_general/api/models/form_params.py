@@ -156,7 +156,7 @@ class GeneralFormParams(BaseModel):
                 description="The strategy to use for partitioning PDF/image. Options are fast, hi_res, auto. Default: auto",
                 examples=["auto", "hi_res"],
             ),
-            BeforeValidator(SmartValueParser[str]().value_or_first_element),
+            BeforeValidator(SmartValueParser[str]().literal_value_stripped_or_first_element),
         ] = "auto",
         extract_image_block_types: Annotated[
             List[str],
