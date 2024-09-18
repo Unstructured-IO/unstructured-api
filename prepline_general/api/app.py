@@ -37,6 +37,12 @@ uvicorn_logger = logging.getLogger("uvicorn.error")
 if os.environ.get("ENV") in ["dev", "prod"]:
     uvicorn_logger.disabled = True
 
+# Silence debug logs on production.
+if os.environ.get("ENV") == "prod":
+    logging.getLogger("uvicorn.access").setLevel(logging.INFO)
+    logging.getLogger("unstructured_api").setLevel(logging.INFO)
+    logging.getLogger("unstructured").setLevel(logging.INFO)
+
 
 # Catch all HTTPException for uniform logging and response
 @app.exception_handler(HTTPException)
