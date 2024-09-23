@@ -1,4 +1,4 @@
-## 0.0.81.dev
+## 0.0.81
 
 * Update `strategy` parameter to allow `'` and `"` as input surrounding the value.
 
