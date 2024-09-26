@@ -1,6 +1,5 @@
 # syntax=docker/dockerfile:experimental
 FROM harbor.sionic.tech/unstructured/c212ca88@sha256:c212ca88005631cb80854341e741451d63967c5f95c4d477963b57b732492738
-
 USER root
 
 # Set up environment
@@ -10,8 +9,13 @@ ENV HOME=/root
 ENV PIPELINE_PACKAGE=general
 ENV PYTHONPATH="/app:${PYTHONPATH}"
 ENV PATH="${HOME}/.local/bin:${PATH}"
-
 WORKDIR ${HOME}
+
+# Install LibreOffice
+RUN apt-get update && apt-get install -y \
+    libreoffice \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
 # Copy requirements and install dependencies
 COPY requirements/base.txt requirements-base.txt
@@ -39,7 +43,8 @@ RUN echo "PYTHONPATH: $PYTHONPATH" && \
     ${PYTHON} --version && \
     ${PYTHON} -c "import site; print(site.getsitepackages())" && \
     ${PYTHON} -c "import unstructured; print(unstructured.__file__)" || echo "Failed to import unstructured" && \
-    ${PYTHON} -c "import numpy; print(numpy.__version__)" || echo "Failed to import numpy"
+    ${PYTHON} -c "import numpy; print(numpy.__version__)" || echo "Failed to import numpy" && \
+    which soffice && soffice --version || echo "Failed to find or run soffice"
 
 # Download NLTK data and initialize unstructured
 RUN ${PYTHON} -c "import nltk; nltk.download('punkt')" && \
