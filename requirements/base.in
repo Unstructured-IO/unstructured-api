@@ -16,3 +16,4 @@ backoff
 pypdf
 pycryptodome
 psutil
+prometheus_client

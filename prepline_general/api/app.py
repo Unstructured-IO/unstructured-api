@@ -2,6 +2,7 @@ from fastapi import FastAPI, Request, status, HTTPException
 from fastapi.datastructures import FormData
 from fastapi.responses import JSONResponse
 from fastapi.security import APIKeyHeader
+from prometheus_client import make_asgi_app
 import logging
 import os
 
@@ -13,7 +14,7 @@ logger = logging.getLogger("unstructured_api")
 app = FastAPI(
     title="Unstructured Pipeline API",
     summary="Partition documents with the Unstructured library",
-    version="0.0.81",
+    version="0.0.82",
     docs_url="/general/docs",
     openapi_url="/general/openapi.json",
     servers=[
@@ -30,6 +31,9 @@ app = FastAPI(
     ],
     openapi_tags=[{"name": "general"}],
 )
+
+metrics_app = make_asgi_app()
+app.mount("/metrics", metrics_app)
 
 # Note(austin) - This logger just dumps exceptions
 # We'd rather handle those below, so disable this in deployments
