@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - yuming/manual_deploy
 
 env:
   DOCKER_REPOSITORY: quay.io/unstructured-io/unstructured-api
