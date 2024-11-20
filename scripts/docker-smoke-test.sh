@@ -16,6 +16,7 @@ CONTAINER_NAME_PARALLEL=unstructured-api-smoke-test-parallel
 PIPELINE_FAMILY=${PIPELINE_FAMILY:-"general"}
 DOCKER_IMAGE="${DOCKER_IMAGE:-pipeline-family-${PIPELINE_FAMILY}-dev:latest}"
 SKIP_INFERENCE_TESTS="${SKIP_INFERENCE_TESTS:-false}"
+DOCKER_PLATFORM="${DOCKER_PLATFORM:-"linux/arm64"}"
 
 start_container() {
 
@@ -30,6 +31,7 @@ start_container() {
 
     echo Starting container "$name"
     docker run -p "$port":"$port" \
+       --platform "${DOCKER_PLATFORM}" \
 	   --entrypoint uvicorn \
            -d \
            --rm \
