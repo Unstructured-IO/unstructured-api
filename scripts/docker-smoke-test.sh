@@ -29,8 +29,9 @@ start_container() {
     fi
 
     echo Starting container "$name"
-    docker run -p "$port":"$port" \
-	   --entrypoint uvicorn \
+    docker run --platform "$DOCKER_PLATFORM" \
+           -p "$port":"$port" \
+           --entrypoint uvicorn \
            -d \
            --rm \
            --name "$name" \

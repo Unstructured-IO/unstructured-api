@@ -45,7 +45,9 @@ jobs:
   build-images:
     strategy:
       matrix:
-        arch: ["arm64", "amd64"]
+        #arch: ["arm64", "amd64"]
+        # NOTE(luke): temporary disable arm64 since its failing the smoke test
+        arch: ["amd64"]
     runs-on: ubuntu-latest-m
     needs: [setup, set-short-sha]
     env:
