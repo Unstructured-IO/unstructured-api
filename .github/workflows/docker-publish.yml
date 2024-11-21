@@ -75,7 +75,7 @@ jobs:
         # Clear some space (https://github.com/actions/runner-images/issues/2840)
         sudo rm -rf /usr/share/dotnet /opt/ghc /usr/local/share/boost
 
-        DOCKER_BUILDKIT=1 docker buildx build --debug --load -f Dockerfile \
+        DOCKER_BUILDKIT=1 docker buildx build --load -f Dockerfile \
           --platform=${{ matrix.arch }} \
           --build-arg PIP_VERSION=$PIP_VERSION \
           --build-arg BUILDKIT_INLINE_CACHE=1 \
