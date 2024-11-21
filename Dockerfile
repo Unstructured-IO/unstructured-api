@@ -9,14 +9,14 @@ ARG PIP_VERSION
 ARG PIPELINE_PACKAGE
 ARG PYTHON_VERSION="3.11"
 
-# Set up environment
-ENV PYTHON="python${PYTHON_VERSION}" \
-    PIP="${PYTHON} -m pip" \
-    PYTHONPATH="${PYTHONPATH}:${HOME}" \
-    PATH="/home/${NB_USER}/.local/bin:${PATH}"
-
 WORKDIR ${HOME}
 USER ${NB_USER}
+
+# Set up environment
+ENV PYTHON="python${PYTHON_VERSION}" 
+ENV PIP="${PYTHON} -m pip" 
+ENV PYTHONPATH="${PYTHONPATH}:${HOME}" 
+ENV PATH="/home/${NB_USER}/.local/bin:${PATH}"
 
 FROM base as python-deps
 COPY --chown=${NB_USER}:${NB_USER} requirements/base.txt requirements-base.txt
