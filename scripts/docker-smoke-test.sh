@@ -59,7 +59,7 @@ start_container() {
     echo "Starting container $name"
 
     # Start the container
-    container_id=$(docker run --debug --platform "$DOCKER_PLATFORM" \
+    container_id=$(docker run --platform "$DOCKER_PLATFORM" \
            -p "$port":"$port" \
            --entrypoint uvicorn \
            -d \
