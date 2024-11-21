@@ -18,33 +18,6 @@ DOCKER_IMAGE="${DOCKER_IMAGE:-pipeline-family-${PIPELINE_FAMILY}-dev:latest}"
 SKIP_INFERENCE_TESTS="${SKIP_INFERENCE_TESTS:-false}"
 DOCKER_PLATFORM="${DOCKER_PLATFORM:-"linux/arm64"}"
 
-#start_container() {
-#
-#    port=$1
-#    use_parallel_mode=$2
-#
-#    if [ "$use_parallel_mode" = "true" ]; then
-#        name=$CONTAINER_NAME_PARALLEL
-#    else
-#        name=$CONTAINER_NAME
-#    fi
-#
-#    echo Starting container "$name"
-#    docker run --platform "$DOCKER_PLATFORM" \
-#           -p "$port":"$port" \
-#           --entrypoint uvicorn \
-#           -d \
-#           --rm \
-#           --name "$name" \
-#           --env "UNSTRUCTURED_PARALLEL_MODE_URL=http://localhost:$port/general/v0/general" \
-#           --env "UNSTRUCTURED_PARALLEL_MODE_ENABLED=$use_parallel_mode" \
-#           "$DOCKER_IMAGE" \
-#           prepline_general.api.app:app --port "$port" --host 0.0.0.0
-#
-
-#    echo "Container $name started successfully."
-#}
-
 start_container() {
 
     port=$1
@@ -56,10 +29,8 @@ start_container() {
         name=$CONTAINER_NAME
     fi
 
-    echo "Starting container $name"
-
-    # Start the container
-    container_id=$(docker run --platform "$DOCKER_PLATFORM" \
+    echo Starting container "$name"
+    docker run --platform "$DOCKER_PLATFORM" \
            -p "$port":"$port" \
            --entrypoint uvicorn \
            -d \
@@ -68,31 +39,7 @@ start_container() {
            --env "UNSTRUCTURED_PARALLEL_MODE_URL=http://localhost:$port/general/v0/general" \
            --env "UNSTRUCTURED_PARALLEL_MODE_ENABLED=$use_parallel_mode" \
            "$DOCKER_IMAGE" \
-           prepline_general.api.app:app --port "$port" --host 0.0.0.0 --log-level debug)
-
-    # Ensure the container starts
-    if [ -z "$container_id" ]; then
-        echo "Error: Failed to start container $name."
-        exit 1
-    fi
-
-    # Monitor logs briefly to confirm startup
-    echo "Checking logs for container $name (ID: $container_id)..."
-    docker logs "$container_id" --follow --since 5s &
-    log_pid=$!
-
-    # Wait a few seconds to confirm the container is running
-    sleep 5
-
-    # Check if the container is still running
-    if ! docker ps --filter "id=$container_id" --format "{{.ID}}" | grep -q "$container_id"; then
-        echo "Error: Container $name failed to stay running."
-        kill $log_pid 2>/dev/null || true  # Stop log tailing
-        exit 1
-    fi
-
-    kill $log_pid 2>/dev/null || true  # Stop log tailing
-    echo "Container $name started successfully."
+           prepline_general.api.app:app --port "$port" --host 0.0.0.0
 }
 
 await_server_ready() {
