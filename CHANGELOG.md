@@ -1,3 +1,7 @@
+## 0.0.82
+
+* Expose Prometheus metrics at /metrics
+
 ## 0.0.81
 
 * Update `strategy` parameter to allow `'` and `"` as input surrounding the value.
