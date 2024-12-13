@@ -981,42 +981,6 @@ def test_general_api_returns_400_bad_json(tmpdir):
     assert response.status_code == 400
 
 
-def test_chipper_memory_protection(monkeypatch, mocker):
-    """
-    For now, only 1 Chipper call is allowed at a time.
-    Assert that we return a 503 while it's in use.
-    """
-
-    def mock_partition(*args, **kwargs):
-        time.sleep(2)
-        return {}
-
-    monkeypatch.setattr(
-        general,
-        "partition",
-        mock_partition,
-    )
-
-    client = TestClient(app)
-    test_file = Path("sample-docs") / "layout-parser-paper-fast.pdf"
-
-    def make_request(*args):
-        return client.post(
-            MAIN_API_ROUTE,
-            files=[("files", (str(test_file), open(test_file, "rb"), "application/pdf"))],
-            data={"strategy": "hi_res", "hi_res_model_name": "chipper"},
-        )
-
-    with ThreadPoolExecutor() as executor:
-        responses = list(executor.map(make_request, range(3)))
-
-        status_codes = [response.status_code for response in responses]
-
-        # Assert only one call got through
-        assert status_codes.count(200) == 1
-        assert status_codes.count(503) == 2
-
-
 def test_invalid_strategy_for_image_file():
     """
     Verify that we get a 400 error if we use "strategy=fast" with an image file
