@@ -1,3 +1,8 @@
+## 0.0.82
+
+* Bump to `unstructured` 0.16.11
+* No longer attempts to download NLTK asset from S3 which could result in a 403
+
 ## 0.0.81
 
 * Update `strategy` parameter to allow `'` and `"` as input surrounding the value.
