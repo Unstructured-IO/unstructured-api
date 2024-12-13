@@ -497,7 +497,6 @@ def _validate_strategy(strategy: str) -> str:
     return strategy
 
 
-
 def _validate_chunking_strategy(chunking_strategy: Optional[str]) -> Optional[str]:
     """Raise on `chunking_strategy` is not a valid chunking strategy name.
 
