@@ -43,7 +43,6 @@ from unstructured.staging.base import (
     elements_from_json,
 )
 from unstructured_inference.models.base import UnknownModelException
-from unstructured_inference.models.chipper import MODEL_TYPES as CHIPPER_MODEL_TYPES
 
 app = FastAPI()
 router = APIRouter()
@@ -214,37 +213,6 @@ def partition_pdf_splits(
     return results
 
 
-is_chipper_processing = False
-
-
-class ChipperMemoryProtection:
-    """Chipper calls are expensive, and right now we can only do one call at a time.
-
-    If the model is in use, return a 503 error. The API should scale up and the user can try again
-    on a different server.
-    """
-
-    def __enter__(self):
-        global is_chipper_processing
-        if is_chipper_processing:
-            # Log here so we can track how often it happens
-            logger.error("Chipper is already is use")
-            raise HTTPException(
-                status_code=503, detail="Server is under heavy load. Please try again later."
-            )
-
-        is_chipper_processing = True
-
-    def __exit__(
-        self,
-        exc_type: Optional[type[BaseException]],
-        exc_value: Optional[BaseException],
-        exc_tb: Optional[TracebackType],
-    ):
-        global is_chipper_processing
-        is_chipper_processing = False
-
-
 def pipeline_api(
     file: IO[bytes],
     request: Request,
@@ -331,7 +299,6 @@ def pipeline_api(
     if file_content_type == "application/pdf":
         _check_pdf(file)
 
-    hi_res_model_name = _validate_hi_res_model_name(hi_res_model_name, coordinates)
     strategy = _validate_strategy(strategy)
     pdf_infer_table_structure = _set_pdf_infer_table_structure(
         pdf_infer_table_structure,
@@ -417,9 +384,6 @@ def pipeline_api(
                 coordinates=coordinates,
                 **partition_kwargs,  # type: ignore # pyright: ignore[reportGeneralTypeIssues]
             )
-        elif hi_res_model_name and hi_res_model_name in CHIPPER_MODEL_TYPES:
-            with ChipperMemoryProtection():
-                elements = partition(**partition_kwargs)  # type: ignore # pyright: ignore[reportGeneralTypeIssues]
         else:
             elements = partition(**partition_kwargs)  # type: ignore # pyright: ignore[reportGeneralTypeIssues]
 
@@ -533,21 +497,6 @@ def _validate_strategy(strategy: str) -> str:
     return strategy
 
 
-def _validate_hi_res_model_name(
-    hi_res_model_name: Optional[str], show_coordinates: bool
-) -> Optional[str]:
-    # Make sure chipper aliases to the latest model
-    if hi_res_model_name and hi_res_model_name == "chipper":
-        hi_res_model_name = "chipperv2"
-
-    if hi_res_model_name and hi_res_model_name in CHIPPER_MODEL_TYPES and show_coordinates:
-        raise HTTPException(
-            status_code=400,
-            detail=f"coordinates aren't available when using the {hi_res_model_name} model type",
-        )
-    return hi_res_model_name
-
-
 def _validate_chunking_strategy(chunking_strategy: Optional[str]) -> Optional[str]:
     """Raise on `chunking_strategy` is not a valid chunking strategy name.
 
@@ -653,7 +602,7 @@ def ungz_file(file: UploadFile, gz_uncompressed_content_type: Optional[str] = No
 
 
 @router.get("/general/v0/general", include_in_schema=False)
-@router.get("/general/v0.0.81/general", include_in_schema=False)
+@router.get("/general/v0.0.82/general", include_in_schema=False)
 async def handle_invalid_get_request():
     raise HTTPException(
         status_code=status.HTTP_405_METHOD_NOT_ALLOWED, detail="Only POST requests are supported."
@@ -668,7 +617,7 @@ async def handle_invalid_get_request():
     description="Description",
     operation_id="partition_parameters",
 )
-@router.post("/general/v0.0.81/general", include_in_schema=False)
+@router.post("/general/v0.0.82/general", include_in_schema=False)
 def general_partition(
     request: Request,
     # cannot use annotated type here because of a bug described here:
