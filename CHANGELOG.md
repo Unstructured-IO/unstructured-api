@@ -1,5 +1,6 @@
 ## 0.0.82
 
+* Patch various python CVEs
 * Bump to `unstructured` 0.16.11
 * No longer attempts to download NLTK asset from S3 which could result in a 403
 
