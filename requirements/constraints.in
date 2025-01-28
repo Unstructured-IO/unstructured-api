@@ -4,3 +4,4 @@
 # words, if something does not require a constraint, it will not be installed.
 ####################################################################################################
 numpy<2.0.0
+starlette>=0.40.0
