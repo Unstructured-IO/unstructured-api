@@ -148,7 +148,7 @@ execnb==0.1.11
     # via nbdev
 executing==2.2.0
     # via stack-data
-fastapi==0.1.17
+fastapi==0.115.7
     # via -r requirements/base.txt
 fastcore==1.7.28
     # via
@@ -838,6 +838,7 @@ typing-extensions==4.12.2
     # via
     #   -r requirements/base.txt
     #   anyio
+    #   fastapi
     #   huggingface-hub
     #   mypy
     #   pydantic

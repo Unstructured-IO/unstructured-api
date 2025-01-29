@@ -63,7 +63,7 @@ et-xmlfile==2.0.0
     # via openpyxl
 eval-type-backport==0.2.2
     # via unstructured-client
-fastapi==0.1.17
+fastapi==0.115.7
     # via -r requirements/base.in
 filelock==3.17.0
     # via
@@ -363,6 +363,7 @@ transformers==4.48.1
 typing-extensions==4.12.2
     # via
     #   anyio
+    #   fastapi
     #   huggingface-hub
     #   pydantic
     #   pydantic-core
