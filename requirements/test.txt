@@ -148,8 +148,10 @@ execnb==0.1.11
     # via nbdev
 executing==2.2.0
     # via stack-data
-fastapi==0.115.8
-    # via -r requirements/base.txt
+fastapi==0.115.7
+    # via
+    #   -c requirements/constraints.in
+    #   -r requirements/base.txt
 fastcore==1.7.28
     # via
     #   execnb
@@ -685,7 +687,7 @@ pyzmq==26.2.1
     #   jupyter-client
     #   jupyter-console
     #   jupyter-server
-rapidfuzz==3.11.0
+rapidfuzz==3.12.1
     # via
     #   -r requirements/base.txt
     #   unstructured
