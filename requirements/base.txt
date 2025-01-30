@@ -74,7 +74,7 @@ filetype==1.2.0
     # via unstructured
 flatbuffers==25.1.24
     # via onnxruntime
-fonttools==4.55.7
+fonttools==4.55.8
     # via matplotlib
 fsspec==2024.12.0
     # via
@@ -328,7 +328,7 @@ sniffio==1.3.1
     # via anyio
 soupsieve==2.6
     # via beautifulsoup4
-starlette==0.45.3
+starlette==0.43.0
     # via
     #   -c requirements/constraints.in
     #   fastapi
@@ -342,13 +342,13 @@ timm==1.0.14
     #   unstructured-inference
 tokenizers==0.21.0
     # via transformers
-torch==2.5.1
+torch==2.6.0
     # via
     #   effdet
     #   timm
     #   torchvision
     #   unstructured-inference
-torchvision==0.20.1
+torchvision==0.21.0
     # via
     #   effdet
     #   timm
@@ -379,7 +379,7 @@ typing-inspect==0.9.0
     #   unstructured-client
 tzdata==2025.1
     # via pandas
-unstructured[all-docs]==0.16.16
+unstructured[all-docs]==0.16.17
     # via -r requirements/base.in
 unstructured-client==0.29.0
     # via unstructured

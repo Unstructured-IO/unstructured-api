@@ -53,7 +53,7 @@ beautifulsoup4==4.12.3
     #   -r requirements/base.txt
     #   nbconvert
     #   unstructured
-black==24.10.0
+black==25.1.0
     # via -r requirements/test.in
 bleach[css]==6.2.0
     # via nbconvert
@@ -173,7 +173,7 @@ flatbuffers==25.1.24
     # via
     #   -r requirements/base.txt
     #   onnxruntime
-fonttools==4.55.7
+fonttools==4.55.8
     # via
     #   -r requirements/base.txt
     #   matplotlib
@@ -329,7 +329,7 @@ jupyter-server==2.15.0
     #   notebook-shim
 jupyter-server-terminals==0.5.3
     # via jupyter-server
-jupyterlab==4.3.4
+jupyterlab==4.3.5
     # via
     #   jupyter
     #   notebook
@@ -760,7 +760,7 @@ soupsieve==2.6
     #   beautifulsoup4
 stack-data==0.6.3
     # via ipython
-starlette==0.45.3
+starlette==0.43.0
     # via
     #   -c requirements/constraints.in
     #   -r requirements/base.txt
@@ -785,14 +785,14 @@ tokenizers==0.21.0
     # via
     #   -r requirements/base.txt
     #   transformers
-torch==2.5.1
+torch==2.6.0
     # via
     #   -r requirements/base.txt
     #   effdet
     #   timm
     #   torchvision
     #   unstructured-inference
-torchvision==0.20.1
+torchvision==0.21.0
     # via
     #   -r requirements/base.txt
     #   effdet
@@ -859,7 +859,7 @@ tzdata==2025.1
     # via
     #   -r requirements/base.txt
     #   pandas
-unstructured[all-docs]==0.16.16
+unstructured[all-docs]==0.16.17
     # via -r requirements/base.txt
 unstructured-client==0.29.0
     # via
