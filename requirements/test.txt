@@ -148,7 +148,7 @@ execnb==0.1.11
     # via nbdev
 executing==2.2.0
     # via stack-data
-fastapi==0.115.7
+fastapi==0.115.8
     # via -r requirements/base.txt
 fastcore==1.7.28
     # via
@@ -232,7 +232,7 @@ httpx==0.28.1
     #   -r requirements/test.in
     #   jupyterlab
     #   unstructured-client
-huggingface-hub==0.28.0
+huggingface-hub==0.28.1
     # via
     #   -r requirements/base.txt
     #   timm
@@ -679,7 +679,7 @@ pyyaml==6.0.2
     #   omegaconf
     #   timm
     #   transformers
-pyzmq==26.2.0
+pyzmq==26.2.1
     # via
     #   ipykernel
     #   jupyter-client
@@ -760,7 +760,7 @@ soupsieve==2.6
     #   beautifulsoup4
 stack-data==0.6.3
     # via ipython
-starlette==0.43.0
+starlette==0.41.2
     # via
     #   -c requirements/constraints.in
     #   -r requirements/base.txt
