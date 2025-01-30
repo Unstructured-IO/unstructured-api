@@ -714,7 +714,7 @@ def general_partition(
             )
 
     def join_responses(
-        responses: Sequence[str | List[Dict[str, Any]] | PlainTextResponse]
+        responses: Sequence[str | List[Dict[str, Any]] | PlainTextResponse],
     ) -> List[str | List[Dict[str, Any]]] | PlainTextResponse:
         """Consolidate partitionings from multiple documents into single response payload."""
         if form_params.output_format != "text/csv":
