@@ -63,10 +63,8 @@ et-xmlfile==2.0.0
     # via openpyxl
 eval-type-backport==0.2.2
     # via unstructured-client
-fastapi==0.115.7
-    # via
-    #   -c requirements/constraints.in
-    #   -r requirements/base.in
+fastapi==0.115.8
+    # via -r requirements/base.in
 filelock==3.17.0
     # via
     #   huggingface-hub
@@ -360,7 +358,7 @@ tqdm==4.67.1
     #   nltk
     #   transformers
     #   unstructured
-transformers==4.48.1
+transformers==4.48.2
     # via unstructured-inference
 typing-extensions==4.12.2
     # via
