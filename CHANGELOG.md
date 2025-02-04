@@ -1,3 +1,7 @@
+## 0.0.83
+
+* Fix Starlette vulnerability
+
 ## 0.0.82
 
 * Patch various python CVEs
