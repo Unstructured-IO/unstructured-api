@@ -37,6 +37,7 @@ class GeneralFormParams(BaseModel):
     overlap_all: bool
     starting_page_number: Optional[int] = None
     include_slide_notes: bool
+    table_ocr_agent: Optional[str] = None
 
     @classmethod
     def as_form(
@@ -150,11 +151,11 @@ class GeneralFormParams(BaseModel):
             BeforeValidator(SmartValueParser[bool]().value_or_first_element),
         ] = True,
         strategy: Annotated[
-            Literal["fast", "hi_res", "auto", "ocr_only"],
+            Literal["fast", "hi_res", "auto", "ocr_only", "od_only", "vlm"],
             Form(
                 title="Strategy",
-                description="The strategy to use for partitioning PDF/image. Options are fast, hi_res, auto. Default: auto",
-                examples=["auto", "hi_res"],
+                description="The strategy to use for partitioning. Options are fast, hi_res, auto, ocr_only, od_only, vlm. Default: auto",
+                examples=["auto", "hi_res", "vlm"],
             ),
             BeforeValidator(SmartValueParser[str]().literal_value_stripped_or_first_element),
         ] = "auto",
@@ -258,6 +259,14 @@ level of "pollution" of otherwise clean semantic chunk boundaries. Default: Fals
                 example=False,
             ),
         ] = True,
+        table_ocr_agent: Annotated[
+            Optional[str],
+            Form(
+                title="table_ocr_agent",
+                description="The OCR agent to use for table extraction. Options are tesseract, paddle, remote",
+                example="tesseract",
+            ),
+        ] = None,
     ) -> "GeneralFormParams":
         return cls(
             xml_keep_tags=xml_keep_tags,
@@ -286,4 +295,5 @@ level of "pollution" of otherwise clean semantic chunk boundaries. Default: Fals
             unique_element_ids=unique_element_ids,
             starting_page_number=starting_page_number,
             include_slide_notes=include_slide_notes,
+            table_ocr_agent=table_ocr_agent,
         )

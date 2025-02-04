@@ -2,26 +2,31 @@ from __future__ import annotations
 
 import gzip
 import io
-import json
-import logging
 import mimetypes
 import os
 import secrets
-import zipfile
+import shutil
+import tempfile
+import time
 from base64 import b64encode
 from concurrent.futures import ThreadPoolExecutor
-from functools import partial
-from types import TracebackType
-from typing import IO, Any, Dict, List, Mapping, Optional, Sequence, Tuple, Union, cast
+from datetime import datetime
+from functools import lru_cache, partial
+from typing import IO, Any, BinaryIO, Dict, List, Mapping, Optional, Sequence, Tuple, Union, cast
+# Add with other imports at top
+from unstructured_vlm_partitioner.partition import partition as vlm_partition  # Optional - can also import only when needed
 
 import backoff
+import elasticapm
+import orjson
 import pandas as pd
-import psutil
 import requests
 from fastapi import (
     APIRouter,
+    BackgroundTasks,
     Depends,
     FastAPI,
+    Header,
     HTTPException,
     Request,
     UploadFile,
@@ -32,33 +37,40 @@ from pypdf import PageObject, PdfReader, PdfWriter
 from pypdf.errors import FileNotDecryptedError, PdfReadError
 from starlette.datastructures import Headers
 from starlette.types import Send
+from unstructured_prop.ocr.remote_agent import OCR_AGENT_REMOTE
 
-from prepline_general.api.models.form_params import GeneralFormParams
+from prepline_general.api import data_storage
+from prepline_general.api.api_requests import record_api_request
+from prepline_general.api.api_requests.api_quota_check import api_quota_check
 from prepline_general.api.filetypes import get_validated_mimetype
+from prepline_general.api.logger import logger
+from prepline_general.api.metrics import send_partition_metrics
+from prepline_general.api.models.form_params import GeneralFormParams
 from unstructured.documents.elements import Element
+from unstructured.errors import PageCountExceededError
 from unstructured.partition.auto import partition
+from unstructured.partition.utils.constants import (
+    OCR_AGENT_PADDLE,
+    OCR_AGENT_TESSERACT,
+)
 from unstructured.staging.base import (
     convert_to_dataframe,
     convert_to_isd,
     elements_from_json,
 )
 from unstructured_inference.models.base import UnknownModelException
-from unstructured_inference.models.chipper import MODEL_TYPES as CHIPPER_MODEL_TYPES
 
 app = FastAPI()
 router = APIRouter()
 
 
-def is_compatible_response_type(media_type: str, response_type: type) -> bool:
-    """True when `response_type` can be converted to `media_type` for HTTP Response."""
+@lru_cache(maxsize=1)
+def _do_not_log_params() -> tuple[str, ...]:
     return (
-        False
-        if media_type == "application/json" and response_type not in [dict, list]
-        else False if media_type == "text/csv" and response_type != str else True
+        ("file",)
+        if os.getenv("FREE_TIER_STORAGE_ENABLED", "False") == "True"
+        else ("file", "metadata_filename")
     )
-
-
-logger = logging.getLogger("unstructured_api")
 
 
 def get_pdf_splits(pdf_pages: Sequence[PageObject], split_size: int = 1):
@@ -136,7 +148,7 @@ def partition_file_via_api(
     The remote url is set by the `UNSTRUCTURED_PARALLEL_MODE_URL` environment variable.
 
     Args:
-    `file_tuple` is a file-like object and byte offset of a page (file, page_offset)
+    `file_tuple` is a file-like object and byte offset of a page (file, page_offest)
     `request` is used to forward the api key header
     `filename` and `content_type` are passed in the file form data
     `partition_kwargs` holds any form parameters to be sent on
@@ -214,130 +226,77 @@ def partition_pdf_splits(
     return results
 
 
-is_chipper_processing = False
+UNSTRUCTURED_PDF_HI_RES_MAX_PAGES_DEFAULT = 300
 
 
-class ChipperMemoryProtection:
-    """Chipper calls are expensive, and right now we can only do one call at a time.
-
-    If the model is in use, return a 503 error. The API should scale up and the user can try again
-    on a different server.
-    """
-
-    def __enter__(self):
-        global is_chipper_processing
-        if is_chipper_processing:
-            # Log here so we can track how often it happens
-            logger.error("Chipper is already is use")
-            raise HTTPException(
-                status_code=503, detail="Server is under heavy load. Please try again later."
-            )
-
-        is_chipper_processing = True
-
-    def __exit__(
-        self,
-        exc_type: Optional[type[BaseException]],
-        exc_value: Optional[BaseException],
-        exc_tb: Optional[TracebackType],
-    ):
-        global is_chipper_processing
-        is_chipper_processing = False
-
-
+@elasticapm.capture_span("pipeline_api")
 def pipeline_api(
     file: IO[bytes],
+    *,
     request: Request,
+    # -- api specific params --
+    response_type: str = "application/json",
+    coordinates: bool = False,
+    org_id: Optional[int] = None,  # Not an api param - just passing through
     # -- chunking options --
     chunking_strategy: Optional[str],
     combine_under_n_chars: Optional[int],
+    include_orig_elements: Optional[bool],
     max_characters: int,
     multipage_sections: bool,
     new_after_n_chars: Optional[int],
     overlap: int,
     overlap_all: bool,
-    # ----------------------
+    similarity_threshold: Optional[float],
+    # --other partition options --
     filename: str = "",
     file_content_type: Optional[str] = None,
-    response_type: str = "application/json",
-    coordinates: bool = False,
     encoding: str = "utf-8",
     hi_res_model_name: Optional[str] = None,
     include_page_breaks: bool = False,
     ocr_languages: Optional[List[str]] = None,
     pdf_infer_table_structure: bool = True,
     skip_infer_table_types: Optional[List[str]] = None,
-    strategy: str = "auto",
+    strategy: str = "hi_res",
     xml_keep_tags: bool = False,
     languages: Optional[List[str]] = None,
     extract_image_block_types: Optional[List[str]] = None,
     unique_element_ids: Optional[bool] = False,
     starting_page_number: Optional[int] = None,
     include_slide_notes: Optional[bool] = True,
+    table_ocr_agent: Optional[str] = OCR_AGENT_TESSERACT,
 ) -> List[Dict[str, Any]] | str:
+    start_process_time = time.time()
+
+    if table_ocr_agent not in (OCR_AGENT_PADDLE, OCR_AGENT_TESSERACT, OCR_AGENT_REMOTE):
+        logger.warning(
+            "invalide option for table_ocr_agent %s, using %s instead",
+            table_ocr_agent,
+            OCR_AGENT_TESSERACT,
+        )
+        table_ocr_agent = OCR_AGENT_TESSERACT
+
+    # FIXME (yao): hack before we refactor open source lib to allow us to pass down a table ocr
+    # option
+    os.environ["TABLE_OCR_AGENT"] = table_ocr_agent or OCR_AGENT_TESSERACT
+
+    # TODO - belongs in filetype checking logic
     if filename.endswith(".msg"):
         # Note(yuming): convert file type for msg files
         # since fast api might sent the wrong one.
         file_content_type = "application/x-ole-storage"
 
-    # We don't want to keep logging the same params for every parallel call
-    is_internal_request = (
-        (
-            request.headers.get("X-Forwarded-For")
-            and str(request.headers.get("X-Forwarded-For")).startswith("10.")
-        )
-        # -- NOTE(scanny): request.client is None in certain testing environments --
-        or (request.client and request.client.host.startswith("10."))
-    )
-
-    if not is_internal_request:
-        logger.debug(
-            "pipeline_api input params: {}".format(
-                json.dumps(
-                    {
-                        "filename": filename,
-                        "response_type": response_type,
-                        "coordinates": coordinates,
-                        "encoding": encoding,
-                        "hi_res_model_name": hi_res_model_name,
-                        "include_page_breaks": include_page_breaks,
-                        "ocr_languages": ocr_languages,
-                        "pdf_infer_table_structure": pdf_infer_table_structure,
-                        "skip_infer_table_types": skip_infer_table_types,
-                        "strategy": strategy,
-                        "xml_keep_tags": xml_keep_tags,
-                        "languages": languages,
-                        "extract_image_block_types": extract_image_block_types,
-                        "unique_element_ids": unique_element_ids,
-                        "chunking_strategy": chunking_strategy,
-                        "combine_under_n_chars": combine_under_n_chars,
-                        "max_characters": max_characters,
-                        "multipage_sections": multipage_sections,
-                        "new_after_n_chars": new_after_n_chars,
-                        "overlap": overlap,
-                        "overlap_all": overlap_all,
-                        "starting_page_number": starting_page_number,
-                        "include_slide_notes": include_slide_notes,
-                    },
-                    default=str,
-                )
-            )
-        )
-
-        logger.debug(f"filetype: {file_content_type}")
-
-    _check_free_memory()
-
     if file_content_type == "application/pdf":
         _check_pdf(file)
-
-    hi_res_model_name = _validate_hi_res_model_name(hi_res_model_name, coordinates)
-    strategy = _validate_strategy(strategy)
-    pdf_infer_table_structure = _set_pdf_infer_table_structure(
-        pdf_infer_table_structure,
-        strategy,
-        skip_infer_table_types,
+    pdf_hi_res_max_pages = int(
+        os.environ.get(
+            "UNSTRUCTURED_PDF_HI_RES_MAX_PAGES",
+            UNSTRUCTURED_PDF_HI_RES_MAX_PAGES_DEFAULT,
+        ),
     )
+
+    strategy = _validate_strategy(strategy, file_content_type)
+    pdf_infer_table_structure = _set_pdf_infer_table_structure(pdf_infer_table_structure, strategy)
 
     # Parallel mode is set by env variable
     enable_parallel_mode = os.environ.get("UNSTRUCTURED_PARALLEL_MODE_ENABLED", "false")
@@ -347,104 +306,136 @@ def pipeline_api(
 
     ocr_languages_str = "+".join(ocr_languages) if ocr_languages and len(ocr_languages) else None
 
-    extract_image_block_to_payload = bool(extract_image_block_types)
+    # Bundle all params to send on to partition
+    partition_kwargs = {
+        "file": file,
+        "metadata_filename": filename,
+        "content_type": file_content_type,
+        "encoding": encoding,
+        "include_page_breaks": include_page_breaks,
+        "hi_res_model_name": hi_res_model_name,
+        "ocr_languages": ocr_languages_str,
+        "pdf_infer_table_structure": pdf_infer_table_structure,
+        "skip_infer_table_types": skip_infer_table_types,
+        "strategy": strategy,
+        "xml_keep_tags": xml_keep_tags,
+        "languages": languages,
+        "extract_image_block_types": extract_image_block_types,
+        "unique_element_ids": unique_element_ids,
+        "starting_page_number": starting_page_number,
+        # Inferred from block_types being non-empty
+        "extract_image_block_to_payload": bool(extract_image_block_types),
+        # -- chunking --
+        "chunking_strategy": chunking_strategy,
+        "combine_text_under_n_chars": combine_under_n_chars,
+        "include_orig_elements": include_orig_elements,
+        "multipage_sections": multipage_sections,
+        "new_after_n_chars": new_after_n_chars,
+        "max_characters": max_characters,
+        "overlap": overlap,
+        "overlap_all": overlap_all,
+        "similarity_threshold": similarity_threshold,
+        "pdf_hi_res_max_pages": pdf_hi_res_max_pages,
+        "include_slide_notes": include_slide_notes,
+        "table_ocr_agent": table_ocr_agent,
+    }
 
-    try:
-        logger.debug(
-            "partition input data: {}".format(
-                json.dumps(
-                    {
-                        "content_type": file_content_type,
-                        "strategy": strategy,
-                        "ocr_languages": ocr_languages_str,
-                        "coordinates": coordinates,
-                        "pdf_infer_table_structure": pdf_infer_table_structure,
-                        "include_page_breaks": include_page_breaks,
-                        "encoding": encoding,
-                        "hi_res_model_name": hi_res_model_name,
-                        "xml_keep_tags": xml_keep_tags,
-                        "skip_infer_table_types": skip_infer_table_types,
-                        "languages": languages,
-                        "chunking_strategy": chunking_strategy,
-                        "multipage_sections": multipage_sections,
-                        "combine_under_n_chars": combine_under_n_chars,
-                        "new_after_n_chars": new_after_n_chars,
-                        "max_characters": max_characters,
-                        "overlap": overlap,
-                        "overlap_all": overlap_all,
-                        "extract_image_block_types": extract_image_block_types,
-                        "extract_image_block_to_payload": extract_image_block_to_payload,
-                        "unique_element_ids": unique_element_ids,
-                        "include_slide_notes": include_slide_notes,
-                    },
-                    default=str,
+    # Add in any api only params (if needed for parallel mode)
+    all_kwargs = {
+        "coordinates": coordinates,
+        **partition_kwargs,
+    }
+
+    loggable_params = {k: v for k, v in all_kwargs.items() if k not in _do_not_log_params()}
+    logger.info(
+        "Attemping to Partition file with filetype %s",
+        file_content_type,
+        extra={"input_params": loggable_params, "org_id": org_id, "file_type": file_content_type},
+    )
+
+    # If file is pdf and parallel mode is on:
+    #   split up file and send pages back through api
+    #   (send all_kwargs here - we need to pass on api only params)
+    #
+    # Else:
+    #    call partition
+    # If file is pdf and parallel mode is on:
+#   split up file and send pages back through api
+#   (send all_kwargs here - we need to pass on api only params)
+#
+# Else:
+#    call partition
+try:
+    if strategy == "vlm":
+        with elasticapm.capture_span("vlm_partition"):
+            from unstructured_vlm_partitioner.partition import partition as vlm_partition
+            
+            # Create temporary file for VLM processing
+            file_extension = file_content_type.split('/')[-1] if file_content_type else ""
+            with tempfile.NamedTemporaryFile(delete=False, suffix=f".{file_extension}") as temp_file:
+                file.seek(0)  # Ensure we're at start of file
+                shutil.copyfileobj(file, temp_file)
+                temp_file_path = temp_file.name
+            
+            try:
+                vlm_config = {
+                    "api_endpoint": os.getenv("CUSTOMER_VLM_ENDPOINT"),
+                    "api_key": os.getenv("CUSTOMER_VLM_API_KEY"),
+                }
+
+                elements, _ = vlm_partition(
+                    filename=temp_file_path,  # Pass filename instead of file object
+                    is_customer_vlm=True,
+                    vlm_config=vlm_config,
+                    unique_element_ids=unique_element_ids,
+                    output_format="application/json"
                 )
-            )
-        )
-
-        partition_kwargs = {
-            "file": file,
-            "metadata_filename": filename,
-            "content_type": file_content_type,
-            "encoding": encoding,
-            "include_page_breaks": include_page_breaks,
-            "hi_res_model_name": hi_res_model_name,
-            "ocr_languages": ocr_languages_str,
-            "pdf_infer_table_structure": pdf_infer_table_structure,
-            "skip_infer_table_types": skip_infer_table_types,
-            "strategy": strategy,
-            "xml_keep_tags": xml_keep_tags,
-            "languages": languages,
-            "chunking_strategy": chunking_strategy,
-            "multipage_sections": multipage_sections,
-            "combine_text_under_n_chars": combine_under_n_chars,
-            "new_after_n_chars": new_after_n_chars,
-            "max_characters": max_characters,
-            "overlap": overlap,
-            "overlap_all": overlap_all,
-            "extract_image_block_types": extract_image_block_types,
-            "extract_image_block_to_payload": extract_image_block_to_payload,
-            "unique_element_ids": unique_element_ids,
-            "starting_page_number": starting_page_number,
-            "include_slide_notes": include_slide_notes,
-        }
-
-        if file_content_type == "application/pdf" and pdf_parallel_mode_enabled:
+            finally:
+                # Clean up temp file
+                os.unlink(temp_file_path)
+                
+    elif file_content_type == "application/pdf" and pdf_parallel_mode_enabled:
+        with elasticapm.capture_span("partition_pdf_splits"):
             pdf = PdfReader(file)
             elements = partition_pdf_splits(
                 request=request,
                 pdf_pages=pdf.pages,
-                coordinates=coordinates,
-                **partition_kwargs,  # type: ignore # pyright: ignore[reportGeneralTypeIssues]
+                **all_kwargs,  # type: ignore[arg-type]
             )
-        elif hi_res_model_name and hi_res_model_name in CHIPPER_MODEL_TYPES:
-            with ChipperMemoryProtection():
-                elements = partition(**partition_kwargs)  # type: ignore # pyright: ignore[reportGeneralTypeIssues]
-        else:
-            elements = partition(**partition_kwargs)  # type: ignore # pyright: ignore[reportGeneralTypeIssues]
+    else:
+        with elasticapm.capture_span(
+            "partition",
+            labels={"strategy": strategy, "chunking_strategy": chunking_strategy or "none"},
+        ):
+            elements = partition(**partition_kwargs)  # pyright: ignore[reportArgumentType]
+        # this may not be accurate since there might be empty pages but this should give us a proxi
+        # of how much compute effort is needed
+        number_of_pages = elements[-1].metadata.page_number or 1 if elements else 0
+
+        # add metadata to the transaction for the number of pages as well as the
+        # strategy. This will help in creating a visualizaton to compare
+        # strategies vs the number of pages.
+        elasticapm.label(number_of_pages=number_of_pages)
+        elasticapm.label(strategy=strategy)
 
     except OSError as e:
-        if isinstance(e.args[0], str) and (
-            "chipper-fast-fine-tuning is not a local folder" in e.args[0]
-            or "ved-fine-tuning is not a local folder" in e.args[0]
-        ):
-            raise HTTPException(
-                status_code=400,
-                detail=(
-                    "The Chipper model is not available for download. It can be accessed via the"
-                    " official hosted API."
-                ),
-            )
-
         # OSError isn't caught by our top level handler, so convert it here
+        logger.error(e, exc_info=True)
         raise HTTPException(
             status_code=500,
             detail=str(e),
         )
+    except PageCountExceededError as e:
+        raise HTTPException(
+            status_code=422,
+            detail=f"{e} Check the split_pdf_page functionality of unstructured_client "
+            f"to send the file in smaller chunks.",
+        )
     except ValueError as e:
         if "Invalid file" in e.args[0]:
             raise HTTPException(
-                status_code=400, detail=f"{file_content_type} not currently supported"
+                status_code=400,
+                detail=f"{file_content_type} not currently supported",
             )
         if "Unstructured schema" in e.args[0]:
             raise HTTPException(
@@ -456,25 +447,52 @@ def pipeline_api(
                 status_code=400,
                 detail="The fast strategy is not available for image files",
             )
-        if "not a ZIP archive (so not a DOCX file)" in e.args[0]:
-            raise HTTPException(
-                status_code=422,
-                detail="File is not a valid docx",
-            )
+        logger.error(e, exc_info=True)
         raise e
     except UnknownModelException:
+        logger.error("Unknown model type: %s", hi_res_model_name)
         raise HTTPException(
             status_code=400,
             detail=f"Unknown model type: {hi_res_model_name}",
         )
 
+    process_time_in_seconds = time.time() - start_process_time
+
+    # Send metrics
+    try:
+        if org_id:
+            metrics_kwargs = {
+                "encoding": encoding,
+                "include_page_breaks": include_page_breaks,
+                "model_name": hi_res_model_name,
+                "ocr_languages": ocr_languages,
+                "pdf_infer_table_structure": pdf_infer_table_structure,
+                "skip_infer_table_types": skip_infer_table_types,
+                "strategy": strategy,
+                "xml_keep_tags": xml_keep_tags,
+                "languages": languages,
+                "chunking_strategy": chunking_strategy,
+                "multipage_sections": multipage_sections,
+                "combine_under_n_chars": combine_under_n_chars,
+                "new_after_n_chars": new_after_n_chars,
+                "max_characters": max_characters,
+                "coordinates": coordinates,
+            }
+            send_partition_metrics(
+                org_id,
+                file_content_type or "",
+                process_time_in_seconds,
+                number_of_pages,
+                **metrics_kwargs,  # type: ignore
+            )
+    except Exception as e:
+        logger.error("Exception during sending metrics", exc_info=True)
+        pass
+
     # Clean up returned elements
     # Note(austin): pydantic should control this sort of thing for us
     for i, element in enumerate(elements):
         elements[i].metadata.filename = os.path.basename(filename)
-
-        if not coordinates and element.metadata.coordinates:
-            elements[i].metadata.coordinates = None
 
         if element.metadata.last_modified:
             elements[i].metadata.last_modified = None
@@ -482,8 +500,12 @@ def pipeline_api(
         if element.metadata.file_directory:
             elements[i].metadata.file_directory = None
 
-        if element.metadata.detection_class_prob:
-            elements[i].metadata.detection_class_prob = None
+        if strategy != "od_only":
+            if not coordinates and element.metadata.coordinates:
+                elements[i].metadata.coordinates = None
+
+            if element.metadata.detection_class_prob:
+                elements[i].metadata.detection_class_prob = None
 
     if response_type == "text/csv":
         df = convert_to_dataframe(elements)
@@ -492,18 +514,6 @@ def pipeline_api(
     result = convert_to_isd(elements)
 
     return result
-
-
-def _check_free_memory():
-    """Reject traffic when free memory is below minimum (default 2GB)."""
-    mem = psutil.virtual_memory()
-    memory_free_minimum = int(os.environ.get("UNSTRUCTURED_MEMORY_FREE_MINIMUM_MB", 2048))
-
-    if mem.available <= memory_free_minimum * 1024 * 1024:
-        logger.warning(f"Rejecting because free memory is below {memory_free_minimum} MB")
-        raise HTTPException(
-            status_code=503, detail="Server is under heavy load. Please try again later."
-        )
 
 
 def _check_pdf(file: IO[bytes]):
@@ -523,61 +533,42 @@ def _check_pdf(file: IO[bytes]):
         raise HTTPException(status_code=422, detail="File does not appear to be a valid PDF")
 
 
-def _validate_strategy(strategy: str) -> str:
+def _validate_strategy(strategy: str, file_content_type: Optional[str]) -> str:
     strategy = strategy.lower()
-    strategies = ["fast", "hi_res", "auto", "ocr_only"]
+    strategies = ["fast", "hi_res", "auto", "ocr_only", "od_only", "vlm"]  # Add vlm here
     if strategy not in strategies:
         raise HTTPException(
-            status_code=400, detail=f"Invalid strategy: {strategy}. Must be one of {strategies}"
+            status_code=400,
+            detail=f"Invalid strategy: {strategy}. Must be one of {strategies}",
+        )
+
+    # Add VLM validation
+    if strategy == "vlm":
+        if not os.getenv("CUSTOMER_VLM_ENDPOINT"):
+            raise HTTPException(
+                status_code=400,
+                detail="VLM strategy requires CUSTOMER_VLM_ENDPOINT environment variable"
+            )
+        if not os.getenv("CUSTOMER_VLM_API_KEY"):
+            raise HTTPException(
+                status_code=400,
+                detail="VLM strategy requires CUSTOMER_VLM_API_KEY environment variable"
+            )
+    if (
+        strategy == "od_only"
+        and file_content_type
+        and file_content_type != "application/pdf"
+        and "image" not in file_content_type
+    ):
+        raise HTTPException(
+            status_code=400,
+            detail="'od_only' strategy is only available for PDF and image files",
         )
     return strategy
 
 
-def _validate_hi_res_model_name(
-    hi_res_model_name: Optional[str], show_coordinates: bool
-) -> Optional[str]:
-    # Make sure chipper aliases to the latest model
-    if hi_res_model_name and hi_res_model_name == "chipper":
-        hi_res_model_name = "chipperv2"
-
-    if hi_res_model_name and hi_res_model_name in CHIPPER_MODEL_TYPES and show_coordinates:
-        raise HTTPException(
-            status_code=400,
-            detail=f"coordinates aren't available when using the {hi_res_model_name} model type",
-        )
-    return hi_res_model_name
-
-
-def _validate_chunking_strategy(chunking_strategy: Optional[str]) -> Optional[str]:
-    """Raise on `chunking_strategy` is not a valid chunking strategy name.
-
-    Also provides case-insensitivity.
-    """
-    if chunking_strategy is None:
-        return None
-
-    chunking_strategy = chunking_strategy.lower()
-    available_strategies = ["basic", "by_title"]
-
-    if chunking_strategy not in available_strategies:
-        raise HTTPException(
-            status_code=400,
-            detail=(
-                f"Invalid chunking strategy: {chunking_strategy}. Must be one of"
-                f" {available_strategies}"
-            ),
-        )
-
-    return chunking_strategy
-
-
-def _set_pdf_infer_table_structure(
-    pdf_infer_table_structure: bool, strategy: str, skip_infer_table_types: Optional[List[str]]
-) -> bool:
+def _set_pdf_infer_table_structure(pdf_infer_table_structure: bool, strategy: str) -> bool:
     """Avoids table inference in "fast" and "ocr_only" runs."""
-    # NOTE(robinson) - line below is for type checking
-    skip_infer_table_types = [] if skip_infer_table_types is None else skip_infer_table_types
-    pdf_infer_table_structure = pdf_infer_table_structure and ("pdf" not in skip_infer_table_types)
     return strategy in ("hi_res", "auto") and pdf_infer_table_structure
 
 
@@ -619,64 +610,70 @@ class MultipartMixedResponse(StreamingResponse):
                 "type": "http.response.start",
                 "status": self.status_code,
                 "headers": self.raw_headers,
-            }
+            },
         )
         async for chunk in self.body_iterator:
             if not isinstance(chunk, bytes):
                 chunk = chunk.encode(self.charset)  # type: ignore
                 chunk = b64encode(chunk)
             await send(
-                {"type": "http.response.body", "body": self.build_part(chunk), "more_body": True}
+                {"type": "http.response.body", "body": self.build_part(chunk), "more_body": True},
             )
 
         await send({"type": "http.response.body", "body": b"", "more_body": False})
 
 
 def ungz_file(file: UploadFile, gz_uncompressed_content_type: Optional[str] = None) -> UploadFile:
-    def return_content_type(filename: str):
-        if gz_uncompressed_content_type:
-            return gz_uncompressed_content_type
-        else:
-            return str(mimetypes.guess_type(filename)[0])
-
     filename = str(file.filename) if file.filename else ""
     if filename.endswith(".gz"):
         filename = filename[:-3]
 
-    gzip_file = gzip.open(file.file).read()
+    if not gz_uncompressed_content_type:
+        gz_uncompressed_content_type = str(mimetypes.guess_type(filename)[0])
+
+    output_file = tempfile.SpooledTemporaryFile()
+    with gzip.open(file.file) as gzfile:
+        shutil.copyfileobj(gzfile, output_file, length=1024 * 1024)  # type: ignore
+    output_file.seek(0)
+
     return UploadFile(
-        file=io.BytesIO(gzip_file),
-        size=len(gzip_file),
+        file=cast(BinaryIO, output_file),
+        size=os.fstat(output_file.fileno()).st_size,
         filename=filename,
-        headers=Headers({"content-type": return_content_type(filename)}),
+        headers=Headers({"content-type": gz_uncompressed_content_type}),
     )
 
 
 @router.get("/general/v0/general", include_in_schema=False)
-@router.get("/general/v0.0.81/general", include_in_schema=False)
+@router.get("/general/v1.0.58/general", include_in_schema=False)
 async def handle_invalid_get_request():
     raise HTTPException(
-        status_code=status.HTTP_405_METHOD_NOT_ALLOWED, detail="Only POST requests are supported."
+        status_code=status.HTTP_405_METHOD_NOT_ALLOWED,
+        detail="Only POST requests are supported.",
     )
 
 
+@elasticapm.capture_span()
 @router.post(
     "/general/v0/general",
     openapi_extra={"x-speakeasy-name-override": "partition"},
     tags=["general"],
     summary="Summary",
     description="Description",
-    operation_id="partition_parameters",
+    operation_id="partition",
 )
-@router.post("/general/v0.0.81/general", include_in_schema=False)
+@router.post("/general/v1.0.58/general", include_in_schema=False)
 def general_partition(
+    background_tasks: BackgroundTasks,
     request: Request,
+    files: List[UploadFile],
+    unstructured_api_key: Union[str, None] = Header(default=None),
     # cannot use annotated type here because of a bug described here:
     # https://github.com/tiangolo/fastapi/discussions/10280
     # The openapi metadata must be added separately in openapi.py file.
-    # TODO: Check if the bug is fixed and change the declaration to use Annotated[List[UploadFile], File(...)]
+    # TODO: Check if the bug is fixed and change the declaration to use
+    #     Annoteted[List[UploadFile], File(...)]
     # For new parameters - add them in models/form_params.py
-    files: List[UploadFile],
     form_params: GeneralFormParams = Depends(GeneralFormParams.as_form),
 ):
     # -- must have a valid API key --
@@ -684,7 +681,8 @@ def general_partition(
         api_key = request.headers.get("unstructured-api-key")
         if api_key != api_key_env:
             raise HTTPException(
-                detail=f"API key {api_key} is invalid", status_code=status.HTTP_401_UNAUTHORIZED
+                detail=f"API key {api_key} is invalid",
+                status_code=status.HTTP_401_UNAUTHORIZED,
             )
 
     accept_type = request.headers.get("Accept")
@@ -706,9 +704,6 @@ def general_partition(
             status_code=status.HTTP_406_NOT_ACCEPTABLE,
         )
 
-    # -- validate other arguments --
-    chunking_strategy = _validate_chunking_strategy(form_params.chunking_strategy)
-
     # -- unzip any uploaded files that need it --
     for idx, file in enumerate(files):
         is_content_type_gz = file.content_type == "application/gzip"
@@ -716,77 +711,118 @@ def general_partition(
         if is_content_type_gz or is_extension_gz:
             files[idx] = ungz_file(file, form_params.gz_uncompressed_content_type)
 
+    request.state.__dict__["bookkeeper"] = record_api_request.FileAccountingObj()
+    passed_quota_check, api_quota_check_info_dict = api_quota_check(request)
+    background_tasks.add_task(
+        record_api_request.send_api_request_info,
+        datetime.utcnow(),
+        passed_quota_check,
+        api_quota_check_info_dict,
+        request,
+    )
+
     def response_generator(is_multipart: bool):
         for file in files:
             file_content_type = get_validated_mimetype(
-                file, content_type_hint=form_params.content_type
+                file,
+                content_type_hint=form_params.content_type,
             )
 
             _file = file.file
-
-            response = pipeline_api(
-                _file,
-                request=request,
-                coordinates=form_params.coordinates,
-                encoding=form_params.encoding,
-                hi_res_model_name=form_params.hi_res_model_name,
-                include_page_breaks=form_params.include_page_breaks,
-                ocr_languages=form_params.ocr_languages,
-                pdf_infer_table_structure=form_params.pdf_infer_table_structure,
-                skip_infer_table_types=form_params.skip_infer_table_types,
-                strategy=form_params.strategy,
-                xml_keep_tags=form_params.xml_keep_tags,
-                response_type=form_params.output_format,
-                filename=str(file.filename),
-                file_content_type=file_content_type,
-                languages=form_params.languages,
-                extract_image_block_types=form_params.extract_image_block_types,
-                unique_element_ids=form_params.unique_element_ids,
+            org_id = api_quota_check_info_dict["org_id"] if api_quota_check_info_dict else None
+            pipeline_api_kwargs: dict[str, Any] = {
+                "request": request,
+                "org_id": org_id,
+                "filename": file.filename,
+                "file_content_type": file_content_type,
+                "response_type": form_params.output_format,
+                "coordinates": form_params.coordinates,
+                "encoding": form_params.encoding,
+                "extract_image_block_types": form_params.extract_image_block_types,
+                "hi_res_model_name": form_params.hi_res_model_name,
+                "include_page_breaks": form_params.include_page_breaks,
+                "ocr_languages": form_params.ocr_languages,
+                "pdf_infer_table_structure": form_params.pdf_infer_table_structure,
+                "skip_infer_table_types": form_params.skip_infer_table_types,
+                "strategy": form_params.strategy,
+                "xml_keep_tags": form_params.xml_keep_tags,
+                "languages": form_params.languages,
+                "unique_element_ids": form_params.unique_element_ids,
+                "starting_page_number": form_params.starting_page_number,
                 # -- chunking options --
-                chunking_strategy=chunking_strategy,
-                combine_under_n_chars=form_params.combine_under_n_chars,
-                max_characters=form_params.max_characters,
-                multipage_sections=form_params.multipage_sections,
-                new_after_n_chars=form_params.new_after_n_chars,
-                overlap=form_params.overlap,
-                overlap_all=form_params.overlap_all,
-                starting_page_number=form_params.starting_page_number,
-                include_slide_notes=form_params.include_slide_notes,
-            )
+                "chunking_strategy": form_params.chunking_strategy,
+                "combine_under_n_chars": form_params.combine_under_n_chars,
+                "include_orig_elements": form_params.include_orig_elements,
+                "max_characters": form_params.max_characters,
+                "multipage_sections": form_params.multipage_sections,
+                "new_after_n_chars": form_params.new_after_n_chars,
+                "overlap": form_params.overlap,
+                "overlap_all": form_params.overlap_all,
+                "similarity_threshold": form_params.similarity_threshold,
+                "include_slide_notes": form_params.include_slide_notes,
+                "table_ocr_agent": form_params.table_ocr_agent,
+            }
+
+            with data_storage.ApiDataStorage(
+                _file,
+                api_quota_check_info_dict,
+                pipeline_api_kwargs,
+            ) as file_storage:
+                response = pipeline_api(
+                    _file,
+                    **pipeline_api_kwargs,  # pyright: ignore[reportArgumentType]
+                )
+                bookkeeper: record_api_request.FileAccountingObj = request.state.bookkeeper
+
+                if isinstance(response, List):
+                    bookkeeper.num_of_pages = record_api_request.get_num_of_pages_from_elements(
+                        response,
+                        org_id,
+                    )
+
+                record_api_request.update_api_request_info(
+                    bookkeeper,
+                    _file,
+                    **pipeline_api_kwargs,
+                )
+                file_storage.save(response, status.HTTP_200_OK, "success")  # type: ignore
 
             yield (
-                json.dumps(response)
+                orjson.dumps(response).decode("utf-8")
                 if is_multipart and type(response) not in [str, bytes]
                 else (
-                    PlainTextResponse(response)
+                    PlainTextResponse(response, headers={"content-type": "text/csv; charset=utf-8"})
                     if not is_multipart and form_params.output_format == "text/csv"
                     else response
                 )
             )
 
     def join_responses(
-        responses: Sequence[str | List[Dict[str, Any]] | PlainTextResponse]
+        responses: Sequence[str | List[Dict[str, Any]] | PlainTextResponse],
     ) -> List[str | List[Dict[str, Any]]] | PlainTextResponse:
-        """Consolidate partitionings from multiple documents into single response payload."""
         if form_params.output_format != "text/csv":
             return cast(List[Union[str, List[Dict[str, Any]]]], responses)
         responses = cast(List[PlainTextResponse], responses)
-        data = pd.read_csv(  # pyright: ignore[reportUnknownMemberType]
-            io.BytesIO(responses[0].body)
+        data: pd.DataFrame = pd.read_csv(  # pyright: ignore[reportUnknownMemberType]
+            io.BytesIO(responses[0].body),
         )
         if len(responses) > 1:
             for resp in responses[1:]:
                 resp_data = pd.read_csv(  # pyright: ignore[reportUnknownMemberType]
-                    io.BytesIO(resp.body)
+                    io.BytesIO(resp.body),
                 )
                 data = data.merge(  # pyright: ignore[reportUnknownMemberType]
-                    resp_data, how="outer"
+                    resp_data,
+                    how="outer",
                 )
-        return PlainTextResponse(data.to_csv())
+        resp = PlainTextResponse(data.to_csv(index=False))
+        resp.headers["content-type"] = "text/csv; charset=utf-8"
+        return resp
 
     return (
         MultipartMixedResponse(
-            response_generator(is_multipart=True), content_type=form_params.output_format
+            response_generator(is_multipart=True),
+            content_type=form_params.output_format,
         )
         if accept_type == "multipart/mixed"
         else (
