@@ -6,7 +6,7 @@ FROM quay.io/unstructured-io/base-images:rocky9.2-9@sha256:73d8492452f086144d4b9
 ARG NB_USER=notebook-user
 ARG NB_UID=1000
 ARG PIP_VERSION
-ARG PIPELINE_PACKAGE
+ARG PIPELINE_PACKAGE=general
 
 # Set up environment
 ENV USER ${NB_USER}
