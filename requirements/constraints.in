@@ -3,6 +3,11 @@
 # extras. Putting a dependency here will only affect dependency sets that contain them -- in other
 # words, if something does not require a constraint, it will not be installed.
 ####################################################################################################
+unstructured @ git+https://github.com/srisudarsan/unstructured.git@main
+
 numpy<2.0.0
 # later versions of Starlette break middleware
 starlette==0.41.2
+
+# pin packaging to a version compatible with langchain-core and prefect
+packaging==23.2

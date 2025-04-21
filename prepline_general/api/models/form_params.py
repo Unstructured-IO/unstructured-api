@@ -22,6 +22,7 @@ class GeneralFormParams(BaseModel):
     encoding: str
     content_type: Optional[str]
     hi_res_model_name: Optional[str]
+    chunking_model_name: Optional[str]
     include_page_breaks: bool
     pdf_infer_table_structure: bool
     strategy: str
@@ -37,6 +38,7 @@ class GeneralFormParams(BaseModel):
     overlap_all: bool
     starting_page_number: Optional[int] = None
     include_slide_notes: bool
+    custom_metadata: Optional[str] = None
 
     @classmethod
     def as_form(
@@ -129,6 +131,15 @@ class GeneralFormParams(BaseModel):
             ),
             BeforeValidator(SmartValueParser[str]().value_or_first_element),
         ] = None,
+        chunking_model_name: Annotated[
+            Optional[str],
+            Form(
+                title="Chunking Model Name",
+                description="The name of a custom model used when the chunking strategy is set to 'custom'.",
+                example="yolox",
+            ),
+            BeforeValidator(SmartValueParser[str]().value_or_first_element),
+        ] = None,
         include_page_breaks: Annotated[
             bool,
             Form(
@@ -178,11 +189,11 @@ class GeneralFormParams(BaseModel):
         ] = False,
         # -- chunking options --
         chunking_strategy: Annotated[
-            Optional[Literal["by_title"]],
+            Optional[Literal["by_title", "custom"]],
             Form(
                 title="Chunking Strategy",
-                description="Use one of the supported strategies to chunk the returned elements. Currently supports: by_title",
-                examples=["by_title"],
+                description="Use one of the supported strategies to chunk the returned elements. Currently supports: by_title, custom",
+                examples=["by_title", "custom"],
             ),
         ] = None,
         combine_under_n_chars: Annotated[
@@ -258,6 +269,15 @@ level of "pollution" of otherwise clean semantic chunk boundaries. Default: Fals
                 example=False,
             ),
         ] = True,
+        custom_metadata: Annotated[
+            Optional[str],
+            Form(
+                title="Custom Metadata",
+                description="A dictionary containing custom metadata for the document or elements. ",
+                example="{'author': 'John Doe', 'keywords': ['AI', 'ML', 'data processing']}",
+            ),
+            BeforeValidator(SmartValueParser[dict]().value_or_first_element),
+        ] = None,
     ) -> "GeneralFormParams":
         return cls(
             xml_keep_tags=xml_keep_tags,
@@ -270,6 +290,7 @@ level of "pollution" of otherwise clean semantic chunk boundaries. Default: Fals
             content_type=content_type,
             encoding=encoding,
             hi_res_model_name=hi_res_model_name,
+            chunking_model_name=chunking_model_name,
             include_page_breaks=include_page_breaks,
             pdf_infer_table_structure=pdf_infer_table_structure,
             strategy=strategy,
@@ -286,4 +307,5 @@ level of "pollution" of otherwise clean semantic chunk boundaries. Default: Fals
             unique_element_ids=unique_element_ids,
             starting_page_number=starting_page_number,
             include_slide_notes=include_slide_notes,
+            custom_metadata=custom_metadata,
         )

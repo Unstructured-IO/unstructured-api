@@ -1,5 +1,6 @@
 -c constraints.in
-unstructured[all-docs]
+-e git+https://github.com/srisudarsan/unstructured.git@main#egg=unstructured
+
 # Pinning click due to a unicode issue in black
 # can remove after black drops support for Python 3.6
 # ref: https://github.com/psf/black/issues/2964

@@ -242,6 +242,8 @@ def pipeline_api(
     unique_element_ids: Optional[bool] = False,
     starting_page_number: Optional[int] = None,
     include_slide_notes: Optional[bool] = True,
+    chunking_model_name: Optional[str] = None,
+    custom_metadata: Optional[str] = None,
 ) -> List[Dict[str, Any]] | str:
     if filename.endswith(".msg"):
         # Note(yuming): convert file type for msg files
@@ -286,6 +288,8 @@ def pipeline_api(
                         "overlap_all": overlap_all,
                         "starting_page_number": starting_page_number,
                         "include_slide_notes": include_slide_notes,
+                        "chunking_model_name": chunking_model_name,
+                        "custom_metadata": custom_metadata,
                     },
                     default=str,
                 )
@@ -343,6 +347,8 @@ def pipeline_api(
                         "extract_image_block_to_payload": extract_image_block_to_payload,
                         "unique_element_ids": unique_element_ids,
                         "include_slide_notes": include_slide_notes,
+                        "chunking_model_name": chunking_model_name,
+                        "custom_metadata": custom_metadata,
                     },
                     default=str,
                 )
@@ -374,6 +380,8 @@ def pipeline_api(
             "unique_element_ids": unique_element_ids,
             "starting_page_number": starting_page_number,
             "include_slide_notes": include_slide_notes,
+            "chunking_model_name": chunking_model_name,
+            "custom_metadata": custom_metadata,
         }
 
         if file_content_type == "application/pdf" and pdf_parallel_mode_enabled:
@@ -406,6 +414,7 @@ def pipeline_api(
             detail=str(e),
         )
     except ValueError as e:
+        logger.info(f"e error {e}")
         if "Invalid file" in e.args[0]:
             raise HTTPException(
                 status_code=400, detail=f"{file_content_type} not currently supported"
@@ -506,7 +515,7 @@ def _validate_chunking_strategy(chunking_strategy: Optional[str]) -> Optional[st
         return None
 
     chunking_strategy = chunking_strategy.lower()
-    available_strategies = ["basic", "by_title"]
+    available_strategies = ["basic", "by_title", "custom"]
 
     if chunking_strategy not in available_strategies:
         raise HTTPException(
@@ -701,6 +710,8 @@ def general_partition(
                 overlap_all=form_params.overlap_all,
                 starting_page_number=form_params.starting_page_number,
                 include_slide_notes=form_params.include_slide_notes,
+                chunking_model_name=form_params.chunking_model_name,
+                custom_metadata=form_params.custom_metadata,
             )
 
             yield (

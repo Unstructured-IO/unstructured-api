@@ -23,12 +23,17 @@ if [[ -n $MAX_LIFETIME_SECONDS ]]; then
     fi
 fi
 
-${OPTIONAL_TIMEOUT} \
-    uvicorn prepline_general.api.app:app \
+CMD="uvicorn prepline_general.api.app:app \
+    --host $HOST \
+    --port $PORT \
     --log-config logger_config.yaml \
-    --host "$HOST" \
-    --port "$PORT" \
-    --workers "$WORKERS" \
+    --workers $WORKERS"
+
+if [[ -n "$OPTIONAL_TIMEOUT" ]]; then
+    $OPTIONAL_TIMEOUT $CMD
+else
+    eval $CMD
+fi
 
 echo "Server was shutdown"
 [ -n "$MAX_LIFETIME_SECONDS" ] && echo "Reached timeout of $MAX_LIFETIME_SECONDS seconds"
