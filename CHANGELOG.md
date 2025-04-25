@@ -1,5 +1,6 @@
 ## 0.0.83
 
+* Patch more CVEs
 * Patch various CVEs
 * Fix Starlette vulnerability
 
