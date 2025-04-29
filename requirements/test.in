@@ -9,6 +9,6 @@ mypy
 pytest-cov
 pytest-mock
 nbdev
-jupyter
+# jupyter
 httpx
 deepdiff

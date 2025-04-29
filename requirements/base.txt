@@ -22,7 +22,7 @@ beautifulsoup4==4.13.4
     # via unstructured
 cachetools==5.5.2
     # via google-auth
-certifi==2025.1.31
+certifi==2025.4.26
     # via
     #   httpcore
     #   httpx
@@ -249,11 +249,11 @@ pycparser==2.22
     # via cffi
 pycryptodome==3.22.0
     # via -r requirements/base.in
-pydantic==2.11.3
+pydantic==2.11.4
     # via
     #   fastapi
     #   unstructured-client
-pydantic-core==2.33.1
+pydantic-core==2.33.2
     # via pydantic
 pypandoc==1.15
     # via unstructured
@@ -331,7 +331,7 @@ starlette==0.41.2
     # via
     #   -c requirements/constraints.in
     #   fastapi
-sympy==1.13.3
+sympy==1.14.0
     # via
     #   onnxruntime
     #   torch
