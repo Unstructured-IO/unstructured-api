@@ -98,13 +98,13 @@ grpcio==1.70.0
     #   grpcio-status
 grpcio-status==1.70.0
     # via google-api-core
-h11==0.14.0
+h11==0.16.0
     # via
     #   httpcore
     #   uvicorn
 html5lib==1.1
     # via unstructured
-httpcore==1.0.7
+httpcore==1.0.9
     # via httpx
 httpx==0.28.1
     # via unstructured-client

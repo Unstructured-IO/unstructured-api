@@ -213,7 +213,7 @@ grpcio-status==1.70.0
     # via
     #   -r requirements/base.txt
     #   google-api-core
-h11==0.14.0
+h11==0.16.0
     # via
     #   -r requirements/base.txt
     #   httpcore
@@ -222,7 +222,7 @@ html5lib==1.1
     # via
     #   -r requirements/base.txt
     #   unstructured
-httpcore==1.0.7
+httpcore==1.0.9
     # via
     #   -r requirements/base.txt
     #   httpx
