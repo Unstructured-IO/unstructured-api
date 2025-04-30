@@ -213,7 +213,7 @@ grpcio-status==1.70.0
     # via
     #   -r requirements/base.txt
     #   google-api-core
-h11==0.14.0
+h11==0.16.0
     # via
     #   -r requirements/base.txt
     #   httpcore
