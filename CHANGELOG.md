@@ -1,3 +1,7 @@
+## 0.0.84
+* Patch h11 CVE
+* bump httpcore version due to h11 dependency
+
 ## 0.0.83
 
 * Patch various CVEs
