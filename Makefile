@@ -129,20 +129,3 @@ tidy:
 check-scripts:
     # Fail if any of these files have warnings
 	scripts/shellcheck.sh
-
-## check-version:               run check to ensure version in CHANGELOG.md matches references in files
-.PHONY: check-version
-check-version:
-# Fail if syncing version would produce changes
-	scripts/version-sync.sh -c \
-		-s CHANGELOG.md \
-		-f ${PACKAGE_NAME}/api/app.py release \
-		-f ${PACKAGE_NAME}/api/general.py release
-
-## version-sync:                update references to version with most recent version from CHANGELOG.md
-.PHONY: version-sync
-version-sync:
-	scripts/version-sync.sh \
-		-s CHANGELOG.md \
-		-f ${PACKAGE_NAME}/api/app.py release \
-		-f ${PACKAGE_NAME}/api/general.py release

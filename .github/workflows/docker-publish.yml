@@ -134,7 +134,7 @@ jobs:
     - name: Extract version from __version__.py
       id: extract-version
       run: |
-        VERSION=$(grep -oP "(?<=^__version__ = ')[^']+" prepline_general/__version__.py)
+        VERSION=$(python3 -c "with open('prepline_general/__version__.py') as f: exec(f.read()); print(__version__)")
         echo "VERSION=$VERSION" >> $GITHUB_ENV
     - name: Push multiarch manifest
       run: |
