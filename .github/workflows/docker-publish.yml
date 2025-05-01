@@ -131,6 +131,11 @@ jobs:
         docker push $DOCKER_BUILD_REPOSITORY:amd64
         #docker tag $DOCKER_BUILD_REPOSITORY:arm64-$SHORT_SHA $DOCKER_BUILD_REPOSITORY:arm64
         #docker push $DOCKER_BUILD_REPOSITORY:arm64
+    - name: Extract version from __version__.py
+      id: extract-version
+      run: |
+        VERSION=$(grep -oP "(?<=^__version__ = ')[^']+" prepline_general/__version__.py)
+        echo "VERSION=$VERSION" >> $GITHUB_ENV
     - name: Push multiarch manifest
       run: |
         #docker manifest create ${DOCKER_REPOSITORY}:latest $DOCKER_BUILD_REPOSITORY:amd64 $DOCKER_BUILD_REPOSITORY:arm64
@@ -139,7 +144,6 @@ jobs:
         #docker manifest create ${DOCKER_REPOSITORY}:$SHORT_SHA $DOCKER_BUILD_REPOSITORY:amd64 $DOCKER_BUILD_REPOSITORY:arm64
         docker manifest create ${DOCKER_REPOSITORY}:$SHORT_SHA $DOCKER_BUILD_REPOSITORY:amd64
         docker manifest push $DOCKER_REPOSITORY:$SHORT_SHA
-        VERSION=$(grep -m1 version preprocessing-pipeline-family.yaml | cut -d ' ' -f2)
         #docker manifest create ${DOCKER_REPOSITORY}:$VERSION $DOCKER_BUILD_REPOSITORY:amd64 $DOCKER_BUILD_REPOSITORY:arm64
         docker manifest create ${DOCKER_REPOSITORY}:$VERSION $DOCKER_BUILD_REPOSITORY:amd64
         docker manifest push ${DOCKER_REPOSITORY}:$VERSION
