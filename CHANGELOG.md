@@ -1,3 +1,7 @@
+## 0.0.85
+* Set version in '__version__.py' file
+* Remove version-sync.py script and preprocessing_family_pipeline.yaml file
+
 ## 0.0.84
 * Patch h11 CVE
 * bump httpcore version due to h11 dependency
