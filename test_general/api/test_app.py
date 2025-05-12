@@ -1153,3 +1153,30 @@ def test_include_slide_notes(monkeypatch, test_default, include_slide_notes, tes
         assert "Here are important notes" == df["text"][0]
     else:
         assert "Here are important notes" != df["text"][0]
+
+def test_basic_chunking_strategy():
+    """
+    Verify that basic chunking strategy works as expected
+    """
+    client = TestClient(app)
+    test_file = Path("sample-docs") / "layout-parser-paper-fast.pdf"
+    response = client.post(
+        MAIN_API_ROUTE,
+        files=[("files", (str(test_file), open(test_file, "rb")))],
+        data={"strategy": "hi_res"},
+    )
+    assert response.status_code == 200
+    response_without_chunking = response.json()
+
+    # chunking
+    response = client.post(
+        MAIN_API_ROUTE,
+        files=[("files", (str(test_file), open(test_file, "rb")))],
+        data={"chunking_strategy": "basic"},
+    )
+    assert response.status_code == 200
+
+    response_with_chunking = response.json()
+    assert len(response_with_chunking) != len(response_without_chunking)
+    assert "CompositeElement" in [element.get("type") for element in response_with_chunking]
+
