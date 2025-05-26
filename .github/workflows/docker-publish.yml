@@ -10,7 +10,7 @@ env:
   DOCKER_BUILD_REPOSITORY: quay.io/unstructured-io/build-unstructured-api
   PACKAGE: "unstructured-api"
   PIPELINE_FAMILY: "general"
-  PIP_VERSION: "22.2.1"
+  PIP_VERSION: "23.3.0"
   PYTHON_VERSION: "3.10"
 
 jobs:

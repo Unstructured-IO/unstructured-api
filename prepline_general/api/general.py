@@ -7,11 +7,9 @@ import logging
 import mimetypes
 import os
 import secrets
-import zipfile
 from base64 import b64encode
 from concurrent.futures import ThreadPoolExecutor
 from functools import partial
-from types import TracebackType
 from typing import IO, Any, Dict, List, Mapping, Optional, Sequence, Tuple, Union, cast
 
 import backoff
@@ -33,8 +31,8 @@ from pypdf.errors import FileNotDecryptedError, PdfReadError
 from starlette.datastructures import Headers
 from starlette.types import Send
 
-from prepline_general.api.models.form_params import GeneralFormParams
 from prepline_general.api.filetypes import get_validated_mimetype
+from prepline_general.api.models.form_params import GeneralFormParams
 from unstructured.documents.elements import Element
 from unstructured.partition.auto import partition
 from unstructured.staging.base import (
@@ -53,7 +51,9 @@ def is_compatible_response_type(media_type: str, response_type: type) -> bool:
     return (
         False
         if media_type == "application/json" and response_type not in [dict, list]
-        else False if media_type == "text/csv" and response_type != str else True
+        else False
+        if media_type == "text/csv" and response_type != str
+        else True
     )
 
 
@@ -602,7 +602,7 @@ def ungz_file(file: UploadFile, gz_uncompressed_content_type: Optional[str] = No
 
 
 @router.get("/general/v0/general", include_in_schema=False)
-@router.get("/general/v0.0.84/general", include_in_schema=False)
+@router.get("/general/v0.0.85/general", include_in_schema=False)
 async def handle_invalid_get_request():
     raise HTTPException(
         status_code=status.HTTP_405_METHOD_NOT_ALLOWED, detail="Only POST requests are supported."
@@ -617,7 +617,7 @@ async def handle_invalid_get_request():
     description="Description",
     operation_id="partition_parameters",
 )
-@router.post("/general/v0.0.84/general", include_in_schema=False)
+@router.post("/general/v0.0.85/general", include_in_schema=False)
 def general_partition(
     request: Request,
     # cannot use annotated type here because of a bug described here:

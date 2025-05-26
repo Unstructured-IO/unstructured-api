@@ -45,7 +45,7 @@ coloredlogs==15.0.1
     # via onnxruntime
 contourpy==1.3.1
     # via matplotlib
-cryptography==44.0.0
+cryptography==44.0.1
     # via
     #   pdfminer-six
     #   unstructured-client
@@ -121,7 +121,7 @@ idna==3.10
     #   anyio
     #   httpx
     #   requests
-jinja2==3.1.5
+jinja2==3.1.6
     # via torch
 joblib==1.4.2
     # via nltk
@@ -358,7 +358,7 @@ tqdm==4.67.1
     #   nltk
     #   transformers
     #   unstructured
-transformers==4.48.2
+transformers==4.50.0
     # via unstructured-inference
 typing-extensions==4.12.2
     # via
