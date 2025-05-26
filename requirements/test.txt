@@ -797,7 +797,7 @@ torchvision==0.21.0
     #   -r requirements/base.txt
     #   effdet
     #   timm
-tornado==6.4.2
+tornado==6.5.0
     # via
     #   ipykernel
     #   jupyter-client
