@@ -332,7 +332,7 @@ starlette==0.41.2
     # via
     #   -c requirements/constraints.in
     #   fastapi
-sympy==1.13.1
+sympy==1.13.3
     # via
     #   onnxruntime
     #   torch

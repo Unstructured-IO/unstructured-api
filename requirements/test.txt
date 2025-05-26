@@ -765,7 +765,7 @@ starlette==0.41.2
     #   -c requirements/constraints.in
     #   -r requirements/base.txt
     #   fastapi
-sympy==1.13.1
+sympy==1.13.3
     # via
     #   -r requirements/base.txt
     #   onnxruntime
