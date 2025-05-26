@@ -108,7 +108,7 @@ httpcore==1.0.9
     # via httpx
 httpx==0.28.1
     # via unstructured-client
-huggingface-hub==0.28.1
+huggingface-hub==0.32.1
     # via
     #   timm
     #   tokenizers
@@ -342,13 +342,13 @@ timm==1.0.14
     #   unstructured-inference
 tokenizers==0.21.0
     # via transformers
-torch==2.6.0
+torch==2.7.0
     # via
     #   effdet
     #   timm
     #   torchvision
     #   unstructured-inference
-torchvision==0.21.0
+torchvision==0.22.0
     # via
     #   effdet
     #   timm

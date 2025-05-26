@@ -232,7 +232,7 @@ httpx==0.28.1
     #   -r requirements/test.in
     #   jupyterlab
     #   unstructured-client
-huggingface-hub==0.28.1
+huggingface-hub==0.32.1
     # via
     #   -r requirements/base.txt
     #   timm
@@ -785,14 +785,14 @@ tokenizers==0.21.0
     # via
     #   -r requirements/base.txt
     #   transformers
-torch==2.6.0
+torch==2.7.0
     # via
     #   -r requirements/base.txt
     #   effdet
     #   timm
     #   torchvision
     #   unstructured-inference
-torchvision==0.21.0
+torchvision==0.22.0
     # via
     #   -r requirements/base.txt
     #   effdet
