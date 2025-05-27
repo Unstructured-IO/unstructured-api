@@ -1,9 +1,9 @@
-from fastapi import FastAPI, Request, status, HTTPException
-from fastapi.datastructures import FormData
-from fastapi.responses import JSONResponse
-from fastapi.security import APIKeyHeader
 import logging
 import os
+
+from fastapi import FastAPI, HTTPException, Request, status
+from fastapi.datastructures import FormData
+from fastapi.responses import JSONResponse
 
 from .general import router as general_router
 from .openapi import set_custom_openapi
@@ -13,7 +13,7 @@ logger = logging.getLogger("unstructured_api")
 app = FastAPI(
     title="Unstructured Pipeline API",
     summary="Partition documents with the Unstructured library",
-    version="0.0.84",
+    version="0.0.85",
     docs_url="/general/docs",
     openapi_url="/general/openapi.json",
     servers=[

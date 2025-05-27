@@ -1,7 +1,7 @@
 PIPELINE_FAMILY := general
 PIPELINE_PACKAGE := general
 PACKAGE_NAME := prepline_${PIPELINE_PACKAGE}
-PIP_VERSION := 23.2.1
+PIP_VERSION := 25.1.1
 ARCH := $(shell uname -m)
 
 .PHONY: help
