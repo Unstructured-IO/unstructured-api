@@ -54,7 +54,7 @@ class GeneralFormParams(BaseModel):
             Form(
                 title="OCR Languages",
                 description="The languages present in the document, for use in partitioning and/or OCR",
-                example="[eng]",
+                examples=["[eng]"],
             ),
             BeforeValidator(SmartValueParser[List[str]]().value_or_first_element),
         ] = [],  # noqa
@@ -63,7 +63,7 @@ class GeneralFormParams(BaseModel):
             Form(
                 title="OCR Languages",
                 description="The languages present in the document, for use in partitioning and/or OCR",
-                example="[eng]",
+                examples=["[eng]"],
             ),
             BeforeValidator(SmartValueParser[List[str]]().value_or_first_element),
         ] = [],
@@ -74,7 +74,7 @@ class GeneralFormParams(BaseModel):
                 description=(
                     "The document types that you want to skip table extraction with. Default: []"
                 ),
-                example="['pdf', 'jpg', 'png']",
+                examples=["['pdf', 'jpg', 'png']"],
             ),
             BeforeValidator(SmartValueParser[List[str]]().value_or_first_element),
         ] = [],  # noqa
@@ -83,7 +83,7 @@ class GeneralFormParams(BaseModel):
             Form(
                 title="Uncompressed Content Type",
                 description="If file is gzipped, use this content type after unzipping",
-                example="application/pdf",
+                examples=["application/pdf"],
             ),
         ] = None,
         output_format: Annotated[
@@ -91,7 +91,7 @@ class GeneralFormParams(BaseModel):
             Form(
                 title="Output Format",
                 description="The format of the response. Supported formats are application/json and text/csv. Default: application/json.",
-                example="application/json",
+                examples=["application/json"],
             ),
         ] = "application/json",
         coordinates: Annotated[
@@ -107,7 +107,7 @@ class GeneralFormParams(BaseModel):
             Form(
                 title="Content type",
                 description="A hint about the content type to use (such as text/markdown), when there are problems processing a specific file. This value is a MIME type in the format type/subtype.",
-                example="text/markdown",
+                examples=["text/markdown"],
             ),
             BeforeValidator(SmartValueParser[str]().value_or_first_element),
         ] = None,
@@ -116,7 +116,7 @@ class GeneralFormParams(BaseModel):
             Form(
                 title="Encoding",
                 description="The encoding method used to decode the text input. Default: utf-8",
-                example="utf-8",
+                examples=["utf-8"],
             ),
             BeforeValidator(SmartValueParser[str]().value_or_first_element),
         ] = "utf-8",
@@ -125,7 +125,7 @@ class GeneralFormParams(BaseModel):
             Form(
                 title="Hi Res Model Name",
                 description="The name of the inference model used when strategy is hi_res",
-                example="yolox",
+                examples=["yolox"],
             ),
             BeforeValidator(SmartValueParser[str]().value_or_first_element),
         ] = None,
@@ -163,7 +163,7 @@ class GeneralFormParams(BaseModel):
             Form(
                 title="Image block types to extract",
                 description="The types of elements to extract, for use in extracting image blocks as base64 encoded data stored in metadata fields",
-                example="""["image", "table"]""",
+                examples=["""["image", "table"]"""],
             ),
             BeforeValidator(SmartValueParser[List[str]]().value_or_first_element),
         ] = [],  # noqa
@@ -173,7 +173,7 @@ class GeneralFormParams(BaseModel):
                 title="unique_element_ids",
                 description="""When `True`, assign UUIDs to element IDs, which guarantees their uniqueness 
 (useful when using them as primary keys in database). Otherwise a SHA-256 of element text is used. Default: False""",
-                example=True,
+                examples=[True],
             ),
         ] = False,
         # -- chunking options --
@@ -190,7 +190,7 @@ class GeneralFormParams(BaseModel):
             Form(
                 title="Combine Under N Chars",
                 description="If chunking strategy is set, combine elements until a section reaches a length of n chars. Default: 500",
-                example=500,
+                examples=[500],
             ),
         ] = None,
         max_characters: Annotated[
@@ -198,7 +198,7 @@ class GeneralFormParams(BaseModel):
             Form(
                 title="Max Characters",
                 description="If chunking strategy is set, cut off new sections after reaching a length of n chars (hard max). Default: 1500",
-                example=1500,
+                examples=[1500],
             ),
         ] = 500,
         multipage_sections: Annotated[
@@ -213,7 +213,7 @@ class GeneralFormParams(BaseModel):
             Form(
                 title="New after n chars",
                 description="If chunking strategy is set, cut off new sections after reaching a length of n chars (soft max). Default: 1500",
-                example=1500,
+                examples=[1500],
             ),
         ] = None,
         overlap: Annotated[
@@ -223,7 +223,7 @@ class GeneralFormParams(BaseModel):
                 description="""Specifies the length of a string ("tail") to be drawn from each chunk and prefixed to the
 next chunk as a context-preserving mechanism. By default, this only applies to split-chunks
 where an oversized element is divided into multiple chunks by text-splitting. Default: 0""",
-                example=20,
+                examples=[20],
             ),
         ] = 0,
         overlap_all: Annotated[
@@ -233,7 +233,7 @@ where an oversized element is divided into multiple chunks by text-splitting. De
                 description="""When `True`, apply overlap between "normal" chunks formed from whole
 elements and not subject to text-splitting. Use this with caution as it entails a certain
 level of "pollution" of otherwise clean semantic chunk boundaries. Default: False""",
-                example=True,
+                examples=[True],
             ),
         ] = False,
         starting_page_number: Annotated[
@@ -244,7 +244,7 @@ level of "pollution" of otherwise clean semantic chunk boundaries. Default: Fals
                     "When PDF is split into pages before sending it into the API, providing "
                     "this information will allow the page number to be assigned correctly."
                 ),
-                example=3,
+                examples=[3],
             ),
         ] = None,
         include_slide_notes: Annotated[
@@ -255,7 +255,7 @@ level of "pollution" of otherwise clean semantic chunk boundaries. Default: Fals
                     "When `True`, slide notes from .ppt and .pptx files"
                     " will be included in the response. Default: `True`"
                 ),
-                example=False,
+                examples=[False],
             ),
         ] = True,
     ) -> "GeneralFormParams":
