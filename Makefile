@@ -95,7 +95,7 @@ run-web-app:
 ## test:                        runs core tests
 .PHONY: test
 test:
-	PYTHONPATH=. pytest -v test_${PIPELINE_PACKAGE} --cov=${PACKAGE_NAME} --cov-report term-missing
+	PYTHONPATH=. python3 -m pytest -n auto -v test_${PIPELINE_PACKAGE} --cov=${PACKAGE_NAME} --cov-report term-missing
 
 # Setting a low bar here - need more tests!
 .PHONY: check-coverage
