@@ -1,5 +1,8 @@
 # syntax=docker/dockerfile:experimental
-FROM quay.io/unstructured-io/base-images:wolfi-base-latest as base
+FROM cgr.dev/chainguard/wolfi-base as base
+
+RUN apk add python-3.12
+RUN python3.12 -m ensurepip
 
 # NOTE(crag): NB_USER ARG for mybinder.org compat:
 #             https://mybinder.readthedocs.io/en/latest/tutorials/dockerfile.html
@@ -12,6 +15,9 @@ ARG PYTHON_VERSION="3.12"
 # Set up environment
 ENV PYTHON python${PYTHON_VERSION}
 ENV PIP ${PYTHON} -m pip
+
+RUN adduser -u ${NB_UID} -D ${NB_USER}
+ENV HOME=/home/${NB_USER}
 
 WORKDIR ${HOME}
 USER ${NB_USER}
