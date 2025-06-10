@@ -702,7 +702,7 @@ regex==2024.11.6
     #   -r requirements/base.txt
     #   nltk
     #   transformers
-requests==2.32.3
+requests==2.32.4
     # via
     #   -r requirements/base.txt
     #   google-api-core
@@ -785,7 +785,7 @@ tokenizers==0.21.0
     # via
     #   -r requirements/base.txt
     #   transformers
-torch==2.7.0
+torch==2.7.1-rc2
     # via
     #   -r requirements/base.txt
     #   effdet
