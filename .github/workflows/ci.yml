@@ -65,7 +65,7 @@ jobs:
       with:
         path: |
           .venv
-        key: ci-venv-${{ env.PIPELINE_FAMILY }}-${{ hashFiles('requirements/base.txt') }}
+        key: ci-venv-${{ env.PIPELINE_FAMILY }}-${{ hashFiles('requirements/base.txt', 'requirements/test.txt') }}
     - name: Run core tests
       run: |
         source .venv/bin/activate
