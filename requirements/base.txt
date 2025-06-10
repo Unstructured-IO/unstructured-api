@@ -348,7 +348,7 @@ torch==2.7.1
     #   timm
     #   torchvision
     #   unstructured-inference
-torchvision==0.22.0
+torchvision==0.22.1
     # via
     #   effdet
     #   timm
