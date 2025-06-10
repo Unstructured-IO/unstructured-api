@@ -785,7 +785,7 @@ tokenizers==0.21.0
     # via
     #   -r requirements/base.txt
     #   transformers
-torch==2.7.1-rc2
+torch==2.7.1
     # via
     #   -r requirements/base.txt
     #   effdet
