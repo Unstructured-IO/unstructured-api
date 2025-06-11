@@ -301,7 +301,7 @@ regex==2024.11.6
     # via
     #   nltk
     #   transformers
-requests==2.32.3
+requests==2.32.4
     # via
     #   -r requirements/base.in
     #   google-api-core
@@ -342,13 +342,13 @@ timm==1.0.14
     #   unstructured-inference
 tokenizers==0.21.0
     # via transformers
-torch==2.7.0
+torch==2.7.1
     # via
     #   effdet
     #   timm
     #   torchvision
     #   unstructured-inference
-torchvision==0.22.0
+torchvision==0.22.1
     # via
     #   effdet
     #   timm
