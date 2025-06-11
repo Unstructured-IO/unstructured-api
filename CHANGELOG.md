@@ -1,7 +1,10 @@
+## 0.0.87
+* Bump Python to 3.12
+
 ## 0.0.86
 * Patch various CVEs
 
-## 0.0.86
+## 0.0.85
 * Patch various CVEs
 * Bump Python version to 3.12, some packages no longer support 3.9
 
