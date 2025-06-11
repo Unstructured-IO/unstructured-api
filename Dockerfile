@@ -1,11 +1,16 @@
 # syntax=docker/dockerfile:experimental
-# FROM quay.io/unstructured-io/base-images:wolfi-base-latest as base
 FROM cgr.dev/chainguard/python as base
 
 # NOTE(crag): NB_USER ARG for mybinder.org compat:
 #             https://mybinder.readthedocs.io/en/latest/tutorials/dockerfile.html
 ARG NB_USER=notebook-user
 ARG NB_UID=1000
+
+# Create the user
+USER root
+RUN adduser -D -u ${NB_UID} ${NB_USER}
+ENV HOME=/home/${NB_USER}
+
 ARG PIPELINE_PACKAGE
 ARG PYTHON_VERSION="3.12"
 
