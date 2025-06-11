@@ -4,10 +4,6 @@
 #
 #    pip-compile --output-file=requirements/test.txt requirements/base.txt requirements/test.in
 #
-accelerate==1.7.0
-    # via
-    #   -r requirements/base.txt
-    #   unstructured-inference
 aiofiles==24.1.0
     # via
     #   -r requirements/base.txt
@@ -20,7 +16,7 @@ antlr4-python3-runtime==4.9.3
     # via
     #   -r requirements/base.txt
     #   omegaconf
-anyio==4.9.0
+anyio==4.8.0
     # via
     #   -r requirements/base.txt
     #   httpx
@@ -52,7 +48,7 @@ backoff==2.2.1
     # via
     #   -r requirements/base.txt
     #   unstructured
-beautifulsoup4==4.13.4
+beautifulsoup4==4.12.3
     # via
     #   -r requirements/base.txt
     #   nbconvert
@@ -61,11 +57,11 @@ black==25.1.0
     # via -r requirements/test.in
 bleach[css]==6.2.0
     # via nbconvert
-cachetools==5.5.2
+cachetools==5.5.1
     # via
     #   -r requirements/base.txt
     #   google-auth
-certifi==2025.4.26
+certifi==2024.12.14
     # via
     #   -r requirements/base.txt
     #   httpcore
@@ -80,7 +76,7 @@ chardet==5.2.0
     # via
     #   -r requirements/base.txt
     #   unstructured
-charset-normalizer==3.4.2
+charset-normalizer==3.4.1
     # via
     #   -r requirements/base.txt
     #   pdfminer-six
@@ -101,13 +97,13 @@ comm==0.2.2
     # via
     #   ipykernel
     #   ipywidgets
-contourpy==1.3.2
+contourpy==1.3.1
     # via
     #   -r requirements/base.txt
     #   matplotlib
 coverage[toml]==7.8.2
     # via pytest-cov
-cryptography==45.0.3
+cryptography==44.0.1
     # via
     #   -r requirements/base.txt
     #   pdfminer-six
@@ -144,9 +140,12 @@ et-xmlfile==2.0.0
     # via
     #   -r requirements/base.txt
     #   openpyxl
-exceptiongroup==1.3.0
+eval-type-backport==0.2.2
     # via
     #   -r requirements/base.txt
+    #   unstructured-client
+exceptiongroup==1.3.0
+    # via
     #   anyio
     #   ipython
     #   pytest
@@ -156,7 +155,7 @@ execnet==2.1.1
     # via pytest-xdist
 executing==2.2.0
     # via stack-data
-fastapi==0.115.12
+fastapi==0.115.8
     # via -r requirements/base.txt
 fastcore==1.8.2
     # via
@@ -165,7 +164,7 @@ fastcore==1.8.2
     #   nbdev
 fastjsonschema==2.21.1
     # via nbformat
-filelock==3.18.0
+filelock==3.17.0
     # via
     #   -r requirements/base.txt
     #   huggingface-hub
@@ -177,47 +176,47 @@ filetype==1.2.0
     #   unstructured
 flake8==7.2.0
     # via -r requirements/test.in
-flatbuffers==25.2.10
+flatbuffers==25.1.24
     # via
     #   -r requirements/base.txt
     #   onnxruntime
-fonttools==4.58.1
+fonttools==4.55.8
     # via
     #   -r requirements/base.txt
     #   matplotlib
 fqdn==1.5.1
     # via jsonschema
-fsspec==2025.5.1
+fsspec==2024.12.0
     # via
     #   -r requirements/base.txt
     #   huggingface-hub
     #   torch
 ghapi==1.0.6
     # via nbdev
-google-api-core[grpc]==2.25.0
+google-api-core[grpc]==2.24.1
     # via
     #   -r requirements/base.txt
     #   google-cloud-vision
-google-auth==2.40.3
+google-auth==2.38.0
     # via
     #   -r requirements/base.txt
     #   google-api-core
     #   google-cloud-vision
-google-cloud-vision==3.10.1
+google-cloud-vision==3.9.0
     # via
     #   -r requirements/base.txt
     #   unstructured
-googleapis-common-protos==1.70.0
+googleapis-common-protos==1.66.0
     # via
     #   -r requirements/base.txt
     #   google-api-core
     #   grpcio-status
-grpcio==1.72.1
+grpcio==1.70.0
     # via
     #   -r requirements/base.txt
     #   google-api-core
     #   grpcio-status
-grpcio-status==1.72.1
+grpcio-status==1.70.0
     # via
     #   -r requirements/base.txt
     #   google-api-core
@@ -227,9 +226,7 @@ h11==0.16.0
     #   httpcore
     #   uvicorn
 hf-xet==1.1.3
-    # via
-    #   -r requirements/base.txt
-    #   huggingface-hub
+    # via huggingface-hub
 html5lib==1.1
     # via
     #   -r requirements/base.txt
@@ -244,10 +241,9 @@ httpx==0.28.1
     #   -r requirements/test.in
     #   jupyterlab
     #   unstructured-client
-huggingface-hub==0.32.4
+huggingface-hub==0.32.1
     # via
     #   -r requirements/base.txt
-    #   accelerate
     #   timm
     #   tokenizers
     #   transformers
@@ -290,12 +286,16 @@ jinja2==3.1.6
     #   jupyterlab-server
     #   nbconvert
     #   torch
-joblib==1.5.1
+joblib==1.4.2
     # via
     #   -r requirements/base.txt
     #   nltk
 json5==0.12.0
     # via jupyterlab-server
+jsonpath-python==1.0.6
+    # via
+    #   -r requirements/base.txt
+    #   unstructured-client
 jsonpointer==3.0.0
     # via jsonschema
 jsonschema[format-nongpl]==4.24.0
@@ -358,14 +358,14 @@ langdetect==1.0.9
     # via
     #   -r requirements/base.txt
     #   unstructured
-lxml==5.4.0
+lxml==5.3.0
     # via
     #   -r requirements/base.txt
     #   pikepdf
     #   python-docx
     #   python-pptx
     #   unstructured
-markdown==3.8
+markdown==3.7
     # via
     #   -r requirements/base.txt
     #   unstructured
@@ -374,13 +374,14 @@ markupsafe==3.0.2
     #   -r requirements/base.txt
     #   jinja2
     #   nbconvert
-marshmallow==3.26.1
+marshmallow==3.26.0
     # via
     #   -r requirements/base.txt
     #   dataclasses-json
-matplotlib==3.10.3
+matplotlib==3.10.0
     # via
     #   -r requirements/base.txt
+    #   pycocotools
     #   unstructured-inference
 matplotlib-inline==0.1.7
     # via
@@ -396,7 +397,7 @@ mpmath==1.3.0
     #   sympy
 mypy==1.16.0
     # via -r requirements/test.in
-mypy-extensions==1.1.0
+mypy-extensions==1.0.0
     # via
     #   -r requirements/base.txt
     #   black
@@ -439,7 +440,6 @@ numpy==1.26.4
     # via
     #   -c /Users/jiajunxu/code/unstructured-api/requirements/constraints.in
     #   -r requirements/base.txt
-    #   accelerate
     #   contourpy
     #   matplotlib
     #   onnx
@@ -460,15 +460,14 @@ omegaconf==2.3.0
     # via
     #   -r requirements/base.txt
     #   effdet
-onnx==1.18.0
+onnx==1.17.0
     # via
     #   -r requirements/base.txt
     #   unstructured
     #   unstructured-inference
-onnxruntime==1.22.0
+onnxruntime==1.20.1
     # via
     #   -r requirements/base.txt
-    #   unstructured
     #   unstructured-inference
 opencv-python==4.11.0.86
     # via
@@ -482,10 +481,9 @@ orderly-set==5.4.1
     # via deepdiff
 overrides==7.7.0
     # via jupyter-server
-packaging==25.0
+packaging==24.2
     # via
     #   -r requirements/base.txt
-    #   accelerate
     #   black
     #   fastcore
     #   ghapi
@@ -504,7 +502,7 @@ packaging==25.0
     #   pytest
     #   transformers
     #   unstructured-pytesseract
-pandas==2.3.0
+pandas==2.2.3
     # via
     #   -r requirements/base.txt
     #   unstructured
@@ -521,22 +519,22 @@ pdf2image==1.17.0
     # via
     #   -r requirements/base.txt
     #   unstructured
-pdfminer-six==20250506
+pdfminer-six==20240706
     # via
     #   -r requirements/base.txt
     #   unstructured
     #   unstructured-inference
 pexpect==4.9.0
     # via ipython
-pi-heif==0.22.0
+pi-heif==0.21.0
     # via
     #   -r requirements/base.txt
     #   unstructured
-pikepdf==9.8.1
+pikepdf==9.5.1
     # via
     #   -r requirements/base.txt
     #   unstructured
-pillow==11.2.1
+pillow==11.1.0
     # via
     #   -r requirements/base.txt
     #   matplotlib
@@ -558,12 +556,12 @@ prompt-toolkit==3.0.51
     # via
     #   ipython
     #   jupyter-console
-proto-plus==1.26.1
+proto-plus==1.26.0
     # via
     #   -r requirements/base.txt
     #   google-api-core
     #   google-cloud-vision
-protobuf==6.31.1
+protobuf==5.29.3
     # via
     #   -r requirements/base.txt
     #   google-api-core
@@ -573,10 +571,9 @@ protobuf==6.31.1
     #   onnx
     #   onnxruntime
     #   proto-plus
-psutil==7.0.0
+psutil==6.1.1
     # via
     #   -r requirements/base.txt
-    #   accelerate
     #   ipykernel
     #   unstructured
 ptyprocess==0.7.0
@@ -590,11 +587,11 @@ pyasn1==0.6.1
     #   -r requirements/base.txt
     #   pyasn1-modules
     #   rsa
-pyasn1-modules==0.4.2
+pyasn1-modules==0.4.1
     # via
     #   -r requirements/base.txt
     #   google-auth
-pycocotools==2.0.10
+pycocotools==2.0.8
     # via
     #   -r requirements/base.txt
     #   effdet
@@ -604,14 +601,14 @@ pycparser==2.22
     # via
     #   -r requirements/base.txt
     #   cffi
-pycryptodome==3.23.0
+pycryptodome==3.21.0
     # via -r requirements/base.txt
-pydantic==2.11.5
+pydantic==2.10.6
     # via
     #   -r requirements/base.txt
     #   fastapi
     #   unstructured-client
-pydantic-core==2.33.2
+pydantic-core==2.27.2
     # via
     #   -r requirements/base.txt
     #   pydantic
@@ -627,11 +624,11 @@ pypandoc==1.15
     # via
     #   -r requirements/base.txt
     #   unstructured
-pyparsing==3.2.3
+pyparsing==3.2.1
     # via
     #   -r requirements/base.txt
     #   matplotlib
-pypdf==5.6.0
+pypdf==5.2.0
     # via
     #   -r requirements/base.txt
     #   unstructured
@@ -658,11 +655,12 @@ python-dateutil==2.9.0.post0
     #   jupyter-client
     #   matplotlib
     #   pandas
+    #   unstructured-client
 python-docx==1.1.2
     # via
     #   -r requirements/base.txt
     #   unstructured
-python-iso639==2025.2.18
+python-iso639==2025.1.28
     # via
     #   -r requirements/base.txt
     #   unstructured
@@ -676,7 +674,7 @@ python-multipart==0.0.20
     # via
     #   -r requirements/base.txt
     #   unstructured-inference
-python-oxmsg==0.0.2
+python-oxmsg==0.0.1
     # via
     #   -r requirements/base.txt
     #   unstructured
@@ -684,14 +682,13 @@ python-pptx==1.0.2
     # via
     #   -r requirements/base.txt
     #   unstructured
-pytz==2025.2
+pytz==2024.2
     # via
     #   -r requirements/base.txt
     #   pandas
 pyyaml==6.0.2
     # via
     #   -r requirements/base.txt
-    #   accelerate
     #   huggingface-hub
     #   jupyter-events
     #   nbdev
@@ -704,7 +701,7 @@ pyzmq==26.4.0
     #   jupyter-client
     #   jupyter-console
     #   jupyter-server
-rapidfuzz==3.13.0
+rapidfuzz==3.12.1
     # via
     #   -r requirements/base.txt
     #   unstructured
@@ -746,17 +743,16 @@ rpds-py==0.25.1
     # via
     #   jsonschema
     #   referencing
-rsa==4.9.1
+rsa==4.9
     # via
     #   -r requirements/base.txt
     #   google-auth
-safetensors==0.5.3
+safetensors==0.5.2
     # via
     #   -r requirements/base.txt
-    #   accelerate
     #   timm
     #   transformers
-scipy==1.15.3
+scipy==1.15.1
     # via
     #   -r requirements/base.txt
     #   unstructured-inference
@@ -774,7 +770,7 @@ sniffio==1.3.1
     # via
     #   -r requirements/base.txt
     #   anyio
-soupsieve==2.7
+soupsieve==2.6
     # via
     #   -r requirements/base.txt
     #   beautifulsoup4
@@ -785,7 +781,7 @@ starlette==0.41.2
     #   -c /Users/jiajunxu/code/unstructured-api/requirements/constraints.in
     #   -r requirements/base.txt
     #   fastapi
-sympy==1.14.0
+sympy==1.13.3
     # via
     #   -r requirements/base.txt
     #   onnxruntime
@@ -794,19 +790,17 @@ terminado==0.18.1
     # via
     #   jupyter-server
     #   jupyter-server-terminals
-timm==1.0.15
+timm==1.0.14
     # via
     #   -r requirements/base.txt
     #   effdet
     #   unstructured-inference
 tinycss2==1.4.0
     # via bleach
-tokenizers==0.21.1
+tokenizers==0.21.0
     # via
     #   -r requirements/base.txt
     #   transformers
-<<<<<<< HEAD
-=======
 tomli==2.2.1
     # via
     #   black
@@ -814,11 +808,9 @@ tomli==2.2.1
     #   jupyterlab
     #   mypy
     #   pytest
->>>>>>> 6d13dc3 (parallelize tests)
 torch==2.7.1
     # via
     #   -r requirements/base.txt
-    #   accelerate
     #   effdet
     #   timm
     #   torchvision
@@ -859,18 +851,17 @@ traitlets==5.14.3
     #   nbclient
     #   nbconvert
     #   nbformat
-transformers==4.52.4
+transformers==4.50.0
     # via
     #   -r requirements/base.txt
     #   unstructured-inference
 types-python-dateutil==2.9.0.20250516
     # via arrow
-typing-extensions==4.14.0
+typing-extensions==4.12.2
     # via
     #   -r requirements/base.txt
     #   anyio
     #   async-lru
-    #   beautifulsoup4
     #   black
     #   exceptiongroup
     #   fastapi
@@ -878,7 +869,6 @@ typing-extensions==4.14.0
     #   ipython
     #   mistune
     #   mypy
-    #   onnx
     #   pydantic
     #   pydantic-core
     #   pypdf
@@ -888,42 +878,38 @@ typing-extensions==4.14.0
     #   referencing
     #   torch
     #   typing-inspect
-    #   typing-inspection
     #   unstructured
     #   uvicorn
 typing-inspect==0.9.0
     # via
     #   -r requirements/base.txt
     #   dataclasses-json
-typing-inspection==0.4.1
-    # via
-    #   -r requirements/base.txt
-    #   pydantic
-tzdata==2025.2
+    #   unstructured-client
+tzdata==2025.1
     # via
     #   -r requirements/base.txt
     #   pandas
-unstructured[all-docs]==0.17.2
+unstructured[all-docs]==0.16.17
     # via -r requirements/base.txt
-unstructured-client==0.36.0
+unstructured-client==0.29.0
     # via
     #   -r requirements/base.txt
     #   unstructured
-unstructured-inference==1.0.5
+unstructured-inference==0.8.6
     # via
     #   -r requirements/base.txt
     #   unstructured
-unstructured-pytesseract==0.3.15
+unstructured-pytesseract==0.3.13
     # via
     #   -r requirements/base.txt
     #   unstructured
 uri-template==1.3.0
     # via jsonschema
-urllib3==2.4.0
+urllib3==2.3.0
     # via
     #   -r requirements/base.txt
     #   requests
-uvicorn==0.34.3
+uvicorn==0.34.0
     # via -r requirements/base.txt
 watchdog==6.0.0
     # via nbdev
@@ -952,7 +938,7 @@ xlrd==2.0.1
     # via
     #   -r requirements/base.txt
     #   unstructured
-xlsxwriter==3.2.3
+xlsxwriter==3.2.2
     # via
     #   -r requirements/base.txt
     #   python-pptx
