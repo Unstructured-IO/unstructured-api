@@ -15,7 +15,7 @@ ENV PIP ${PYTHON} -m pip
 WORKDIR ${HOME}
 
 USER root
-RUN apk add --no-cache python3 python3-pip
+RUN apk add --no-cache python3.12 py3.12-pip
 
 USER ${NB_USER}
 
