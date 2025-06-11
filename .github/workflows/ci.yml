@@ -56,7 +56,7 @@ jobs:
         uses: ludeeus/action-shellcheck@master
 
   test:
-    runs-on: self-hosted-xlarge
+    runs-on: ubuntu-latest-m
     needs: [setup, lint]
     steps:
     - uses: actions/checkout@v4
