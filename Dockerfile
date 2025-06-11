@@ -1,5 +1,6 @@
 # syntax=docker/dockerfile:experimental
-FROM quay.io/unstructured-io/base-images:wolfi-base-latest as base
+# FROM quay.io/unstructured-io/base-images:wolfi-base-latest as base
+FROM cgr.dev/chainguard/python:3.12 as base
 
 # NOTE(crag): NB_USER ARG for mybinder.org compat:
 #             https://mybinder.readthedocs.io/en/latest/tutorials/dockerfile.html
@@ -13,9 +14,6 @@ ENV PYTHON python${PYTHON_VERSION}
 ENV PIP ${PYTHON} -m pip
 
 WORKDIR ${HOME}
-
-USER root
-RUN apk add --no-cache python-3.12 py3.12-pip
 
 USER ${NB_USER}
 
