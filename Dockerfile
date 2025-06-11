@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:experimental
 # FROM quay.io/unstructured-io/base-images:wolfi-base-latest as base
-FROM cgr.dev/chainguard/python:3.12 as base
+FROM cgr.dev/chainguard/python as base
 
 # NOTE(crag): NB_USER ARG for mybinder.org compat:
 #             https://mybinder.readthedocs.io/en/latest/tutorials/dockerfile.html
