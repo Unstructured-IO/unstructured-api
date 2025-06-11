@@ -20,8 +20,6 @@ ENV PIP ${PYTHON} -m pip
 
 WORKDIR ${HOME}
 
-USER ${NB_USER}
-
 ENV PYTHONPATH="${PYTHONPATH}:${HOME}"
 ENV PATH="/home/${NB_USER}/.local/bin:${PATH}"
 
