@@ -13,6 +13,10 @@ ENV PYTHON python${PYTHON_VERSION}
 ENV PIP ${PYTHON} -m pip
 
 WORKDIR ${HOME}
+
+USER root
+RUN apk add --no-cache {PYTHON} py${PYTHON_VERSION/./}-pip
+
 USER ${NB_USER}
 
 ENV PYTHONPATH="${PYTHONPATH}:${HOME}"
