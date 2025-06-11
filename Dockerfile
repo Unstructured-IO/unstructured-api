@@ -5,7 +5,6 @@ FROM quay.io/unstructured-io/base-images:wolfi-base-latest as base
 #             https://mybinder.readthedocs.io/en/latest/tutorials/dockerfile.html
 ARG NB_USER=notebook-user
 ARG NB_UID=1000
-ARG PIP_VERSION
 ARG PIPELINE_PACKAGE
 ARG PYTHON_VERSION="3.12"
 
@@ -21,7 +20,6 @@ ENV PATH="/home/${NB_USER}/.local/bin:${PATH}"
 
 FROM base as python-deps
 COPY --chown=${NB_USER}:${NB_USER} requirements/base.txt requirements-base.txt
-RUN ${PIP} install pip==${PIP_VERSION}
 RUN ${PIP} install --no-cache -r requirements-base.txt
 
 FROM python-deps as model-deps
