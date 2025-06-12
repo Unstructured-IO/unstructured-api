@@ -20,7 +20,7 @@ jobs:
       with:
         path: |
           .venv
-        key: ci-venv-${{ env.PIPELINE_FAMILY }}-${{ hashFiles('requirements/base.txt') }}
+        key: ci-venv-${{ env.PIPELINE_FAMILY }}-${{ hashFiles('requirements/base.txt', 'requirements/test.txt') }}
     - name: Set up Python ${{ env.PYTHON_VERSION }}
       uses: actions/setup-python@v5
       with:
@@ -42,7 +42,7 @@ jobs:
       with:
         path: |
           .venv
-        key: ci-venv-${{ env.PIPELINE_FAMILY }}-${{ hashFiles('requirements/base.txt') }}
+        key: ci-venv-${{ env.PIPELINE_FAMILY }}-${{ hashFiles('requirements/base.txt', 'requirements/test.txt') }}
     - name: Lint
       run: |
         source .venv/bin/activate
@@ -65,7 +65,7 @@ jobs:
       with:
         path: |
           .venv
-        key: ci-venv-${{ env.PIPELINE_FAMILY }}-${{ hashFiles('requirements/base.txt') }}
+        key: ci-venv-${{ env.PIPELINE_FAMILY }}-${{ hashFiles('requirements/base.txt', 'requirements/test.txt') }}
     - name: Run core tests
       run: |
         source .venv/bin/activate
@@ -74,7 +74,7 @@ jobs:
         sudo add-apt-repository -y ppa:alex-p/tesseract-ocr5
         sudo apt-get install -y tesseract-ocr tesseract-ocr-kor
         tesseract --version
-        make install
+        make install-nltk-models
         make test
         make check-coverage
 
@@ -106,7 +106,7 @@ jobs:
       with:
         path: |
           .venv
-        key: ci-venv-${{ env.PIPELINE_FAMILY }}-${{ hashFiles('requirements/base.txt') }}
+        key: ci-venv-${{ env.PIPELINE_FAMILY }}-${{ hashFiles('requirements/base.txt', 'requirements/test.txt') }}
     - name: Test Dockerfile
       run: |
         source .venv/bin/activate
