@@ -74,7 +74,6 @@ jobs:
         sudo add-apt-repository -y ppa:alex-p/tesseract-ocr5
         sudo apt-get install -y tesseract-ocr tesseract-ocr-kor
         tesseract --version
-        make install-nltk-models
         make test
         make check-coverage
 
