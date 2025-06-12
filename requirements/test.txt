@@ -438,7 +438,7 @@ notebook-shim==0.2.4
     #   notebook
 numpy==1.26.4
     # via
-    #   -c /Users/jiajunxu/code/unstructured-api/requirements/constraints.in
+    #   -c requirements/constraints.in
     #   -r requirements/base.txt
     #   contourpy
     #   matplotlib
@@ -778,7 +778,7 @@ stack-data==0.6.3
     # via ipython
 starlette==0.41.2
     # via
-    #   -c /Users/jiajunxu/code/unstructured-api/requirements/constraints.in
+    #   -c requirements/constraints.in
     #   -r requirements/base.txt
     #   fastapi
 sympy==1.13.3
