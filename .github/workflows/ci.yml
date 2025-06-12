@@ -66,16 +66,6 @@ jobs:
         path: |
           .venv
         key: ci-venv-${{ env.PIPELINE_FAMILY }}-${{ hashFiles('requirements/base.txt', 'requirements/test.txt') }}
-    - name: Set up Python ${{ env.PYTHON_VERSION }}
-      uses: actions/setup-python@v5
-      with:
-        python-version: ${{ env.PYTHON_VERSION }}
-    - name: Setup virtual environment (no cache hit)
-      if: steps.virtualenv-cache.outputs.cache-hit != 'true'
-      run: |
-        python${{ env.PYTHON_VERSION }} -m venv .venv
-        source .venv/bin/activate
-        make install-ci
     - name: Run core tests
       run: |
         source .venv/bin/activate
@@ -116,16 +106,6 @@ jobs:
         path: |
           .venv
         key: ci-venv-${{ env.PIPELINE_FAMILY }}-${{ hashFiles('requirements/base.txt', 'requirements/test.txt') }}
-    - name: Set up Python ${{ env.PYTHON_VERSION }}
-      uses: actions/setup-python@v5
-      with:
-        python-version: ${{ env.PYTHON_VERSION }}
-    - name: Setup virtual environment (no cache hit)
-      if: steps.virtualenv-cache.outputs.cache-hit != 'true'
-      run: |
-        python${{ env.PYTHON_VERSION }} -m venv .venv
-        source .venv/bin/activate
-        make install-ci
     - name: Test Dockerfile
       run: |
         source .venv/bin/activate
