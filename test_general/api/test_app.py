@@ -961,6 +961,7 @@ def test_encrypted_pdf():
         assert response.status_code == 200
 
 
+@pytest.mark.skip(reason="the json became processable in the 0.17.2 unstructured library")
 def test_general_api_returns_400_bad_json(tmpdir):
     """
     Verify that we get a 400 for invalid json schemas
