@@ -848,7 +848,8 @@ def test_partition_file_via_api_not_retryable_error_code(monkeypatch, mocker):
 
     assert response.status_code == 401
 
-    assert remote_partition.called_once()
+    # one call for each page
+    assert remote_partition.call_count == 1
 
 
 def test_chunking_strategy_param():

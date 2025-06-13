@@ -388,7 +388,7 @@ typing-inspection==0.4.1
     # via pydantic
 tzdata==2025.2
     # via pandas
-unstructured[all-docs]==0.17.2
+unstructured[all-docs]==0.16.17
     # via -r requirements/base.in
 unstructured-client==0.36.0
     # via unstructured

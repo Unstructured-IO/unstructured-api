@@ -885,7 +885,7 @@ tzdata==2025.2
     # via
     #   -r requirements/base.txt
     #   pandas
-unstructured[all-docs]==0.17.2
+unstructured[all-docs]==0.16.17
     # via -r requirements/base.txt
 unstructured-client==0.36.0
     # via
