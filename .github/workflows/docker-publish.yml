@@ -11,7 +11,7 @@ env:
   PACKAGE: "unstructured-api"
   PIPELINE_FAMILY: "general"
   PIP_VERSION: "25.1.1"
-  PYTHON_VERSION: "3.12"
+  PYTHON_VERSION: "3.11"
 
 jobs:
   setup:
