@@ -10,8 +10,8 @@ env:
   DOCKER_BUILD_REPOSITORY: quay.io/unstructured-io/build-unstructured-api
   PACKAGE: "unstructured-api"
   PIPELINE_FAMILY: "general"
-  PIP_VERSION: "22.2.1"
-  PYTHON_VERSION: "3.10"
+  PIP_VERSION: "25.1.1"
+  PYTHON_VERSION: "3.12"
 
 jobs:
   setup:
@@ -48,7 +48,7 @@ jobs:
         #arch: ["arm64", "amd64"]
         # NOTE(luke): temporary disable arm64 since its failing the smoke test
         arch: ["amd64"]
-    runs-on: ubuntu-latest-m
+    runs-on: ubuntu-latest
     needs: [setup, set-short-sha]
     env:
       SHORT_SHA: ${{ needs.set-short-sha.outputs.short_sha }}
@@ -103,7 +103,7 @@ jobs:
         # write to the build repository to cache for the publish-images job
         docker push $DOCKER_BUILD_REPOSITORY:${{ matrix.arch }}-$SHORT_SHA
   publish-images:
-    runs-on: ubuntu-latest-m
+    runs-on: ubuntu-latest
     needs: [setup, set-short-sha, build-images]
     env:
       SHORT_SHA: ${{ needs.set-short-sha.outputs.short_sha }}

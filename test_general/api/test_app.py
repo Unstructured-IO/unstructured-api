@@ -848,7 +848,8 @@ def test_partition_file_via_api_not_retryable_error_code(monkeypatch, mocker):
 
     assert response.status_code == 401
 
-    assert remote_partition.called_once()
+    # one call for each page
+    assert remote_partition.call_count == 1
 
 
 def test_chunking_strategy_param():
@@ -960,6 +961,7 @@ def test_encrypted_pdf():
         assert response.status_code == 200
 
 
+@pytest.mark.skip(reason="the json became processable in the 0.17.2 unstructured library")
 def test_general_api_returns_400_bad_json(tmpdir):
     """
     Verify that we get a 400 for invalid json schemas

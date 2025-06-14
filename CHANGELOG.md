@@ -1,3 +1,14 @@
+## 0.0.86
+* Patch various CVEs
+
+## 0.0.86
+* Patch various CVEs
+* Bump Python version to 3.12, some packages no longer support 3.9
+
+## 0.0.84
+* Patch h11 CVE
+* bump httpcore version due to h11 dependency
+
 ## 0.0.83
 
 * Patch various CVEs
