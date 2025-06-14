@@ -289,12 +289,13 @@ curl -X 'POST'
 * Using `pyenv` to manage virtualenv's is recommended
 	* Mac install instructions. See [here](https://github.com/Unstructured-IO/community#mac--homebrew) for more detailed instructions.
 		* `brew install pyenv-virtualenv`
-	  * `pyenv install 3.10.12`
+	  * `pyenv install 3.12`
   * Linux instructions are available [here](https://github.com/Unstructured-IO/community#linux).
 
   * Create a virtualenv to work in and activate it, e.g. for one named `document-processing`:
 
-	`pyenv  virtualenv 3.10.12 unstructured-api` <br />
+	`pyenv  virtualenv 3.12
+   unstructured-api` <br />
 	`pyenv activate unstructured-api`
 
 See the [Unstructured Quick Start](https://github.com/Unstructured-IO/unstructured#eight_pointed_black_star-quick-start) for the many OS dependencies that are required, if the ability to process all file types is desired.

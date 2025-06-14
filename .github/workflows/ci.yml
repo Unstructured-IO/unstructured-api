@@ -7,7 +7,7 @@ on:
     branches: [ main ]
 
 env:
-  PYTHON_VERSION: "3.10"
+  PYTHON_VERSION: "3.12"
   PIPELINE_FAMILY: "general"
 
 jobs:
@@ -20,7 +20,7 @@ jobs:
       with:
         path: |
           .venv
-        key: ci-venv-${{ env.PIPELINE_FAMILY }}-${{ hashFiles('requirements/base.txt') }}
+        key: ci-venv-${{ env.PIPELINE_FAMILY }}-${{ hashFiles('requirements/*.txt') }}
     - name: Set up Python ${{ env.PYTHON_VERSION }}
       uses: actions/setup-python@v5
       with:
@@ -42,7 +42,7 @@ jobs:
       with:
         path: |
           .venv
-        key: ci-venv-${{ env.PIPELINE_FAMILY }}-${{ hashFiles('requirements/base.txt') }}
+        key: ci-venv-${{ env.PIPELINE_FAMILY }}-${{ hashFiles('requirements/*.txt') }}
     - name: Lint
       run: |
         source .venv/bin/activate
@@ -65,16 +65,17 @@ jobs:
       with:
         path: |
           .venv
-        key: ci-venv-${{ env.PIPELINE_FAMILY }}-${{ hashFiles('requirements/base.txt') }}
+        key: ci-venv-${{ env.PIPELINE_FAMILY }}-${{ hashFiles('requirements/test.txt') }}
     - name: Run core tests
       run: |
+        python${{ env.PYTHON_VERSION }} -m venv .venv
         source .venv/bin/activate
         sudo apt-get update && sudo apt-get install --yes poppler-utils libreoffice
+        make install-test
         make install-pandoc
         sudo add-apt-repository -y ppa:alex-p/tesseract-ocr5
         sudo apt-get install -y tesseract-ocr tesseract-ocr-kor
         tesseract --version
-        make install-nltk-models
         make test
         make check-coverage
 
@@ -106,10 +107,12 @@ jobs:
       with:
         path: |
           .venv
-        key: ci-venv-${{ env.PIPELINE_FAMILY }}-${{ hashFiles('requirements/base.txt') }}
+        key: ci-venv-${{ env.PIPELINE_FAMILY }}-${{ hashFiles('requirements/test.txt') }}
     - name: Test Dockerfile
       run: |
+        python${{ env.PYTHON_VERSION }} -m venv .venv
         source .venv/bin/activate
+        make install-test
         make docker-build
         make docker-test
     # - name: Scan image
