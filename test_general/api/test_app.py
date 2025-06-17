@@ -1155,3 +1155,45 @@ def test_include_slide_notes(monkeypatch, test_default, include_slide_notes, tes
         assert "Here are important notes" == df["text"][0]
     else:
         assert "Here are important notes" != df["text"][0]
+
+
+@pytest.mark.parametrize(
+    ("pdf_name", "expected_error_message"),
+    [
+        ("failing-encrypted.pdf", "File is encrypted. Please decrypt it with password."),
+        (
+            "failing-invalid.pdf",
+            "File does not appear to be a valid PDF. Error: Stream has ended unexpectedly",
+        ),
+        (
+            "failing-missing-root.pdf",
+            "File does not appear to be a valid PDF. Error: Cannot find Root object in pdf",
+        ),
+        (
+            "failing-missing-pages.pdf",
+            "File does not appear to be a valid PDF. Error: Invalid object in /Pages",
+        ),
+    ],
+)
+@pytest.mark.parametrize(
+    "strategy",
+    [
+        "auto",
+        "fast",
+        "hi_res",
+        "ocr_only",
+    ],
+)
+def test_failing_pdfs_return_422(pdf_name: str, expected_error_message: str, strategy: str):
+    client = TestClient(app)
+    test_file = Path(__file__).parent.parent.parent / "sample-docs" / pdf_name
+
+    with open(test_file, "rb") as f:
+        response = client.post(
+            MAIN_API_ROUTE,
+            files=[("files", (str(test_file), f))],
+            data={"strategy": strategy},
+        )
+
+    assert response.status_code == 422
+    assert expected_error_message == str(response.json()["detail"])
