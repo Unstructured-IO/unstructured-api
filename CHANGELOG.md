@@ -3,6 +3,10 @@
 
 ## 0.0.86
 * Patch various CVEs
+* Enable pytest concurrency
+* Enable Claude Code
+* Use Python 3.12 for testing
+* Define version in one place
 
 ## 0.0.86
 * Patch various CVEs

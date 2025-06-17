@@ -41,6 +41,7 @@ from unstructured.staging.base import (
     elements_from_json,
 )
 from unstructured_inference.models.base import UnknownModelException
+from prepline_general.api import __version__ as api_version
 
 app = FastAPI()
 router = APIRouter()
@@ -618,7 +619,7 @@ def ungz_file(file: UploadFile, gz_uncompressed_content_type: Optional[str] = No
 
 
 @router.get("/general/v0/general", include_in_schema=False)
-@router.get("/general/v0.0.87/general", include_in_schema=False)
+@router.get(f"/general/{api_version}/general", include_in_schema=False)
 async def handle_invalid_get_request():
     raise HTTPException(
         status_code=status.HTTP_405_METHOD_NOT_ALLOWED, detail="Only POST requests are supported."
@@ -633,7 +634,7 @@ async def handle_invalid_get_request():
     description="Description",
     operation_id="partition_parameters",
 )
-@router.post("/general/v0.0.87/general", include_in_schema=False)
+@router.post(f"/general/{api_version}/general", include_in_schema=False)
 def general_partition(
     request: Request,
     # cannot use annotated type here because of a bug described here:
