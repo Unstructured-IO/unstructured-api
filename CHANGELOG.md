@@ -1,3 +1,6 @@
+## 0.0.87
+* Return 422 HTTP code when PDF can't be processed
+
 ## 0.0.86
 * Patch various CVEs
 
