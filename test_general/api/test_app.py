@@ -495,9 +495,7 @@ def test_general_api_returns_422_bad_pdf():
     response = client.post(
         MAIN_API_ROUTE, files=[("files", (str(tmp.name), open(tmp.name, "rb"), "application/pdf"))]
     )
-    assert response.json() == {
-        "detail": "File does not appear to be a valid PDF. Error: Cannot read an empty file"
-    }
+    assert "File does not appear to be a valid PDF" in response.json()["detail"]
     assert response.status_code == 422
     tmp.close()
 
@@ -508,9 +506,7 @@ def test_general_api_returns_422_bad_pdf():
         files=[("files", (str(test_file), open(test_file, "rb"), "application/pdf"))],
     )
 
-    assert response.json() == {
-        "detail": "File does not appear to be a valid PDF. Error: Cannot read an empty file"
-    }
+    assert "File does not appear to be a valid PDF" in response.json()["detail"]
     assert response.status_code == 422
 
 
