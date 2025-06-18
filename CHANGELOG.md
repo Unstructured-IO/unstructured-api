@@ -1,3 +1,6 @@
+## 0.0.88
+* Return 422 HTTP code when PDF can't be processed
+
 ## 0.0.87
 * Patch various CVEs
 * Enable pytest concurrency

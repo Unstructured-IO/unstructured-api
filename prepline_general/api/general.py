@@ -470,20 +470,38 @@ def _check_free_memory():
 
 
 def _check_pdf(file: IO[bytes]):
-    """Check if the PDF file is encrypted, otherwise assume it is not a valid PDF."""
+    """
+    Check if PDF is:
+    - Encrypted
+    - Has corrupted pages
+    - Has corrupted root object
+
+    Throws:
+    - HTTPException 442 UNPROCESSABLE ENTITY if file is encrypted or corrupted
+    """
     try:
         pdf = PdfReader(file)
 
         # This will raise if the file is encrypted
         pdf.metadata
+
+        # This will raise if the file's root object is corrupted
+        pdf.root_object
+
+        # This will raise if the file's pages are corrupted
+        list(pdf.pages)
+
         return pdf
     except FileNotDecryptedError:
         raise HTTPException(
-            status_code=400,
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             detail="File is encrypted. Please decrypt it with password.",
         )
-    except PdfReadError:
-        raise HTTPException(status_code=422, detail="File does not appear to be a valid PDF")
+    except PdfReadError as e:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=f"File does not appear to be a valid PDF. Error: {e}",
+        )
 
 
 def _validate_strategy(strategy: str) -> str:

@@ -495,7 +495,7 @@ def test_general_api_returns_422_bad_pdf():
     response = client.post(
         MAIN_API_ROUTE, files=[("files", (str(tmp.name), open(tmp.name, "rb"), "application/pdf"))]
     )
-    assert response.json() == {"detail": "File does not appear to be a valid PDF"}
+    assert "File does not appear to be a valid PDF" in response.json()["detail"]
     assert response.status_code == 422
     tmp.close()
 
@@ -506,8 +506,54 @@ def test_general_api_returns_422_bad_pdf():
         files=[("files", (str(test_file), open(test_file, "rb"), "application/pdf"))],
     )
 
-    assert response.json() == {"detail": "File does not appear to be a valid PDF"}
+    assert "File does not appear to be a valid PDF" in response.json()["detail"]
     assert response.status_code == 422
+
+
+@pytest.mark.parametrize(
+    ("pdf_name", "expected_error_message"),
+    [
+        (
+            "failing-invalid.pdf",
+            "File does not appear to be a valid PDF. Error: Stream has ended unexpectedly",
+        ),
+        (
+            "failing-missing-root.pdf",
+            "File does not appear to be a valid PDF. Error: Cannot find Root object in pdf",
+        ),
+        (
+            "failing-missing-pages.pdf",
+            "File does not appear to be a valid PDF. Error: Invalid object in /Pages",
+        ),
+    ],
+)
+@pytest.mark.parametrize(
+    "strategy",
+    [
+        "auto",
+        "fast",
+        "hi_res",
+        "ocr_only",
+    ],
+)
+def test_general_api_returns_422_invalid_pdf(
+    pdf_name: str, expected_error_message: str, strategy: str
+):
+    """
+    Verify that we get a 422 with the correct error message for invalid PDF files
+    """
+    client = TestClient(app)
+    test_file = Path(__file__).parent.parent.parent / "sample-docs" / pdf_name
+
+    with open(test_file, "rb") as f:
+        response = client.post(
+            MAIN_API_ROUTE,
+            files=[("files", (str(test_file), f))],
+            data={"strategy": strategy},
+        )
+
+    assert response.status_code == 422
+    assert expected_error_message == str(response.json()["detail"])
 
 
 def test_general_api_returns_503(monkeypatch):
@@ -939,13 +985,13 @@ def test_encrypted_pdf():
         writer.encrypt(user_password="password123")
         writer.write(temp_file.name)
 
-        # Response should be 400
+        # Response should be 422
         response = client.post(
             MAIN_API_ROUTE,
             files=[("files", (str(temp_file.name), open(temp_file.name, "rb"), "application/pdf"))],
         )
         assert response.json() == {"detail": "File is encrypted. Please decrypt it with password."}
-        assert response.status_code == 400
+        assert response.status_code == 422
 
         # This file is owner encrypted, i.e. readable with edit restrictions
         writer = PdfWriter()
