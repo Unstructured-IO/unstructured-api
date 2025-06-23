@@ -17,34 +17,18 @@ def _remove_optional_info_from_mime_type(content_type: str | None) -> str | None
     return content_type.split(";")[0]
 
 
-def get_validated_mimetype(file: UploadFile, content_type_hint: str | None = None) -> Optional[str]:
+def get_validated_mimetype(file: UploadFile) -> Optional[str]:
     """Given the incoming file, identify and return the correct mimetype.
 
-    Order of operations:
-    - If user passed content_type as a form param, take it as truth.
-    - Otherwise, use file.content_type (as set by the Content-Type header)
-    - If no content_type was passed and the header wasn't useful, call the library's detect_filetype
+    Always inspects the actual file bytes to determine the true file type,
+    ignoring client-provided Content-Type headers which can be misleading.
 
     Once we have a filteype, check is_partitionable and return 400 if we don't support this file.
     """
-    content_type: str | None = None
-
-    if content_type_hint is not None:
-        content_type = content_type_hint
-    else:
-        content_type = _remove_optional_info_from_mime_type(file.content_type)
-
-    filetype = FileType.from_mime_type(content_type)
-
-    # If content_type was not specified, use the library to identify the file
-    # We inspect the bytes to do this, so we need to buffer the file
-    if not filetype or filetype == FileType.UNK:
-        file_buffer = BytesIO(file.file.read())
-        file.file.seek(0)
-
-        file_buffer.name = file.filename
-
-        filetype = detect_filetype(file=file_buffer)
+    file_buffer = BytesIO(file.file.read())
+    file.file.seek(0)
+    file_buffer.name = file.filename
+    filetype = detect_filetype(file=file_buffer)
 
     if not filetype.is_partitionable:
         raise HTTPException(

@@ -684,9 +684,7 @@ def general_partition(
 
     def response_generator(is_multipart: bool):
         for file in files:
-            file_content_type = get_validated_mimetype(
-                file, content_type_hint=form_params.content_type
-            )
+            file_content_type = get_validated_mimetype(file)
 
             _file = file.file
 

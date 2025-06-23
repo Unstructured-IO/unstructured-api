@@ -1201,3 +1201,37 @@ def test_include_slide_notes(monkeypatch, test_default, include_slide_notes, tes
         assert "Here are important notes" == df["text"][0]
     else:
         assert "Here are important notes" != df["text"][0]
+
+
+def test_text_file_with_pdf_extension_detected_correctly():
+    """
+    Verify that a text file with a .pdf extension is correctly detected as text/plain
+    instead of failing as a malformed PDF.
+
+    This test validates that the API inspects actual file content rather than
+    trusting client-provided Content-Type headers based on file extensions.
+    """
+    client = TestClient(app)
+
+    with tempfile.NamedTemporaryFile(suffix=".pdf", mode="w", delete=False) as temp_file:
+        temp_file.write("This is simple text content, not a PDF file.")
+        temp_file_path = temp_file.name
+
+    try:
+        # Upload the file without explicitly setting content type
+        # The client will auto-detect Content-Type as application/pdf based on .pdf extension
+        with open(temp_file_path, "rb") as f:
+            response = client.post(
+                MAIN_API_ROUTE, files=[("files", (temp_file_path, f))], data={"strategy": "fast"}
+            )
+
+        assert response.status_code == 200
+
+        elements = response.json()
+        assert len(elements) > 0
+        assert any("This is simple text content" in elem["text"] for elem in elements)
+
+        assert all(elem["metadata"]["filetype"] == "text/plain" for elem in elements)
+
+    finally:
+        os.unlink(temp_file_path)
