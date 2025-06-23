@@ -1218,11 +1218,13 @@ def test_text_file_with_pdf_extension_detected_correctly():
         temp_file_path = temp_file.name
 
     try:
-        # Upload the file without explicitly setting content type
-        # The client will auto-detect Content-Type as application/pdf based on .pdf extension
+        # Upload the file with explicit PDF content type to test that the API
+        # ignores client-provided Content-Type and inspects actual file content
         with open(temp_file_path, "rb") as f:
             response = client.post(
-                MAIN_API_ROUTE, files=[("files", (temp_file_path, f))], data={"strategy": "fast"}
+                MAIN_API_ROUTE,
+                files=[("files", (temp_file_path, f, "application/pdf"))],
+                data={"strategy": "fast"},
             )
 
         assert response.status_code == 200
