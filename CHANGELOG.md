@@ -1,3 +1,6 @@
+## 0.0.89
+* Upgrade Pillow to 11.3.0 to address a CVE
+
 ## 0.0.88
 * Return 422 HTTP code when PDF can't be processed
 
