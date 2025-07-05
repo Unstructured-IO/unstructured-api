@@ -532,7 +532,7 @@ pikepdf==9.8.1
     # via
     #   -r requirements/base.txt
     #   unstructured
-pillow==11.2.1
+pillow==11.3.0
     # via
     #   -r requirements/base.txt
     #   matplotlib
