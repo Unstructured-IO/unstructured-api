@@ -17,7 +17,7 @@ jobs:
   setup:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
     - uses: actions/cache@v4
       id: virtualenv-cache
       with:
@@ -59,7 +59,7 @@ jobs:
       with:
         driver: ${{ matrix.arch == 'amd64' && 'docker' || 'docker-container' }}
     - name: Checkout code
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
     - name: Login to Quay.io
       uses: docker/login-action@v3
       with:
@@ -109,7 +109,7 @@ jobs:
       SHORT_SHA: ${{ needs.set-short-sha.outputs.short_sha }}
     steps:
     - name: Checkout code
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
     - name: Set SHORT_SHA
       run: echo "SHORT_SHA=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
     - name: Login to Quay.io
