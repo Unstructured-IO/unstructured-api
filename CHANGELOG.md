@@ -1,3 +1,7 @@
+## 0.0.90
+* dependancy bumps via pip-compile
+* Bump unstructured to 0.0.90
+
 ## 0.0.89
 * Upgrade Pillow to 11.3.0 to address a CVE
 
