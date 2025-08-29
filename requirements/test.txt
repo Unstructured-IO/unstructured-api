@@ -797,8 +797,9 @@ soupsieve==2.8
     #   beautifulsoup4
 stack-data==0.6.3
     # via ipython
-starlette==0.47.3
+starlette==0.41.2
     # via
+    #   -c requirements/constraints.in
     #   -r requirements/base.txt
     #   fastapi
 sympy==1.14.0
@@ -899,7 +900,6 @@ typing-extensions==4.15.0
     #   python-oxmsg
     #   python-pptx
     #   referencing
-    #   starlette
     #   torch
     #   typing-inspect
     #   typing-inspection
