@@ -1,3 +1,6 @@
+## 0.0.90
+* Upgrade version to pull in latest unstructured verison and bump versions of dependancies.
+
 ## 0.0.89
 * Upgrade Pillow to 11.3.0 to address a CVE
 
