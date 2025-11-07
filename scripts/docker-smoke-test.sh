@@ -7,7 +7,7 @@
 # Is there a good way to reuse code here?
 # Also note this can evolve into a generalized pipeline smoke test
 
-# shellcheck disable=SC2317  # Shellcheck complains that trap functions are unreachable...
+# shellcheck disable=SC2317,SC2329  # Shellcheck complains that trap functions are unreachable/unused...
 
 set -e
 
