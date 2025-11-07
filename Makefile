@@ -38,10 +38,28 @@ install-nltk-models:
 	python3 -c "from unstructured.nlp.tokenize import download_nltk_packages; download_nltk_packages()"
 
 ## pip-compile:                 compiles all base/dev/test requirements
+SHELL := /bin/bash
+BASE_REQUIREMENTS := $(shell ls ./requirements/*.in)
+BASE_REQUIREMENTSTXT := $(patsubst %.in,%.txt,$(BASE_REQUIREMENTS))
+
 .PHONY: pip-compile
-pip-compile:
-	pip-compile --upgrade requirements/base.in
+pip-compile: compile-all-base
+
+.PHONY: compile-test
+compile-test:
 	pip-compile --upgrade -o requirements/test.txt requirements/base.txt requirements/test.in
+
+.PHONY: compile-base
+compile-base:
+	pip-compile --upgrade requirements/base.in
+
+.PHONY: compile-all-base
+compile-all-base: compile-base compile-test
+	@$(foreach file,$(BASE_REQUIREMENTS),echo -e "\n\ncompiling: $(file)" && pip-compile --no-strip-extras --upgrade $(file) || exit;)
+
+.PHONY: clean-requirements
+clean-requirements:
+	rm $(BASE_REQUIREMENTSTXT)
 
 .PHONY: install-pandoc
 install-pandoc:
