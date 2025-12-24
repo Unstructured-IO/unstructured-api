@@ -194,7 +194,8 @@ detect_changed_packages() {
       PACKAGE_NAME=$(echo "$CHANGED_PACKAGES" | head -1 | cut -d'=' -f1)
       CHANGELOG_ENTRY="- **Security update**: Updated \`${PACKAGE_NAME}\` to address security vulnerability"
     elif [ "$PACKAGE_COUNT" -le 3 ]; then
-      PACKAGE_NAMES=$(echo "$CHANGED_PACKAGES" | cut -d'=' -f1 | paste -sd, - | sed 's/,/, /g' | sed 's/\([^,]*\)/`\1`/g')
+      # Wrap each package in backticks, then join with commas
+      PACKAGE_NAMES=$(echo "$CHANGED_PACKAGES" | cut -d'=' -f1 | awk -v count="$PACKAGE_COUNT" '{printf "`%s`", $0; if (NR < count) printf ", "}')
       CHANGELOG_ENTRY="- **Security update**: Updated ${PACKAGE_NAMES} to address security vulnerabilities"
     else
       CHANGELOG_ENTRY="- **Security update**: Updated ${PACKAGE_COUNT} dependencies to address security vulnerabilities"
@@ -276,7 +277,11 @@ update_changelog() {
           dev_header = use_brackets == "true" ? "## [" dev_version "]" : "## " dev_version
           release_header = use_brackets == "true" ? "## [" release_version "]" : "## " release_version
 
-          if (index($0, dev_header) == 1) {
+          # Exact match: strip trailing whitespace and compare
+          line_trimmed = $0
+          gsub(/[[:space:]]+$/, "", line_trimmed)
+
+          if (line_trimmed == dev_header) {
             print release_header
             in_target_version = 1
             next
