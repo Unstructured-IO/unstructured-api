@@ -146,12 +146,13 @@ detect_changed_packages() {
   fi
 
   # Try requirements/*.in files (unpinned requirements)
+  # Strip extras [.*] and version specifiers, handle packages like requests[security]>=2.0
   if [ -z "$CHANGED_PACKAGES" ]; then
-    CHANGED_PACKAGES=$(git diff --cached requirements/*.in 2>/dev/null | grep -E '^[-+][a-zA-Z0-9][a-zA-Z0-9._-]*' | grep -v '^[-+]#' | grep -v '^[-+]-' | sed 's/^[+-]//' | sed 's/[<>=].*//' | sort -u | head -20 || true)
+    CHANGED_PACKAGES=$(git diff --cached requirements/*.in 2>/dev/null | grep -E '^[-+][a-zA-Z0-9][a-zA-Z0-9._-]*' | grep -v '^[-+]#' | grep -v '^[-+]-' | sed 's/^[+-]//' | sed -E 's/\[.*//; s/[<>=~].*//' | sort -u | head -20 || true)
   fi
 
   if [ -z "$CHANGED_PACKAGES" ]; then
-    CHANGED_PACKAGES=$(git diff requirements/*.in 2>/dev/null | grep -E '^[-+][a-zA-Z0-9][a-zA-Z0-9._-]*' | grep -v '^[-+]#' | grep -v '^[-+]-' | sed 's/^[+-]//' | sed 's/[<>=].*//' | sort -u | head -20 || true)
+    CHANGED_PACKAGES=$(git diff requirements/*.in 2>/dev/null | grep -E '^[-+][a-zA-Z0-9][a-zA-Z0-9._-]*' | grep -v '^[-+]#' | grep -v '^[-+]-' | sed 's/^[+-]//' | sed -E 's/\[.*//; s/[<>=~].*//' | sort -u | head -20 || true)
   fi
 
   # Try uv.lock if no requirements changes found
@@ -164,12 +165,13 @@ detect_changed_packages() {
   fi
 
   # Try pyproject.toml dependencies section
+  # Match version specifiers (<>=~^!), extras [, quotes ", commas, or end of line for unversioned
   if [ -z "$CHANGED_PACKAGES" ]; then
-    CHANGED_PACKAGES=$(git diff --cached pyproject.toml 2>/dev/null | grep -E '^[-+]\s*"?[a-zA-Z0-9][a-zA-Z0-9._-]*[<>=]' | sed -E 's/^[-+]\s*"?([a-zA-Z0-9][a-zA-Z0-9._-]*).*/\1/' | sort -u | head -20 || true)
+    CHANGED_PACKAGES=$(git diff --cached pyproject.toml 2>/dev/null | grep -E '^[-+]\s*"?[a-zA-Z0-9][a-zA-Z0-9._-]*([<>=~^!\[",]|$)' | sed -E 's/^[-+]\s*"?([a-zA-Z0-9][a-zA-Z0-9._-]*).*/\1/' | sort -u | head -20 || true)
   fi
 
   if [ -z "$CHANGED_PACKAGES" ]; then
-    CHANGED_PACKAGES=$(git diff pyproject.toml 2>/dev/null | grep -E '^[-+]\s*"?[a-zA-Z0-9][a-zA-Z0-9._-]*[<>=]' | sed -E 's/^[-+]\s*"?([a-zA-Z0-9][a-zA-Z0-9._-]*).*/\1/' | sort -u | head -20 || true)
+    CHANGED_PACKAGES=$(git diff pyproject.toml 2>/dev/null | grep -E '^[-+]\s*"?[a-zA-Z0-9][a-zA-Z0-9._-]*([<>=~^!\[",]|$)' | sed -E 's/^[-+]\s*"?([a-zA-Z0-9][a-zA-Z0-9._-]*).*/\1/' | sort -u | head -20 || true)
   fi
 
   # Build changelog entry
