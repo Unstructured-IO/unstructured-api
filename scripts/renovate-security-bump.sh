@@ -52,8 +52,14 @@ read_current_version() {
   if [[ "$VERSION_STYLE" == "python" ]]; then
     CURRENT_VERSION=$(grep -o -E "(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)(-dev[0-9]*)?" "$VERSION_FILE" | head -1)
   elif [[ "$VERSION_STYLE" == "pyproject" ]]; then
-    # Extract version from pyproject.toml (handles both quoted styles)
-    CURRENT_VERSION=$(grep -E "^version\s*=" "$VERSION_FILE" | head -1 | sed -E 's/version\s*=\s*["\x27]?([^"\x27]+)["\x27]?/\1/' | tr -d ' ')
+    # Extract version from pyproject.toml (detect quote style for portability)
+    if grep -qE "^version\s*=\s*\"" "$VERSION_FILE"; then
+      # Double quotes - match and discard trailing content (comments, etc)
+      CURRENT_VERSION=$(grep -E "^version\s*=" "$VERSION_FILE" | head -1 | sed -E 's/version\s*=\s*"([^"]+)".*/\1/' | tr -d ' ')
+    else
+      # Single quotes (portable - avoid \x27 which breaks on BSD sed)
+      CURRENT_VERSION=$(grep -E "^version\s*=" "$VERSION_FILE" | head -1 | sed -E "s/version\s*=\s*'([^']+)'.*/\1/" | tr -d ' ')
+    fi
   fi
   echo "Current version: $CURRENT_VERSION"
 }
@@ -182,11 +188,22 @@ detect_changed_packages() {
     if [ "$PACKAGE_COUNT" -gt 5 ]; then
       echo "  ... and $((PACKAGE_COUNT - 5)) more"
     fi
+
+    # Build specific changelog entry with package names
+    if [ "$PACKAGE_COUNT" -eq 1 ]; then
+      PACKAGE_NAME=$(echo "$CHANGED_PACKAGES" | head -1 | cut -d'=' -f1)
+      CHANGELOG_ENTRY="- **Security update**: Updated \`${PACKAGE_NAME}\` to address security vulnerability"
+    elif [ "$PACKAGE_COUNT" -le 3 ]; then
+      PACKAGE_NAMES=$(echo "$CHANGED_PACKAGES" | cut -d'=' -f1 | paste -sd, - | sed 's/,/, /g' | sed 's/\([^,]*\)/`\1`/g')
+      CHANGELOG_ENTRY="- **Security update**: Updated ${PACKAGE_NAMES} to address security vulnerabilities"
+    else
+      CHANGELOG_ENTRY="- **Security update**: Updated ${PACKAGE_COUNT} dependencies to address security vulnerabilities"
+    fi
   else
     echo "Could not auto-detect packages, using generic entry"
+    CHANGELOG_ENTRY="- **Security update**: Bumped dependencies to address security vulnerabilities"
   fi
 
-  CHANGELOG_ENTRY="- **Security update**: Bumped dependencies to address security vulnerabilities"
   echo "Changelog entry: $CHANGELOG_ENTRY"
 }
 
@@ -202,8 +219,10 @@ update_changelog() {
 
   # Only look for -dev version to rename if CURRENT_VERSION had -dev suffix
   if [[ -n "${DEV_SUFFIX:-}" ]]; then
-    # Look for -dev version header in CHANGELOG that matches our version
-    DEV_VERSION_HEADER=$(grep -m 1 -F "## $CURRENT_VERSION" "$CHANGELOG_FILE" || true)
+    # Look for -dev version header in CHANGELOG that matches our version exactly (not substring)
+    # Escape dots for regex, then match with end-of-line or whitespace anchor
+    ESCAPED_VERSION="${CURRENT_VERSION//./\\.}"
+    DEV_VERSION_HEADER=$(grep -m 1 -E "^## ${ESCAPED_VERSION}(\s*$)" "$CHANGELOG_FILE" || true)
 
     if [[ -n "$DEV_VERSION_HEADER" ]]; then
       echo "Found dev version in CHANGELOG: $DEV_VERSION_HEADER"
