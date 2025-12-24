@@ -135,26 +135,51 @@ update_pyproject_version() {
 detect_changed_packages() {
   echo "Detecting changed dependencies..."
 
-  # Try requirements files first
-  CHANGED_PACKAGES=$(git diff --cached requirements/*.txt 2>/dev/null | grep -E "^[-+][a-zA-Z0-9_-]+==" | sed 's/^[+-]//' | sort -u | head -20 || true)
+  # Package name regex per PEP 508: starts with letter/digit, can contain letters, digits, dots, underscores, hyphens
+  local pkg_pattern='^[-+][a-zA-Z0-9][a-zA-Z0-9._-]*=='
+
+  # Try requirements/*.txt files first (pip-compile output format)
+  CHANGED_PACKAGES=$(git diff --cached requirements/*.txt 2>/dev/null | grep -E "$pkg_pattern" | sed 's/^[+-]//' | sort -u | head -20 || true)
 
   if [ -z "$CHANGED_PACKAGES" ]; then
-    CHANGED_PACKAGES=$(git diff requirements/*.txt 2>/dev/null | grep -E "^[-+][a-zA-Z0-9_-]+==" | sed 's/^[+-]//' | sort -u | head -20 || true)
+    CHANGED_PACKAGES=$(git diff requirements/*.txt 2>/dev/null | grep -E "$pkg_pattern" | sed 's/^[+-]//' | sort -u | head -20 || true)
+  fi
+
+  # Try requirements/*.in files (unpinned requirements)
+  if [ -z "$CHANGED_PACKAGES" ]; then
+    CHANGED_PACKAGES=$(git diff --cached requirements/*.in 2>/dev/null | grep -E '^[-+][a-zA-Z0-9][a-zA-Z0-9._-]*' | grep -v '^[-+]#' | grep -v '^[-+]-' | sed 's/^[+-]//' | sed 's/[<>=].*//' | sort -u | head -20 || true)
+  fi
+
+  if [ -z "$CHANGED_PACKAGES" ]; then
+    CHANGED_PACKAGES=$(git diff requirements/*.in 2>/dev/null | grep -E '^[-+][a-zA-Z0-9][a-zA-Z0-9._-]*' | grep -v '^[-+]#' | grep -v '^[-+]-' | sed 's/^[+-]//' | sed 's/[<>=].*//' | sort -u | head -20 || true)
   fi
 
   # Try uv.lock if no requirements changes found
   if [ -z "$CHANGED_PACKAGES" ]; then
-    CHANGED_PACKAGES=$(git diff --cached uv.lock 2>/dev/null | grep -E "^[-+]name\s*=" | sed -E 's/^[-+]name\s*=\s*"([^"]+)"/\1/' | sort -u | head -20 || true)
+    CHANGED_PACKAGES=$(git diff --cached uv.lock 2>/dev/null | grep -E '^[-+]name\s*=' | sed -E 's/^[-+]name\s*=\s*"([^"]+)"/\1/' | sort -u | head -20 || true)
   fi
 
   if [ -z "$CHANGED_PACKAGES" ]; then
-    CHANGED_PACKAGES=$(git diff uv.lock 2>/dev/null | grep -E "^[-+]name\s*=" | sed -E 's/^[-+]name\s*=\s*"([^"]+)"/\1/' | sort -u | head -20 || true)
+    CHANGED_PACKAGES=$(git diff uv.lock 2>/dev/null | grep -E '^[-+]name\s*=' | sed -E 's/^[-+]name\s*=\s*"([^"]+)"/\1/' | sort -u | head -20 || true)
+  fi
+
+  # Try pyproject.toml dependencies section
+  if [ -z "$CHANGED_PACKAGES" ]; then
+    CHANGED_PACKAGES=$(git diff --cached pyproject.toml 2>/dev/null | grep -E '^[-+]\s*"?[a-zA-Z0-9][a-zA-Z0-9._-]*[<>=]' | sed -E 's/^[-+]\s*"?([a-zA-Z0-9][a-zA-Z0-9._-]*).*/\1/' | sort -u | head -20 || true)
+  fi
+
+  if [ -z "$CHANGED_PACKAGES" ]; then
+    CHANGED_PACKAGES=$(git diff pyproject.toml 2>/dev/null | grep -E '^[-+]\s*"?[a-zA-Z0-9][a-zA-Z0-9._-]*[<>=]' | sed -E 's/^[-+]\s*"?([a-zA-Z0-9][a-zA-Z0-9._-]*).*/\1/' | sort -u | head -20 || true)
   fi
 
   # Build changelog entry
   if [ -n "$CHANGED_PACKAGES" ]; then
     PACKAGE_COUNT=$(echo "$CHANGED_PACKAGES" | wc -l | tr -d ' ')
-    echo "Found $PACKAGE_COUNT changed package(s)"
+    echo "Found $PACKAGE_COUNT changed package(s):"
+    echo "$CHANGED_PACKAGES" | head -5 | sed 's/^/  - /'
+    if [ "$PACKAGE_COUNT" -gt 5 ]; then
+      echo "  ... and $((PACKAGE_COUNT - 5)) more"
+    fi
   else
     echo "Could not auto-detect packages, using generic entry"
   fi
