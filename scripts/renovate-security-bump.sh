@@ -207,6 +207,27 @@ detect_changed_packages() {
   echo "Changelog entry: $CHANGELOG_ENTRY"
 }
 
+# Detect CHANGELOG format from existing entries
+detect_changelog_format() {
+  # Check if headers use brackets: ## [1.2.3] vs ## 1.2.3
+  if grep -q -m 1 -E '^## \[[0-9]+\.[0-9]+\.[0-9]+' "$CHANGELOG_FILE" 2>/dev/null; then
+    CHANGELOG_USE_BRACKETS=true
+    echo "Detected CHANGELOG format: bracketed headers (## [version])"
+  else
+    CHANGELOG_USE_BRACKETS=false
+    echo "Detected CHANGELOG format: plain headers (## version)"
+  fi
+
+  # Check if CHANGELOG uses subsections (### Fixes) or direct bullets
+  if grep -q -m 1 '^### ' "$CHANGELOG_FILE" 2>/dev/null; then
+    CHANGELOG_USE_SUBSECTIONS=true
+    echo "Detected CHANGELOG format: uses subsections (### Fixes)"
+  else
+    CHANGELOG_USE_SUBSECTIONS=false
+    echo "Detected CHANGELOG format: direct bullet points"
+  fi
+}
+
 # Update CHANGELOG.md
 update_changelog() {
   echo "Updating CHANGELOG..."
@@ -217,12 +238,19 @@ update_changelog() {
     return 0
   fi
 
+  # Detect the format
+  detect_changelog_format
+
   # Only look for -dev version to rename if CURRENT_VERSION had -dev suffix
   if [[ -n "${DEV_SUFFIX:-}" ]]; then
     # Look for -dev version header in CHANGELOG that matches our version exactly (not substring)
-    # Escape dots for regex, then match with end-of-line or whitespace anchor
+    # Escape dots for regex, handle brackets if used
     ESCAPED_VERSION="${CURRENT_VERSION//./\\.}"
-    DEV_VERSION_HEADER=$(grep -m 1 -E "^## ${ESCAPED_VERSION}(\s*$)" "$CHANGELOG_FILE" || true)
+    if [ "$CHANGELOG_USE_BRACKETS" = true ]; then
+      DEV_VERSION_HEADER=$(grep -m 1 -E "^## \[${ESCAPED_VERSION}\]" "$CHANGELOG_FILE" || true)
+    else
+      DEV_VERSION_HEADER=$(grep -m 1 -E "^## ${ESCAPED_VERSION}(\s*$)" "$CHANGELOG_FILE" || true)
+    fi
 
     if [[ -n "$DEV_VERSION_HEADER" ]]; then
       echo "Found dev version in CHANGELOG: $DEV_VERSION_HEADER"
@@ -234,7 +262,9 @@ update_changelog() {
 
       awk -v dev_version="$DEV_VERSION" \
         -v release_version="$RELEASE_VERSION" \
-        -v security_entry="$CHANGELOG_ENTRY" '
+        -v security_entry="$CHANGELOG_ENTRY" \
+        -v use_brackets="$CHANGELOG_USE_BRACKETS" \
+        -v use_subsections="$CHANGELOG_USE_SUBSECTIONS" '
         BEGIN {
           in_target_version = 0
           found_fixes = 0
@@ -242,16 +272,24 @@ update_changelog() {
         }
 
         /^## / {
-          if (index($0, "## " dev_version) == 1) {
-            print "## " release_version
+          # Match the dev version header (with or without brackets)
+          dev_header = use_brackets == "true" ? "## [" dev_version "]" : "## " dev_version
+          release_header = use_brackets == "true" ? "## [" release_version "]" : "## " release_version
+
+          if (index($0, dev_header) == 1) {
+            print release_header
             in_target_version = 1
             next
           } else {
             if (in_target_version && !found_fixes && !added_entry) {
-              print ""
-              print "### Fixes"
+              if (use_subsections == "true") {
+                print ""
+                print "### Fixes"
+              }
               print security_entry
-              print ""
+              if (use_subsections == "true") {
+                print ""
+              }
               added_entry = 1
             }
             in_target_version = 0
@@ -259,7 +297,7 @@ update_changelog() {
           }
         }
 
-        /^### Fixes/ && in_target_version {
+        /^### Fixes/ && in_target_version && use_subsections == "true" {
           print
           print security_entry
           found_fixes = 1
@@ -271,8 +309,10 @@ update_changelog() {
 
         END {
           if (in_target_version && !found_fixes && !added_entry) {
-            print ""
-            print "### Fixes"
+            if (use_subsections == "true") {
+              print ""
+              print "### Fixes"
+            }
             print security_entry
           }
         }
@@ -295,13 +335,31 @@ create_new_changelog_entry() {
   local tmp_file
   tmp_file=$(mktemp)
 
-  cat >"$tmp_file" <<EOF
-## $RELEASE_VERSION
+  # Format header based on detected style
+  local header
+  if [ "$CHANGELOG_USE_BRACKETS" = true ]; then
+    header="## [$RELEASE_VERSION]"
+  else
+    header="## $RELEASE_VERSION"
+  fi
+
+  # Build entry based on subsection style
+  if [ "$CHANGELOG_USE_SUBSECTIONS" = true ]; then
+    cat >"$tmp_file" <<EOF
+$header
 
 ### Fixes
 $CHANGELOG_ENTRY
 
 EOF
+  else
+    cat >"$tmp_file" <<EOF
+$header
+
+$CHANGELOG_ENTRY
+
+EOF
+  fi
 
   cat "$tmp_file" "$CHANGELOG_FILE" >"$CHANGELOG_FILE.tmp"
   mv "$CHANGELOG_FILE.tmp" "$CHANGELOG_FILE"
