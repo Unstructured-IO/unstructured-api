@@ -22,7 +22,7 @@ echo "=== Renovate Security Version Bump ==="
 detect_version_style() {
   if [[ "$VERSION_FILE" == "auto" ]]; then
     # Check for pyproject.toml with version field first (modern style)
-    if [[ -f "$REPO_ROOT/pyproject.toml" ]] && grep -q "^version\s*=" "$REPO_ROOT/pyproject.toml"; then
+    if [[ -f "$REPO_ROOT/pyproject.toml" ]] && grep -qE "^version\s*=" "$REPO_ROOT/pyproject.toml"; then
       VERSION_FILE="$REPO_ROOT/pyproject.toml"
       VERSION_STYLE="pyproject"
       echo "Auto-detected: pyproject.toml versioning"
@@ -50,7 +50,7 @@ detect_version_style() {
 # Read current version based on style
 read_current_version() {
   if [[ "$VERSION_STYLE" == "python" ]]; then
-    CURRENT_VERSION=$(grep -o -E "(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)(-dev[0-9]+)?" "$VERSION_FILE")
+    CURRENT_VERSION=$(grep -o -E "(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)(-dev[0-9]*)?" "$VERSION_FILE" | head -1)
   elif [[ "$VERSION_STYLE" == "pyproject" ]]; then
     # Extract version from pyproject.toml (handles both quoted styles)
     CURRENT_VERSION=$(grep -E "^version\s*=" "$VERSION_FILE" | head -1 | sed -E 's/version\s*=\s*["\x27]?([^"\x27]+)["\x27]?/\1/' | tr -d ' ')
@@ -60,7 +60,7 @@ read_current_version() {
 
 # Calculate new release version
 calculate_release_version() {
-  if [[ "$CURRENT_VERSION" =~ ^([0-9]+)\.([0-9]+)\.([0-9]+)(-dev.*)?$ ]]; then
+  if [[ "$CURRENT_VERSION" =~ ^([0-9]+)\.([0-9]+)\.([0-9]+)(-dev[0-9]*)?$ ]]; then
     MAJOR="${BASH_REMATCH[1]}"
     MINOR="${BASH_REMATCH[2]}"
     PATCH="${BASH_REMATCH[3]}"
@@ -119,7 +119,7 @@ update_pyproject_version() {
     sed -i.bak -E "s/^(version\s*=\s*)\"[^\"]+\"/\1\"$RELEASE_VERSION\"/" "$VERSION_FILE"
   else
     # Single quotes
-    sed -i.bak -E "s/^(version\s*=\s*)'[^']+'$/\1'$RELEASE_VERSION'/" "$VERSION_FILE"
+    sed -i.bak -E "s/^(version\s*=\s*)'[^']+'/\1'$RELEASE_VERSION'/" "$VERSION_FILE"
   fi
 
   # Verify the update succeeded
@@ -223,7 +223,7 @@ update_changelog() {
         }
 
         /^## / {
-          if ($0 ~ "^## " dev_version) {
+          if (index($0, "## " dev_version) == 1) {
             print "## " release_version
             in_target_version = 1
             next
@@ -273,7 +273,10 @@ update_changelog() {
 create_new_changelog_entry() {
   echo "Creating new CHANGELOG entry for $RELEASE_VERSION"
 
-  cat >/tmp/new_changelog_section.tmp <<EOF
+  local tmp_file
+  tmp_file=$(mktemp)
+
+  cat >"$tmp_file" <<EOF
 ## $RELEASE_VERSION
 
 ### Fixes
@@ -281,9 +284,9 @@ $CHANGELOG_ENTRY
 
 EOF
 
-  cat /tmp/new_changelog_section.tmp "$CHANGELOG_FILE" >"$CHANGELOG_FILE.tmp"
+  cat "$tmp_file" "$CHANGELOG_FILE" >"$CHANGELOG_FILE.tmp"
   mv "$CHANGELOG_FILE.tmp" "$CHANGELOG_FILE"
-  rm -f /tmp/new_changelog_section.tmp
+  rm -f "$tmp_file"
 }
 
 # Main execution
