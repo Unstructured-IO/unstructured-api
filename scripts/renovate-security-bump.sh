@@ -146,13 +146,13 @@ detect_changed_packages() {
   fi
 
   # Try requirements/*.in files (unpinned requirements)
-  # Strip extras [.*] and version specifiers, handle packages like requests[security]>=2.0
+  # Strip comments, extras [.*], version specifiers; exclude URLs and flags
   if [ -z "$CHANGED_PACKAGES" ]; then
-    CHANGED_PACKAGES=$(git diff --cached requirements/*.in 2>/dev/null | grep -E '^[-+][a-zA-Z0-9][a-zA-Z0-9._-]*' | grep -v '^[-+]#' | grep -v '^[-+]-' | sed 's/^[+-]//' | sed -E 's/\[.*//; s/[<>=~].*//' | sort -u | head -20 || true)
+    CHANGED_PACKAGES=$(git diff --cached requirements/*.in 2>/dev/null | grep -E '^[-+][a-zA-Z0-9][a-zA-Z0-9._-]*' | grep -v '^[-+]#' | grep -v '^[-+]-' | grep -v '://' | sed 's/^[+-]//' | sed -E 's/#.*//; s/\[.*//; s/[<>=~].*//' | sed 's/[[:space:]]*$//' | sort -u | head -20 || true)
   fi
 
   if [ -z "$CHANGED_PACKAGES" ]; then
-    CHANGED_PACKAGES=$(git diff requirements/*.in 2>/dev/null | grep -E '^[-+][a-zA-Z0-9][a-zA-Z0-9._-]*' | grep -v '^[-+]#' | grep -v '^[-+]-' | sed 's/^[+-]//' | sed -E 's/\[.*//; s/[<>=~].*//' | sort -u | head -20 || true)
+    CHANGED_PACKAGES=$(git diff requirements/*.in 2>/dev/null | grep -E '^[-+][a-zA-Z0-9][a-zA-Z0-9._-]*' | grep -v '^[-+]#' | grep -v '^[-+]-' | grep -v '://' | sed 's/^[+-]//' | sed -E 's/#.*//; s/\[.*//; s/[<>=~].*//' | sed 's/[[:space:]]*$//' | sort -u | head -20 || true)
   fi
 
   # Try uv.lock if no requirements changes found
