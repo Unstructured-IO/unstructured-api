@@ -1,3 +1,6 @@
+## 0.0.91
+* Upgrade packages to resolve CVEs
+
 ## 0.0.90
 * Upgrade version to pull in latest unstructured verison and bump versions of dependancies.
 
