@@ -66,11 +66,28 @@ jobs:
         registry: quay.io
         username: ${{ secrets.QUAY_IO_ROBOT_USERNAME }}
         password: ${{ secrets.QUAY_IO_ROBOT_TOKEN }}
-    - name: Build image
+    - name: Free up disk space
       run: |
         # Clear some space (https://github.com/actions/runner-images/issues/2840)
-        sudo rm -rf /usr/share/dotnet /opt/ghc /usr/local/share/boost
+        echo "Disk usage before cleanup:"
+        df -h
 
+        # Remove unnecessary pre-installed software
+        sudo rm -rf /usr/share/dotnet
+        sudo rm -rf /opt/ghc
+        sudo rm -rf /usr/local/share/boost
+        sudo rm -rf /usr/local/lib/android
+        sudo rm -rf /opt/hostedtoolcache/CodeQL
+        sudo rm -rf /usr/local/.ghcup
+        sudo rm -rf /usr/share/swift
+
+        # Clean up docker to ensure we start fresh
+        docker system prune -af --volumes
+
+        echo "Disk usage after cleanup:"
+        df -h
+    - name: Build image
+      run: |
         DOCKER_BUILDKIT=1 docker buildx build --load -f Dockerfile \
           --platform=$DOCKER_PLATFORM \
           --build-arg PIP_VERSION=$PIP_VERSION \
