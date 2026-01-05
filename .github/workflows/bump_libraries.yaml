@@ -38,7 +38,7 @@ jobs:
             changelog_message="Bump $package to ${{ steps.metadata.outputs.new-version }}"
             ./scripts/version-increment.sh "$changelog_message"
             make version-sync
-        - uses: stefanzweifel/git-auto-commit-action@v6
+        - uses: stefanzweifel/git-auto-commit-action@v7
           with:
             commit_message: "Bump libraries and release"
 
