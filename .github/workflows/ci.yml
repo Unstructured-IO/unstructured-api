@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v5
-    - uses: actions/cache@v4
+    - uses: actions/cache@v5
       id: virtualenv-cache
       with:
         path: |
@@ -37,7 +37,7 @@ jobs:
     needs: setup
     steps:
     - uses: actions/checkout@v5
-    - uses: actions/cache@v4
+    - uses: actions/cache@v5
       id: virtualenv-cache
       with:
         path: |
@@ -60,7 +60,7 @@ jobs:
     needs: [setup, lint]
     steps:
     - uses: actions/checkout@v5
-    - uses: actions/cache@v4
+    - uses: actions/cache@v5
       id: virtualenv-cache
       with:
         path: |
@@ -107,7 +107,7 @@ jobs:
     needs: [setup, lint]
     steps:
     - uses: actions/checkout@v5
-    - uses: actions/cache@v4
+    - uses: actions/cache@v5
       id: virtualenv-cache
       with:
         python-version: ${{ env.PYTHON_VERSION }}
