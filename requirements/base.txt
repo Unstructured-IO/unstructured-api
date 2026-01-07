@@ -216,8 +216,9 @@ pandas==2.3.3
     #   unstructured-inference
 pdf2image==1.17.0
     # via unstructured
-pdfminer-six==20251230
+pdfminer-six==20260107
     # via
+    #   -c requirements/constraints.in
     #   unstructured
     #   unstructured-inference
 pi-heif==1.1.1
