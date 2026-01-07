@@ -6,3 +6,5 @@
 numpy<2.0.0
 # later versions of Starlette break middleware
 starlette==0.41.2
+# pdfminer.six 20260107 includes performance fix
+pdfminer-six==20260107

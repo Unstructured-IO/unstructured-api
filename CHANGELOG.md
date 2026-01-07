@@ -1,3 +1,6 @@
+## 0.0.92
+* Upgrade pdfminer-six to 20260107 to fix ~15-18% performance regression from eager f-string evaluation
+
 ## 0.0.91
 * Upgrade packages to resolve CVEs
 
