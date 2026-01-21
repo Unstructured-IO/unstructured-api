@@ -1,0 +1,22 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "github>unstructured-io/renovate-config"
+  ],
+  "packageRules": [
+    {
+      "matchDatasources": ["pypi"],
+      "matchIsVulnerabilityAlert": true,
+      "postUpgradeTasks": {
+        "commands": [
+          "VERSION_FILE=prepline_general/api/__version__.py bash scripts/renovate-security-bump.sh"
+        ],
+        "fileFilters": [
+          "prepline_general/api/__version__.py",
+          "CHANGELOG.md"
+        ],
+        "executionMode": "branch"
+      }
+    }
+  ]
+}
