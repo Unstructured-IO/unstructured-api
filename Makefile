@@ -47,17 +47,17 @@ pip-compile: compile-all-base
 
 .PHONY: compile-test
 compile-test:
-	uv pip compile --python-version 3.10 --upgrade -o requirements/test.txt requirements/base.txt requirements/test.in --no-emit-package pip --no-emit-package setuptools
+	uv pip compile --python-version 3.12 -o requirements/test.txt requirements/base.txt requirements/test.in --no-emit-package pip --no-emit-package setuptools
 
 .PHONY: compile-base
 compile-base:
-	uv pip compile --python-version 3.10 --upgrade requirements/base.in -o requirements/base.txt --no-emit-package pip --no-emit-package setuptools
+	uv pip compile --python-version 3.12 requirements/base.in -o requirements/base.txt --no-emit-package pip --no-emit-package setuptools
 
 .PHONY: compile-all-base
 compile-all-base: compile-base compile-test
 	@for file in $(BASE_REQUIREMENTS); do \
 		echo -e "\n\ncompiling: $$file"; \
-		uv pip compile --python-version 3.10 --upgrade --no-strip-extras $$file -o $${file%.in}.txt --no-emit-package pip --no-emit-package setuptools || exit 1; \
+		uv pip compile --python-version 3.12 --no-strip-extras $$file -o $${file%.in}.txt --no-emit-package pip --no-emit-package setuptools || exit 1; \
 	done
 
 .PHONY: clean-requirements
