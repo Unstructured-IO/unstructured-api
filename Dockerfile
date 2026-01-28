@@ -66,7 +66,8 @@ RUN ${PIP} install pip==${PIP_VERSION} && \
     ${PIP} install --no-cache -r requirements-base.txt
 
 RUN ${PYTHON} -c "from unstructured.nlp.tokenize import download_nltk_packages; download_nltk_packages()" && \
-    ${PYTHON} -c "from unstructured.partition.model_init import initialize; initialize()"
+    ${PYTHON} -c "from unstructured.partition.model_init import initialize; initialize()" && \
+    ${PYTHON} -c "from unstructured_inference.models.tables import UnstructuredTableTransformerModel; model = UnstructuredTableTransformerModel(); model.initialize('microsoft/table-transformer-structure-recognition')"
 
 COPY --chown=${NB_USER}:${NB_USER} CHANGELOG.md CHANGELOG.md
 COPY --chown=${NB_USER}:${NB_USER} logger_config.yaml logger_config.yaml
