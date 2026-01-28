@@ -1,3 +1,7 @@
+## 0.0.93
+* Refactored the Dockerfile to use the chainguard/wolfi-base image instead of the unstructured/base-image. This is to align with the recent change in the unstructured repo where the same change was made.
+* upgraded dependancies to address CVEs
+
 ## 0.0.92
 * Upgrade pdfminer-six to 20260107 to fix ~15-18% performance regression from eager f-string evaluation
 
