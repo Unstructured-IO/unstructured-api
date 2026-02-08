@@ -1,3 +1,11 @@
+## 0.1.0
+* Migrate to native uv for package management, replacing pip and pip-compile
+* Replace black and flake8 with ruff for linting and formatting
+* Remove all version pins from dependencies, use uv.lock for reproducibility
+* Update Dockerfile, CI workflows, and Makefile to use uv throughout
+* Add type stubs (types-requests) as explicit test dependencies
+* Fix flaky Korean OCR test assertions for tesseract compatibility
+
 ## 0.0.93
 * Refactored the Dockerfile to use the chainguard/wolfi-base image instead of the unstructured/base-image. This is to align with the recent change in the unstructured repo where the same change was made.
 * upgraded dependancies to address CVEs

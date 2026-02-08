@@ -1,7 +1,6 @@
 PIPELINE_FAMILY := general
 PIPELINE_PACKAGE := general
 PACKAGE_NAME := prepline_${PIPELINE_PACKAGE}
-PIP_VERSION := 25.1.1
 ARCH := $(shell uname -m)
 
 .PHONY: help
@@ -15,58 +14,38 @@ help: Makefile
 
 ## install-base:                installs minimum requirements to run the API
 .PHONY: install-base
-install-base: install-base-pip-packages install-nltk-models
+install-base: install-base-packages install-nltk-models
 
 ## install:                     installs all test and dev requirements
 .PHONY: install
-install:install-base install-test
+install: install-base install-test
 
-.PHONY: install-base-pip-packages
-install-base-pip-packages:
-	python3 -m pip install pip==${PIP_VERSION}
-	python3 -m pip install -r requirements/base.txt
+.PHONY: install-base-packages
+install-base-packages:
+	uv sync --no-dev --frozen
 
 .PHONY: install-test
-install-test: install-base
-	python3 -m pip install -r requirements/test.txt
-
-.PHONY: install-ci
-install-ci: install-test
+install-test:
+	uv sync --extra test --frozen
 
 .PHONY: install-nltk-models
 install-nltk-models:
-	python3 -c "from unstructured.nlp.tokenize import download_nltk_packages; download_nltk_packages()"
+	uv run python -c "from unstructured.nlp.tokenize import download_nltk_packages; download_nltk_packages()"
 
-## pip-compile:                 compiles all base/dev/test requirements
-SHELL := /bin/bash
-BASE_REQUIREMENTS := $(shell ls ./requirements/*.in)
-BASE_REQUIREMENTSTXT := $(patsubst %.in,%.txt,$(BASE_REQUIREMENTS))
+## lock:                        regenerates uv.lock
+.PHONY: lock
+lock:
+	uv lock --upgrade
 
-.PHONY: pip-compile
-pip-compile: compile-all-base
-
-.PHONY: compile-test
-compile-test:
-	uv pip compile --python-version 3.12 --upgrade -o requirements/test.txt requirements/base.txt requirements/test.in --no-emit-package pip --no-emit-package setuptools
-
-.PHONY: compile-base
-compile-base:
-	uv pip compile --python-version 3.12 --upgrade requirements/base.in -o requirements/base.txt --no-emit-package pip --no-emit-package setuptools
-
-.PHONY: compile-all-base
-compile-all-base: compile-base compile-test
-	@for file in $(BASE_REQUIREMENTS); do \
-		echo -e "\n\ncompiling: $$file"; \
-		uv pip compile --python-version 3.12 --upgrade --no-strip-extras $$file -o $${file%.in}.txt --no-emit-package pip --no-emit-package setuptools || exit 1; \
-	done
-
-.PHONY: clean-requirements
-clean-requirements:
-	rm $(BASE_REQUIREMENTSTXT)
-
+PANDOC_VERSION := 3.9
 .PHONY: install-pandoc
 install-pandoc:
-	ARCH=${ARCH} ./scripts/install-pandoc.sh
+	@ARCH=$$(uname -m) && \
+	if [ "$$ARCH" = "x86_64" ]; then PANDOC_ARCH="amd64"; else PANDOC_ARCH="arm64"; fi && \
+	wget -q "https://github.com/jgm/pandoc/releases/download/$(PANDOC_VERSION)/pandoc-$(PANDOC_VERSION)-linux-$$PANDOC_ARCH.tar.gz" -O /tmp/pandoc.tar.gz && \
+	tar -xzf /tmp/pandoc.tar.gz -C /tmp && \
+	sudo cp /tmp/pandoc-$(PANDOC_VERSION)/bin/pandoc /usr/local/bin/ && \
+	rm -rf /tmp/pandoc*
 
 ##########
 # Docker #
@@ -82,7 +61,7 @@ DOCKER_IMAGE ?= pipeline-family-${PIPELINE_FAMILY}-dev:latest
 
 .PHONY: docker-build
 docker-build:
-	PIP_VERSION=${PIP_VERSION} PIPELINE_FAMILY=${PIPELINE_FAMILY} PIPELINE_PACKAGE=${PIPELINE_PACKAGE} ./scripts/docker-build.sh
+	PIPELINE_FAMILY=${PIPELINE_FAMILY} PIPELINE_PACKAGE=${PIPELINE_PACKAGE} ./scripts/docker-build.sh
 
 .PHONY: docker-start-api
 docker-start-api:
@@ -107,7 +86,7 @@ docker-test:
 ## run-web-app:                 runs the FastAPI api with hot reloading
 .PHONY: run-web-app
 run-web-app:
-	PYTHONPATH=$(realpath .) uvicorn ${PACKAGE_NAME}.api.app:app --reload --log-config logger_config.yaml
+	PYTHONPATH=$(realpath .) uv run uvicorn ${PACKAGE_NAME}.api.app:app --reload --log-config logger_config.yaml
 
 #################
 # Test and Lint #
@@ -116,12 +95,12 @@ run-web-app:
 ## test:                        runs core tests
 .PHONY: test
 test:
-	PYTHONPATH=. pytest -n auto -v test_${PIPELINE_PACKAGE} --cov=${PACKAGE_NAME} --cov-report term-missing
+	PYTHONPATH=. uv run pytest -n auto -v test_${PIPELINE_PACKAGE} --cov=${PACKAGE_NAME} --cov-report term-missing
 
 # Setting a low bar here - need more tests!
 .PHONY: check-coverage
 check-coverage:
-	coverage report --fail-under=60
+	uv run coverage report --fail-under=60
 
 ## check:                       runs linters (includes tests)
 .PHONY: check
@@ -130,20 +109,20 @@ check: check-src check-tests check-version
 ## check-src:                   runs linters (source only, no tests)
 .PHONY: check-src
 check-src:
-	black --line-length 100 ${PACKAGE_NAME} --check
-	flake8 ${PACKAGE_NAME}
-	mypy ${PACKAGE_NAME} --ignore-missing-imports --install-types --non-interactive --implicit-optional
+	uv run ruff format --check ${PACKAGE_NAME}
+	uv run ruff check ${PACKAGE_NAME}
+	uv run mypy ${PACKAGE_NAME} --ignore-missing-imports --implicit-optional
 
 .PHONY: check-tests
 check-tests:
-	black --line-length 100 test_${PIPELINE_PACKAGE} --check
-	flake8 test_${PIPELINE_PACKAGE} scripts/smoketest.py
+	uv run ruff format --check test_${PIPELINE_PACKAGE} scripts/smoketest.py
+	uv run ruff check test_${PIPELINE_PACKAGE} scripts/smoketest.py
 
-## tidy:                        run black
+## tidy:                        run ruff format and fix
 .PHONY: tidy
 tidy:
-	black --line-length 100 ${PACKAGE_NAME}
-	black --line-length 100 test_${PIPELINE_PACKAGE} scripts/smoketest.py
+	uv run ruff format ${PACKAGE_NAME} test_${PIPELINE_PACKAGE} scripts/smoketest.py
+	uv run ruff check --fix ${PACKAGE_NAME} test_${PIPELINE_PACKAGE} scripts/smoketest.py
 
 ## check-scripts:               run shellcheck
 .PHONY: check-scripts
@@ -157,7 +136,6 @@ check-version:
 # Fail if syncing version would produce changes
 	scripts/version-sync.sh -c \
 		-s CHANGELOG.md \
-		-f preprocessing-pipeline-family.yaml release \
 		-f prepline_general/api/__version__.py release \
 
 ## version-sync:                update references to version with most recent version from CHANGELOG.md
@@ -165,5 +143,4 @@ check-version:
 version-sync:
 	scripts/version-sync.sh \
 		-s CHANGELOG.md \
-		-f preprocessing-pipeline-family.yaml release \
 		-f prepline_general/api/__version__.py release \

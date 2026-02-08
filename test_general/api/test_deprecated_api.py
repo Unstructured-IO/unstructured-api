@@ -1,9 +1,9 @@
-import pytest
-
 from pathlib import Path
 from typing import Any
 
+import pytest
 from fastapi.testclient import TestClient
+
 from prepline_general.api.app import app
 
 MAIN_API_ROUTE = "general/v0/general"

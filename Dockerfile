@@ -5,24 +5,20 @@ FROM cgr.dev/chainguard/wolfi-base:latest
 #             https://mybinder.readthedocs.io/en/latest/tutorials/dockerfile.html
 ARG NB_USER=notebook-user
 ARG NB_UID=1000
-ARG PIP_VERSION
 ARG PIPELINE_PACKAGE
 ARG PYTHON_VERSION="3.12"
 
 # Set up environment
 ENV PYTHON=python${PYTHON_VERSION}
-ENV PIP="${PYTHON} -m pip"
+
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /usr/local/bin/uv
 
 USER root
-
-COPY ./docker/packages/*.apk /tmp/packages/
 
 RUN apk update && \
     apk add libxml2 python-3.12 python-3.12-base py3.12-pip glib \
       mesa-gl mesa-libgallium cmake bash libmagic wget git openjpeg \
       poppler poppler-utils poppler-glib libreoffice tesseract && \
-    apk add --allow-untrusted /tmp/packages/pandoc-3.1.8-r0.apk && \
-    rm -rf /tmp/packages && \
     git clone --depth 1 https://github.com/tesseract-ocr/tessdata.git /tmp/tessdata && \
     mkdir -p /usr/local/share/tessdata && \
     cp /tmp/tessdata/*.traineddata /usr/local/share/tessdata && \
@@ -60,10 +56,21 @@ RUN ./initialize-libreoffice.sh && rm initialize-libreoffice.sh
 ENV PYTHONPATH="${PYTHONPATH}:${HOME}"
 ENV PATH="/home/${NB_USER}/.local/bin:${PATH}"
 ENV TESSDATA_PREFIX=/usr/local/share/tessdata
+ENV UV_COMPILE_BYTECODE=1
+ENV UV_LINK_MODE=copy
+ENV UV_PROJECT_ENVIRONMENT="${HOME}/.local"
 
-COPY --chown=${NB_USER}:${NB_USER} requirements/base.txt requirements-base.txt
-RUN ${PIP} install pip==${PIP_VERSION} && \
-    ${PIP} install --no-cache -r requirements-base.txt
+COPY --chown=${NB_USER}:${NB_USER} pyproject.toml pyproject.toml
+COPY --chown=${NB_USER}:${NB_USER} uv.lock uv.lock
+RUN uv sync --no-dev --no-install-project --frozen
+
+ARG PANDOC_VERSION="3.9"
+RUN ARCH=$(uname -m) && \
+    if [ "$ARCH" = "x86_64" ]; then PANDOC_ARCH="amd64"; else PANDOC_ARCH="arm64"; fi && \
+    wget -q "https://github.com/jgm/pandoc/releases/download/${PANDOC_VERSION}/pandoc-${PANDOC_VERSION}-linux-${PANDOC_ARCH}.tar.gz" -O /tmp/pandoc.tar.gz && \
+    tar -xzf /tmp/pandoc.tar.gz -C /tmp && \
+    cp /tmp/pandoc-${PANDOC_VERSION}/bin/pandoc /home/${USER}/.local/bin/ && \
+    rm -rf /tmp/pandoc*
 
 RUN ${PYTHON} -c "from unstructured.nlp.tokenize import download_nltk_packages; download_nltk_packages()" && \
     ${PYTHON} -c "from unstructured.partition.model_init import initialize; initialize()" && \

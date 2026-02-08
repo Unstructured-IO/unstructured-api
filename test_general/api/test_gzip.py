@@ -1,6 +1,6 @@
 import gzip
-import shutil
 import io
+import shutil
 import tempfile
 from pathlib import Path
 from typing import List
@@ -8,8 +8,8 @@ from typing import List
 import httpx
 import pandas as pd
 import pytest
-from fastapi.testclient import TestClient
 from deepdiff import DeepDiff
+from fastapi.testclient import TestClient
 
 from prepline_general.api.app import app
 

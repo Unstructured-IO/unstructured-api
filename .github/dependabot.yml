@@ -1,7 +1,7 @@
 version: 2
 updates:
   - package-ecosystem: "pip"
-    directory: "/requirements"
+    directory: "/"
     schedule:
       interval: "daily"
     # Only use this to bump our libraries

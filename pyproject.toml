@@ -1,5 +1,42 @@
-[tool.black]
-line-length = 100
+[project]
+name = "prepline-general"
+dynamic = ["version"]
+description = "Unstructured API for document processing"
+requires-python = ">=3.12"
+dependencies = [
+    "unstructured[all-docs] >=0.18.31, <1.0.0",
+    "fastapi >=0.128.4, <1.0.0",
+    "uvicorn >=0.40.0, <1.0.0",
+]
+
+[project.optional-dependencies]
+test = [
+    "ruff >=0.15.0, <1.0.0",
+    "mypy >=1.19.1, <2.0.0",
+    "types-requests >=2.32.4, <3.0.0",
+    "pytest >=9.0.2, <10.0.0",
+    "pytest-cov >=7.0.0, <8.0.0",
+    "pytest-mock >=3.15.1, <4.0.0",
+    "pytest-xdist >=3.8.0, <4.0.0",
+    "httpx >=0.28.1, <1.0.0",
+    "deepdiff >=8.6.1, <9.0.0",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.version]
+path = "prepline_general/api/__version__.py"
+
+[tool.uv]
+# Constraints for transitive dependencies that need pinning for functional reasons
+constraint-dependencies = [
+    # later versions of Starlette break middleware
+    "starlette==0.41.2",
+    # pdfminer.six 20260107 includes performance fix
+    "pdfminer-six==20260107",
+]
 
 [tool.pyright]
 pythonPlatform = "Linux"
@@ -9,10 +46,16 @@ typeCheckingMode = "strict"
 
 [tool.ruff]
 line-length = 100
+
+[tool.ruff.lint]
+exclude = [
+    "prepline_*/api",
+]
 select = [
     "C4",       # -- flake8-comprehensions --
     "COM",      # -- flake8-commas --
     "E",        # -- pycodestyle errors --
+    "W",        # -- pycodestyle warnings --
     "F",        # -- pyflakes --
     "I",        # -- isort (imports) --
     "PLR0402",  # -- Name compared with itself like `foo == foo` --
@@ -25,8 +68,12 @@ select = [
 ]
 ignore = [
     "COM812",   # -- over aggressively insists on trailing commas where not desireable --
+    "PT006",    # -- pytest.mark.parametrize string vs tuple style for arg names --
     "PT011",    # -- pytest.raises({exc}) too broad, use match param or more specific exception --
     "PT012",    # -- pytest.raises() block should contain a single simple statement --
+    "PT014",    # -- duplicate parametrize test case --
+    "PT015",    # -- assertion always fails, use pytest.fail() --
+    "SIM115",   # -- use context manager for opening files (too noisy for test multipart patterns) --
     "SIM117",   # -- merge `with` statements for context managers that have same scope --
 ]
 
@@ -35,3 +82,10 @@ known-first-party = [
     "unstructured",
     "unstructured_inference",
 ]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+
+[tool.pytest.ini_options]
+testpaths = ["test_general"]

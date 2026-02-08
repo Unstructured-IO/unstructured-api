@@ -1,15 +1,15 @@
+import gzip
 import io
 import os
-import time
-import gzip
 import shutil
+import tempfile
+import time
 from pathlib import Path
 from typing import List, Optional
-import tempfile
 
+import pandas as pd
 import pytest
 import requests
-import pandas as pd
 
 API_URL = "http://localhost:8000/general/v0/general"
 # NOTE(rniko): Skip inference tests if we're running on an emulated architecture
@@ -276,9 +276,7 @@ def test_table_support(strategy: str, skip_infer_table_types: list[str], expecte
 
     assert response.status_code == 200
     extracted_tables = [
-        el["metadata"]["text_as_html"]
-        for el in response.json()
-        if "text_as_html" in el["metadata"].keys()
+        el["metadata"]["text_as_html"] for el in response.json() if "text_as_html" in el["metadata"]
     ]
     assert len(extracted_tables) == expected_table_num
     if expected_table_num > 0:
