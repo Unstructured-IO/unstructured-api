@@ -46,11 +46,11 @@ typeCheckingMode = "strict"
 
 [tool.ruff]
 line-length = 100
-
-[tool.ruff.lint]
 exclude = [
     "prepline_*/api",
 ]
+
+[tool.ruff.lint]
 select = [
     "C4",       # -- flake8-comprehensions --
     "COM",      # -- flake8-commas --
