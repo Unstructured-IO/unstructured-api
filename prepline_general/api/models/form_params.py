@@ -54,7 +54,7 @@ class GeneralFormParams(BaseModel):
             Form(
                 title="OCR Languages",
                 description="The languages present in the document, for use in partitioning and/or OCR",
-                examples=["[eng]"],
+                examples=['["eng"]'],
             ),
             BeforeValidator(SmartValueParser[List[str]]().value_or_first_element),
         ] = [],  # noqa
@@ -63,7 +63,7 @@ class GeneralFormParams(BaseModel):
             Form(
                 title="OCR Languages",
                 description="The languages present in the document, for use in partitioning and/or OCR",
-                examples=["[eng]"],
+                examples=['["eng"]'],
             ),
             BeforeValidator(SmartValueParser[List[str]]().value_or_first_element),
         ] = [],
@@ -74,7 +74,7 @@ class GeneralFormParams(BaseModel):
                 description=(
                     "The document types that you want to skip table extraction with. Default: []"
                 ),
-                examples=["['pdf', 'jpg', 'png']"],
+                examples=['["pdf", "jpg", "png"]'],
             ),
             BeforeValidator(SmartValueParser[List[str]]().value_or_first_element),
         ] = [],  # noqa
