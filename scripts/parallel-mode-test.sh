@@ -6,10 +6,29 @@
 # diff the two outputs to make sure parallel mode does not alter the response.
 # Note the filepaths assume you ran this from the top level
 
-# shellcheck disable=SC2317  # Shellcheck complains that trap functions are unreachable...
+# shellcheck disable=SC2317,SC2086  # SC2317: trap functions appear unreachable, SC2086: curl params require word splitting
 
 base_url_1=$1
 base_url_2=$2
+MAX_RETRIES=3
+
+curl_with_retry() {
+    local curl_command=$1
+    local output_file=$2
+
+    for attempt in $(seq 1 $MAX_RETRIES); do
+        $curl_command 2> /dev/null | jq -S 'del(..|.parent_id?)' > "$output_file"
+        if [ -s "$output_file" ]; then
+            return 0
+        fi
+        echo "  Attempt $attempt/$MAX_RETRIES failed, retrying in 5s..."
+        sleep 5
+    done
+
+    echo "  All $MAX_RETRIES attempts failed!"
+    $curl_command
+    return 1
+}
 
 declare -a curl_params=(
     "-F files=@sample-docs/layout-parser-paper.pdf -F 'strategy=fast'"
@@ -29,27 +48,19 @@ do
    # Run in single mode
    # Note(austin): Parallel mode screws up hierarchy! While we deal with that,
    # let's ignore parent_id fields in the results
-   $curl_command 2> /dev/null | jq -S 'del(..|.parent_id?)' > output.json
-   original_length=$(jq 'length' output.json)
-
-   # Stop if curl didn't work
-   if [ ! -s output.json ]; then
+   if ! curl_with_retry "$curl_command" output.json; then
        echo Command failed!
-       $curl_command
        exit 1
    fi
+   original_length=$(jq 'length' output.json)
 
    # Run in parallel mode
    curl_command="curl $base_url_2/general/v0/general $params"
-   $curl_command 2> /dev/null | jq -S 'del(..|.parent_id?)' > parallel_output.json
-   parallel_length=$(jq 'length' parallel_output.json)
-
-   # Stop if curl didn't work
-   if [ ! -s parallel_output.json ]; then
+   if ! curl_with_retry "$curl_command" parallel_output.json; then
        echo Command failed!
-       $curl_command
        exit 1
    fi
+   parallel_length=$(jq 'length' parallel_output.json)
 
    if ! [[ "$original_length" == "$parallel_length" ]]; then
        echo Parallel mode returned a different number of elements!
@@ -60,5 +71,3 @@ do
    rm -f output.json parallel_output.json
    echo
 done
-
-

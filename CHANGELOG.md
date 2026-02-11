@@ -13,6 +13,8 @@
 * Pin uv version in Dockerfile for reproducible builds
 * Remove `py3.12-pip` from Dockerfile (unused since uv migration)
 * Drop mypy from CI (ruff covers linting sufficiently)
+* Add retry logic to parallel-mode curl tests for transient connection failures
+* Switch Dependabot from `pip` to `uv` ecosystem
 * Remove unused `ARCH` variable from Makefile
 
 ## 0.0.93

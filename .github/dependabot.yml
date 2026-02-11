@@ -1,12 +1,12 @@
 version: 2
 updates:
-  - package-ecosystem: "pip"
+  - package-ecosystem: "uv"
     directory: "/"
     schedule:
       interval: "daily"
     # Only use this to bump our libraries
     allow:
-      - dependency-name: "unstructured[local-inference]"
+      - dependency-name: "unstructured[all-docs]"
 
   - package-ecosystem: "github-actions"
     # NOTE(robinson) - Workflow files stored in the
