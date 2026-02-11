@@ -3,7 +3,6 @@
 * Replace black and flake8 with ruff for linting and formatting
 * Remove all version pins from dependencies, use uv.lock for reproducibility
 * Update Dockerfile, CI workflows, and Makefile to use uv throughout
-* Add type stubs (types-requests) as explicit test dependencies
 * Fix flaky Korean OCR test assertions for tesseract compatibility
 * Use `.python-version` file as single source of truth for Python version across all CI workflows
 * Re-enable arm64 Docker image builds using a dedicated ARM runner (`opensource-linux-arm64-4core`), restoring multiarch support for both amd64 and arm64
@@ -12,6 +11,9 @@
 * Add explicit dependencies for `backoff`, `pandas`, `psutil`, `pypdf`, and `requests` (previously only transitive via `unstructured[all-docs]`)
 * Pre-download NLTK models before parallel test runs to prevent race conditions
 * Parallelize Docker smoke tests by running one container per xdist worker on dedicated ports
+* Pin uv version in Dockerfile for reproducible builds
+* Remove `py3.12-pip` from Dockerfile (unused since uv migration)
+* Drop mypy from CI (ruff covers linting sufficiently)
 * Remove unused `ARCH` variable from Makefile
 
 ## 0.0.93
