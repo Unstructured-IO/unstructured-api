@@ -24,7 +24,7 @@ jobs:
     strategy:
       matrix:
         arch: ["arm64", "amd64"]
-    runs-on: ${{ matrix.arch == 'arm64' && 'opensource-linux-arm64-4core' || 'opensource-linux-8core' }}
+    runs-on: ${{ matrix.arch == 'arm64' && 'ubuntu-24.04-arm' || 'opensource-linux-8core' }}
     needs: set-short-sha
     env:
       SHORT_SHA: ${{ needs.set-short-sha.outputs.short_sha }}

@@ -1,3 +1,6 @@
+## 0.1.1
+* Switch arm64 Docker build runner from custom `opensource-linux-arm64-4core` to GitHub-hosted `ubuntu-24.04-arm`
+
 ## 0.1.0
 * Migrate to native uv for package management, replacing pip and pip-compile
 * Replace black and flake8 with ruff for linting and formatting
@@ -5,7 +8,7 @@
 * Update Dockerfile, CI workflows, and Makefile to use uv throughout
 * Fix flaky Korean OCR test assertions for tesseract compatibility
 * Use `.python-version` file as single source of truth for Python version across all CI workflows
-* Re-enable arm64 Docker image builds using a dedicated ARM runner (`opensource-linux-arm64-4core`), restoring multiarch support for both amd64 and arm64
+* Re-enable arm64 Docker image builds with a dedicated ARM runner, restoring multiarch support for both amd64 and arm64
 * Switch all CI workflows to faster self-hosted runners (`opensource-linux-8core`)
 * Split lint tools into a lightweight dependency group so the CI lint step no longer installs heavy runtime dependencies
 * Add explicit dependencies for `backoff`, `pandas`, `psutil`, `pypdf`, and `requests` (previously only transitive via `unstructured[all-docs]`)
