@@ -10,6 +10,26 @@
 
 base_url_1=$1
 base_url_2=$2
+MAX_RETRIES=3
+
+curl_with_retry() {
+    local url=$1
+    local params=$2
+    local output_file=$3
+
+    for attempt in $(seq 1 $MAX_RETRIES); do
+        curl $url $params 2> /dev/null | jq -S 'del(..|.parent_id?)' > "$output_file"
+        if [ -s "$output_file" ]; then
+            return 0
+        fi
+        echo "  Attempt $attempt/$MAX_RETRIES failed, retrying in 5s..."
+        sleep 5
+    done
+
+    echo "  All $MAX_RETRIES attempts failed!"
+    curl $url $params
+    return 1
+}
 
 declare -a curl_params=(
     "-F files=@sample-docs/layout-parser-paper.pdf -F 'strategy=fast'"
@@ -23,33 +43,23 @@ declare -a curl_params=(
 
 for params in "${curl_params[@]}"
 do
-   curl_command="curl $base_url_1/general/v0/general $params"
-   echo Testing: "$curl_command"
+   echo Testing: "curl $base_url_1/general/v0/general $params"
 
    # Run in single mode
    # Note(austin): Parallel mode screws up hierarchy! While we deal with that,
    # let's ignore parent_id fields in the results
-   $curl_command 2> /dev/null | jq -S 'del(..|.parent_id?)' > output.json
+   if ! curl_with_retry "$base_url_1/general/v0/general" "$params" output.json; then
+       echo Command failed!
+       exit 1
+   fi
    original_length=$(jq 'length' output.json)
 
-   # Stop if curl didn't work
-   if [ ! -s output.json ]; then
-       echo Command failed!
-       $curl_command
-       exit 1
-   fi
-
    # Run in parallel mode
-   curl_command="curl $base_url_2/general/v0/general $params"
-   $curl_command 2> /dev/null | jq -S 'del(..|.parent_id?)' > parallel_output.json
-   parallel_length=$(jq 'length' parallel_output.json)
-
-   # Stop if curl didn't work
-   if [ ! -s parallel_output.json ]; then
+   if ! curl_with_retry "$base_url_2/general/v0/general" "$params" parallel_output.json; then
        echo Command failed!
-       $curl_command
        exit 1
    fi
+   parallel_length=$(jq 'length' parallel_output.json)
 
    if ! [[ "$original_length" == "$parallel_length" ]]; then
        echo Parallel mode returned a different number of elements!

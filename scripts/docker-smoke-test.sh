@@ -94,9 +94,14 @@ PYTHONPATH=. SKIP_INFERENCE_TESTS=$SKIP_INFERENCE_TESTS SMOKE_TEST_BASE_PORT=$BA
 # Test parallel vs single mode
 #######################
 if ! $SKIP_INFERENCE_TESTS; then
+    # Stop extra smoke test containers to free memory, keep only the first one
+    for i in $(seq 1 $((NUM_WORKERS-1))); do
+        docker stop "${CONTAINER_NAME_PREFIX}-${i}" 2> /dev/null || true
+    done
+
     # Reuse the first container on BASE_PORT for single mode,
-    # start a new one for parallel mode on a non-conflicting port
-    parallel_port=$((BASE_PORT + NUM_WORKERS))
+    # start a new one for parallel mode
+    parallel_port=$((BASE_PORT + 1))
     start_container "$parallel_port" "$CONTAINER_NAME_PARALLEL" "true"
     await_server_ready "$parallel_port"
 
