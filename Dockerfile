@@ -11,12 +11,12 @@ ARG PYTHON_VERSION="3.12"
 # Set up environment
 ENV PYTHON=python${PYTHON_VERSION}
 
-COPY --from=ghcr.io/astral-sh/uv:latest /uv /usr/local/bin/uv
+COPY --from=ghcr.io/astral-sh/uv:0.10.0 /uv /usr/local/bin/uv
 
 USER root
 
 RUN apk update && \
-    apk add libxml2 python-3.12 python-3.12-base py3.12-pip glib \
+    apk add libxml2 python-3.12 python-3.12-base glib \
       mesa-gl mesa-libgallium cmake bash libmagic wget git openjpeg \
       poppler poppler-utils poppler-glib libreoffice tesseract && \
     git clone --depth 1 https://github.com/tesseract-ocr/tessdata.git /tmp/tessdata && \
@@ -32,7 +32,6 @@ RUN apk update && \
     ln -s /usr/lib/libreoffice/program/soffice.bin /usr/bin/soffice && \
     chmod +x /usr/lib/libreoffice/program/soffice.bin && \
     apk add --no-cache font-ubuntu fontconfig && \
-    apk upgrade --no-cache py3.12-pip && \
     fc-cache -fv && \
     ln -sf /usr/bin/$PYTHON /usr/bin/python3 && \
     addgroup --gid ${NB_UID} ${NB_USER} && \
