@@ -10,12 +10,9 @@
 * Split lint tools into a lightweight dependency group so the CI lint step no longer installs heavy runtime dependencies
 * Add explicit dependencies for `backoff`, `pandas`, `psutil`, `pypdf`, and `requests` (previously only transitive via `unstructured[all-docs]`)
 * Pre-download NLTK models before parallel test runs to prevent race conditions
-* Parallelize Docker smoke tests by running one container per xdist worker on dedicated ports
 * Pin uv version in Dockerfile for reproducible builds
 * Remove `py3.12-pip` from Dockerfile (unused since uv migration)
 * Drop mypy from CI (ruff covers linting sufficiently)
-* Free memory by stopping extra smoke test containers before parallel-mode tests
-* Add retry logic to parallel-mode curl tests for transient connection failures
 * Remove unused `ARCH` variable from Makefile
 
 ## 0.0.93

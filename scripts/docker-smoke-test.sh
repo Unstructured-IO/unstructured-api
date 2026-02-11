@@ -11,20 +11,24 @@
 
 set -e
 
-CONTAINER_NAME_PREFIX=unstructured-api-smoke-test
+CONTAINER_NAME=unstructured-api-smoke-test
 CONTAINER_NAME_PARALLEL=unstructured-api-smoke-test-parallel
 PIPELINE_FAMILY=${PIPELINE_FAMILY:-"general"}
 DOCKER_IMAGE="${DOCKER_IMAGE:-pipeline-family-${PIPELINE_FAMILY}-dev:latest}"
 SKIP_INFERENCE_TESTS="${SKIP_INFERENCE_TESTS:-false}"
-NUM_WORKERS="${NUM_WORKERS:-4}"
-BASE_PORT=8000
 
 start_container() {
-    local port=$1
-    local name=$2
-    local use_parallel_mode=${3:-false}
 
-    echo Starting container "$name" on port "$port"
+    port=$1
+    use_parallel_mode=$2
+
+    if [ "$use_parallel_mode" = "true" ]; then
+        name=$CONTAINER_NAME_PARALLEL
+    else
+        name=$CONTAINER_NAME
+    fi
+
+    echo Starting container "$name"
     docker run --platform "$DOCKER_PLATFORM" \
            -p "$port":"$port" \
            --entrypoint uvicorn \
@@ -38,8 +42,8 @@ start_container() {
 }
 
 await_server_ready() {
-    local port=$1
-    local url=localhost:$port/healthcheck
+    port=$1
+    url=localhost:$port/healthcheck
 
     # NOTE(rniko): Increasing the timeout to 120 seconds because emulated arm tests are slow to start
     for _ in {1..120}; do
@@ -56,59 +60,37 @@ await_server_ready() {
     exit 1
 }
 
-stop_all_containers() {
-    for i in $(seq 0 $((NUM_WORKERS-1))); do
-        local name="${CONTAINER_NAME_PREFIX}-${i}"
-        echo Stopping container "$name"
-        docker stop "$name" 2> /dev/null || true
-    done
+stop_container() {
+    echo Stopping container "$CONTAINER_NAME"
+    # Note (austin) - if you're getting an error from the api, try dumping the logs
+    # docker logs $CONTAINER_NAME 2> docker_logs.txt
+    docker stop "$CONTAINER_NAME" 2> /dev/null || true
 
     echo Stopping container "$CONTAINER_NAME_PARALLEL"
     docker stop "$CONTAINER_NAME_PARALLEL" 2> /dev/null || true
 }
 
-# Always clean up all containers
-trap stop_all_containers EXIT
+# Always clean up the container
+trap stop_container EXIT
 
-#######################
-# Start worker containers
-#######################
-for i in $(seq 0 $((NUM_WORKERS-1))); do
-    port=$((BASE_PORT + i))
-    start_container "$port" "${CONTAINER_NAME_PREFIX}-${i}" "false"
-done
-
-for i in $(seq 0 $((NUM_WORKERS-1))); do
-    port=$((BASE_PORT + i))
-    await_server_ready "$port"
-done
+start_container 8000 "false"
+await_server_ready 8000
 
 #######################
 # Smoke Tests
 #######################
-echo "Running smoke tests with SKIP_INFERENCE_TESTS: $SKIP_INFERENCE_TESTS, NUM_WORKERS: $NUM_WORKERS"
-PYTHONPATH=. SKIP_INFERENCE_TESTS=$SKIP_INFERENCE_TESTS SMOKE_TEST_BASE_PORT=$BASE_PORT \
-    uv run pytest -n "$NUM_WORKERS" -vv scripts/smoketest.py
+echo Running smoke tests with SKIP_INFERENCE_TESTS: "$SKIP_INFERENCE_TESTS"
+PYTHONPATH=. SKIP_INFERENCE_TESTS=$SKIP_INFERENCE_TESTS uv run pytest -vv scripts/smoketest.py
 
 #######################
 # Test parallel vs single mode
 #######################
 if ! $SKIP_INFERENCE_TESTS; then
-    # Stop all smoke test containers to free memory and avoid stale state
-    for i in $(seq 0 $((NUM_WORKERS-1))); do
-        docker stop "${CONTAINER_NAME_PREFIX}-${i}" 2> /dev/null || true
-    done
-
-    # Start fresh containers for the parallel-mode comparison test
-    single_port=$BASE_PORT
-    parallel_port=$((BASE_PORT + 1))
-    start_container "$single_port" "${CONTAINER_NAME_PREFIX}-0" "false"
-    start_container "$parallel_port" "$CONTAINER_NAME_PARALLEL" "true"
-    await_server_ready "$single_port"
-    await_server_ready "$parallel_port"
+    start_container 9000 true
+    await_server_ready 9000
 
     echo Running parallel mode test
-    ./scripts/parallel-mode-test.sh "localhost:$single_port" "localhost:$parallel_port"
+    ./scripts/parallel-mode-test.sh localhost:8000 localhost:9000
 fi
 
 result=$?

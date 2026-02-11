@@ -11,21 +11,9 @@ import pandas as pd
 import pytest
 import requests
 
+API_URL = "http://localhost:8000/general/v0/general"
 # NOTE(rniko): Skip inference tests if we're running on an emulated architecture
 skip_inference_tests = os.getenv("SKIP_INFERENCE_TESTS", "").lower() in {"true", "yes", "y", "1"}
-
-
-def _get_api_url() -> str:
-    """Determine the API URL for the current xdist worker.
-
-    Each pytest-xdist worker (gw0, gw1, ...) is assigned its own container
-    on a dedicated port (base_port + worker_number). When running without
-    xdist, defaults to base_port.
-    """
-    base_port = int(os.environ.get("SMOKE_TEST_BASE_PORT", "8000"))
-    worker_id = os.environ.get("PYTEST_XDIST_WORKER", "gw0")
-    worker_num = int(worker_id.replace("gw", ""))
-    return f"http://localhost:{base_port + worker_num}/general/v0/general"
 
 
 def send_document(
@@ -54,7 +42,7 @@ def send_document(
         options["gz_uncompressed_content_type"] = uncompressed_content_type
 
     return requests.post(
-        _get_api_url(),
+        API_URL,
         files=files,
         data=options,
     )
