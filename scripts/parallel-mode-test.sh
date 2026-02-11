@@ -6,7 +6,7 @@
 # diff the two outputs to make sure parallel mode does not alter the response.
 # Note the filepaths assume you ran this from the top level
 
-# shellcheck disable=SC2317  # Shellcheck complains that trap functions are unreachable...
+# shellcheck disable=SC2317,SC2086  # SC2317: trap functions appear unreachable, SC2086: curl params require word splitting
 
 base_url_1=$1
 base_url_2=$2
