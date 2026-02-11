@@ -108,20 +108,20 @@ check: check-src check-tests check-version
 ## check-src:                   runs linters (source only, no tests)
 .PHONY: check-src
 check-src:
-	uv run ruff format --check ${PACKAGE_NAME}
-	uv run ruff check ${PACKAGE_NAME}
-	uv run mypy ${PACKAGE_NAME} --ignore-missing-imports --implicit-optional
+	uv run --no-sync ruff format --check ${PACKAGE_NAME}
+	uv run --no-sync ruff check ${PACKAGE_NAME}
+	uv run --no-sync mypy ${PACKAGE_NAME} --ignore-missing-imports --implicit-optional
 
 .PHONY: check-tests
 check-tests:
-	uv run ruff format --check test_${PIPELINE_PACKAGE} scripts/smoketest.py
-	uv run ruff check test_${PIPELINE_PACKAGE} scripts/smoketest.py
+	uv run --no-sync ruff format --check test_${PIPELINE_PACKAGE} scripts/smoketest.py
+	uv run --no-sync ruff check test_${PIPELINE_PACKAGE} scripts/smoketest.py
 
 ## tidy:                        run ruff format and fix
 .PHONY: tidy
 tidy:
-	uv run ruff format ${PACKAGE_NAME} test_${PIPELINE_PACKAGE} scripts/smoketest.py
-	uv run ruff check --fix ${PACKAGE_NAME} test_${PIPELINE_PACKAGE} scripts/smoketest.py
+	uv run --no-sync ruff format ${PACKAGE_NAME} test_${PIPELINE_PACKAGE} scripts/smoketest.py
+	uv run --no-sync ruff check --fix ${PACKAGE_NAME} test_${PIPELINE_PACKAGE} scripts/smoketest.py
 
 ## check-scripts:               run shellcheck
 .PHONY: check-scripts
