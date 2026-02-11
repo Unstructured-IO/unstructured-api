@@ -1,6 +1,7 @@
 ## 0.1.1
 * Switch arm64 Docker build runner from custom `opensource-linux-arm64-4core` to GitHub-hosted `ubuntu-24.04-arm`
 * Consolidate multiarch Docker manifest creation into a single `docker buildx imagetools create` call
+* Skip inference tests in CD Docker smoke tests for both architectures (already covered by CI)
 
 ## 0.1.0
 * Migrate to native uv for package management, replacing pip and pip-compile
