@@ -25,7 +25,7 @@ install-base-packages:
 
 .PHONY: install-test
 install-test:
-	uv sync --extra test --frozen
+	uv sync --group test --frozen
 
 .PHONY: install-nltk-models
 install-nltk-models:
