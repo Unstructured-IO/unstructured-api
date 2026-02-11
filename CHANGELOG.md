@@ -5,6 +5,8 @@
 * Update Dockerfile, CI workflows, and Makefile to use uv throughout
 * Add type stubs (types-requests) as explicit test dependencies
 * Fix flaky Korean OCR test assertions for tesseract compatibility
+* Use `.python-version` file as single source of truth for Python version across all CI workflows
+* Re-enable arm64 Docker image builds using a dedicated ARM runner (`opensource-linux-arm64-4core`), restoring multiarch support for both amd64 and arm64
 
 ## 0.0.93
 * Refactored the Dockerfile to use the chainguard/wolfi-base image instead of the unstructured/base-image. This is to align with the recent change in the unstructured repo where the same change was made.
