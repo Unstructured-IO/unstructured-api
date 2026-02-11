@@ -1,7 +1,6 @@
 PIPELINE_FAMILY := general
 PIPELINE_PACKAGE := general
 PACKAGE_NAME := prepline_${PIPELINE_PACKAGE}
-ARCH := $(shell uname -m)
 
 .PHONY: help
 help: Makefile
