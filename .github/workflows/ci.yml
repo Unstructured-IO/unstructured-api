@@ -11,7 +11,7 @@ env:
 
 jobs:
   lint:
-    runs-on: ubuntu-latest
+    runs-on: opensource-linux-8core
     steps:
     - uses: actions/checkout@v5
     - name: Read Python version from .python-version
@@ -29,14 +29,14 @@ jobs:
       run: make check
 
   shellcheck:
-    runs-on: ubuntu-latest
+    runs-on: opensource-linux-8core
     steps:
       - uses: actions/checkout@v5
       - name: ShellCheck
         uses: ludeeus/action-shellcheck@master
 
   test:
-    runs-on: ubuntu-latest
+    runs-on: opensource-linux-8core
     needs: lint
     steps:
     - uses: actions/checkout@v5
@@ -61,7 +61,7 @@ jobs:
         make check-coverage
 
   changelog:
-    runs-on: ubuntu-latest
+    runs-on: opensource-linux-8core
     steps:
     - uses: actions/checkout@v5
     - if: github.ref != 'refs/heads/main'
@@ -78,7 +78,7 @@ jobs:
 
   # TODO - figure out best practice for caching docker images
   test_dockerfile:
-    runs-on: ubuntu-latest
+    runs-on: opensource-linux-8core
     needs: lint
     steps:
     - uses: actions/checkout@v5

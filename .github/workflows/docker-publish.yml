@@ -13,7 +13,7 @@ env:
 
 jobs:
   set-short-sha:
-    runs-on: ubuntu-latest
+    runs-on: opensource-linux-8core
     outputs:
       short_sha: ${{ steps.set_short_sha.outputs.short_sha }}
     steps:
@@ -24,7 +24,7 @@ jobs:
     strategy:
       matrix:
         arch: ["arm64", "amd64"]
-    runs-on: ${{ matrix.arch == 'arm64' && 'opensource-linux-arm64-4core' || 'ubuntu-latest' }}
+    runs-on: ${{ matrix.arch == 'arm64' && 'opensource-linux-arm64-4core' || 'opensource-linux-8core' }}
     needs: set-short-sha
     env:
       SHORT_SHA: ${{ needs.set-short-sha.outputs.short_sha }}
@@ -96,7 +96,7 @@ jobs:
         # write to the build repository to cache for the publish-images job
         docker push $DOCKER_BUILD_REPOSITORY:${{ matrix.arch }}-$SHORT_SHA
   publish-images:
-    runs-on: ubuntu-latest
+    runs-on: opensource-linux-8core
     needs: [set-short-sha, build-images]
     env:
       SHORT_SHA: ${{ needs.set-short-sha.outputs.short_sha }}

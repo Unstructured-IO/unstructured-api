@@ -11,7 +11,7 @@ on:
 
 jobs:
     bump-changelog:
-        runs-on: ubuntu-latest
+        runs-on: opensource-linux-8core
         if: ${{ github.actor == 'dependabot[bot]' }}
         permissions:
           contents: write 
