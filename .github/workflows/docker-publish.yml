@@ -76,7 +76,7 @@ jobs:
           --cache-from $DOCKER_BUILD_REPOSITORY:${{ matrix.arch }} \
           -t $DOCKER_BUILD_REPOSITORY:${{ matrix.arch }}-$SHORT_SHA .
     - name: Install uv
-      uses: astral-sh/setup-uv@v5
+      uses: astral-sh/setup-uv@v7
       with:
         enable-cache: true
         cache-dependency-glob: "uv.lock"
