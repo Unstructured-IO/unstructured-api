@@ -17,7 +17,7 @@ jobs:
     - name: Read Python version from .python-version
       run: echo "PYTHON_VERSION=$(cat .python-version)" >> $GITHUB_ENV
     - name: Install uv
-      uses: astral-sh/setup-uv@v5
+      uses: astral-sh/setup-uv@v7
       with:
         enable-cache: true
         cache-dependency-glob: "uv.lock"
@@ -43,7 +43,7 @@ jobs:
     - name: Read Python version from .python-version
       run: echo "PYTHON_VERSION=$(cat .python-version)" >> $GITHUB_ENV
     - name: Install uv
-      uses: astral-sh/setup-uv@v5
+      uses: astral-sh/setup-uv@v7
       with:
         enable-cache: true
         cache-dependency-glob: "uv.lock"
@@ -86,7 +86,7 @@ jobs:
     - name: Read Python version from .python-version
       run: echo "PYTHON_VERSION=$(cat .python-version)" >> $GITHUB_ENV
     - name: Install uv
-      uses: astral-sh/setup-uv@v5
+      uses: astral-sh/setup-uv@v7
       with:
         enable-cache: true
         cache-dependency-glob: "uv.lock"
