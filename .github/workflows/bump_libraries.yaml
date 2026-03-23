@@ -16,7 +16,7 @@ jobs:
         permissions:
           contents: write 
         steps:
-        - uses: actions/checkout@v5
+        - uses: actions/checkout@v6
         - name: Read Python version from .python-version
           run: echo "PYTHON_VERSION=$(cat .python-version)" >> $GITHUB_ENV
         - name: Install uv
