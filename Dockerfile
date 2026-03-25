@@ -11,7 +11,7 @@ ARG PYTHON_VERSION="3.12"
 # Set up environment
 ENV PYTHON=python${PYTHON_VERSION}
 
-COPY --from=ghcr.io/astral-sh/uv:0.10.0 /uv /usr/local/bin/uv
+COPY --from=ghcr.io/astral-sh/uv:0.11.1 /uv /usr/local/bin/uv
 
 USER root
 
