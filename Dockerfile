@@ -61,7 +61,7 @@ ENV UV_PROJECT_ENVIRONMENT="${HOME}/.local"
 
 COPY --chown=${NB_USER}:${NB_USER} pyproject.toml pyproject.toml
 COPY --chown=${NB_USER}:${NB_USER} uv.lock uv.lock
-RUN uv sync --no-dev --no-install-project --frozen
+RUN uv sync --no-dev --no-install-project --locked
 
 ARG PANDOC_VERSION="3.9"
 RUN ARCH=$(uname -m) && \

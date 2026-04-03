@@ -21,11 +21,11 @@ install: install-base install-test
 
 .PHONY: install-base-packages
 install-base-packages:
-	uv sync --no-dev --frozen
+	uv sync --no-dev --locked
 
 .PHONY: install-test
 install-test:
-	uv sync --group test --frozen
+	uv sync --group test --locked
 
 .PHONY: install-nltk-models
 install-nltk-models:
