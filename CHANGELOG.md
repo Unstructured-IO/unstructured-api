@@ -1,3 +1,7 @@
+## 0.1.2
+* Bump all packages (refresh uv.lock)
+* Switch `uv sync --frozen` to `uv sync --locked` across Dockerfile, Makefile, and CI workflows
+
 ## 0.1.1
 * Switch arm64 Docker build runner from custom `opensource-linux-arm64-4core` to GitHub-hosted `ubuntu-24.04-arm`
 * Consolidate multiarch Docker manifest creation into a single `docker buildx imagetools create` call
