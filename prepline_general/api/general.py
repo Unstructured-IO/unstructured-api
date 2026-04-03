@@ -145,7 +145,7 @@ def partition_file_via_api(
     if not request_url:
         raise HTTPException(status_code=500, detail="Parallel mode enabled but no url set!")
 
-    api_key = request.headers.get("unstructured-api-key", default="")
+    api_key = request.headers.get("unstructured-api-key", "")
     partition_kwargs["starting_page_number"] = (
         partition_kwargs.get("starting_page_number", 1) + page_offset
     )

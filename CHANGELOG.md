@@ -1,5 +1,6 @@
 ## 0.1.2
-* Bump all packages (refresh uv.lock)
+* Bump all packages (refresh uv.lock), pulling `unstructured==0.22.12` which replaces NLTK with spaCy
+* Replace `download_nltk_packages` calls with spaCy model pre-download in Makefile, Dockerfile, and CI
 * Switch `uv sync --frozen` to `uv sync --locked` across Dockerfile, Makefile, and CI workflows
 
 ## 0.1.1
