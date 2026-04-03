@@ -1,3 +1,9 @@
+## 0.1.2
+
+### Security
+
+- **security:** fix(deps): upgrade vulnerable transitive dependencies [security]
+
 ## 0.1.1
 * Switch arm64 Docker build runner from custom `opensource-linux-arm64-4core` to GitHub-hosted `ubuntu-24.04-arm`
 * Consolidate multiarch Docker manifest creation into a single `docker buildx imagetools create` call
