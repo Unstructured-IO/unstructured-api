@@ -6,6 +6,7 @@ requires-python = ">=3.12"
 dependencies = [
     "unstructured[all-docs] >=0.18.31, <1.0.0",
     "fastapi >=0.128.4, <1.0.0",
+    "python-multipart >=0.0.18",
     "uvicorn >=0.40.0, <1.0.0",
     "backoff >=2.2.1, <3.0.0",
     "pandas >=3.0.0, <4.0.0",

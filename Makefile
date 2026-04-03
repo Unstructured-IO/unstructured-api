@@ -13,7 +13,7 @@ help: Makefile
 
 ## install-base:                installs minimum requirements to run the API
 .PHONY: install-base
-install-base: install-base-packages install-nltk-models
+install-base: install-base-packages install-nlp-models
 
 ## install:                     installs all test and dev requirements
 .PHONY: install
@@ -21,15 +21,15 @@ install: install-base install-test
 
 .PHONY: install-base-packages
 install-base-packages:
-	uv sync --no-dev --frozen
+	uv sync --no-dev --locked
 
 .PHONY: install-test
 install-test:
-	uv sync --group test --frozen
+	uv sync --group test --locked
 
-.PHONY: install-nltk-models
-install-nltk-models:
-	uv run python -c "from unstructured.nlp.tokenize import download_nltk_packages; download_nltk_packages()"
+.PHONY: install-nlp-models
+install-nlp-models:
+	uv run python -c "from unstructured.nlp.tokenize import _load_spacy_model; _load_spacy_model()"
 
 ## lock:                        regenerates uv.lock
 .PHONY: lock
