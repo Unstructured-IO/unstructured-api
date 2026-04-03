@@ -24,7 +24,7 @@ jobs:
     - name: Set up Python ${{ env.PYTHON_VERSION }}
       run: uv python install ${{ env.PYTHON_VERSION }}
     - name: Install lint dependencies
-      run: uv sync --only-group lint --frozen
+      run: uv sync --only-group lint --locked
     - name: Lint
       run: make check
 
@@ -52,9 +52,9 @@ jobs:
     - name: Install dependencies and run core tests
       run: |
         sudo apt-get update && sudo apt-get install --yes poppler-utils libreoffice
-        uv sync --group test --frozen
+        uv sync --group test --locked
         make install-pandoc
-        make install-nltk-models
+        make install-nlp-models
         sudo add-apt-repository -y ppa:alex-p/tesseract-ocr5
         sudo apt-get install -y tesseract-ocr tesseract-ocr-kor
         tesseract --version
@@ -114,6 +114,6 @@ jobs:
         df -h
     - name: Test Dockerfile
       run: |
-        uv sync --group test --frozen
+        uv sync --group test --locked
         make docker-build
         make docker-test

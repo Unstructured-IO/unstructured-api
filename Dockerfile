@@ -61,7 +61,7 @@ ENV UV_PROJECT_ENVIRONMENT="${HOME}/.local"
 
 COPY --chown=${NB_USER}:${NB_USER} pyproject.toml pyproject.toml
 COPY --chown=${NB_USER}:${NB_USER} uv.lock uv.lock
-RUN uv sync --no-dev --no-install-project --frozen
+RUN uv sync --no-dev --no-install-project --locked
 
 ARG PANDOC_VERSION="3.9"
 RUN ARCH=$(uname -m) && \
@@ -71,7 +71,7 @@ RUN ARCH=$(uname -m) && \
     cp /tmp/pandoc-${PANDOC_VERSION}/bin/pandoc /home/${USER}/.local/bin/ && \
     rm -rf /tmp/pandoc*
 
-RUN ${PYTHON} -c "from unstructured.nlp.tokenize import download_nltk_packages; download_nltk_packages()" && \
+RUN ${PYTHON} -c "from unstructured.nlp.tokenize import _load_spacy_model; _load_spacy_model()" && \
     ${PYTHON} -c "from unstructured.partition.model_init import initialize; initialize()" && \
     ${PYTHON} -c "from unstructured_inference.models.tables import UnstructuredTableTransformerModel; model = UnstructuredTableTransformerModel(); model.initialize('microsoft/table-transformer-structure-recognition')"
 
