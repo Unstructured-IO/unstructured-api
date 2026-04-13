@@ -2231,7 +2231,7 @@ requires-dist = [
     { name = "pypdf", specifier = ">=6.0.0,<7.0.0" },
     { name = "python-multipart", specifier = ">=0.0.18" },
     { name = "requests", specifier = ">=2.32.0,<3.0.0" },
-    { name = "unstructured", extras = ["all-docs"], specifier = ">=0.18.31,<1.0.0" },
+    { name = "unstructured", extras = ["all-docs"], specifier = ">=0.22.18,<1.0.0" },
     { name = "uvicorn", specifier = ">=0.40.0,<1.0.0" },
 ]
 
@@ -3525,7 +3525,7 @@ wheels = [
 
 [[package]]
 name = "unstructured"
-version = "0.22.12"
+version = "0.22.18"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "beautifulsoup4" },
@@ -3552,9 +3552,9 @@ dependencies = [
     { name = "unstructured-client" },
     { name = "wrapt" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/3a/a4/786671d2b2903f49cfb2749e7318029e741ce3e5ef0f8c42f24f2b68ef51/unstructured-0.22.12.tar.gz", hash = "sha256:2b26cea00a63a6669adf2031a1e2a8fa497cd69ca7ae75b8c3ce5ace270c61e4", size = 1516306, upload-time = "2026-04-02T16:27:53.751Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/6d/7c/0a83aab91e4af230526d1864c37879e335fb7f13b35814c3bd877c66fd8e/unstructured-0.22.18.tar.gz", hash = "sha256:91e1af7dda1568b5fe33f56e18be359ff5805e7aebff7139900f531c22287617", size = 1518991, upload-time = "2026-04-08T14:03:14.033Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/2c/d9/46d17d0dbebb3a2224bf7a78429a214d6bc5a3288502b80c0932db348439/unstructured-0.22.12-py3-none-any.whl", hash = "sha256:8b98e920ce725f8808e20b5eb984b1a36b734f5dc5d8e44045e8cceeb6ccd02c", size = 1572235, upload-time = "2026-04-02T16:27:52.054Z" },
+    { url = "https://files.pythonhosted.org/packages/51/36/927f8786b43cf6fa37905bbe8dbc0b0af399689d84431851760096bc974d/unstructured-0.22.18-py3-none-any.whl", hash = "sha256:4ab389035d58474213a4f2cd0c5febc02171d9e43ad0db06c28403806581e23e", size = 1574708, upload-time = "2026-04-08T14:03:11.9Z" },
 ]
 
 [package.optional-dependencies]
