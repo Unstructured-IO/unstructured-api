@@ -113,7 +113,15 @@ RUN ARCH=$(uname -m) && \
       uv pip uninstall "$pkg" 2>/dev/null || true; \
     done && \
     uv pip install --no-deps /tmp/"${WHEEL}" && \
-    rm /tmp/"${WHEEL}"
+    rm /tmp/"${WHEEL}" && \
+    # `uv pip uninstall` only drops the package from site-packages; the wheel
+    # cache under ~/.cache/uv still holds the extracted opencv-python archive
+    # (including its bundled `.libs/libavcodec.so.59.*` + friends). Scanners
+    # see those files and still flag the 14 ffmpeg CVEs even though nothing
+    # links against them at runtime. Wipe the cache so the image layer no
+    # longer contains the vulnerable libs. Safe because UV_LINK_MODE=copy
+    # ensures installed files are independent copies, not cache hardlinks.
+    uv cache clean
 
 COPY --chown=${NB_USER}:${NB_USER} CHANGELOG.md CHANGELOG.md
 COPY --chown=${NB_USER}:${NB_USER} logger_config.yaml logger_config.yaml

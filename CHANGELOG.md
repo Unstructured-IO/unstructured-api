@@ -1,3 +1,9 @@
+## 0.1.5
+
+### Security
+
+- **Purge uv wheel cache after opencv swap**: The 0.1.4 Dockerfile uninstalled the PyPI `opencv-python` wheel and installed the ffmpeg-free replacement, but the original wheel's extracted contents (including `libavcodec.so.59.*` and friends) remained in `~/.cache/uv/archive-v0/…/opencv_python.libs/`. Image scanners still flagged the 14 ffmpeg CVEs because they walk the whole filesystem. Added `uv cache clean` at the end of the opencv replacement `RUN` so the vulnerable libs are evicted from the final image layer.
+
 ## 0.1.4
 
 ### Security
