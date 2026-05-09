@@ -1,3 +1,10 @@
+## 0.1.6
+
+### Security
+
+- **Bump starlette** to latest to remediate CVE-2025-54121 (MEDIUM) and CVE-2025-62727 (HIGH). Removes the `starlette==0.41.2` constraint pin.
+- **Bump python-multipart** to latest to remediate CVE-2026-40347 (MEDIUM).
+
 ## 0.1.5
 
 ### Security
