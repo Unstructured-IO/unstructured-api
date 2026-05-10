@@ -86,6 +86,7 @@ async def patched_get_form(
     *,
     max_files: int | float = 1000,
     max_fields: int | float = 1000,
+    max_part_size: int = 1024 * 1024,
 ) -> FormData:
     """
     Call the original get_form, and iterate the results
