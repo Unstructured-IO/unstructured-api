@@ -6,7 +6,7 @@ requires-python = ">=3.12"
 dependencies = [
     "unstructured[all-docs] >=0.18.31, <1.0.0",
     "fastapi >=0.128.4, <1.0.0",
-    "python-multipart >=0.0.18",
+    "python-multipart >=0.0.29",
     "uvicorn >=0.40.0, <1.0.0",
     "backoff >=2.2.1, <3.0.0",
     "pandas >=3.0.0, <4.0.0",
@@ -43,6 +43,10 @@ path = "prepline_general/api/__version__.py"
 constraint-dependencies = [
     # pdfminer.six 20260107 includes performance fix
     "pdfminer-six==20260107",
+    # starlette >=1.1.0 fixes CVE-2025-62727 (HIGH) and CVE-2025-54121 (MEDIUM)
+    "starlette>=1.1.0",
+    # lxml >=6.1.1 fixes CVE-2026-41066 (HIGH)
+    "lxml>=6.1.1",
 ]
 
 [[tool.uv.index]]

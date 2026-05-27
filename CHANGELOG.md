@@ -1,3 +1,12 @@
+## 0.1.7
+
+### Security
+
+- **Bump starlette** to >=1.1.0 to remediate CVE-2025-62727 (HIGH) and CVE-2025-54121 (MEDIUM).
+- **Bump lxml** to >=6.1.1 to remediate CVE-2026-41066 (HIGH).
+- **Bump python-multipart** to >=0.0.29 to remediate CVE-2026-40347 (MEDIUM).
+- **Rebuild** to pick up latest python-3.12 apk, resolving CVE-2025-12781 (MEDIUM).
+
 ## 0.1.6
 
 ### Security
