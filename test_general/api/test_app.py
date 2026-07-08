@@ -758,6 +758,7 @@ def test_parallel_mode_passes_params(monkeypatch):
             "new_after_n_chars": "1501",
             "overlap": "25",
             "overlap_all": "true",
+            "include_orig_elements": "false",
             "include_slide_notes": "true",
         },
     )
@@ -791,6 +792,7 @@ def test_parallel_mode_passes_params(monkeypatch):
         new_after_n_chars=1501,
         overlap=25,
         overlap_all=True,
+        include_orig_elements=False,
         include_slide_notes=True,
     )
 

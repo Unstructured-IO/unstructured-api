@@ -34,6 +34,7 @@ MAIN_API_ROUTE = "general/v0/general"
         pytest.param({"combine_under_n_chars": ["500"]}, id="combine_under_n_chars"),
         pytest.param({"new_after_n_chars": ["1500"]}, id="new_after_n_chars"),
         pytest.param({"max_characters": ["1500"]}, id="max_characters"),
+        pytest.param({"include_orig_elements": ["false"]}, id="include_orig_elements"),
     ],
 )
 def test_form_params_passed_as_first_element_of_array_are_properly_handled(
