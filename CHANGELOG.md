@@ -1,3 +1,9 @@
+## 0.1.8
+
+### Features
+
+- **Add `include_orig_elements` parameter for chunking**: When `True` (the default), the elements used to form each chunk are attached to that chunk's `.metadata.orig_elements` as a gzipped+base64 blob. Set to `False` to omit them and produce a much smaller response payload — useful for large documents with tables, where this blob is duplicated into every chunk.
+
 ## 0.1.7
 
 ### Security

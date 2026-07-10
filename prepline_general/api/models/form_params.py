@@ -35,6 +35,7 @@ class GeneralFormParams(BaseModel):
     new_after_n_chars: Optional[int]
     overlap: int
     overlap_all: bool
+    include_orig_elements: bool
     starting_page_number: Optional[int] = None
     include_slide_notes: bool
 
@@ -236,6 +237,18 @@ level of "pollution" of otherwise clean semantic chunk boundaries. Default: Fals
                 examples=[True],
             ),
         ] = False,
+        include_orig_elements: Annotated[
+            bool,
+            Form(
+                title="Include Orig Elements",
+                description="""When `True` (the default), the elements used to form each chunk are
+added to that chunk's `.metadata.orig_elements` as a gzipped+base64 blob. Set to `False` to omit
+them and produce a much smaller payload — useful for large tables, where this blob is duplicated
+into every chunk and can balloon the response size dramatically.""",
+                examples=[False],
+            ),
+            BeforeValidator(SmartValueParser[bool]().value_or_first_element),
+        ] = True,
         starting_page_number: Annotated[
             Optional[int],
             Form(
@@ -283,6 +296,7 @@ level of "pollution" of otherwise clean semantic chunk boundaries. Default: Fals
             new_after_n_chars=new_after_n_chars,
             overlap=overlap,
             overlap_all=overlap_all,
+            include_orig_elements=include_orig_elements,
             unique_element_ids=unique_element_ids,
             starting_page_number=starting_page_number,
             include_slide_notes=include_slide_notes,
