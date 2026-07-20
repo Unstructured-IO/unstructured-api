@@ -155,7 +155,7 @@ make docker-start-api
 | `ALLOWED_ORIGINS` | unset | Comma-separated origins allowed by the optional CORS middleware. |
 | `MAX_LIFETIME_SECONDS` | unset | Begin graceful shutdown after this many seconds: new requests are denied while in-flight requests finish, then the server exits (forcefully after at most 3600 seconds). Requires GNU `timeout` (`gtimeout` on macOS). |
 
-### Parallel PDF mode
+### Parallel PDF mode (experimental)
 
 Parallel mode splits PDFs into page ranges, sends those ranges to another Partition Endpoint, and
 combines the results. It is most useful for `hi_res` workloads.
