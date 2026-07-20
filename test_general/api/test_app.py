@@ -595,8 +595,6 @@ def test_general_api_returns_401(monkeypatch, caplog):
 
     assert response.status_code == 200
 
-    client = TestClient(app)
-    test_file = Path("sample-docs") / "fake-xml.xml"
     with caplog.at_level(logging.ERROR, logger="unstructured_api"):
         response = client.post(
             MAIN_API_ROUTE,
@@ -606,7 +604,7 @@ def test_general_api_returns_401(monkeypatch, caplog):
 
     assert response.status_code == 401
     assert response.json() == {"detail": "API key is invalid"}
-    assert not any("helloworld" in record.getMessage() for record in caplog.records)
+    assert "helloworld" not in caplog.text
 
 
 class MockResponse:
