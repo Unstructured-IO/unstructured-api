@@ -1,11 +1,29 @@
-import os
-from typing import Optional
-from io import BytesIO
+from typing import IO, Any, Optional, cast
 
 from fastapi import HTTPException, UploadFile
 
 from unstructured.file_utils.filetype import detect_filetype
 from unstructured.file_utils.model import FileType
+
+
+class _SpooledFileProxy:
+    """Expose a spooled upload as a normal file without copying its complete body.
+
+    `unstructured.detect_filetype()` copies `SpooledTemporaryFile` inputs into a `BytesIO`, even
+    though its detector only seeks and reads small portions. Hiding the concrete type preserves the
+    normal file interface while avoiding that document-sized allocation.
+
+    `name` is set explicitly rather than forwarded: the detector reads `.name` to derive the
+    filename-extension, and a spooled file's own `.name` is the temporary file rather than the
+    uploaded filename.
+    """
+
+    def __init__(self, file: IO[bytes], name: str | None):
+        self._file = file
+        self.name = name
+
+    def __getattr__(self, name: str) -> Any:
+        return getattr(self._file, name)
 
 
 def _remove_optional_info_from_mime_type(content_type: str | None) -> str | None:
@@ -37,14 +55,12 @@ def get_validated_mimetype(file: UploadFile, content_type_hint: str | None = Non
     filetype = FileType.from_mime_type(content_type)
 
     # If content_type was not specified, use the library to identify the file
-    # We inspect the bytes to do this, so we need to buffer the file
+    # The detector seeks and reads bounded portions of the upload. Proxy the spooled file so the
+    # dependency does not make a complete in-memory `BytesIO` copy first.
     if not filetype or filetype == FileType.UNK:
-        file_buffer = BytesIO(file.file.read())
+        file_proxy = cast(IO[bytes], _SpooledFileProxy(file.file, file.filename))
+        filetype = detect_filetype(file=file_proxy)
         file.file.seek(0)
-
-        file_buffer.name = file.filename
-
-        filetype = detect_filetype(file=file_buffer)
 
     if not filetype.is_partitionable:
         raise HTTPException(

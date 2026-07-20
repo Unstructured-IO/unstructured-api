@@ -1,3 +1,9 @@
+## 0.1.9
+
+### Performance
+
+- **Avoid copying uploads during MIME detection**: unknown file types are now detected directly from the existing spooled upload stream while preserving the filename expected by the file-type detector.
+
 ## 0.1.8
 
 ### Features
