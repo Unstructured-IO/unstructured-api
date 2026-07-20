@@ -742,12 +742,16 @@ def general_partition(
         if form_params.output_format != "text/csv":
             return cast(List[Union[str, List[Dict[str, Any]]]], responses)
         responses = cast(List[PlainTextResponse], responses)
-        data = pd.concat(  # pyright: ignore[reportUnknownMemberType]
-            [
-                pd.read_csv(io.BytesIO(response.body))  # pyright: ignore[reportUnknownMemberType]
-                for response in responses
-            ]
-        )
+        # -- a document that produced no elements serializes to a bodiless CSV, which pandas
+        # -- cannot parse; it contributes no rows --
+        frames = [
+            pd.read_csv(io.BytesIO(response.body))  # pyright: ignore[reportUnknownMemberType]
+            for response in responses
+            if response.body.strip()
+        ]
+        if not frames:
+            return PlainTextResponse(responses[0].body)
+        data = pd.concat(frames)  # pyright: ignore[reportUnknownMemberType]
         return PlainTextResponse(data.to_csv(index=False))
 
     return (

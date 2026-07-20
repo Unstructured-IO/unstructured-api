@@ -1174,6 +1174,26 @@ def test_output_format_csv_concatenates_multiple_files_without_index_column():
     assert "Unnamed: 0" not in df.columns
 
 
+def test_output_format_csv_keeps_rows_when_one_file_has_no_elements():
+    client = TestClient(app)
+    test_file = Path("sample-docs") / "family-day.eml"
+
+    with open(test_file, "rb") as doc:
+        response = client.post(
+            MAIN_API_ROUTE,
+            files=[
+                ("files", ("empty.txt", io.BytesIO(b""), "text/plain")),
+                ("files", (str(test_file), doc, "message/rfc822")),
+            ],
+            data={"output_format": "text/csv"},
+        )
+
+    assert response.status_code == 200
+    df = pd.read_csv(io.StringIO(response.text))
+    assert len(df) == 9
+    assert df["text"][3] == "Make sure to RSVP!"
+
+
 @pytest.mark.parametrize(
     "pdf_infer_table_structure, strategy, skip_infer_table_types, expected",
     [
