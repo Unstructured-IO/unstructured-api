@@ -153,7 +153,7 @@ make docker-start-api
 | `UNSTRUCTURED_API_KEY` | unset | When set, requests must supply the same value in the `unstructured-api-key` header. |
 | `UNSTRUCTURED_MEMORY_FREE_MINIMUM_MB` | `2048` | Reject new work with HTTP 503 below this amount of free memory. Set to `0` to disable the check. |
 | `ALLOWED_ORIGINS` | unset | Comma-separated origins allowed by the optional CORS middleware. |
-| `MAX_LIFETIME_SECONDS` | unset | Begin graceful shutdown after this many seconds: new requests are denied while in-flight requests finish, then the server exits (forcefully after at most 3600 seconds). Requires GNU `timeout` (`gtimeout` on macOS). |
+| `MAX_LIFETIME_SECONDS` | unset | Begin graceful shutdown after this many seconds: new requests are denied while in-flight requests finish, then the server exits (forcefully after at most 3600 seconds). Requires GNU `timeout`. |
 
 ### Parallel PDF mode (experimental)
 
