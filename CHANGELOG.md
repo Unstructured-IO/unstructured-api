@@ -1,3 +1,9 @@
+## 0.1.9
+
+### Fixes
+
+- **Preserve rows in multi-file CSV responses**: CSV output now concatenates each file's partition results in request order without using filenames as dictionary keys, so duplicate filenames cannot overwrite earlier rows.
+
 ## 0.1.8
 
 ### Features

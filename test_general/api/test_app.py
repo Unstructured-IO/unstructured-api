@@ -1154,6 +1154,26 @@ def test_output_format_csv_ignore_specified_accept_header():
     assert df["text"][3] == "Make sure to RSVP!"
 
 
+def test_output_format_csv_concatenates_multiple_files_without_index_column():
+    client = TestClient(app)
+    test_file = Path("sample-docs") / "family-day.eml"
+
+    with open(test_file, "rb") as first, open(test_file, "rb") as second:
+        response = client.post(
+            MAIN_API_ROUTE,
+            files=[
+                ("files", ("same-name.eml", first, "message/rfc822")),
+                ("files", ("same-name.eml", second, "message/rfc822")),
+            ],
+            data={"output_format": "text/csv"},
+        )
+
+    assert response.status_code == 200
+    df = pd.read_csv(io.StringIO(response.text))
+    assert len(df) == 18
+    assert "Unnamed: 0" not in df.columns
+
+
 @pytest.mark.parametrize(
     "pdf_infer_table_structure, strategy, skip_infer_table_types, expected",
     [
