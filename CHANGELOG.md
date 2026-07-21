@@ -1,3 +1,9 @@
+## 0.1.9
+
+### Security
+
+- **Avoid reflecting invalid API keys**: authentication failures now return a generic error message instead of including the submitted credential in the response and request logs.
+
 ## 0.1.8
 
 ### Features

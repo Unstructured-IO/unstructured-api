@@ -1,4 +1,5 @@
 import io
+import logging
 import os
 import tempfile
 import uuid
@@ -578,7 +579,7 @@ def test_general_api_returns_503(monkeypatch):
     assert response.status_code == 503
 
 
-def test_general_api_returns_401(monkeypatch):
+def test_general_api_returns_401(monkeypatch, caplog):
     """
     When UNSTRUCTURED_API_KEY is set, return a 401 if the unstructured-api-key header does not match
     """
@@ -594,15 +595,16 @@ def test_general_api_returns_401(monkeypatch):
 
     assert response.status_code == 200
 
-    client = TestClient(app)
-    test_file = Path("sample-docs") / "fake-xml.xml"
-    response = client.post(
-        MAIN_API_ROUTE,
-        files=[("files", (str(test_file), open(test_file, "rb")))],
-        headers={"unstructured-api-key": "helloworld"},
-    )
+    with caplog.at_level(logging.ERROR, logger="unstructured_api"):
+        response = client.post(
+            MAIN_API_ROUTE,
+            files=[("files", (str(test_file), open(test_file, "rb")))],
+            headers={"unstructured-api-key": "helloworld"},
+        )
 
     assert response.status_code == 401
+    assert response.json() == {"detail": "API key is invalid"}
+    assert "helloworld" not in caplog.text
 
 
 class MockResponse:
