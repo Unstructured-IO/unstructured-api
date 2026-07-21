@@ -59,8 +59,10 @@ def get_validated_mimetype(file: UploadFile, content_type_hint: str | None = Non
     # dependency does not make a complete in-memory `BytesIO` copy first.
     if not filetype or filetype == FileType.UNK:
         file_proxy = cast(IO[bytes], _SpooledFileProxy(file.file, file.filename))
-        filetype = detect_filetype(file=file_proxy)
-        file.file.seek(0)
+        try:
+            filetype = detect_filetype(file=file_proxy)
+        finally:
+            file.file.seek(0)
 
     if not filetype.is_partitionable:
         raise HTTPException(
