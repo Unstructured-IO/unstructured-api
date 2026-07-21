@@ -876,24 +876,33 @@ def test_partition_file_via_api_will_retry(monkeypatch, mocker):
     assert response.status_code == 200
 
 
-def test_call_api_not_retryable_error_code(monkeypatch):
+def test_partition_file_via_api_not_retryable_error_code(monkeypatch, mocker):
     """
     Verify we didn't retry if the error code is not retryable
     """
-    remote_partition = Mock(return_value=MockResponse(status_code=401))
-    monkeypatch.setattr(requests, "post", remote_partition)
+    monkeypatch.setenv("UNSTRUCTURED_PARALLEL_MODE_ENABLED", "true")
+    monkeypatch.setenv("UNSTRUCTURED_PARALLEL_MODE_URL", "unused")
+    monkeypatch.setenv("UNSTRUCTURED_PARALLEL_MODE_THREADS", "1")
+    monkeypatch.setenv("UNSTRUCTURED_PARALLEL_MODE_RETRY_ATTEMPTS", "3")
 
-    with pytest.raises(HTTPException) as exc_info:
-        general.call_api(
-            request_url="unused",
-            api_key="",
-            filename="test.pdf",
-            file=io.BytesIO(b"test"),
-            content_type="application/pdf",
-        )
+    remote_partition = Mock(side_effect=HTTPException(status_code=401))
+
+    monkeypatch.setattr(
+        requests,
+        "post",
+        remote_partition,
+    )
+    client = TestClient(app)
+    test_file = Path("sample-docs") / "list-item-example.pdf"
+
+    response = client.post(
+        MAIN_API_ROUTE,
+        files=[("files", (str(test_file), open(test_file, "rb"), "application/pdf"))],
+    )
+
+    assert response.status_code == 401
 
     # no retries for non-retryable status codes
-    assert exc_info.value.status_code == 401
     assert remote_partition.call_count == 1
 
 
