@@ -9,11 +9,40 @@ import httpx
 import pandas as pd
 import pytest
 from deepdiff import DeepDiff
+from fastapi import UploadFile
 from fastapi.testclient import TestClient
 
 from prepline_general.api.app import app
+from prepline_general.api.general import _GZIP_SPOOL_MAX_MEMORY_BYTES, ungz_file
 
 MAIN_API_ROUTE = "general/v0/general"
+
+
+def _gzip_upload(content: bytes, filename: str = "sample.txt.gz") -> UploadFile:
+    compressed = io.BytesIO(gzip.compress(content))
+    return UploadFile(file=compressed, filename=filename)
+
+
+def test_ungz_file_keeps_small_outputs_in_memory():
+    content = b"small gzip payload"
+
+    result = ungz_file(_gzip_upload(content))
+
+    assert result.filename == "sample.txt"
+    assert result.content_type == "text/plain"
+    assert result.size == len(content)
+    assert result.file.read() == content
+    assert result.file._rolled is False
+
+
+def test_ungz_file_spills_large_outputs_to_disk():
+    content_size = _GZIP_SPOOL_MAX_MEMORY_BYTES + 1
+
+    result = ungz_file(_gzip_upload(b"x" * content_size))
+
+    assert result.size == content_size
+    assert result.file._rolled is True
+    assert result.file.read(16) == b"x" * 16
 
 
 @pytest.mark.xfail(reason="The outputs are different as of unstructured==0.13.5")

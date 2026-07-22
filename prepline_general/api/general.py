@@ -7,10 +7,12 @@ import logging
 import mimetypes
 import os
 import secrets
+import shutil
+import tempfile
 from base64 import b64encode
 from concurrent.futures import ThreadPoolExecutor
 from functools import partial
-from typing import IO, Any, Dict, List, Mapping, Optional, Sequence, Tuple, Union, cast
+from typing import IO, Any, BinaryIO, Dict, List, Mapping, Optional, Sequence, Tuple, Union, cast
 
 import backoff
 import pandas as pd
@@ -31,6 +33,7 @@ from pypdf.errors import FileNotDecryptedError, PdfReadError
 from starlette.datastructures import Headers
 from starlette.types import Send
 
+from prepline_general.api import __version__ as api_version
 from prepline_general.api.filetypes import get_validated_mimetype
 from prepline_general.api.models.form_params import GeneralFormParams
 from unstructured.documents.elements import Element
@@ -41,10 +44,12 @@ from unstructured.staging.base import (
     elements_from_json,
 )
 from unstructured_inference.models.base import UnknownModelException
-from prepline_general.api import __version__ as api_version
 
 app = FastAPI()
 router = APIRouter()
+
+_GZIP_COPY_CHUNK_SIZE = 1024 * 1024
+_GZIP_SPOOL_MAX_MEMORY_BYTES = 1024 * 1024
 
 
 def is_compatible_response_type(media_type: str, response_type: type) -> bool:
@@ -613,10 +618,22 @@ def ungz_file(file: UploadFile, gz_uncompressed_content_type: Optional[str] = No
     if filename.endswith(".gz"):
         filename = filename[:-3]
 
-    gzip_file = gzip.open(file.file).read()
+    output_file = tempfile.SpooledTemporaryFile(
+        max_size=_GZIP_SPOOL_MAX_MEMORY_BYTES,
+        mode="w+b",
+    )
+    try:
+        with gzip.open(file.file) as gzip_file:
+            shutil.copyfileobj(gzip_file, output_file, length=_GZIP_COPY_CHUNK_SIZE)
+        uncompressed_size = output_file.tell()
+        output_file.seek(0)
+    except Exception:
+        output_file.close()
+        raise
+
     return UploadFile(
-        file=io.BytesIO(gzip_file),
-        size=len(gzip_file),
+        file=cast(BinaryIO, output_file),
+        size=uncompressed_size,
         filename=filename,
         headers=Headers({"content-type": return_content_type(filename)}),
     )
