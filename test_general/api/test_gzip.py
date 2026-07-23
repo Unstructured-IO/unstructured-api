@@ -44,6 +44,19 @@ def test_ungz_file_bounds_decompression_memory(content: bytes, spills_to_disk: b
         assert result.size == len(content)
         assert result.file.read() == content
         assert result.file._rolled is spills_to_disk
+        assert isinstance(result.file, tempfile.SpooledTemporaryFile) is not spills_to_disk
+    finally:
+        result.file.close()
+        assert result.file.closed
+
+
+def test_ungz_file_proxy_preserves_special_file_methods():
+    result = ungz_file(_gzip_upload(b"first\nsecond\n" * _GZIP_SPOOL_MAX_MEMORY_BYTES))
+
+    try:
+        assert iter(result.file) is not result.file
+        assert next(result.file) == b"first\n"
+        assert result.file.__enter__() is result.file
     finally:
         result.file.close()
 

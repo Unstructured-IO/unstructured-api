@@ -48,7 +48,32 @@ from unstructured_inference.models.base import UnknownModelException
 app = FastAPI()
 router = APIRouter()
 
-_GZIP_SPOOL_MAX_MEMORY_BYTES = 10 * 1024 * 1024
+_GZIP_COPY_CHUNK_SIZE = 1024 * 1024
+_GZIP_SPOOL_MAX_MEMORY_BYTES = 1024 * 1024
+
+
+class _SpooledFileProxy:
+    """Expose a spooled file without its concrete type triggering downstream copies."""
+
+    def __init__(self, file: IO[bytes], name: str | None):
+        self._file = file
+        self.name = name
+
+    def __getattr__(self, name: str) -> Any:
+        return getattr(self._file, name)
+
+    def __enter__(self) -> _SpooledFileProxy:
+        self._file.__enter__()
+        return self
+
+    def __exit__(self, *args: Any) -> Any:
+        return self._file.__exit__(*args)
+
+    def __iter__(self):
+        return iter(self._file)
+
+    def __next__(self) -> bytes:
+        return next(self._file)
 
 
 def is_compatible_response_type(media_type: str, response_type: type) -> bool:
@@ -620,7 +645,7 @@ def ungz_file(file: UploadFile, gz_uncompressed_content_type: Optional[str] = No
     output_file = tempfile.SpooledTemporaryFile(max_size=_GZIP_SPOOL_MAX_MEMORY_BYTES)
     try:
         with gzip.open(file.file) as gzip_file:
-            shutil.copyfileobj(gzip_file, output_file)
+            shutil.copyfileobj(gzip_file, output_file, length=_GZIP_COPY_CHUNK_SIZE)
         uncompressed_size = output_file.tell()
         output_file.seek(0)
     except Exception:
@@ -631,7 +656,10 @@ def ungz_file(file: UploadFile, gz_uncompressed_content_type: Optional[str] = No
     # request finishes. A newly-created UploadFile would not belong to the parsed FormData and
     # would therefore remain open after the response.
     file.file.close()
-    file.file = cast(BinaryIO, output_file)
+    decompressed_file = (
+        _SpooledFileProxy(output_file, filename) if output_file._rolled else output_file
+    )
+    file.file = cast(BinaryIO, decompressed_file)
     file.size = uncompressed_size
     file.filename = filename
     file.headers = Headers({"content-type": return_content_type(filename)})
