@@ -657,7 +657,9 @@ def ungz_file(file: UploadFile, gz_uncompressed_content_type: Optional[str] = No
     # would therefore remain open after the response.
     file.file.close()
     decompressed_file = (
-        _SpooledFileProxy(output_file, filename) if output_file._rolled else output_file
+        _SpooledFileProxy(output_file, filename)
+        if uncompressed_size > _GZIP_SPOOL_MAX_MEMORY_BYTES
+        else output_file
     )
     file.file = cast(BinaryIO, decompressed_file)
     file.size = uncompressed_size
