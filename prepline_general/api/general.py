@@ -13,6 +13,7 @@ from functools import partial
 from typing import IO, Any, Dict, List, Mapping, Optional, Sequence, Tuple, Union, cast
 
 import backoff
+import orjson
 import pandas as pd
 import psutil
 import requests
@@ -25,12 +26,13 @@ from fastapi import (
     UploadFile,
     status,
 )
-from fastapi.responses import PlainTextResponse, StreamingResponse
+from fastapi.responses import PlainTextResponse, Response, StreamingResponse
 from pypdf import PageObject, PdfReader, PdfWriter
 from pypdf.errors import FileNotDecryptedError, PdfReadError
 from starlette.datastructures import Headers
 from starlette.types import Send
 
+from prepline_general.api import __version__ as api_version
 from prepline_general.api.filetypes import get_validated_mimetype
 from prepline_general.api.models.form_params import GeneralFormParams
 from unstructured.documents.elements import Element
@@ -41,7 +43,6 @@ from unstructured.staging.base import (
     elements_from_json,
 )
 from unstructured_inference.models.base import UnknownModelException
-from prepline_general.api import __version__ as api_version
 
 app = FastAPI()
 router = APIRouter()
@@ -574,14 +575,16 @@ class MultipartMixedResponse(StreamingResponse):
             header_bytes += f"{header}: {value}".encode() + self.CRLF
         return header_bytes
 
-    def build_part(self, chunk: bytes) -> bytes:
+    def _build_part_prefix(self, content_length: int) -> bytes:
         part = self.boundary + self.CRLF
-        part_headers = {"Content-Length": len(chunk), "Content-Transfer-Encoding": "base64"}
+        part_headers = {
+            "Content-Length": content_length,
+            "Content-Transfer-Encoding": "base64",
+        }
         if self.content_type is not None:
             part_headers["Content-Type"] = self.content_type
         part += self._build_part_headers(part_headers)
-        part += self.CRLF + chunk + self.CRLF
-        return part
+        return part + self.CRLF
 
     async def stream_response(self, send: Send) -> None:
         await send(
@@ -594,10 +597,16 @@ class MultipartMixedResponse(StreamingResponse):
         async for chunk in self.body_iterator:
             if not isinstance(chunk, bytes):
                 chunk = chunk.encode(self.charset)  # type: ignore
-                chunk = b64encode(chunk)
+            chunk = b64encode(chunk)
             await send(
-                {"type": "http.response.body", "body": self.build_part(chunk), "more_body": True}
+                {
+                    "type": "http.response.body",
+                    "body": self._build_part_prefix(len(chunk)),
+                    "more_body": True,
+                }
             )
+            await send({"type": "http.response.body", "body": chunk, "more_body": True})
+            await send({"type": "http.response.body", "body": self.CRLF, "more_body": True})
 
         await send({"type": "http.response.body", "body": b"", "more_body": False})
 
@@ -726,7 +735,7 @@ def general_partition(
             )
 
             yield (
-                json.dumps(response)
+                orjson.dumps(response)
                 if is_multipart and type(response) not in [str, bytes]
                 else (
                     PlainTextResponse(response)
@@ -755,17 +764,17 @@ def general_partition(
                 )
         return PlainTextResponse(data.to_csv())
 
-    return (
-        MultipartMixedResponse(
+    if accept_type == "multipart/mixed":
+        return MultipartMixedResponse(
             response_generator(is_multipart=True), content_type=form_params.output_format
         )
-        if accept_type == "multipart/mixed"
-        else (
-            list(response_generator(is_multipart=False))[0]
-            if len(files) == 1
-            else join_responses(list(response_generator(is_multipart=False)))
-        )
-    )
+
+    responses = list(response_generator(is_multipart=False))
+    data = responses[0] if len(files) == 1 else join_responses(responses)
+    if isinstance(data, PlainTextResponse):
+        return data
+
+    return Response(content=orjson.dumps(data), media_type="application/json")
 
 
 app.include_router(router)
