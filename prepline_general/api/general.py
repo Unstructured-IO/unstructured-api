@@ -654,7 +654,7 @@ def general_partition(
         api_key = request.headers.get("unstructured-api-key")
         if api_key != api_key_env:
             raise HTTPException(
-                detail=f"API key {api_key} is invalid", status_code=status.HTTP_401_UNAUTHORIZED
+                detail="API key is invalid", status_code=status.HTTP_401_UNAUTHORIZED
             )
 
     accept_type = request.headers.get("Accept")
