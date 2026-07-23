@@ -25,24 +25,38 @@ def _gzip_upload(content: bytes, filename: str = "sample.txt.gz") -> UploadFile:
 
 def test_ungz_file_keeps_small_outputs_in_memory():
     content = b"small gzip payload"
+    upload = _gzip_upload(content)
+    compressed_file = upload.file
 
-    result = ungz_file(_gzip_upload(content))
+    result = ungz_file(upload)
 
-    assert result.filename == "sample.txt"
-    assert result.content_type == "text/plain"
-    assert result.size == len(content)
-    assert result.file.read() == content
-    assert result.file._rolled is False
+    try:
+        assert result is upload
+        assert compressed_file.closed
+        assert result.filename == "sample.txt"
+        assert result.content_type == "text/plain"
+        assert result.size == len(content)
+        assert result.file.read() == content
+        assert result.file._rolled is False
+    finally:
+        result.file.close()
 
 
 def test_ungz_file_spills_large_outputs_to_disk():
     content_size = _GZIP_SPOOL_MAX_MEMORY_BYTES + 1
+    upload = _gzip_upload(b"x" * content_size)
+    compressed_file = upload.file
 
-    result = ungz_file(_gzip_upload(b"x" * content_size))
+    result = ungz_file(upload)
 
-    assert result.size == content_size
-    assert result.file._rolled is True
-    assert result.file.read(16) == b"x" * 16
+    try:
+        assert result is upload
+        assert compressed_file.closed
+        assert result.size == content_size
+        assert result.file._rolled is True
+        assert result.file.read(16) == b"x" * 16
+    finally:
+        result.file.close()
 
 
 @pytest.mark.xfail(reason="The outputs are different as of unstructured==0.13.5")

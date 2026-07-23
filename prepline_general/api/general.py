@@ -631,12 +631,16 @@ def ungz_file(file: UploadFile, gz_uncompressed_content_type: Optional[str] = No
         output_file.close()
         raise
 
-    return UploadFile(
-        file=cast(BinaryIO, output_file),
-        size=uncompressed_size,
-        filename=filename,
-        headers=Headers({"content-type": return_content_type(filename)}),
-    )
+    # Reuse the request-owned UploadFile so FastAPI closes the decompressed spool when the
+    # request finishes. A newly-created UploadFile would not belong to the parsed FormData and
+    # would therefore remain open after the response.
+    file.file.close()
+    file.file = cast(BinaryIO, output_file)
+    file.size = uncompressed_size
+    file.filename = filename
+    file.headers = Headers({"content-type": return_content_type(filename)})
+    file._max_mem_size = getattr(output_file, "_max_size", 0)
+    return file
 
 
 @router.get("/general/v0/general", include_in_schema=False)
