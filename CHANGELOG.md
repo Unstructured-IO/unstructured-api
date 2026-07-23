@@ -1,3 +1,9 @@
+## 0.1.10
+
+### Fixes
+
+- **Preserve rows in multi-file CSV responses**: CSV output for a multi-file request was produced by outer-merging each file's DataFrame into the previous one, which collapsed identical rows across files into a single row and dropped legitimate duplicates. Results are now concatenated in request order, so every row from every file is retained, differing columns are unioned, and the row index is no longer emitted as a leading unnamed column. A file that produces no elements contributes no rows instead of failing the whole request.
+
 ## 0.1.9
 
 ### Security
