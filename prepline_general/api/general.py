@@ -48,8 +48,7 @@ from unstructured_inference.models.base import UnknownModelException
 app = FastAPI()
 router = APIRouter()
 
-_GZIP_COPY_CHUNK_SIZE = 1024 * 1024
-_GZIP_SPOOL_MAX_MEMORY_BYTES = 1024 * 1024
+_GZIP_SPOOL_MAX_MEMORY_BYTES = 10 * 1024 * 1024
 
 
 def is_compatible_response_type(media_type: str, response_type: type) -> bool:
@@ -618,13 +617,10 @@ def ungz_file(file: UploadFile, gz_uncompressed_content_type: Optional[str] = No
     if filename.endswith(".gz"):
         filename = filename[:-3]
 
-    output_file = tempfile.SpooledTemporaryFile(
-        max_size=_GZIP_SPOOL_MAX_MEMORY_BYTES,
-        mode="w+b",
-    )
+    output_file = tempfile.SpooledTemporaryFile(max_size=_GZIP_SPOOL_MAX_MEMORY_BYTES)
     try:
         with gzip.open(file.file) as gzip_file:
-            shutil.copyfileobj(gzip_file, output_file, length=_GZIP_COPY_CHUNK_SIZE)
+            shutil.copyfileobj(gzip_file, output_file)
         uncompressed_size = output_file.tell()
         output_file.seek(0)
     except Exception:
@@ -639,7 +635,6 @@ def ungz_file(file: UploadFile, gz_uncompressed_content_type: Optional[str] = No
     file.size = uncompressed_size
     file.filename = filename
     file.headers = Headers({"content-type": return_content_type(filename)})
-    file._max_mem_size = getattr(output_file, "_max_size", 0)
     return file
 
 

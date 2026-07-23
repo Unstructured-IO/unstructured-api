@@ -23,8 +23,14 @@ def _gzip_upload(content: bytes, filename: str = "sample.txt.gz") -> UploadFile:
     return UploadFile(file=compressed, filename=filename)
 
 
-def test_ungz_file_keeps_small_outputs_in_memory():
-    content = b"small gzip payload"
+@pytest.mark.parametrize(
+    ("content", "spills_to_disk"),
+    [
+        pytest.param(b"small gzip payload", False, id="small-stays-in-memory"),
+        pytest.param(b"x" * (_GZIP_SPOOL_MAX_MEMORY_BYTES + 1), True, id="large-spills-to-disk"),
+    ],
+)
+def test_ungz_file_bounds_decompression_memory(content: bytes, spills_to_disk: bool):
     upload = _gzip_upload(content)
     compressed_file = upload.file
 
@@ -37,24 +43,7 @@ def test_ungz_file_keeps_small_outputs_in_memory():
         assert result.content_type == "text/plain"
         assert result.size == len(content)
         assert result.file.read() == content
-        assert result.file._rolled is False
-    finally:
-        result.file.close()
-
-
-def test_ungz_file_spills_large_outputs_to_disk():
-    content_size = _GZIP_SPOOL_MAX_MEMORY_BYTES + 1
-    upload = _gzip_upload(b"x" * content_size)
-    compressed_file = upload.file
-
-    result = ungz_file(upload)
-
-    try:
-        assert result is upload
-        assert compressed_file.closed
-        assert result.size == content_size
-        assert result.file._rolled is True
-        assert result.file.read(16) == b"x" * 16
+        assert result.file._rolled is spills_to_disk
     finally:
         result.file.close()
 
