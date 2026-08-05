@@ -1,4 +1,5 @@
 import io
+import logging
 import os
 import tempfile
 import uuid
@@ -578,7 +579,7 @@ def test_general_api_returns_503(monkeypatch):
     assert response.status_code == 503
 
 
-def test_general_api_returns_401(monkeypatch):
+def test_general_api_returns_401(monkeypatch, caplog):
     """
     When UNSTRUCTURED_API_KEY is set, return a 401 if the unstructured-api-key header does not match
     """
@@ -594,15 +595,16 @@ def test_general_api_returns_401(monkeypatch):
 
     assert response.status_code == 200
 
-    client = TestClient(app)
-    test_file = Path("sample-docs") / "fake-xml.xml"
-    response = client.post(
-        MAIN_API_ROUTE,
-        files=[("files", (str(test_file), open(test_file, "rb")))],
-        headers={"unstructured-api-key": "helloworld"},
-    )
+    with caplog.at_level(logging.ERROR, logger="unstructured_api"):
+        response = client.post(
+            MAIN_API_ROUTE,
+            files=[("files", (str(test_file), open(test_file, "rb")))],
+            headers={"unstructured-api-key": "helloworld"},
+        )
 
     assert response.status_code == 401
+    assert response.json() == {"detail": "API key is invalid"}
+    assert "helloworld" not in caplog.text
 
 
 class MockResponse:
@@ -1148,6 +1150,69 @@ def test_output_format_csv_ignore_specified_accept_header():
         data={"output_format": "text/csv"},
         headers={"accept": "application/json"},
     )
+    assert response.status_code == 200
+    df = pd.read_csv(io.StringIO(response.text))
+    assert len(df) == 9
+    assert df["text"][3] == "Make sure to RSVP!"
+
+
+def test_output_format_csv_concatenates_multiple_files_without_index_column():
+    client = TestClient(app)
+    test_file = Path("sample-docs") / "family-day.eml"
+
+    with open(test_file, "rb") as first, open(test_file, "rb") as second:
+        response = client.post(
+            MAIN_API_ROUTE,
+            files=[
+                ("files", ("same-name.eml", first, "message/rfc822")),
+                ("files", ("same-name.eml", second, "message/rfc822")),
+            ],
+            data={"output_format": "text/csv"},
+        )
+
+    assert response.status_code == 200
+    df = pd.read_csv(io.StringIO(response.text))
+    assert len(df) == 18
+    assert "Unnamed: 0" not in df.columns
+
+
+def test_output_format_csv_unions_columns_from_multiple_files():
+    client = TestClient(app)
+    email_file = Path("sample-docs") / "family-day.eml"
+    text_file = Path("sample-docs") / "fake-text.txt"
+
+    with open(email_file, "rb") as email, open(text_file, "rb") as text:
+        response = client.post(
+            MAIN_API_ROUTE,
+            files=[
+                ("files", (email_file.name, email, "message/rfc822")),
+                ("files", (text_file.name, text, "text/plain")),
+            ],
+            data={"output_format": "text/csv"},
+        )
+
+    assert response.status_code == 200
+    df = pd.read_csv(io.StringIO(response.text))
+    assert len(df) == 14
+    assert {"sent_from", "parent_id"}.issubset(df.columns)
+    assert df.loc[df["filename"] == email_file.name, "parent_id"].isna().all()
+    assert df.loc[df["filename"] == text_file.name, "sent_from"].isna().all()
+
+
+def test_output_format_csv_keeps_rows_when_one_file_has_no_elements():
+    client = TestClient(app)
+    test_file = Path("sample-docs") / "family-day.eml"
+
+    with open(test_file, "rb") as doc:
+        response = client.post(
+            MAIN_API_ROUTE,
+            files=[
+                ("files", ("empty.txt", io.BytesIO(b""), "text/plain")),
+                ("files", (str(test_file), doc, "message/rfc822")),
+            ],
+            data={"output_format": "text/csv"},
+        )
+
     assert response.status_code == 200
     df = pd.read_csv(io.StringIO(response.text))
     assert len(df) == 9

@@ -654,7 +654,7 @@ def general_partition(
         api_key = request.headers.get("unstructured-api-key")
         if api_key != api_key_env:
             raise HTTPException(
-                detail=f"API key {api_key} is invalid", status_code=status.HTTP_401_UNAUTHORIZED
+                detail="API key is invalid", status_code=status.HTTP_401_UNAUTHORIZED
             )
 
     accept_type = request.headers.get("Accept")
@@ -742,18 +742,17 @@ def general_partition(
         if form_params.output_format != "text/csv":
             return cast(List[Union[str, List[Dict[str, Any]]]], responses)
         responses = cast(List[PlainTextResponse], responses)
-        data = pd.read_csv(  # pyright: ignore[reportUnknownMemberType]
-            io.BytesIO(responses[0].body)
-        )
-        if len(responses) > 1:
-            for resp in responses[1:]:
-                resp_data = pd.read_csv(  # pyright: ignore[reportUnknownMemberType]
-                    io.BytesIO(resp.body)
-                )
-                data = data.merge(  # pyright: ignore[reportUnknownMemberType]
-                    resp_data, how="outer"
-                )
-        return PlainTextResponse(data.to_csv())
+        # -- a document that produced no elements serializes to a bodiless CSV, which pandas
+        # -- cannot parse; it contributes no rows --
+        frames = [
+            pd.read_csv(io.BytesIO(response.body))  # pyright: ignore[reportUnknownMemberType]
+            for response in responses
+            if response.body.strip()
+        ]
+        if not frames:
+            return PlainTextResponse(responses[0].body)
+        data = pd.concat(frames)  # pyright: ignore[reportUnknownMemberType]
+        return PlainTextResponse(data.to_csv(index=False))
 
     return (
         MultipartMixedResponse(
