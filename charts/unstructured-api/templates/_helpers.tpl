@@ -45,8 +45,8 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 Selector labels
 */}}
 {{- define "unstructured-api.selectorLabels" -}}
-app.kubernetes.io/name: {{ include "unstructured-api.name" . }}
-app.kubernetes.io/instance: {{ .Release.Name }}
+app.kubernetes.io/name: {{ include "unstructured-api.name" . | quote }}
+app.kubernetes.io/instance: {{ .Release.Name | quote }}
 {{- end }}
 
 {{/*
@@ -102,6 +102,15 @@ Validate configuration.
 {{- define "unstructured-api.validateValues" -}}
 {{- if and .Values.apiKey.enabled (not .Values.apiKey.existingSecret) (not .Values.apiKey.value) -}}
 {{- fail "apiKey.enabled is true but neither apiKey.value nor apiKey.existingSecret is set." -}}
+{{- end -}}
+{{- if and .Values.apiKey.enabled .Values.apiKey.existingSecret (not .Values.apiKey.existingSecretKey) -}}
+{{- fail "apiKey.existingSecret is set but apiKey.existingSecretKey is empty." -}}
+{{- end -}}
+{{- if and .Values.autoscaling.enabled (not .Values.autoscaling.targetCPUUtilizationPercentage) (not .Values.autoscaling.targetMemoryUtilizationPercentage) -}}
+{{- fail "autoscaling.enabled requires targetCPUUtilizationPercentage or targetMemoryUtilizationPercentage to be set." -}}
+{{- end -}}
+{{- if and .Values.podDisruptionBudget.enabled (eq (toString .Values.podDisruptionBudget.minAvailable) "") (eq (toString .Values.podDisruptionBudget.maxUnavailable) "") -}}
+{{- fail "podDisruptionBudget.enabled requires minAvailable or maxUnavailable to be set." -}}
 {{- end -}}
 {{- if and .Values.config.parallelMode.enabled (not .Values.config.parallelMode.url) -}}
 {{- fail "config.parallelMode.enabled is true but config.parallelMode.url is empty." -}}

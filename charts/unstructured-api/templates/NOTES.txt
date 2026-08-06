@@ -19,11 +19,13 @@ No Service was created (service.enabled=false). Expose the pods yourself to reac
 
 Reachable via Ingress at:
 {{- range .Values.ingress.hosts }}
+{{- $host := .host }}
   {{- range .paths }}
-  http{{ if $.Values.ingress.tls }}s{{ end }}://{{ .host }}{{ .path }}
+  http{{ if $.Values.ingress.tls }}s{{ end }}://{{ $host }}{{ .path }}
   {{- end }}
 {{- end }}
-{{- else if contains "NodePort" .Values.service.type }}
+{{- else if .Values.service.enabled }}
+{{- if contains "NodePort" .Values.service.type }}
 
 Get the application URL by running:
   export NODE_PORT=$(kubectl get --namespace {{ .Release.Namespace }} -o jsonpath="{.spec.ports[0].nodePort}" services {{ include "unstructured-api.fullname" . }})
@@ -49,6 +51,7 @@ Partition a document:
 {{- end }}
     --header 'accept: application/json' \
     --form 'files=@sample-docs/family-day.eml'
+{{- end }}
 {{- end }}
 
 {{- if .Values.apiKey.enabled }}

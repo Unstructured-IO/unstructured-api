@@ -149,11 +149,13 @@ autoscaling:
   # -- Target memory utilization percentage (optional).
   targetMemoryUtilizationPercentage: 0
 
-# PodDisruptionBudget for controlled voluntary disruptions.
+# PodDisruptionBudget. Set exactly one of maxUnavailable / minAvailable (minAvailable wins
+# if both are set). maxUnavailable is safer at low replica counts: minAvailable: 1 with a
+# single replica blocks every voluntary disruption and stalls node drains.
 podDisruptionBudget:
   enabled: false
-  minAvailable: 1
-  # maxUnavailable: ""
+  maxUnavailable: 1
+  minAvailable: ""
 
 ingress:
   enabled: false

@@ -6,10 +6,10 @@ metadata:
   labels:
     {{- include "unstructured-api.labels" . | nindent 4 }}
 spec:
-  {{- if .Values.podDisruptionBudget.maxUnavailable }}
-  maxUnavailable: {{ .Values.podDisruptionBudget.maxUnavailable }}
-  {{- else }}
+  {{- if ne (toString .Values.podDisruptionBudget.minAvailable) "" }}
   minAvailable: {{ .Values.podDisruptionBudget.minAvailable }}
+  {{- else if ne (toString .Values.podDisruptionBudget.maxUnavailable) "" }}
+  maxUnavailable: {{ .Values.podDisruptionBudget.maxUnavailable }}
   {{- end }}
   selector:
     matchLabels:

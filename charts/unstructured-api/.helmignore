@@ -6,3 +6,4 @@
 *.tmproj
 .vscode/
 ci/
+.DS_Store
