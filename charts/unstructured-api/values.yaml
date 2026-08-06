@@ -1,0 +1,194 @@
+# -- Number of replicas. Ignored when autoscaling.enabled is true.
+replicaCount: 1
+
+image:
+  # -- Container image repository.
+  repository: quay.io/unstructured-io/unstructured-api
+  # -- Image pull policy.
+  pullPolicy: IfNotPresent
+  # -- Image tag. Defaults to the chart appVersion when left empty.
+  tag: ""
+
+# -- Image pull secrets for private registries.
+imagePullSecrets: []
+# -- Override the chart name used in resource names.
+nameOverride: ""
+# -- Override the fully-qualified app name used in resource names.
+fullnameOverride: ""
+
+serviceAccount:
+  # -- Create a ServiceAccount for the workload.
+  create: true
+  # -- Annotations to add to the ServiceAccount (e.g. IRSA / Workload Identity).
+  annotations: {}
+  # -- Name of the ServiceAccount. Generated from the fullname when empty.
+  name: ""
+  # -- Automount the ServiceAccount API token.
+  automount: false
+
+# -- Extra annotations for the Deployment's pod template.
+podAnnotations: {}
+# -- Extra labels for the Deployment's pod template.
+podLabels: {}
+
+# Pod-level security context. Defaults match the image's non-root user (uid/gid 1000).
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 1000
+  runAsGroup: 1000
+  fsGroup: 1000
+  seccompProfile:
+    type: RuntimeDefault
+
+# Container-level security context.
+# NOTE: readOnlyRootFilesystem is intentionally false. Partitioning shells out to
+# LibreOffice/Tesseract, which write to $HOME and temp paths at runtime.
+securityContext:
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: false
+  capabilities:
+    drop:
+      - ALL
+
+service:
+  # -- Create a Service. Ingress and the helm test require it.
+  enabled: true
+  # -- Kubernetes Service type.
+  type: ClusterIP
+  # -- Service port.
+  port: 80
+  # -- Extra Service annotations.
+  annotations: {}
+
+# Container / application configuration, surfaced as environment variables.
+config:
+  # -- Port the API listens on inside the container (PORT).
+  port: 8000
+  # -- Interface the API binds to (HOST).
+  host: "0.0.0.0"
+  # -- Uvicorn workers (WORKERS). Each one loads its own copy of the models; prefer more
+  #    replicas over more workers.
+  workers: 1
+  # -- Reject new work with HTTP 503 below this amount of free memory in MB
+  #    (UNSTRUCTURED_MEMORY_FREE_MINIMUM_MB). Set to 0 to disable.
+  memoryFreeMinimumMb: 2048
+  # -- Comma-separated CORS origins (ALLOWED_ORIGINS). Empty disables CORS.
+  allowedOrigins: ""
+  # -- Begin graceful shutdown after this many seconds (MAX_LIFETIME_SECONDS). Empty disables.
+  maxLifetimeSeconds: ""
+  # -- Sets ENV, which silences the noisy uvicorn error logger. Typically "prod".
+  env: "prod"
+
+  parallelMode:
+    # -- Enable experimental parallel PDF mode (UNSTRUCTURED_PARALLEL_MODE_ENABLED).
+    enabled: false
+    # -- Partition Endpoint URL that receives page ranges (UNSTRUCTURED_PARALLEL_MODE_URL).
+    url: ""
+    # -- Max concurrent remote requests (UNSTRUCTURED_PARALLEL_MODE_THREADS).
+    threads: 3
+    # -- Pages per remote request (UNSTRUCTURED_PARALLEL_MODE_SPLIT_SIZE).
+    splitSize: 1
+    # -- Retries after the initial request (UNSTRUCTURED_PARALLEL_RETRY_ATTEMPTS).
+    retryAttempts: 2
+
+# API-key authentication (UNSTRUCTURED_API_KEY). When set, clients must send the same
+# value in the `unstructured-api-key` request header.
+apiKey:
+  # -- Enable API-key authentication.
+  enabled: false
+  # -- API-key value. Rendered into a Secret managed by this chart. Leave empty and use
+  #    existingSecret to manage the key out-of-band.
+  value: ""
+  # -- Reference an existing Secret instead of creating one.
+  existingSecret: ""
+  # -- Key within existingSecret that holds the API key.
+  existingSecretKey: "UNSTRUCTURED_API_KEY"
+
+# -- Extra environment variables (list of name/value or name/valueFrom maps).
+extraEnv: []
+# -- Extra environment variables sourced from ConfigMaps/Secrets via envFrom.
+extraEnvFrom: []
+
+# -- Resource requests/limits.
+resources:
+  requests:
+    cpu: 500m
+    memory: 3Gi
+  limits:
+    cpu: "4"
+    memory: 8Gi
+
+# Probes hit /healthcheck. It only confirms the HTTP server is up, not that models are
+# loaded or that memory is free, so readiness won't drain an overloaded pod.
+livenessProbe:
+  enabled: true
+  initialDelaySeconds: 0
+  periodSeconds: 15
+  timeoutSeconds: 5
+  failureThreshold: 3
+readinessProbe:
+  enabled: true
+  initialDelaySeconds: 0
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 3
+# Covers process start only (a few seconds), not model loading.
+startupProbe:
+  enabled: true
+  initialDelaySeconds: 10
+  periodSeconds: 5
+  timeoutSeconds: 5
+  failureThreshold: 6
+
+autoscaling:
+  # -- Enable a HorizontalPodAutoscaler.
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 5
+  targetCPUUtilizationPercentage: 80
+  # -- Target memory utilization percentage (optional).
+  targetMemoryUtilizationPercentage: 0
+
+# PodDisruptionBudget for controlled voluntary disruptions.
+podDisruptionBudget:
+  enabled: false
+  minAvailable: 1
+  # maxUnavailable: ""
+
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+  hosts:
+    - host: unstructured-api.local
+      paths:
+        - path: /
+          pathType: Prefix
+  tls: []
+  #  - secretName: unstructured-api-tls
+  #    hosts:
+  #      - unstructured-api.local
+
+# -- Grace period for in-flight requests on shutdown. hi_res requests can run for a
+#    couple of minutes, so this is well above the 30s default to avoid killing them.
+terminationGracePeriodSeconds: 120
+
+# -- Rollout deadline.
+progressDeadlineSeconds: 900
+
+# -- Node selector for pod scheduling.
+nodeSelector: {}
+# -- Tolerations for pod scheduling.
+tolerations: []
+# -- Spread replicas across nodes: "soft" (preferred), "hard" (one per node), or "" to
+#    disable. Ignored when `affinity` is set.
+podAntiAffinity: soft
+# -- Affinity rules for pod scheduling. Overrides podAntiAffinity when set.
+affinity: {}
+# -- Topology spread constraints.
+topologySpreadConstraints: []
+
+# -- Additional volumes for the pod.
+volumes: []
+# -- Additional volume mounts for the container.
+volumeMounts: []
