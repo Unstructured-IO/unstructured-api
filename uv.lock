@@ -2236,7 +2236,7 @@ requires-dist = [
     { name = "pypdf", specifier = ">=6.0.0,<7.0.0" },
     { name = "python-multipart", specifier = ">=0.0.29" },
     { name = "requests", specifier = ">=2.32.0,<3.0.0" },
-    { name = "unstructured", extras = ["all-docs"], specifier = ">=0.18.31,<1.0.0" },
+    { name = "unstructured", extras = ["all-docs"], specifier = ">=0.22.18,<1.0.0" },
     { name = "uvicorn", specifier = ">=0.40.0,<1.0.0" },
 ]
 
