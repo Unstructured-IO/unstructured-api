@@ -9,11 +9,56 @@ import httpx
 import pandas as pd
 import pytest
 from deepdiff import DeepDiff
+from fastapi import UploadFile
 from fastapi.testclient import TestClient
 
 from prepline_general.api.app import app
+from prepline_general.api.general import _GZIP_SPOOL_MAX_MEMORY_BYTES, ungz_file
 
 MAIN_API_ROUTE = "general/v0/general"
+
+
+def _gzip_upload(content: bytes, filename: str = "sample.txt.gz") -> UploadFile:
+    compressed = io.BytesIO(gzip.compress(content))
+    return UploadFile(file=compressed, filename=filename)
+
+
+@pytest.mark.parametrize(
+    ("content", "spills_to_disk"),
+    [
+        pytest.param(b"small gzip payload", False, id="small-stays-in-memory"),
+        pytest.param(b"x" * (_GZIP_SPOOL_MAX_MEMORY_BYTES + 1), True, id="large-spills-to-disk"),
+    ],
+)
+def test_ungz_file_bounds_decompression_memory(content: bytes, spills_to_disk: bool):
+    upload = _gzip_upload(content)
+    compressed_file = upload.file
+
+    result = ungz_file(upload)
+
+    try:
+        assert result is upload
+        assert compressed_file.closed
+        assert result.filename == "sample.txt"
+        assert result.content_type == "text/plain"
+        assert result.size == len(content)
+        assert result.file.read() == content
+        assert result.file._rolled is spills_to_disk
+        assert isinstance(result.file, tempfile.SpooledTemporaryFile) is not spills_to_disk
+    finally:
+        result.file.close()
+        assert result.file.closed
+
+
+def test_ungz_file_proxy_preserves_special_file_methods():
+    result = ungz_file(_gzip_upload(b"first\nsecond\n" * _GZIP_SPOOL_MAX_MEMORY_BYTES))
+
+    try:
+        assert iter(result.file) is not result.file
+        assert next(result.file) == b"first\n"
+        assert result.file.__enter__() is result.file
+    finally:
+        result.file.close()
 
 
 @pytest.mark.xfail(reason="The outputs are different as of unstructured==0.13.5")

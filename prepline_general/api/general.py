@@ -7,10 +7,12 @@ import logging
 import mimetypes
 import os
 import secrets
+import shutil
+import tempfile
 from base64 import b64encode
 from concurrent.futures import ThreadPoolExecutor
 from functools import partial
-from typing import IO, Any, Dict, List, Mapping, Optional, Sequence, Tuple, Union, cast
+from typing import IO, Any, BinaryIO, Dict, List, Mapping, Optional, Sequence, Tuple, Union, cast
 
 import backoff
 import pandas as pd
@@ -31,6 +33,7 @@ from pypdf.errors import FileNotDecryptedError, PdfReadError
 from starlette.datastructures import Headers
 from starlette.types import Send
 
+from prepline_general.api import __version__ as api_version
 from prepline_general.api.filetypes import get_validated_mimetype
 from prepline_general.api.models.form_params import GeneralFormParams
 from unstructured.documents.elements import Element
@@ -41,10 +44,36 @@ from unstructured.staging.base import (
     elements_from_json,
 )
 from unstructured_inference.models.base import UnknownModelException
-from prepline_general.api import __version__ as api_version
 
 app = FastAPI()
 router = APIRouter()
+
+_GZIP_COPY_CHUNK_SIZE = 1024 * 1024
+_GZIP_SPOOL_MAX_MEMORY_BYTES = 1024 * 1024
+
+
+class _SpooledFileProxy:
+    """Expose a spooled file without its concrete type triggering downstream copies."""
+
+    def __init__(self, file: IO[bytes], name: str | None):
+        self._file = file
+        self.name = name
+
+    def __getattr__(self, name: str) -> Any:
+        return getattr(self._file, name)
+
+    def __enter__(self) -> _SpooledFileProxy:
+        self._file.__enter__()
+        return self
+
+    def __exit__(self, *args: Any) -> Any:
+        return self._file.__exit__(*args)
+
+    def __iter__(self):
+        return iter(self._file)
+
+    def __next__(self) -> bytes:
+        return next(self._file)
 
 
 def is_compatible_response_type(media_type: str, response_type: type) -> bool:
@@ -613,13 +642,30 @@ def ungz_file(file: UploadFile, gz_uncompressed_content_type: Optional[str] = No
     if filename.endswith(".gz"):
         filename = filename[:-3]
 
-    gzip_file = gzip.open(file.file).read()
-    return UploadFile(
-        file=io.BytesIO(gzip_file),
-        size=len(gzip_file),
-        filename=filename,
-        headers=Headers({"content-type": return_content_type(filename)}),
+    output_file = tempfile.SpooledTemporaryFile(max_size=_GZIP_SPOOL_MAX_MEMORY_BYTES)
+    try:
+        with gzip.open(file.file) as gzip_file:
+            shutil.copyfileobj(gzip_file, output_file, length=_GZIP_COPY_CHUNK_SIZE)
+        uncompressed_size = output_file.tell()
+        output_file.seek(0)
+    except Exception:
+        output_file.close()
+        raise
+
+    # Reuse the request-owned UploadFile so FastAPI closes the decompressed spool when the
+    # request finishes. A newly-created UploadFile would not belong to the parsed FormData and
+    # would therefore remain open after the response.
+    file.file.close()
+    decompressed_file = (
+        _SpooledFileProxy(output_file, filename)
+        if uncompressed_size > _GZIP_SPOOL_MAX_MEMORY_BYTES
+        else output_file
     )
+    file.file = cast(BinaryIO, decompressed_file)
+    file.size = uncompressed_size
+    file.filename = filename
+    file.headers = Headers({"content-type": return_content_type(filename)})
+    return file
 
 
 @router.get("/general/v0/general", include_in_schema=False)
@@ -747,7 +793,7 @@ def general_partition(
         frames = [
             pd.read_csv(io.BytesIO(response.body))  # pyright: ignore[reportUnknownMemberType]
             for response in responses
-            if response.body.strip()
+            if cast(bytes, response.body).strip()
         ]
         if not frames:
             return PlainTextResponse(responses[0].body)

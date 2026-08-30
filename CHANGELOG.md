@@ -1,3 +1,9 @@
+## 0.1.11
+
+### Fixes
+
+- **Bound gzip decompression memory**: gzip uploads are decompressed incrementally into a spooled temporary file instead of being materialized as a complete in-memory `bytes` value. Expanded outputs larger than 1 MiB remain disk-backed through MIME detection and partitioning, avoiding downstream document-sized copies while preserving the partition API.
+
 ## 0.1.10
 
 ### Fixes
