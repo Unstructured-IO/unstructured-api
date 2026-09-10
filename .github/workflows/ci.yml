@@ -6,6 +6,10 @@ on:
   pull_request:
     branches: [ main ]
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 env:
   PIPELINE_FAMILY: "general"
 
@@ -21,6 +25,7 @@ jobs:
       with:
         enable-cache: true
         cache-dependency-glob: "uv.lock"
+        cache-suffix: lint
     - name: Set up Python ${{ env.PYTHON_VERSION }}
       run: uv python install ${{ env.PYTHON_VERSION }}
     - name: Install lint dependencies
@@ -47,19 +52,24 @@ jobs:
       with:
         enable-cache: true
         cache-dependency-glob: "uv.lock"
+        cache-suffix: test
     - name: Set up Python ${{ env.PYTHON_VERSION }}
       run: uv python install ${{ env.PYTHON_VERSION }}
-    - name: Install dependencies and run core tests
+    - name: Install system dependencies
       run: |
         sudo apt-get update && sudo apt-get install --yes poppler-utils libreoffice
-        uv sync --group test --locked
         make install-pandoc
-        make install-nlp-models
         sudo add-apt-repository -y ppa:alex-p/tesseract-ocr5
         sudo apt-get install -y tesseract-ocr tesseract-ocr-kor
         tesseract --version
-        make test
-        make check-coverage
+    - name: Install test dependencies
+      run: uv sync --group test --locked
+    - name: Install NLP models
+      run: make install-nlp-models
+    - name: Run core tests
+      run: make test
+    - name: Check coverage
+      run: make check-coverage
 
   changelog:
     runs-on: opensource-linux-8core
@@ -77,7 +87,6 @@ jobs:
     - if: steps.changes.outputs.src == 'true' && github.ref != 'refs/heads/main'
       uses: dangoslen/changelog-enforcer@v3
 
-  # TODO - figure out best practice for caching docker images
   test_dockerfile:
     runs-on: opensource-linux-8core
     needs: lint
@@ -90,6 +99,7 @@ jobs:
       with:
         enable-cache: true
         cache-dependency-glob: "uv.lock"
+        cache-suffix: smoke
     - name: Set up Python ${{ env.PYTHON_VERSION }}
       run: uv python install ${{ env.PYTHON_VERSION }}
     - name: Free up disk space
@@ -112,8 +122,9 @@ jobs:
 
         echo "Disk usage after cleanup:"
         df -h
+    - name: Install smoke test dependencies
+      run: uv sync --only-group smoke --locked
+    - name: Build Dockerfile
+      run: make docker-build
     - name: Test Dockerfile
-      run: |
-        uv sync --group test --locked
-        make docker-build
-        make docker-test
+      run: make docker-test
