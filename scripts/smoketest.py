@@ -146,7 +146,6 @@ def test_happy_path_all_types(extension, example_filename: str, content_type: st
     assert len(df) == len(json_response.json())
 
 
-@pytest.mark.parametrize("output_format", ["application/json", "text/csv"])
 @pytest.mark.parametrize(
     "filenames_to_gzip, filenames_verbatim, uncompressed_content_type",
     [
@@ -173,7 +172,6 @@ def test_happy_path_all_types(extension, example_filename: str, content_type: st
     ],
 )
 def test_gzip_sending(
-    output_format: str,
     filenames_to_gzip: List[str],
     filenames_verbatim: List[str],
     uncompressed_content_type: str,

@@ -1,8 +1,12 @@
 ## 0.1.11
 
-### Performance
+### Improvements
 
-- **Avoid copying uploads during MIME detection**: unknown file types are now detected directly from the existing spooled upload stream while preserving the filename expected by the file-type detector.
+- Detect unknown upload MIME types from the existing stream without a full-file copy; preserve filename hints and rewind on success or failure.
+
+### Fixes
+
+- **Restore `MAX_LIFETIME_SECONDS` support in the Docker image**: `scripts/app-start.sh` invokes GNU `timeout` with `--preserve-status` and `--foreground`, flags the Wolfi base's BusyBox `timeout` does not support. Setting `MAX_LIFETIME_SECONDS` therefore caused the server to fail to start and the container to restart-loop. Added `coreutils` to the image so GNU `timeout` is available. This regressed when the base image moved from RockyLinux (which shipped GNU coreutils) to Wolfi.
 
 ## 0.1.10
 
