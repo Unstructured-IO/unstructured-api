@@ -2,7 +2,7 @@
 
 ### Improvements
 
-- Detect unknown upload MIME types from the existing stream without a full-file copy; preserve filename hints and rewind on success or failure.
+- Detect unknown upload MIME types from the request's upload stream, passing the uploaded filename as the extension hint and rewinding the stream on success or failure. With `unstructured>=0.27.11` the detector no longer makes a full in-memory copy of the upload.
 
 ### Fixes
 

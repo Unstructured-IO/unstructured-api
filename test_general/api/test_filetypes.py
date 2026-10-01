@@ -13,9 +13,9 @@ def test_unknown_mimetype_is_detected_from_existing_upload_stream(monkeypatch):
     upload_stream.seek(0)
     upload = UploadFile(file=upload_stream, filename="sample.txt")
 
-    def fake_detect_filetype(*, file):
-        assert file._file is upload_stream
-        assert file.name == "sample.txt"
+    def fake_detect_filetype(*, file, metadata_file_path):
+        assert file is upload_stream
+        assert metadata_file_path == "sample.txt"
         file.seek(4)
         return FileType.TXT
 
@@ -31,7 +31,7 @@ def test_unknown_mimetype_rewinds_upload_stream_when_detection_fails(monkeypatch
     upload_stream.seek(0)
     upload = UploadFile(file=upload_stream, filename="sample.txt")
 
-    def fake_detect_filetype(*, file):
+    def fake_detect_filetype(*, file, metadata_file_path):
         file.seek(4)
         raise RuntimeError("detection failed")
 
