@@ -6,6 +6,7 @@
 
 ### Fixes
 
+- **Bound gzip decompression memory**: gzip uploads are decompressed incrementally into a spooled temporary file instead of being materialized as a complete in-memory `bytes` value. Expanded outputs larger than 1 MiB spill to temporary disk, and the request still closes the decompressed file when it finishes. With `unstructured>=0.27.11`, MIME detection and partitioning read that file in place instead of copying it into memory. No size limit is introduced.
 - **Restore `MAX_LIFETIME_SECONDS` support in the Docker image**: `scripts/app-start.sh` invokes GNU `timeout` with `--preserve-status` and `--foreground`, flags the Wolfi base's BusyBox `timeout` does not support. Setting `MAX_LIFETIME_SECONDS` therefore caused the server to fail to start and the container to restart-loop. Added `coreutils` to the image so GNU `timeout` is available. This regressed when the base image moved from RockyLinux (which shipped GNU coreutils) to Wolfi.
 
 ## 0.1.10
