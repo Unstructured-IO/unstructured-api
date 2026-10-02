@@ -73,6 +73,22 @@ def test_real_detector_matches_copied_upload(filename, payload, max_size):
     _assert_matches_copied_upload(filename, payload, max_size)
 
 
+@pytest.mark.parametrize("max_size", [1, 1024 * 1024])
+@pytest.mark.parametrize(
+    "filename,payload,expected",
+    [
+        ("sample.md", b"# Heading\n\nSome *markdown* text.\n", FileType.MD),
+        ("sample.tsv", b"name\tvalue\nAlice\t1\nBob\t2\n", FileType.TSV),
+    ],
+)
+def test_real_detector_uses_uploaded_filename_extension(filename, payload, expected, max_size):
+    with SpooledTemporaryFile(max_size=max_size) as stream:
+        stream.write(payload)
+        stream.seek(0)
+        upload = UploadFile(file=stream, filename=filename)
+        assert filetypes.get_validated_mimetype(upload) == expected.mime_type
+
+
 @pytest.mark.parametrize("filename", ["layout-parser-paper.pdf", "notes.pptx", "stanley-cups.xlsx"])
 @pytest.mark.parametrize("max_size", [1, 10 * 1024 * 1024])
 def test_real_detector_matches_copied_binary_upload(filename, max_size):
