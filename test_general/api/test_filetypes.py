@@ -1,3 +1,5 @@
+from io import BytesIO
+from pathlib import Path
 from tempfile import SpooledTemporaryFile
 
 import pytest
@@ -43,6 +45,19 @@ def test_unknown_mimetype_rewinds_upload_stream_when_detection_fails(monkeypatch
     assert upload_stream.tell() == 0
 
 
+def _assert_matches_copied_upload(filename: str | None, payload: bytes, max_size: int):
+    copied = BytesIO(payload)
+    copied.name = filename
+    expected = filetypes.detect_filetype(file=copied)
+    with SpooledTemporaryFile(max_size=max_size) as stream:
+        stream.write(payload)
+        stream.seek(0)
+        upload = UploadFile(file=stream, filename=filename)
+        assert filetypes.get_validated_mimetype(upload) == expected.mime_type
+        assert stream.tell() == 0
+        assert not stream.closed
+
+
 @pytest.mark.parametrize("max_size", [1, 1024 * 1024])
 @pytest.mark.parametrize(
     "filename,payload",
@@ -55,34 +70,11 @@ def test_unknown_mimetype_rewinds_upload_stream_when_detection_fails(monkeypatch
     ],
 )
 def test_real_detector_matches_copied_upload(filename, payload, max_size):
-    from io import BytesIO
-
-    copied = BytesIO(payload)
-    copied.name = filename
-    expected = filetypes.detect_filetype(file=copied)
-    with SpooledTemporaryFile(max_size=max_size) as stream:
-        stream.write(payload)
-        stream.seek(0)
-        upload = UploadFile(file=stream, filename=filename)
-        assert filetypes.get_validated_mimetype(upload) == expected.mime_type
-        assert stream.tell() == 0
-        assert not stream.closed
+    _assert_matches_copied_upload(filename, payload, max_size)
 
 
 @pytest.mark.parametrize("filename", ["layout-parser-paper.pdf", "notes.pptx", "stanley-cups.xlsx"])
 @pytest.mark.parametrize("max_size", [1, 10 * 1024 * 1024])
 def test_real_detector_matches_copied_binary_upload(filename, max_size):
-    from io import BytesIO
-    from pathlib import Path
-
     payload = (Path("sample-docs") / filename).read_bytes()
-    copied = BytesIO(payload)
-    copied.name = filename
-    expected = filetypes.detect_filetype(file=copied)
-    with SpooledTemporaryFile(max_size=max_size) as stream:
-        stream.write(payload)
-        stream.seek(0)
-        upload = UploadFile(file=stream, filename=filename)
-        assert filetypes.get_validated_mimetype(upload) == expected.mime_type
-        assert stream.tell() == 0
-        assert not stream.closed
+    _assert_matches_copied_upload(filename, payload, max_size)
