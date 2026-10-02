@@ -12,6 +12,7 @@ from deepdiff import DeepDiff
 from fastapi import UploadFile
 from fastapi.testclient import TestClient
 
+from prepline_general.api import general
 from prepline_general.api.app import app
 from prepline_general.api.general import _GZIP_SPOOL_MAX_MEMORY_BYTES, ungz_file
 from unstructured.partition.common.common import convert_to_bytes
@@ -62,6 +63,28 @@ def test_ungz_file_output_that_spills_to_disk_is_readable_by_unstructured():
         assert result.file.tell() == 0
     finally:
         result.file.close()
+
+
+def test_gzipped_upload_is_partitioned_and_closed_after_the_request(monkeypatch):
+    content = b"Gzipped uploads are partitioned like their uncompressed content."
+    decompressed_uploads: list[UploadFile] = []
+
+    def capture_ungz_file(*args, **kwargs):
+        upload = ungz_file(*args, **kwargs)
+        decompressed_uploads.append(upload)
+        return upload
+
+    monkeypatch.setattr(general, "ungz_file", capture_ungz_file)
+
+    response = TestClient(app).post(
+        MAIN_API_ROUTE,
+        files=[("files", ("sample.txt.gz", gzip.compress(content), "application/gzip"))],
+    )
+
+    assert response.status_code == 200
+    assert [element["text"] for element in response.json()] == [content.decode()]
+    assert len(decompressed_uploads) == 1
+    assert decompressed_uploads[0].file.closed
 
 
 @pytest.mark.xfail(reason="The outputs are different as of unstructured==0.13.5")
