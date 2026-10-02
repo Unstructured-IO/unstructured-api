@@ -1,3 +1,9 @@
+## 0.1.13
+
+### Fixes
+
+- **Bound gzip decompression memory**: gzip uploads are decompressed incrementally into a spooled temporary file instead of being materialized as a complete in-memory `bytes` value. Expanded outputs larger than 1 MiB spill to temporary disk, and the request still closes the decompressed file when it finishes. Once `unstructured` includes [unstructured#4419](https://github.com/Unstructured-IO/unstructured/pull/4419) (expected in 0.27.12), MIME detection and partitioning read that file in place instead of copying it into memory. No size limit is introduced.
+
 ## 0.1.12
 
 ### Improvements
