@@ -102,26 +102,21 @@ jobs:
         cache-suffix: smoke
     - name: Set up Python ${{ env.PYTHON_VERSION }}
       run: uv python install ${{ env.PYTHON_VERSION }}
-    - name: Free up disk space
+    - name: Free up disk space when needed
       run: |
-        # Clear some space (https://github.com/actions/runner-images/issues/2840)
-        echo "Disk usage before cleanup:"
-        df -h
-
-        # Remove unnecessary pre-installed software
-        sudo rm -rf /usr/share/dotnet
-        sudo rm -rf /opt/ghc
-        sudo rm -rf /usr/local/share/boost
-        sudo rm -rf /usr/local/lib/android
-        sudo rm -rf /opt/hostedtoolcache/CodeQL
-        sudo rm -rf /usr/local/.ghcup
-        sudo rm -rf /usr/share/swift
-
-        # Clean up docker to ensure we start fresh
+        # Large runners normally have hundreds of GiB free. Keep the fallback for
+        # smaller runners, but avoid spending minutes deleting unused toolchains.
+        docker_root=$(docker info --format '{{.DockerRootDir}}')
+        available_kib=$(df -Pk "$docker_root" | awk 'NR == 2 {print $4}')
+        if (( available_kib >= 30 * 1024 * 1024 )); then
+          echo "Skipping cleanup: $((available_kib / 1024 / 1024)) GiB free for Docker"
+          exit 0
+        fi
+        df -h "$docker_root"
+        sudo rm -rf /usr/share/dotnet /opt/ghc /usr/local/share/boost \
+          /usr/local/lib/android /opt/hostedtoolcache/CodeQL /usr/local/.ghcup /usr/share/swift
         docker system prune -af --volumes
-
-        echo "Disk usage after cleanup:"
-        df -h
+        df -h "$docker_root"
     - name: Install smoke test dependencies
       run: uv sync --only-group smoke --locked
     - name: Build Dockerfile
