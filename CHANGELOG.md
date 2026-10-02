@@ -1,8 +1,10 @@
-## 0.1.11
+## 0.1.12
 
 ### Improvements
 
-- Detect unknown upload MIME types from the request's upload stream, passing the uploaded filename as the extension hint and rewinding the stream on success or failure. With `unstructured>=0.27.11` the detector no longer makes a full in-memory copy of the upload.
+- Detect unknown upload MIME types from the request's upload stream, passing the uploaded filename as the extension hint and rewinding the stream on success or failure. Once `unstructured` includes [unstructured#4419](https://github.com/Unstructured-IO/unstructured/pull/4419) (expected in 0.27.12), the detector no longer makes a full in-memory copy of the upload.
+
+## 0.1.11
 
 ### Fixes
 
