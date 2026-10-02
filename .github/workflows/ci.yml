@@ -106,17 +106,19 @@ jobs:
       run: |
         # Large runners normally have hundreds of GiB free. Keep the fallback for
         # smaller runners, but avoid spending minutes deleting unused toolchains.
+        # Docker images and the host toolchains/venv may live on different
+        # filesystems, so both must have room before cleanup is skipped.
         docker_root=$(docker info --format '{{.DockerRootDir}}')
-        available_kib=$(df -Pk "$docker_root" | awk 'NR == 2 {print $4}')
+        available_kib=$(df -Pk / "$docker_root" | awk 'NR > 1 && (min == "" || $4 < min) {min = $4} END {print min}')
         if (( available_kib >= 30 * 1024 * 1024 )); then
-          echo "Skipping cleanup: $((available_kib / 1024 / 1024)) GiB free for Docker"
+          echo "Skipping cleanup: $((available_kib / 1024 / 1024)) GiB free on / and Docker storage"
           exit 0
         fi
-        df -h "$docker_root"
+        df -h / "$docker_root"
         sudo rm -rf /usr/share/dotnet /opt/ghc /usr/local/share/boost \
           /usr/local/lib/android /opt/hostedtoolcache/CodeQL /usr/local/.ghcup /usr/share/swift
         docker system prune -af --volumes
-        df -h "$docker_root"
+        df -h / "$docker_root"
     - name: Install smoke test dependencies
       run: uv sync --only-group smoke --locked
     - name: Build Dockerfile
