@@ -67,7 +67,7 @@ def send_document(
         (".md", "README.md", "text/markdown"),
         (".msg", "fake-email.msg", "application/x-ole-storage"),
         (".odt", "fake.odt", "application/vnd.oasis.opendocument.text"),
-        (".pdf", "layout-parser-paper.pdf", "application/pdf"),
+        (".pdf", "layout-parser-paper-fast.pdf", "application/pdf"),
         (".png", "english-and-korean.png", "image/png"),
         (".ppt", "fake-power-point.ppt", "application/vnd.ms-powerpoint"),
         (
@@ -89,12 +89,12 @@ def send_document(
         (".json", "spring-weather.html.json", "application/json"),
         (
             ".gz",
-            "layout-parser-paper.pdf.gz",
+            "layout-parser-paper-fast.pdf",
             "application/gzip",
         ),
     ],
 )
-def test_happy_path_all_types(extension, example_filename: str, content_type: str):
+def test_happy_path_all_types(extension, example_filename: str, content_type: str, tmp_path: Path):
     """
     For the files in sample-docs, verify that we get a 200
     and some structured response
@@ -113,6 +113,12 @@ def test_happy_path_all_types(extension, example_filename: str, content_type: st
         pytest.skip("emulated hardware")
 
     test_file = str(Path("sample-docs") / example_filename)
+    if extension == ".gz":
+        # Gzip the one-page PDF at test time; full-document inference is covered
+        # by the table and strategy tests.
+        gzipped_file = tmp_path / f"{example_filename}.gz"
+        gzip_file(test_file, str(gzipped_file))
+        test_file = str(gzipped_file)
 
     # Verify we can send with explicit content type
     response = send_document(filenames=[test_file], content_type=content_type)
