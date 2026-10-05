@@ -114,8 +114,8 @@ def test_happy_path_all_types(extension, example_filename: str, content_type: st
 
     test_file = str(Path("sample-docs") / example_filename)
     if extension == ".gz":
-        # Exercise the same PDF through gzip without repeatedly processing the
-        # full paper. Full-document inference stays in the table/strategy tests.
+        # Gzip the one-page PDF at test time; full-document inference is covered
+        # by the table and strategy tests.
         gzipped_file = tmp_path / f"{example_filename}.gz"
         gzip_file(test_file, str(gzipped_file))
         test_file = str(gzipped_file)
