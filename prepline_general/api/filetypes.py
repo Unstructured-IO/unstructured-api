@@ -1,6 +1,4 @@
-import os
 from typing import Optional
-from io import BytesIO
 
 from fastapi import HTTPException, UploadFile
 
@@ -36,15 +34,13 @@ def get_validated_mimetype(file: UploadFile, content_type_hint: str | None = Non
 
     filetype = FileType.from_mime_type(content_type)
 
-    # If content_type was not specified, use the library to identify the file
-    # We inspect the bytes to do this, so we need to buffer the file
+    # If content_type was not specified, use the library to identify the file. The upload's own
+    # `.name` is its temporary file, so the uploaded filename is passed as the extension hint.
     if not filetype or filetype == FileType.UNK:
-        file_buffer = BytesIO(file.file.read())
-        file.file.seek(0)
-
-        file_buffer.name = file.filename
-
-        filetype = detect_filetype(file=file_buffer)
+        try:
+            filetype = detect_filetype(file=file.file, metadata_file_path=file.filename)
+        finally:
+            file.file.seek(0)
 
     if not filetype.is_partitionable:
         raise HTTPException(
