@@ -116,8 +116,12 @@ def call_api(
     )
 
     if response.status_code != 200:
-        detail = response.json().get("detail") or response.text
-        raise HTTPException(status_code=response.status_code, detail=detail)
+        try:
+            error = response.json()
+        except ValueError:
+            error = None
+        detail = error.get("detail") if isinstance(error, dict) else None
+        raise HTTPException(status_code=response.status_code, detail=detail or response.text)
 
     return response.text
 

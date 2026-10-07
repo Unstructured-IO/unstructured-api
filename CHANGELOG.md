@@ -1,3 +1,9 @@
+## 0.1.12
+
+### Fixes
+
+- **Preserve worker HTTP errors for non-JSON responses**: In parallel PDF mode, a worker error whose body was plain text, HTML, or a JSON value other than an object raised a decoding or attribute error while reading `detail`. The worker status code was lost and transient 5xx errors were not retried. The detail now falls back to the response text, the original status code is kept, and the existing retry policy applies.
+
 ## 0.1.11
 
 ### Fixes
