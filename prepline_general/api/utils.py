@@ -60,7 +60,7 @@ def is_convertible_to_list(s: str) -> Tuple[bool, Union[List, str]]:
 
     delimiters = ["+", ","]
     for delimiter in delimiters:
-        if delimiter in delimiters:
+        if delimiter in s:
             return True, s.split(delimiter)
 
     return False, "Input is not valid JSON."  # Invalid JSON

@@ -1,3 +1,11 @@
+## 0.1.14
+
+### Fixes
+
+- **Split comma-separated form lists**: A list parameter such as `languages=eng,deu` was always split on `+`, so it was forwarded as the single value `eng,deu`. Comma-separated values are now split on the comma. JSON arrays, `+`-separated values, and repeated fields are unchanged, and `+` still takes precedence when both delimiters appear.
+
+
+
 ## 0.1.13
 
 ### Fixes
