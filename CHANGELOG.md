@@ -1,8 +1,15 @@
-## 0.1.12
+## 0.1.13
 
 ### Fixes
 
 - **Honor `combine_under_n_chars` in parallel mode**: Parallel PDF requests forwarded the library argument `combine_text_under_n_chars` to workers, which accept the form field `combine_under_n_chars`. Workers ignored the requested threshold and used the default. Worker requests now send the form field name.
+
+
+## 0.1.12
+
+### Fixes
+
+- **Preserve worker HTTP errors for non-JSON responses**: In parallel PDF mode, a worker error whose body was plain text, HTML, or a JSON value other than an object raised a decoding or attribute error while reading `detail`. The worker status code was lost and transient 5xx errors were not retried. The detail now falls back to the response text, the original status code is kept, and the existing retry policy applies.
 
 ## 0.1.11
 
