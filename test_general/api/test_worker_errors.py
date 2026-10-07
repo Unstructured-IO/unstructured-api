@@ -1,4 +1,5 @@
 import io
+import os
 from unittest.mock import Mock
 
 import pytest
@@ -6,6 +7,8 @@ import requests
 from fastapi import HTTPException
 
 from prepline_general.api import general
+
+WORKER_MAX_TRIES = int(os.environ.get("UNSTRUCTURED_PARALLEL_RETRY_ATTEMPTS", 2)) + 1
 
 
 def worker_response(status, body):
@@ -75,4 +78,4 @@ def test_non_json_server_errors_preserve_status_after_retry_exhaustion(monkeypat
 
     assert exc_info.value.status_code == 503
     assert exc_info.value.detail == "Service unavailable"
-    assert post.call_count == 3
+    assert post.call_count == WORKER_MAX_TRIES
