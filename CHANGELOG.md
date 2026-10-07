@@ -1,8 +1,15 @@
-## 0.1.12
+## 0.1.13
 
 ### Fixes
 
 - **Split comma-separated form lists**: A list parameter such as `languages=eng,deu` was always split on `+`, so it was forwarded as the single value `eng,deu`. Comma-separated values are now split on the comma. JSON arrays, `+`-separated values, and repeated fields are unchanged, and `+` still takes precedence when both delimiters appear.
+
+
+## 0.1.12
+
+### Fixes
+
+- **Preserve worker HTTP errors for non-JSON responses**: In parallel PDF mode, a worker error whose body was plain text, HTML, or a JSON value other than an object raised a decoding or attribute error while reading `detail`. The worker status code was lost and transient 5xx errors were not retried. The detail now falls back to the response text, the original status code is kept, and the existing retry policy applies.
 
 ## 0.1.11
 
