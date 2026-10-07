@@ -1,3 +1,10 @@
+## 0.1.13
+
+### Fixes
+
+- **Honor `combine_under_n_chars` in parallel mode**: Parallel PDF requests forwarded the library argument `combine_text_under_n_chars` to workers, which accept the form field `combine_under_n_chars`. Workers ignored the requested threshold and used the default. Worker requests now send the form field name.
+
+
 ## 0.1.12
 
 ### Fixes
