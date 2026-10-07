@@ -599,7 +599,13 @@ class MultipartMixedResponse(StreamingResponse):
                 {"type": "http.response.body", "body": self.build_part(chunk), "more_body": True}
             )
 
-        await send({"type": "http.response.body", "body": b"", "more_body": False})
+        await send(
+            {
+                "type": "http.response.body",
+                "body": self.boundary + b"--" + self.CRLF,
+                "more_body": False,
+            }
+        )
 
 
 def ungz_file(file: UploadFile, gz_uncompressed_content_type: Optional[str] = None) -> UploadFile:
