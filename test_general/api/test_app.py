@@ -907,7 +907,9 @@ def test_partition_file_via_api_not_retryable_error_code(monkeypatch, mocker):
     # Each page worker stops after its first 401. A queued worker may start
     # before the first failure reaches the executor, so count calls per PDF split.
     assert remote_partition.call_count >= 1
-    submitted_splits = [call.kwargs["files"]["files"][1] for call in remote_partition.call_args_list]
+    submitted_splits = [
+        call.kwargs["files"]["files"][1] for call in remote_partition.call_args_list
+    ]
     assert len({id(split) for split in submitted_splits}) == remote_partition.call_count
 
 
