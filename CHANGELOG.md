@@ -1,8 +1,16 @@
-## 0.1.13
+## 0.1.14
 
 ### Fixes
 
 - **Split comma-separated form lists**: A list parameter such as `languages=eng,deu` was always split on `+`, so it was forwarded as the single value `eng,deu`. Comma-separated values are now split on the comma. JSON arrays, `+`-separated values, and repeated fields are unchanged, and `+` still takes precedence when both delimiters appear.
+
+
+
+## 0.1.13
+
+### Fixes
+
+- **Honor `combine_under_n_chars` in parallel mode**: Parallel PDF requests forwarded the library argument `combine_text_under_n_chars` to workers, which accept the form field `combine_under_n_chars`. Workers ignored the requested threshold and used the default. Worker requests now send the form field name.
 
 
 ## 0.1.12
