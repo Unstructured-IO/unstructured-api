@@ -146,9 +146,12 @@ def partition_file_via_api(
         raise HTTPException(status_code=500, detail="Parallel mode enabled but no url set!")
 
     api_key = request.headers.get("unstructured-api-key", "")
-    partition_kwargs["starting_page_number"] = (
-        partition_kwargs.get("starting_page_number", 1) + page_offset
+    worker_kwargs = partition_kwargs.copy()
+    worker_kwargs["starting_page_number"] = (
+        worker_kwargs.get("starting_page_number", 1) + page_offset
     )
+    if "combine_text_under_n_chars" in worker_kwargs:
+        worker_kwargs["combine_under_n_chars"] = worker_kwargs.pop("combine_text_under_n_chars")
 
     result = call_api(
         request_url,
@@ -156,7 +159,7 @@ def partition_file_via_api(
         filename,
         file,
         content_type,
-        **partition_kwargs,
+        **worker_kwargs,
     )
     return elements_from_json(text=result)
 
