@@ -31,6 +31,7 @@ from pypdf.errors import FileNotDecryptedError, PdfReadError
 from starlette.datastructures import Headers
 from starlette.types import Send
 
+from prepline_general.api import __version__ as api_version
 from prepline_general.api.filetypes import get_validated_mimetype
 from prepline_general.api.models.form_params import GeneralFormParams
 from unstructured.documents.elements import Element
@@ -41,7 +42,6 @@ from unstructured.staging.base import (
     elements_from_json,
 )
 from unstructured_inference.models.base import UnknownModelException
-from prepline_general.api import __version__ as api_version
 
 app = FastAPI()
 router = APIRouter()
@@ -49,11 +49,11 @@ router = APIRouter()
 
 def is_compatible_response_type(media_type: str, response_type: type) -> bool:
     """True when `response_type` can be converted to `media_type` for HTTP Response."""
-    return (
-        False
-        if media_type == "application/json" and response_type not in [dict, list]
-        else False if media_type == "text/csv" and response_type != str else True
-    )
+    if media_type == "application/json":
+        return response_type in [dict, list]
+    if media_type == "text/csv":
+        return response_type is str
+    return True
 
 
 logger = logging.getLogger("unstructured_api")
@@ -116,8 +116,12 @@ def call_api(
     )
 
     if response.status_code != 200:
-        detail = response.json().get("detail") or response.text
-        raise HTTPException(status_code=response.status_code, detail=detail)
+        try:
+            error = response.json()
+        except ValueError:
+            error = None
+        detail = error.get("detail") if isinstance(error, dict) else None
+        raise HTTPException(status_code=response.status_code, detail=detail or response.text)
 
     return response.text
 
@@ -146,9 +150,12 @@ def partition_file_via_api(
         raise HTTPException(status_code=500, detail="Parallel mode enabled but no url set!")
 
     api_key = request.headers.get("unstructured-api-key", "")
-    partition_kwargs["starting_page_number"] = (
-        partition_kwargs.get("starting_page_number", 1) + page_offset
+    worker_kwargs = partition_kwargs.copy()
+    worker_kwargs["starting_page_number"] = (
+        worker_kwargs.get("starting_page_number", 1) + page_offset
     )
+    if "combine_text_under_n_chars" in worker_kwargs:
+        worker_kwargs["combine_under_n_chars"] = worker_kwargs.pop("combine_text_under_n_chars")
 
     result = call_api(
         request_url,
@@ -156,7 +163,7 @@ def partition_file_via_api(
         filename,
         file,
         content_type,
-        **partition_kwargs,
+        **worker_kwargs,
     )
     return elements_from_json(text=result)
 
@@ -650,7 +657,7 @@ def general_partition(
     # cannot use annotated type here because of a bug described here:
     # https://github.com/tiangolo/fastapi/discussions/10280
     # The openapi metadata must be added separately in openapi.py file.
-    # TODO: Check if the bug is fixed and change the declaration to use Annotated[List[UploadFile], File(...)]
+    # TODO: Check whether FastAPI supports Annotated[List[UploadFile], File(...)].
     # For new parameters - add them in models/form_params.py
     files: List[UploadFile],
     form_params: GeneralFormParams = Depends(GeneralFormParams.as_form),
