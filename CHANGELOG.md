@@ -1,3 +1,9 @@
+## 0.1.15
+
+### Fixes
+
+- **Terminate multipart responses with the closing boundary**: `multipart/mixed` responses ended after the last part without the closing `--boundary--` delimiter, so strict MIME parsers reported an incomplete message. The closing delimiter is now sent when the stream completes. A stream that fails partway still ends without it.
+
 ## 0.1.14
 
 ### Fixes

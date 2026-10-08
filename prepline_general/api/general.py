@@ -31,6 +31,7 @@ from pypdf.errors import FileNotDecryptedError, PdfReadError
 from starlette.datastructures import Headers
 from starlette.types import Send
 
+from prepline_general.api import __version__ as api_version
 from prepline_general.api.filetypes import get_validated_mimetype
 from prepline_general.api.models.form_params import GeneralFormParams
 from unstructured.documents.elements import Element
@@ -41,7 +42,6 @@ from unstructured.staging.base import (
     elements_from_json,
 )
 from unstructured_inference.models.base import UnknownModelException
-from prepline_general.api import __version__ as api_version
 
 app = FastAPI()
 router = APIRouter()
@@ -49,11 +49,11 @@ router = APIRouter()
 
 def is_compatible_response_type(media_type: str, response_type: type) -> bool:
     """True when `response_type` can be converted to `media_type` for HTTP Response."""
-    return (
-        False
-        if media_type == "application/json" and response_type not in [dict, list]
-        else False if media_type == "text/csv" and response_type != str else True
-    )
+    if media_type == "application/json":
+        return response_type in [dict, list]
+    if media_type == "text/csv":
+        return response_type is str
+    return True
 
 
 logger = logging.getLogger("unstructured_api")
@@ -606,7 +606,13 @@ class MultipartMixedResponse(StreamingResponse):
                 {"type": "http.response.body", "body": self.build_part(chunk), "more_body": True}
             )
 
-        await send({"type": "http.response.body", "body": b"", "more_body": False})
+        await send(
+            {
+                "type": "http.response.body",
+                "body": self.boundary + b"--" + self.CRLF,
+                "more_body": False,
+            }
+        )
 
 
 def ungz_file(file: UploadFile, gz_uncompressed_content_type: Optional[str] = None) -> UploadFile:
@@ -651,7 +657,7 @@ def general_partition(
     # cannot use annotated type here because of a bug described here:
     # https://github.com/tiangolo/fastapi/discussions/10280
     # The openapi metadata must be added separately in openapi.py file.
-    # TODO: Check if the bug is fixed and change the declaration to use Annotated[List[UploadFile], File(...)]
+    # TODO: Check whether FastAPI supports Annotated[List[UploadFile], File(...)].
     # For new parameters - add them in models/form_params.py
     files: List[UploadFile],
     form_params: GeneralFormParams = Depends(GeneralFormParams.as_form),
