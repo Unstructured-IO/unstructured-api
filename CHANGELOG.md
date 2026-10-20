@@ -3,6 +3,7 @@
 ### Fixes
 
 - **Bump locked `certifi` to 2026.10.19**: The release removes the emSign ECC Root CA - G3 root after eight eMudhra intermediate CA private keys were compromised. `requests` and `httpx` trust certifi's bundle and do not check revocation, so with the older bundle they accepted certificates chaining to that root. The Docker image installs from the lockfile and picks it up, and `certifi>=2026.10.19` is recorded in `constraint-dependencies` so future relocks cannot fall below it.
+- **Bump uv in the Docker image to 0.13.4**: Earlier uv releases bundle a CA store that trusts the same emSign ECC Root CA - G3 ([GHSA-hq85-5cpj-mr62](https://github.com/astral-sh/uv/security/advisories/GHSA-hq85-5cpj-mr62)). uv 0.13.4 drops it, so package downloads during the image build no longer trust certificates chaining to that root.
 
 ## 0.1.15
 
