@@ -28,6 +28,7 @@ resolution-markers = [
 
 [manifest]
 constraints = [
+    { name = "certifi", specifier = ">=2026.10.19" },
     { name = "lxml", specifier = ">=6.1.1" },
     { name = "pdfminer-six", specifier = "==20260107" },
     { name = "starlette", specifier = ">=1.1.0" },
