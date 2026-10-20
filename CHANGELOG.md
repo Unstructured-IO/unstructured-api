@@ -1,3 +1,9 @@
+## 0.1.16
+
+### Fixes
+
+- **Bump locked `certifi` to 2026.10.19**: The release removes the emSign ECC Root CA - G3 root after eight eMudhra intermediate CA private keys were compromised. `requests` and `httpx` trust certifi's bundle and do not check revocation, so with the older bundle they accepted certificates chaining to that root. The Docker image installs from the lockfile and picks it up.
+
 ## 0.1.15
 
 ### Fixes
