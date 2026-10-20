@@ -52,6 +52,8 @@ constraint-dependencies = [
     "starlette>=1.1.0",
     # lxml >=6.1.1 fixes CVE-2026-41066 (HIGH)
     "lxml>=6.1.1",
+    # certifi >=2026.10.19 removes emSign ECC Root CA - G3 (eMudhra intermediate CA key compromise)
+    "certifi>=2026.10.19",
 ]
 
 [[tool.uv.index]]
