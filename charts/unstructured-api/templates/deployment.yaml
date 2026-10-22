@@ -1,0 +1,160 @@
+{{- include "unstructured-api.validateValues" . -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "unstructured-api.fullname" . }}
+  labels:
+    {{- include "unstructured-api.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  {{- with .Values.progressDeadlineSeconds }}
+  progressDeadlineSeconds: {{ . }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "unstructured-api.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+        {{- if and .Values.apiKey.enabled (not .Values.apiKey.existingSecret) }}
+        checksum/api-key: {{ include (print $.Template.BasePath "/secret.yaml") . | sha256sum }}
+        {{- end }}
+        {{- with .Values.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      labels:
+        {{- include "unstructured-api.labels" . | nindent 8 }}
+        {{- with .Values.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "unstructured-api.serviceAccountName" . }}
+      automountServiceAccountToken: {{ .Values.serviceAccount.automount }}
+      {{- with .Values.podSecurityContext }}
+      securityContext:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      terminationGracePeriodSeconds: {{ .Values.terminationGracePeriodSeconds }}
+      containers:
+        - name: {{ .Chart.Name }}
+          {{- with .Values.securityContext }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.config.port }}
+              protocol: TCP
+          env:
+            - name: PORT
+              value: {{ .Values.config.port | quote }}
+            - name: HOST
+              value: {{ .Values.config.host | quote }}
+            - name: WORKERS
+              value: {{ .Values.config.workers | quote }}
+            - name: UNSTRUCTURED_MEMORY_FREE_MINIMUM_MB
+              value: {{ .Values.config.memoryFreeMinimumMb | quote }}
+            {{- if .Values.config.env }}
+            - name: ENV
+              value: {{ .Values.config.env | quote }}
+            {{- end }}
+            {{- if .Values.config.allowedOrigins }}
+            - name: ALLOWED_ORIGINS
+              value: {{ .Values.config.allowedOrigins | quote }}
+            {{- end }}
+            {{- if .Values.config.maxLifetimeSeconds }}
+            - name: MAX_LIFETIME_SECONDS
+              value: {{ .Values.config.maxLifetimeSeconds | quote }}
+            {{- end }}
+            {{- if .Values.config.parallelMode.enabled }}
+            - name: UNSTRUCTURED_PARALLEL_MODE_ENABLED
+              value: "true"
+            - name: UNSTRUCTURED_PARALLEL_MODE_URL
+              value: {{ .Values.config.parallelMode.url | quote }}
+            - name: UNSTRUCTURED_PARALLEL_MODE_THREADS
+              value: {{ .Values.config.parallelMode.threads | quote }}
+            - name: UNSTRUCTURED_PARALLEL_MODE_SPLIT_SIZE
+              value: {{ .Values.config.parallelMode.splitSize | quote }}
+            - name: UNSTRUCTURED_PARALLEL_RETRY_ATTEMPTS
+              value: {{ .Values.config.parallelMode.retryAttempts | quote }}
+            {{- end }}
+            {{- if .Values.apiKey.enabled }}
+            - name: UNSTRUCTURED_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "unstructured-api.apiKeySecretName" . }}
+                  key: {{ if .Values.apiKey.existingSecret }}{{ .Values.apiKey.existingSecretKey }}{{ else }}UNSTRUCTURED_API_KEY{{ end }}
+            {{- end }}
+            {{- with .Values.extraEnv }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+          {{- with .Values.extraEnvFrom }}
+          envFrom:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- if .Values.startupProbe.enabled }}
+          startupProbe:
+            httpGet:
+              path: /healthcheck
+              port: http
+            initialDelaySeconds: {{ .Values.startupProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.startupProbe.periodSeconds }}
+            timeoutSeconds: {{ .Values.startupProbe.timeoutSeconds }}
+            failureThreshold: {{ .Values.startupProbe.failureThreshold }}
+          {{- end }}
+          {{- if .Values.livenessProbe.enabled }}
+          livenessProbe:
+            httpGet:
+              path: /healthcheck
+              port: http
+            initialDelaySeconds: {{ .Values.livenessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.livenessProbe.periodSeconds }}
+            timeoutSeconds: {{ .Values.livenessProbe.timeoutSeconds }}
+            failureThreshold: {{ .Values.livenessProbe.failureThreshold }}
+          {{- end }}
+          {{- if .Values.readinessProbe.enabled }}
+          readinessProbe:
+            httpGet:
+              path: /healthcheck
+              port: http
+            initialDelaySeconds: {{ .Values.readinessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.readinessProbe.periodSeconds }}
+            timeoutSeconds: {{ .Values.readinessProbe.timeoutSeconds }}
+            failureThreshold: {{ .Values.readinessProbe.failureThreshold }}
+          {{- end }}
+          {{- with .Values.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.volumeMounts }}
+          volumeMounts:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+      {{- with .Values.volumes }}
+      volumes:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with (include "unstructured-api.affinity" .) }}
+      affinity:
+        {{- . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.topologySpreadConstraints }}
+      topologySpreadConstraints:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
