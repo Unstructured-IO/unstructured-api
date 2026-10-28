@@ -13,6 +13,8 @@ dependencies = [
     "psutil >=7.0.0, <8.0.0",
     "pypdf >=6.0.0, <7.0.0",
     "requests >=2.32.0, <3.0.0",
+    # imported directly for OleFileError; also a transitive dep of unstructured
+    "olefile >=0.47, <1.0.0",
 ]
 
 [dependency-groups]
