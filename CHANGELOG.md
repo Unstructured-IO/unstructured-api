@@ -1,3 +1,9 @@
+## 0.1.17
+
+### Fixes
+
+- **Honor the `OCR_AGENT` environment variable**: The API called `partition()` without `ocr_agent`, so the library default (Tesseract) was always used and an image built with PaddleOCR and `OCR_AGENT` set still ran Tesseract. The agent named by `OCR_AGENT` is now passed to `partition()`, resolved the same way the library resolves it, so the legacy names `tesseract` and `paddle` keep working. Requests without `OCR_AGENT` still use Tesseract. Parallel-mode workers resolve the variable from their own environment.
+
 ## 0.1.16
 
 ### Fixes

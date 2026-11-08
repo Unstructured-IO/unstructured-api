@@ -41,6 +41,7 @@ from unstructured.staging.base import (
     convert_to_isd,
     elements_from_json,
 )
+from unstructured.partition.utils.ocr_models.ocr_interface import OCRAgent
 from unstructured_inference.models.base import UnknownModelException
 
 app = FastAPI()
@@ -156,6 +157,8 @@ def partition_file_via_api(
     )
     if "combine_text_under_n_chars" in worker_kwargs:
         worker_kwargs["combine_under_n_chars"] = worker_kwargs.pop("combine_text_under_n_chars")
+    # -- not a form field; each worker resolves OCR_AGENT from its own environment --
+    worker_kwargs.pop("ocr_agent", None)
 
     result = call_api(
         request_url,
@@ -324,6 +327,10 @@ def pipeline_api(
 
     extract_image_block_to_payload = bool(extract_image_block_types)
 
+    # -- partition() defaults to Tesseract unless `ocr_agent` is passed, so resolve the agent
+    # -- named by the OCR_AGENT env var (legacy names like "paddle" included) here.
+    ocr_agent = OCRAgent._get_ocr_agent_cls_qname()
+
     try:
         logger.debug(
             "partition input data: {}".format(
@@ -332,6 +339,7 @@ def pipeline_api(
                         "content_type": file_content_type,
                         "strategy": strategy,
                         "ocr_languages": ocr_languages_str,
+                        "ocr_agent": ocr_agent,
                         "coordinates": coordinates,
                         "pdf_infer_table_structure": pdf_infer_table_structure,
                         "include_page_breaks": include_page_breaks,
@@ -366,6 +374,7 @@ def pipeline_api(
             "include_page_breaks": include_page_breaks,
             "hi_res_model_name": hi_res_model_name,
             "ocr_languages": ocr_languages_str,
+            "ocr_agent": ocr_agent,
             "pdf_infer_table_structure": pdf_infer_table_structure,
             "skip_infer_table_types": skip_infer_table_types,
             "strategy": strategy,
