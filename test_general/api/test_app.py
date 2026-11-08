@@ -15,6 +15,7 @@ from pypdf import PdfReader, PdfWriter
 
 from prepline_general.api import general
 from prepline_general.api.app import app
+from unstructured.partition.utils.constants import OCR_AGENT_PADDLE
 
 MAIN_API_ROUTE = "general/v0/general"
 
@@ -720,6 +721,7 @@ def test_parallel_mode_passes_params(monkeypatch):
     TODO - do the same test when params are sent back to the api
     """
     monkeypatch.setenv("UNSTRUCTURED_PARALLEL_MODE_ENABLED", "true")
+    monkeypatch.setenv("OCR_AGENT", OCR_AGENT_PADDLE)
 
     # Make this really big so we just call partition
     monkeypatch.setenv("UNSTRUCTURED_PARALLEL_MODE_SPLIT_SIZE", "500")
@@ -775,6 +777,7 @@ def test_parallel_mode_passes_params(monkeypatch):
         encoding="foo",
         include_page_breaks=True,
         ocr_languages=None,
+        ocr_agent=OCR_AGENT_PADDLE,
         languages=["eng"],
         # NOTE(robinson) - pdf_infer_table_structure is False because
         # skip_infer_table_type=["pdf"] superceded pdf_infer_table_structure
