@@ -1,0 +1,24 @@
+{
+  // Compiles ./steps/*.ts -> ./steps/*.js for PUBLISHING only (prepack
+  // builds, postpack cleans). A hub suite that installs this package discovers its steps as
+  // compiled `steps/**/*.js`: defineAcceptanceConfig imports discovered steps straight
+  // out of node_modules, where Playwright's TypeScript transform does not apply. Local runs keep
+  // using the .ts sources (see playwright.config.ts), so this never affects `npm test`.
+  //
+  // The root is stamped by acceptance-init from `unstructuredAcceptance.steps` in package.json,
+  // defaulting to `steps`. Re-run acceptance-init after changing that field — this file is
+  // framework-managed, so editing the include here would be overwritten.
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "strict": true,
+    "skipLibCheck": true,
+    "declaration": false,
+    "sourceMap": false
+    // No outDir on purpose: each .js is emitted next to its .ts, which is the layout
+    // discovery expects (`<package>/steps/**/*.js`). Setting outDir to "." would make tsc
+    // exclude its own output dir — the whole project — and find no inputs at all.
+  },
+  "include": ["steps/**/*.ts"]
+}
