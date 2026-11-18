@@ -88,8 +88,8 @@ jobs:
           series="$(node -p "require('./package.json').version.split('.').slice(0, 2).join('.')")"
           version="${series}.$(git rev-list --count HEAD -- .)"
           npm version --no-git-tag-version --allow-same-version "${version}" >/dev/null
-          # Every version lands under the 'rc' dist-tag, as the other @utic acceptance packages
-          # do; consumers pin a version or range, so 'latest' is never resolved.
+          # Every version lands under the 'rc' dist-tag: consumers pin a version or range, so
+          # 'latest' is never resolved.
           if output=$(npm publish --tag rc 2>&1); then
             echo "$output"
             echo "::notice::Published @utic/unstructured-api-acceptance@${version}"
