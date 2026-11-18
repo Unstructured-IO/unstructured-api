@@ -15,6 +15,8 @@ concurrency:
 jobs:
   contract:
     name: Acceptance contract
+    # A fork's pull request gets no OIDC token, so it could not install the framework.
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
     timeout-minutes: 15
     permissions:
@@ -33,18 +35,21 @@ jobs:
           cache-dependency-path: acceptance/package-lock.json
 
       # @utic/acceptance-core is on the private Azure Artifacts feed; acceptance/.npmrc reads the
-      # token from AZURE_ARTIFACTS_TOKEN.
+      # token from AZURE_ARTIFACTS_TOKEN. This is a public repo, which GitHub does not allow to use
+      # actions from the internal github-workflows repo, so the token is minted inline.
+      - name: Log in to Azure with the package feed reader
+        uses: azure/login@a457da9ea143d694b1b9c7c869ebb04ebe844ef5 # v2.3.0
+        with:
+          client-id: a74a6a24-379b-4810-b01a-00707cb7decf
+          tenant-id: dcb38522-c289-4665-a9d8-c4995b630804
+          allow-no-subscriptions: true
+
       - name: Mint package feed token
         id: ado
-        uses: Unstructured-IO/github-workflows/.github/actions/azure-devops-oidc-token@v6
-        with:
-          access: read
-
-      - name: Require package feed access
-        if: steps.ado.outputs.oidc-available != 'true'
         run: |
-          echo "::error::OIDC was unavailable, so no feed token was minted."
-          exit 1
+          token=$(az account get-access-token --resource 499b84ac-1321-427f-aa17-267ca6975798 --query accessToken -o tsv)
+          echo "::add-mask::${token}"
+          echo "AZ_DEVOPS_TOKEN=${token}" >> "${GITHUB_OUTPUT}"
 
       - name: Install dependencies
         env:

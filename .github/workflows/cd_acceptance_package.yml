@@ -44,18 +44,22 @@ jobs:
           cache-dependency-path: acceptance/package-lock.json
 
       # acceptance/.npmrc reads the feed token from AZURE_ARTIFACTS_TOKEN. The install gets a
-      # read token so dependency install scripts never hold publish rights.
-      - name: Mint package feed read token
-        id: ado_read
-        uses: Unstructured-IO/github-workflows/.github/actions/azure-devops-oidc-token@v6
+      # read token so dependency install scripts never hold publish rights. This is a public repo,
+      # which GitHub does not allow to use actions from the internal github-workflows repo, so the
+      # tokens are minted inline.
+      - name: Log in to Azure with the package feed reader
+        uses: azure/login@a457da9ea143d694b1b9c7c869ebb04ebe844ef5 # v2.3.0
         with:
-          access: read
+          client-id: a74a6a24-379b-4810-b01a-00707cb7decf
+          tenant-id: dcb38522-c289-4665-a9d8-c4995b630804
+          allow-no-subscriptions: true
 
-      - name: Require package feed access
-        if: steps.ado_read.outputs.oidc-available != 'true'
+      - name: Mint package feed reader token
+        id: ado_read
         run: |
-          echo "::error::OIDC was unavailable, so no feed token was minted."
-          exit 1
+          token=$(az account get-access-token --resource 499b84ac-1321-427f-aa17-267ca6975798 --query accessToken -o tsv)
+          echo "::add-mask::${token}"
+          echo "AZ_DEVOPS_TOKEN=${token}" >> "${GITHUB_OUTPUT}"
 
       - name: Install dependencies
         env:
@@ -73,12 +77,20 @@ jobs:
           npx --no-install bddgen
           npx --no-install playwright test --list
 
-      # `write` selects the publisher service principal, which only admits refs/heads/main.
-      - name: Mint package feed publish token
-        id: ado_write
-        uses: Unstructured-IO/github-workflows/.github/actions/azure-devops-oidc-token@v6
+      # The publisher app only admits refs/heads/main.
+      - name: Log in to Azure with the package feed publisher
+        uses: azure/login@a457da9ea143d694b1b9c7c869ebb04ebe844ef5 # v2.3.0
         with:
-          access: write
+          client-id: 781d0ae1-1f8f-42f6-a7ae-136af0b01d48
+          tenant-id: dcb38522-c289-4665-a9d8-c4995b630804
+          allow-no-subscriptions: true
+
+      - name: Mint package feed publisher token
+        id: ado_write
+        run: |
+          token=$(az account get-access-token --resource 499b84ac-1321-427f-aa17-267ca6975798 --query accessToken -o tsv)
+          echo "::add-mask::${token}"
+          echo "AZ_DEVOPS_TOKEN=${token}" >> "${GITHUB_OUTPUT}"
 
       - name: Publish to the feed
         env:
