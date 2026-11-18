@@ -101,8 +101,9 @@ jobs:
           version="${series}.$(git rev-list --count HEAD -- .)"
           npm version --no-git-tag-version --allow-same-version "${version}" >/dev/null
           # Every version lands under the 'rc' dist-tag: consumers pin a version or range, so
-          # 'latest' is never resolved.
-          if output=$(npm publish --tag rc 2>&1); then
+          # 'latest' is never resolved. --ignore-scripts keeps prepack's build (code from
+          # node_modules) away from the publisher token; the verify step already built the steps.
+          if output=$(npm publish --tag rc --ignore-scripts 2>&1); then
             echo "$output"
             echo "::notice::Published @utic/unstructured-api-acceptance@${version}"
           elif grep -qiE "EPUBLISHCONFLICT|409 Conflict|cannot publish over|already exists" <<<"$output"; then
