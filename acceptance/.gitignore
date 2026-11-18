@@ -1,0 +1,11 @@
+node_modules/
+.features-gen/
+playwright-report/
+test-results/
+.auth/
+.acceptance-suite/
+.recordings/
+env/*.local.env
+# Compiled step definitions — build output of `npm run build` (prepack), shipped in the
+# published test package and removed again by postpack. Never committed.
+steps/**/*.js
