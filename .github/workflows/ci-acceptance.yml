@@ -1,10 +1,10 @@
 name: CI — acceptance
 
 # Proves that every scenario a TEST_ENV=staging run collects binds to a step. Scenarios staging
-# does not collect go unchecked: those tagged @bug or @flaky, those tagged @skip-staging or
-# @skip-saas, and those whose only freq tiers are qualified for another environment, such as
-# @freq-release-di. It runs no scenario against an environment: those need staging's secrets and a
-# live partition API, which a pull request check should not.
+# does not collect go unchecked, among them those not tagged @platform, those tagged @bug or
+# @flaky, and those tagged @skip-staging or @skip-saas. It runs no scenario against an
+# environment: those need staging's secrets and a live partition API, which a pull request check
+# should not.
 
 on:
   pull_request:
