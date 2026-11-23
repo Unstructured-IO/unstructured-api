@@ -30,6 +30,10 @@ jobs:
     permissions:
       contents: read
       id-token: write
+    env:
+      # bddgen and --list skip these tags by default, which would leave a scenario carrying only
+      # one of them unchecked.
+      TEST_EXPLICIT_INCLUDE_TAGS: freq-release,freq-daily,freq-weekly,long-running
     defaults:
       run:
         working-directory: acceptance
