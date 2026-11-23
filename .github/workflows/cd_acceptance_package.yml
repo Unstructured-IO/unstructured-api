@@ -14,6 +14,8 @@ on:
     branches: [main]
     paths:
       - "acceptance/**"
+      - ".github/workflows/cd_acceptance_package.yml"
+  workflow_dispatch:
 
 # Two concurrent runs would race to publish the same version.
 concurrency:
@@ -110,7 +112,7 @@ jobs:
           if output=$(npm publish --tag rc --ignore-scripts 2>&1); then
             echo "$output"
             echo "::notice::Published @utic/unstructured-api-acceptance@${version}"
-          elif grep -qiE "EPUBLISHCONFLICT|409 Conflict|cannot publish over|already exists" <<<"$output"; then
+          elif grep -qiE "EPUBLISHCONFLICT|409 Conflict|cannot publish over|already exists|already contains file" <<<"$output"; then
             echo "$output"
             echo "::notice::@utic/unstructured-api-acceptance@${version} is already published; nothing to do."
           else
