@@ -1,0 +1,34 @@
+{
+  "name": "@utic/unstructured-api-acceptance",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Acceptance tests built on @utic/acceptance-core. Owns only ./features and ./steps. Also publishable as a test package, so a hub suite can discover these scenarios and run them alongside its own.",
+  "keywords": [
+    "unstructured-acceptance-tests"
+  ],
+  "files": [
+    "features",
+    "steps/**/*.js"
+  ],
+  "scripts": {
+    "test": "bddgen && playwright test",
+    "report": "playwright show-report",
+    "build": "tsc",
+    "clean": "node -e \"const fs=require('node:fs'),p=require('node:path');const m=JSON.parse(fs.readFileSync('package.json','utf8'));const r=(m.unstructuredAcceptance&&m.unstructuredAcceptance.steps)||'steps';if(!fs.existsSync(r))process.exit(0);const w=d=>{for(const e of fs.readdirSync(d,{withFileTypes:true}))e.isDirectory()?w(p.join(d,e.name)):e.name.endsWith('.js')&&fs.rmSync(p.join(d,e.name))};w(r)\"",
+    "prepack": "npm run build",
+    "postpack": "npm run clean"
+  },
+  "peerDependencies": {
+    "@playwright/test": ">=1.49.0",
+    "@utic/acceptance-core": ">=0.9.0 <1",
+    "playwright-bdd": ">=9.2.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.49.0",
+    "@types/node": "^24.19.2",
+    "@utic/acceptance-core": ">=0.9.0 <1",
+    "playwright-bdd": "^9.2.0",
+    "tsx": "^4.23.0",
+    "typescript": "^5.7.0"
+  }
+}

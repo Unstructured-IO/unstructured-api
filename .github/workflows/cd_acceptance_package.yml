@@ -1,0 +1,116 @@
+name: CD — acceptance test package
+
+# Publishes acceptance/ to the Azure Artifacts "unstructured-npm" feed as
+# @utic/unstructured-api-acceptance. A hub suite that depends on it picks the scenarios up through the
+# "unstructured-acceptance-tests" keyword in acceptance/package.json.
+#
+# The version is `<major>.<minor>` from acceptance/package.json plus, as the patch, the number of
+# commits that have touched acceptance/. Nobody writes the patch by hand, so a merged change to
+# the suite cannot ship nothing by forgetting a bump, and a commit that changes nothing here
+# derives the same number and has nothing to publish.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "acceptance/**"
+
+# Two concurrent runs would race to publish the same version.
+concurrency:
+  group: cd-acceptance-package
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    name: Publish @utic/unstructured-api-acceptance
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      id-token: write
+    defaults:
+      run:
+        working-directory: acceptance
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          # The patch is a commit count; a shallow clone would count 1 forever.
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: acceptance/.nvmrc
+          cache: npm
+          cache-dependency-path: acceptance/package-lock.json
+
+      # acceptance/.npmrc reads the feed token from AZURE_ARTIFACTS_TOKEN. The install gets a
+      # read token so dependency install scripts never hold publish rights. This is a public repo,
+      # which GitHub does not allow to use actions from the internal github-workflows repo, so the
+      # tokens are minted inline.
+      - name: Log in to Azure with the package feed reader
+        uses: azure/login@a457da9ea143d694b1b9c7c869ebb04ebe844ef5 # v2.3.0
+        with:
+          client-id: a74a6a24-379b-4810-b01a-00707cb7decf
+          tenant-id: dcb38522-c289-4665-a9d8-c4995b630804
+          allow-no-subscriptions: true
+
+      - name: Mint package feed reader token
+        id: ado_read
+        run: |
+          token=$(az account get-access-token --resource 499b84ac-1321-427f-aa17-267ca6975798 --query accessToken -o tsv)
+          echo "::add-mask::${token}"
+          echo "AZ_DEVOPS_TOKEN=${token}" >> "${GITHUB_OUTPUT}"
+
+      - name: Install dependencies
+        env:
+          AZURE_ARTIFACTS_TOKEN: ${{ steps.ado_read.outputs.AZ_DEVOPS_TOKEN }}
+        run: npm ci
+
+      # bddgen fails on an unbound step and --list on no collected scenario, so a suite the hub
+      # cannot run stops here instead of shipping. No global setup runs, so no secret is fetched.
+      - name: Verify the suite builds and binds
+        env:
+          TEST_ENV: staging
+          TEST_SECRETS_ID: ""
+        run: |
+          npm run build
+          npx --no-install bddgen
+          npx --no-install playwright test --list
+
+      # The publisher app only admits refs/heads/main.
+      - name: Log in to Azure with the package feed publisher
+        uses: azure/login@a457da9ea143d694b1b9c7c869ebb04ebe844ef5 # v2.3.0
+        with:
+          client-id: 781d0ae1-1f8f-42f6-a7ae-136af0b01d48
+          tenant-id: dcb38522-c289-4665-a9d8-c4995b630804
+          allow-no-subscriptions: true
+
+      - name: Mint package feed publisher token
+        id: ado_write
+        run: |
+          token=$(az account get-access-token --resource 499b84ac-1321-427f-aa17-267ca6975798 --query accessToken -o tsv)
+          echo "::add-mask::${token}"
+          echo "AZ_DEVOPS_TOKEN=${token}" >> "${GITHUB_OUTPUT}"
+
+      - name: Publish to the feed
+        env:
+          AZURE_ARTIFACTS_TOKEN: ${{ steps.ado_write.outputs.AZ_DEVOPS_TOKEN }}
+        run: |
+          set -euo pipefail
+          series="$(node -p "require('./package.json').version.split('.').slice(0, 2).join('.')")"
+          version="${series}.$(git rev-list --count HEAD -- .)"
+          npm version --no-git-tag-version --allow-same-version "${version}" >/dev/null
+          # Every version lands under the 'rc' dist-tag: consumers pin a version or range, so
+          # 'latest' is never resolved. --ignore-scripts keeps prepack's build (code from
+          # node_modules) away from the publisher token; the verify step already built the steps.
+          if output=$(npm publish --tag rc --ignore-scripts 2>&1); then
+            echo "$output"
+            echo "::notice::Published @utic/unstructured-api-acceptance@${version}"
+          elif grep -qiE "EPUBLISHCONFLICT|409 Conflict|cannot publish over|already exists" <<<"$output"; then
+            echo "$output"
+            echo "::notice::@utic/unstructured-api-acceptance@${version} is already published; nothing to do."
+          else
+            echo "$output" >&2
+            echo "::error::npm publish failed for @utic/unstructured-api-acceptance@${version}"
+            exit 1
+          fi
