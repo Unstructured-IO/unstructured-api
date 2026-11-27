@@ -1,0 +1,17 @@
+{{- if .Values.podDisruptionBudget.enabled -}}
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ include "unstructured-api.fullname" . }}
+  labels:
+    {{- include "unstructured-api.labels" . | nindent 4 }}
+spec:
+  {{- if ne (toString .Values.podDisruptionBudget.minAvailable) "" }}
+  minAvailable: {{ .Values.podDisruptionBudget.minAvailable }}
+  {{- else if ne (toString .Values.podDisruptionBudget.maxUnavailable) "" }}
+  maxUnavailable: {{ .Values.podDisruptionBudget.maxUnavailable }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "unstructured-api.selectorLabels" . | nindent 6 }}
+{{- end }}

@@ -1,0 +1,62 @@
+✅ {{ include "unstructured-api.fullname" . }} has been deployed.
+
+The Unstructured API listens on container port {{ .Values.config.port }}.
+{{- if .Values.service.enabled }}
+It is exposed by a {{ .Values.service.type }} Service on port {{ .Values.service.port }}.
+
+In-cluster endpoint:
+
+  http://{{ include "unstructured-api.fullname" . }}.{{ .Release.Namespace }}.svc.cluster.local{{ if ne (.Values.service.port | int) 80 }}:{{ .Values.service.port }}{{ end }}
+
+Partition endpoint:
+
+  http://{{ include "unstructured-api.fullname" . }}.{{ .Release.Namespace }}.svc.cluster.local{{ if ne (.Values.service.port | int) 80 }}:{{ .Values.service.port }}{{ end }}/general/v0/general
+{{- else }}
+No Service was created (service.enabled=false). Expose the pods yourself to reach the API.
+{{- end }}
+
+{{- if .Values.ingress.enabled }}
+
+Reachable via Ingress at:
+{{- range .Values.ingress.hosts }}
+{{- $host := .host }}
+  {{- range .paths }}
+  http{{ if $.Values.ingress.tls }}s{{ end }}://{{ $host }}{{ .path }}
+  {{- end }}
+{{- end }}
+{{- else if .Values.service.enabled }}
+{{- if contains "NodePort" .Values.service.type }}
+
+Get the application URL by running:
+  export NODE_PORT=$(kubectl get --namespace {{ .Release.Namespace }} -o jsonpath="{.spec.ports[0].nodePort}" services {{ include "unstructured-api.fullname" . }})
+  export NODE_IP=$(kubectl get nodes --namespace {{ .Release.Namespace }} -o jsonpath="{.items[0].status.addresses[0].address}")
+  echo "http://$NODE_IP:$NODE_PORT"
+{{- else if contains "LoadBalancer" .Values.service.type }}
+
+Get the application URL by running (the LoadBalancer may take a moment to provision):
+  kubectl get --namespace {{ .Release.Namespace }} svc -w {{ include "unstructured-api.fullname" . }}
+{{- else }}
+
+Port-forward to reach the API locally:
+  kubectl port-forward --namespace {{ .Release.Namespace }} svc/{{ include "unstructured-api.fullname" . }} 8000:{{ .Values.service.port }}
+
+Then verify it is ready:
+  curl --fail http://localhost:8000/healthcheck
+
+Partition a document:
+  curl --request POST \
+    --url http://localhost:8000/general/v0/general \
+{{- if .Values.apiKey.enabled }}
+    --header 'unstructured-api-key: <your-api-key>' \
+{{- end }}
+    --header 'accept: application/json' \
+    --form 'files=@sample-docs/family-day.eml'
+{{- end }}
+{{- end }}
+
+{{- if .Values.apiKey.enabled }}
+
+🔐 API-key authentication is enabled. Clients must send the key in the `unstructured-api-key` header.
+{{- end }}
+
+Interactive docs: <base-url>/general/docs

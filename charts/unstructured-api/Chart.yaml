@@ -1,0 +1,26 @@
+apiVersion: v2
+name: unstructured-api
+description: A Helm chart for the self-hosted Unstructured document-partitioning REST API.
+type: application
+# Chart version. Bump on any change to the chart itself.
+version: 0.1.0
+# The version of the unstructured-api application shipped by default (see values.yaml image.tag).
+appVersion: "0.1.10"
+kubeVersion: ">=1.23.0-0"
+home: https://github.com/Unstructured-IO/unstructured-api
+sources:
+  - https://github.com/Unstructured-IO/unstructured-api
+keywords:
+  - unstructured
+  - document-processing
+  - partitioning
+  - ocr
+  - nlp
+  - fastapi
+maintainers:
+  - name: Unstructured API contributors
+    url: https://github.com/Unstructured-IO/unstructured-api
+icon: https://raw.githubusercontent.com/Unstructured-IO/unstructured-api/main/img/unstructured_logo.svg
+annotations:
+  category: MachineLearning
+  licenses: Apache-2.0
