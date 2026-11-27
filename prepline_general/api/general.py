@@ -7,6 +7,7 @@ import logging
 import mimetypes
 import os
 import secrets
+import zipfile
 from base64 import b64encode
 from concurrent.futures import ThreadPoolExecutor
 from functools import partial
@@ -26,10 +27,12 @@ from fastapi import (
     status,
 )
 from fastapi.responses import PlainTextResponse, StreamingResponse
+from olefile.olefile import OleFileError  # note: olefile <0.48 does not re-export it at top level
 from pypdf import PageObject, PdfReader, PdfWriter
 from pypdf.errors import FileNotDecryptedError, PdfReadError
 from starlette.datastructures import Headers
 from starlette.types import Send
+from unstructured.errors import UnprocessableEntityError
 
 from prepline_general.api import __version__ as api_version
 from prepline_general.api.filetypes import get_validated_mimetype
@@ -397,6 +400,24 @@ def pipeline_api(
         else:
             elements = partition(**partition_kwargs)  # type: ignore # pyright: ignore[reportGeneralTypeIssues]
 
+    except OleFileError as e:
+        # OleFileError subclasses OSError, so it must be caught before the OSError
+        # handler below. Corrupt or truncated OLE files (.doc, .ppt, .msg) are a
+        # client-side problem and should not surface as a 500.
+        raise HTTPException(
+            status_code=400,
+            detail=f"File does not appear to be a valid OLE file: {e}",
+        )
+    except zipfile.BadZipFile as e:
+        raise HTTPException(
+            status_code=400,
+            detail=f"File does not appear to be a valid OOXML file: {e}",
+        )
+    except UnprocessableEntityError as e:
+        raise HTTPException(
+            status_code=400,
+            detail=str(e),
+        )
     except OSError as e:
         if isinstance(e.args[0], str) and (
             "chipper-fast-fine-tuning is not a local folder" in e.args[0]

@@ -110,6 +110,34 @@ def test_general_api(example_filename, content_type):
     assert len(dfs) > 0
 
 
+@pytest.mark.parametrize(
+    "example_filename, content_type",
+    [
+        ("fake.doc", "application/msword"),
+        (
+            "fake-power-point.pptx",
+            "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+        ),
+    ],
+)
+def test_truncated_binary_documents_return_400(example_filename, content_type):
+    """
+    A truncated binary document is a client-side problem and must return 400,
+    not the catch-all 500. Truncating a valid fixture mid-file corrupts the
+    OLE/ZIP container without changing its detected file type.
+    """
+    client = TestClient(app)
+    test_file_path = Path("sample-docs") / example_filename
+    with open(test_file_path, "rb") as f:
+        data = f.read()
+    response = client.post(
+        MAIN_API_ROUTE,
+        files=[("files", (example_filename, io.BytesIO(data[: len(data) // 2]), content_type))],
+    )
+
+    assert response.status_code == 400
+
+
 def test_metadata_fields_removed():
     """
     Verify that responses do not include coordinates unless requested
